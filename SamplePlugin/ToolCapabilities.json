@@ -1,0 +1,8 @@
+{
+  "identifier": "org.eof.tools.MCPStudio.SamplePlugin",
+  "permissions": {
+    "filesystem": ["read","write"],
+    "network": true,
+    "clipboard": false
+  }
+}

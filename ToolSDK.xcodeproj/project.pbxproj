@@ -1,0 +1,548 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F75EE2782F436EE7009908F1 /* ToolCapabilities.json in Resources */ = {isa = PBXBuildFile; fileRef = F75EE26A2F436EE7009908F1 /* ToolCapabilities.json */; };
+		F75EE2B82F436EE7009908F1 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
+		F75EE2C12F436EE7009908F1 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2622F436EE7009908F1 /* PluginMain.mm */; };
+		F75EE2C92F436EE7009908F1 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2632F436EE7009908F1 /* ToolDescriptor.c */; };
+		F75EE2D42F436FA2009908F1 /* SamplePluginDyLib.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F75EE2D32F436FA2009908F1 /* SamplePluginDyLib.hpp */; };
+		F75EE2D62F436FA2009908F1 /* SamplePluginDyLibPriv.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F75EE2D52F436FA2009908F1 /* SamplePluginDyLibPriv.hpp */; };
+		F75EE2D82F436FA2009908F1 /* SamplePluginDyLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2D72F436FA2009908F1 /* SamplePluginDyLib.cpp */; };
+		F75EE36E2F43718D009908F1 /* PluginMain.c in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2662F436EE7009908F1 /* PluginMain.c */; };
+		F75EE36F2F43718D009908F1 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2672F436EE7009908F1 /* ToolDescriptor.c */; };
+		F75EE3702F4371A2009908F1 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
+		F75EE3732F4377C5009908F1 /* ToolEntryHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE3722F4377C5009908F1 /* ToolEntryHandler.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F75EE36C2F43716F009908F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F75EE1EF2F436EAB009908F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F75EE2D02F436FA2009908F1;
+			remoteInfo = SamplePluginDyLib;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SamplePluginBundle.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		F75EE1FE2F436EE7009908F1 /* CustomToolExports.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomToolExports.h; sourceTree = "<group>"; };
+		F75EE1FF2F436EE7009908F1 /* ToolABI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolABI.h; sourceTree = "<group>"; };
+		F75EE2002F436EE7009908F1 /* ToolLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolLogging.h; sourceTree = "<group>"; };
+		F75EE2022F436EE7009908F1 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		F75EE2032F436EE7009908F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F75EE2042F436EE7009908F1 /* README-MCPServer.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-MCPServer.md"; sourceTree = "<group>"; };
+		F75EE2052F436EE7009908F1 /* README-REPO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-REPO.md"; sourceTree = "<group>"; };
+		F75EE2062F436EE7009908F1 /* README-SamplePlugin.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-SamplePlugin.md"; sourceTree = "<group>"; };
+		F75EE2072F436EE7009908F1 /* README-Scripting.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-Scripting.md"; sourceTree = "<group>"; };
+		F75EE2612F436EE7009908F1 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		F75EE2622F436EE7009908F1 /* PluginMain.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PluginMain.mm; sourceTree = "<group>"; };
+		F75EE2632F436EE7009908F1 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
+		F75EE2652F436EE7009908F1 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		F75EE2662F436EE7009908F1 /* PluginMain.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PluginMain.c; sourceTree = "<group>"; };
+		F75EE2672F436EE7009908F1 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
+		F75EE2692F436EE7009908F1 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		F75EE26A2F436EE7009908F1 /* ToolCapabilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ToolCapabilities.json; sourceTree = "<group>"; };
+		F75EE26C2F436EE7009908F1 /* data_pipeline_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = data_pipeline_script.js; sourceTree = "<group>"; };
+		F75EE26D2F436EE7009908F1 /* example_tool_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = example_tool_script.js; sourceTree = "<group>"; };
+		F75EE26E2F436EE7009908F1 /* http_test_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = http_test_script.js; sourceTree = "<group>"; };
+		F75EE26F2F436EE7009908F1 /* http_tool_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = http_tool_script.js; sourceTree = "<group>"; };
+		F75EE2702F436EE7009908F1 /* test_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = test_script.js; sourceTree = "<group>"; };
+		F75EE2722F436EE7009908F1 /* ToolJSONBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolJSONBridge.h; sourceTree = "<group>"; };
+		F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolJSONBridge.mm; sourceTree = "<group>"; };
+		F75EE2D12F436FA2009908F1 /* libSamplePluginDyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSamplePluginDyLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		F75EE2D32F436FA2009908F1 /* SamplePluginDyLib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SamplePluginDyLib.hpp; sourceTree = "<group>"; };
+		F75EE2D52F436FA2009908F1 /* SamplePluginDyLibPriv.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SamplePluginDyLibPriv.hpp; sourceTree = "<group>"; };
+		F75EE2D72F436FA2009908F1 /* SamplePluginDyLib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SamplePluginDyLib.cpp; sourceTree = "<group>"; };
+		F75EE3712F4377C5009908F1 /* ToolEntryHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolEntryHandler.h; sourceTree = "<group>"; };
+		F75EE3722F4377C5009908F1 /* ToolEntryHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolEntryHandler.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F75EE1F42F436EAB009908F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F75EE2CF2F436FA2009908F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F75EE1EE2F436EAB009908F1 = {
+			isa = PBXGroup;
+			children = (
+				F75EE2712F436EE7009908F1 /* Scripts */,
+				F75EE2012F436EE7009908F1 /* include */,
+				F75EE2742F436EE7009908F1 /* ToolJSONBridge */,
+				F75EE26B2F436EE7009908F1 /* SamplePlugin */,
+				F75EE2022F436EE7009908F1 /* LICENSE */,
+				F75EE2032F436EE7009908F1 /* README.md */,
+				F75EE2042F436EE7009908F1 /* README-MCPServer.md */,
+				F75EE2052F436EE7009908F1 /* README-REPO.md */,
+				F75EE2062F436EE7009908F1 /* README-SamplePlugin.md */,
+				F75EE2072F436EE7009908F1 /* README-Scripting.md */,
+				F75EE1F82F436EAB009908F1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F75EE1F82F436EAB009908F1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */,
+				F75EE2D12F436FA2009908F1 /* libSamplePluginDyLib.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F75EE2012F436EE7009908F1 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE1FE2F436EE7009908F1 /* CustomToolExports.h */,
+				F75EE1FF2F436EE7009908F1 /* ToolABI.h */,
+				F75EE2002F436EE7009908F1 /* ToolLogging.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		F75EE2642F436EE7009908F1 /* bundle */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE2612F436EE7009908F1 /* CMakeLists.txt */,
+				F75EE2622F436EE7009908F1 /* PluginMain.mm */,
+				F75EE2632F436EE7009908F1 /* ToolDescriptor.c */,
+				F75EE3712F4377C5009908F1 /* ToolEntryHandler.h */,
+				F75EE3722F4377C5009908F1 /* ToolEntryHandler.mm */,
+			);
+			path = bundle;
+			sourceTree = "<group>";
+		};
+		F75EE2682F436EE7009908F1 /* dylib */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE2652F436EE7009908F1 /* CMakeLists.txt */,
+				F75EE2662F436EE7009908F1 /* PluginMain.c */,
+				F75EE2672F436EE7009908F1 /* ToolDescriptor.c */,
+				F75EE2D32F436FA2009908F1 /* SamplePluginDyLib.hpp */,
+				F75EE2D72F436FA2009908F1 /* SamplePluginDyLib.cpp */,
+				F75EE2D52F436FA2009908F1 /* SamplePluginDyLibPriv.hpp */,
+			);
+			path = dylib;
+			sourceTree = "<group>";
+		};
+		F75EE26B2F436EE7009908F1 /* SamplePlugin */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE2642F436EE7009908F1 /* bundle */,
+				F75EE2682F436EE7009908F1 /* dylib */,
+				F75EE2692F436EE7009908F1 /* CMakeLists.txt */,
+				F75EE26A2F436EE7009908F1 /* ToolCapabilities.json */,
+			);
+			path = SamplePlugin;
+			sourceTree = "<group>";
+		};
+		F75EE2712F436EE7009908F1 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE26C2F436EE7009908F1 /* data_pipeline_script.js */,
+				F75EE26D2F436EE7009908F1 /* example_tool_script.js */,
+				F75EE26E2F436EE7009908F1 /* http_test_script.js */,
+				F75EE26F2F436EE7009908F1 /* http_tool_script.js */,
+				F75EE2702F436EE7009908F1 /* test_script.js */,
+			);
+			path = Scripts;
+			sourceTree = "<group>";
+		};
+		F75EE2742F436EE7009908F1 /* ToolJSONBridge */ = {
+			isa = PBXGroup;
+			children = (
+				F75EE2722F436EE7009908F1 /* ToolJSONBridge.h */,
+				F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */,
+			);
+			path = ToolJSONBridge;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F75EE2CD2F436FA2009908F1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F75EE2D42F436FA2009908F1 /* SamplePluginDyLib.hpp in Headers */,
+				F75EE2D62F436FA2009908F1 /* SamplePluginDyLibPriv.hpp in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F75EE1F62F436EAB009908F1 /* SamplePluginBundle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F75EE1FB2F436EAB009908F1 /* Build configuration list for PBXNativeTarget "SamplePluginBundle" */;
+			buildPhases = (
+				F75EE1F32F436EAB009908F1 /* Sources */,
+				F75EE1F42F436EAB009908F1 /* Frameworks */,
+				F75EE1F52F436EAB009908F1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F75EE36D2F43716F009908F1 /* PBXTargetDependency */,
+			);
+			name = SamplePluginBundle;
+			packageProductDependencies = (
+			);
+			productName = ToolSDK;
+			productReference = F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */;
+			productType = "com.apple.product-type.bundle";
+		};
+		F75EE2D02F436FA2009908F1 /* SamplePluginDyLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F75EE2D92F436FA2009908F1 /* Build configuration list for PBXNativeTarget "SamplePluginDyLib" */;
+			buildPhases = (
+				F75EE2CD2F436FA2009908F1 /* Headers */,
+				F75EE2CE2F436FA2009908F1 /* Sources */,
+				F75EE2CF2F436FA2009908F1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SamplePluginDyLib;
+			packageProductDependencies = (
+			);
+			productName = SamplePluginDyLib;
+			productReference = F75EE2D12F436FA2009908F1 /* libSamplePluginDyLib.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F75EE1EF2F436EAB009908F1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					F75EE1F62F436EAB009908F1 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					F75EE2D02F436FA2009908F1 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+				};
+			};
+			buildConfigurationList = F75EE1F22F436EAB009908F1 /* Build configuration list for PBXProject "ToolSDK" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F75EE1EE2F436EAB009908F1;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F75EE1F82F436EAB009908F1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F75EE1F62F436EAB009908F1 /* SamplePluginBundle */,
+				F75EE2D02F436FA2009908F1 /* SamplePluginDyLib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F75EE1F52F436EAB009908F1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F75EE2782F436EE7009908F1 /* ToolCapabilities.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F75EE1F32F436EAB009908F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F75EE2B82F436EE7009908F1 /* ToolJSONBridge.mm in Sources */,
+				F75EE3732F4377C5009908F1 /* ToolEntryHandler.mm in Sources */,
+				F75EE2C12F436EE7009908F1 /* PluginMain.mm in Sources */,
+				F75EE2C92F436EE7009908F1 /* ToolDescriptor.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F75EE2CE2F436FA2009908F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F75EE3702F4371A2009908F1 /* ToolJSONBridge.mm in Sources */,
+				F75EE36E2F43718D009908F1 /* PluginMain.c in Sources */,
+				F75EE36F2F43718D009908F1 /* ToolDescriptor.c in Sources */,
+				F75EE2D82F436FA2009908F1 /* SamplePluginDyLib.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F75EE36D2F43716F009908F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F75EE2D02F436FA2009908F1 /* SamplePluginDyLib */;
+			targetProxy = F75EE36C2F43716F009908F1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F75EE1F92F436EAB009908F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.7;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F75EE1FA2F436EAB009908F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.7;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F75EE1FC2F436EAB009908F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - Sample Plugin";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = "-DTOOL_BUNDLE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.SamplePlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Debug;
+		};
+		F75EE1FD2F436EAB009908F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - Sample Plugin";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = "-DTOOL_BUNDLE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.SamplePlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Release;
+		};
+		F75EE2DA2F436FA2009908F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				OTHER_CFLAGS = "-DTOOL_DYLIB";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		F75EE2DB2F436FA2009908F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				OTHER_CFLAGS = "-DTOOL_DYLIB";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F75EE1F22F436EAB009908F1 /* Build configuration list for PBXProject "ToolSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F75EE1F92F436EAB009908F1 /* Debug */,
+				F75EE1FA2F436EAB009908F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F75EE1FB2F436EAB009908F1 /* Build configuration list for PBXNativeTarget "SamplePluginBundle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F75EE1FC2F436EAB009908F1 /* Debug */,
+				F75EE1FD2F436EAB009908F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F75EE2D92F436FA2009908F1 /* Build configuration list for PBXNativeTarget "SamplePluginDyLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F75EE2DA2F436FA2009908F1 /* Debug */,
+				F75EE2DB2F436FA2009908F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F75EE1EF2F436EAB009908F1 /* Project object */;
+}
