@@ -10,7 +10,7 @@
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log("Script started - SID: " + sid 
+    console.log("[Script] Script started - SID: " + sid 
                 + ", Handler: " + handlerName 
                 + " JSON: " + jsonParams);
     
@@ -45,7 +45,7 @@ function toolEntry(sid, handlerName, jsonParams) {
         }
         
     } catch(error) {
-        console.error("Script error: " + error.toString());
+        console.error("[Script] Script error: " + error.toString());
         return createErrorResult(error.toString());
     }
 }
@@ -61,7 +61,7 @@ function processFile(params) {
         return createErrorResult("filePath parameter is required");
     }
     
-    console.log("Processing file: " + filePath);
+    console.log("[Script] Processing file: " + filePath);
     
     // Check if file exists
     if (!Swift.fileExists(filePath)) {
@@ -101,7 +101,7 @@ function processFile(params) {
 function analyzeDirectory(params) {
     var dirPath = params.dirPath || Swift.getDocumentsPath();
     
-    console.log("Analyzing directory: " + dirPath);
+    console.log("[Script] Analyzing directory: " + dirPath);
     
     if (!Swift.fileExists(dirPath)) {
         return createErrorResult("Directory not found: " + dirPath);
@@ -130,7 +130,7 @@ function createReport(params) {
     var data = params.data || {};
     var outputPath = params.outputPath;
     
-    console.log("Creating report: " + title);
+    console.log("[Script] Creating report: " + title);
     
     // Generate report content
     var reportContent = "========================================\n";
@@ -229,7 +229,7 @@ function transformData(params) {
         return createErrorResult("inputPath parameter is required");
     }
     
-    console.log("Transforming data from: " + inputPath);
+    console.log("[Script] Transforming data from: " + inputPath);
     
     // Read input file
     var content = Swift.openFile(inputPath);
@@ -340,3 +340,5 @@ function getTempFile(prefix) {
     var timestamp = new Date().getTime();
     return temp + "/" + prefix + "_" + timestamp + ".txt";
 }
+
+console.log("[Script] Example script loaded successfully");

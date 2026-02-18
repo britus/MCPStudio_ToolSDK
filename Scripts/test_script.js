@@ -313,4 +313,4 @@ function testJSON() {
     });
 }
 
-console.log("Test script loaded successfully");
+console.log("[Script] Test script loaded successfully");

@@ -11,7 +11,7 @@
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log("HTTP Tool - Handler: " + handlerName);
+    console.log("[Script] HTTP Tool - Handler: " + handlerName);
     
     try {
         var params = JSON.parse(jsonParams);
@@ -45,7 +45,7 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return error("Unknown handler: " + handlerName);
         }
     } catch(e) {
-        console.error("Error: " + e.toString());
+        console.error("[Script] Error: " + e.toString());
         return error(e.toString());
     }
 }
@@ -83,7 +83,7 @@ function fetchData(params) {
     if (params.saveToFile) {
         var saved = Swift.saveFile(params.saveToFile, response.body);
         if (!saved) {
-            console.warn("Failed to save response to file");
+            console.warn("[Script] Failed to save response to file");
         }
     }
     
@@ -103,7 +103,7 @@ function postData(params) {
         return error("URL is required");
     }
     
-    console.log("Posting data to: " + url);
+    console.log("[Script] Posting data to: " + url);
     
     // Convert data to JSON string if its an object
     var body = typeof data === 'string' ? data : JSON.stringify(data);
@@ -141,8 +141,8 @@ function fetchJSON(params) {
         return error("URL is required");
     }
     
-    console.log("Fetching JSON from: " + url);
-    a
+    console.log("[Script] Fetching JSON from: " + url);
+    
     // Set Accept header for JSON
     var headers = params.headers || {};
     headers['Accept'] = 'application/json';
@@ -197,8 +197,8 @@ function downloadFile(params) {
         destination = Swift.getTempPath() + "/" + filename;
     }
     
-    console.log("Downloading file from: " + url);
-    console.log("Destination: " + destination);
+    console.log("[Script] Downloading file from: " + url);
+    console.log("[Script] Destination: " + destination);
     
     var success = Swift.downloadFile(url, destination);
     
@@ -234,7 +234,7 @@ function apiRequest(params) {
         return error("URL is required");
     }
     
-    console.log("Making " + method + " request to: " + url);
+    console.log("[Script] Making " + method + " request to: " + url);
     
     // Prepare body
     var body = null;
@@ -286,7 +286,7 @@ function scrapeWebpage(params) {
         return error("URL is required");
     }
     
-    console.log("Scraping webpage: " + url);
+    console.log("[Script] Scraping webpage: " + url);
     
     // Fetch HTML
     var headers = {
@@ -339,7 +339,7 @@ function checkStatus(params) {
         return error("URLs array is required");
     }
     
-    console.log("Checking status of " + urls.length + " URLs");
+    console.log("[Script] Checking status of " + urls.length + " URLs");
     
     var results = [];
     
@@ -377,7 +377,7 @@ function webhookCall(params) {
         return error("Webhook URL is required");
     }
     
-    console.log("Calling webhook: " + url);
+    console.log("[Script] Calling webhook: " + url);
     
     var body = JSON.stringify(payload);
     var headers = params.headers || {};
@@ -497,7 +497,7 @@ function extractPattern(html, pattern) {
         
         return matches;
     } catch(e) {
-        console.error("Invalid pattern: " + pattern);
+        console.error("[Script] Invalid pattern: " + pattern);
         return [];
     }
 }
@@ -526,4 +526,4 @@ function error(message) {
     });
 }
 
-console.log("HTTP/HTTPS tool script loaded");
+console.log("[Script] HTTP/HTTPS tool script loaded");

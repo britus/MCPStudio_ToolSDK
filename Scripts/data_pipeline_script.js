@@ -11,7 +11,7 @@
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log("Data Pipeline - Handler: " + handlerName);
+    console.log("[Script] Data Pipeline - Handler: " + handlerName);
     
     try {
         var params = JSON.parse(jsonParams);
@@ -37,7 +37,7 @@ function toolEntry(sid, handlerName, jsonParams) {
         }
         
     } catch(e) {
-        console.error("Pipeline error: " + e.toString());
+        console.error("[Script] Pipeline error: " + e.toString());
         return error(e.toString());
     }
 }
@@ -47,7 +47,7 @@ function toolEntry(sid, handlerName, jsonParams) {
 // ===================================================================
 
 function processPipeline(params) {
-    console.log("\n=== Starting Data Processing Pipeline ===");
+    console.log("[Script] === Starting Data Processing Pipeline ===");
     
     var inputDir = params.inputDir || Swift.getDocumentsPath() + "/input";
     var outputDir = params.outputDir || Swift.getDocumentsPath() + "/output";
@@ -63,7 +63,7 @@ function processPipeline(params) {
     };
     
     // Stage 1: Extract data from input files
-    console.log("\n--- Stage 1: Extract Data ---");
+    console.log("[Script] --- Stage 1: Extract Data ---");
     var extractResult = extractStage(inputDir, outputDir + "/extracted");
     pipeline.stages.push({
         stage: "extract",
@@ -75,7 +75,7 @@ function processPipeline(params) {
     }
     
     // Stage 2: Transform extracted data
-    console.log("\n--- Stage 2: Transform Data ---");
+    console.log("[Script] --- Stage 2: Transform Data ---");
     var transformResult = transformStage(
         outputDir + "/extracted",
         outputDir + "/transformed",
@@ -87,7 +87,7 @@ function processPipeline(params) {
     });
     
     // Stage 3: Aggregate results
-    console.log("\n--- Stage 3: Aggregate Data ---");
+    console.log("[Script] --- Stage 3: Aggregate Data ---");
     var aggregateResult = aggregateStage(
         outputDir + "/transformed",
         outputDir + "/aggregated.json"
@@ -98,13 +98,13 @@ function processPipeline(params) {
     });
     
     // Stage 4: Generate report
-    console.log("\n--- Stage 4: Generate Report ---");
+    console.log("[Script] --- Stage 4: Generate Report ---");
     pipeline.endTime = new Date().toISOString();
     
     var report = generatePipelineReport(pipeline, reportPath);
     
-    console.log("\n=== Pipeline Complete ===");
-    console.log("Report saved to: " + reportPath);
+    console.log("[Script] === Pipeline Complete ===");
+    console.log("[Script] Report saved to: " + reportPath);
     
     return success({
         message: "Pipeline completed successfully",
@@ -119,7 +119,7 @@ function processPipeline(params) {
 // ===================================================================
 
 function extractStage(inputDir, outputDir) {
-    console.log("Extracting from: " + inputDir);
+    console.log("[Script] Extracting from: " + inputDir);
     
     if (!Swift.fileExists(inputDir)) {
         return { error: "Input directory not found: " + inputDir };
@@ -168,7 +168,7 @@ function extractStage(inputDir, outputDir) {
         }
     });
     
-    console.log("Extracted " + extracted.length + " files");
+    console.log("[Script] Extracted " + extracted.length + " files");
     
     return {
         filesProcessed: extracted.length,
@@ -178,7 +178,7 @@ function extractStage(inputDir, outputDir) {
 }
 
 function transformStage(inputDir, outputDir, rules) {
-    console.log("Transforming data from: " + inputDir);
+    console.log("[Script] Transforming data from: " + inputDir);
     
     if (!Swift.fileExists(inputDir)) {
         return { error: "Input directory not found" };
@@ -221,7 +221,7 @@ function transformStage(inputDir, outputDir, rules) {
         }
     });
     
-    console.log("Transformed " + transformed.length + " files");
+    console.log("[Script] Transformed " + transformed.length + " files");
     
     return {
         filesProcessed: transformed.length,
@@ -231,7 +231,7 @@ function transformStage(inputDir, outputDir, rules) {
 }
 
 function aggregateStage(inputDir, outputPath) {
-    console.log("Aggregating data from: " + inputDir);
+    console.log("[Script] Aggregating data from: " + inputDir);
     
     if (!Swift.fileExists(inputDir)) {
         return { error: "Input directory not found" };
@@ -292,7 +292,7 @@ function aggregateStage(inputDir, outputPath) {
     // Save aggregated data
     Swift.saveFile(outputPath, JSON.stringify(aggregated, null, 2));
     
-    console.log("Aggregated " + aggregated.totalFiles + " files");
+    console.log("[Script] Aggregated " + aggregated.totalFiles + " files");
     
     return {
         outputPath: outputPath,
@@ -538,4 +538,4 @@ function error(message) {
     });
 }
 
-console.log("Data Processing Pipeline script loaded");
+console.log("[Script] Data Processing Pipeline script loaded");

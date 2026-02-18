@@ -10,7 +10,7 @@
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log("=== HTTP Test Script Started ===");
+    console.log("[Script] === HTTP Test Script Started ===");
 
     try {
         var params = JSON.parse(jsonParams);
@@ -32,7 +32,7 @@ function toolEntry(sid, handlerName, jsonParams) {
                 });
         }
     } catch(error) {
-        console.error("Test error: " + error.toString());
+        console.error("[Script] Test error: " + error.toString());
         return JSON.stringify({
             error: error.toString()
         });
@@ -45,7 +45,7 @@ function toolEntry(sid, handlerName, jsonParams) {
 // ===================================================================
 
 function testAll(params) {
-    console.log("\n=== Running All HTTP Tests ===\n");
+    console.log("[Script] === Running All HTTP Tests ===");
     
     var results = {
         get: testGet(params),
@@ -61,7 +61,7 @@ function testAll(params) {
             allPassed = false;
             console.error("Test failed: " + test + " - " + result.error);
         } else {
-            console.log("Test passed: " + test);
+            console.log("[Script] Test passed: " + test);
         }
     }
     
@@ -78,14 +78,14 @@ function testAll(params) {
 }
 
 function testGet(params) {
-    console.log("--- Testing HTTP GET ---");
+    console.log("[Script] --- Testing HTTP GET ---");
     
     // Use a reliable test endpoint
     var testUrl = "https://httpbin.org/get"
     testUrl = params.testUrl || testUrl;
     testUrl = params.url     || testUrl;
     
-    console.log("Making GET request to: " + testUrl);
+    console.log("[Script] Making GET request to: " + testUrl);
     
     try {
         //var responseJSON = Swift.httpGet(testUrl, "{}");
@@ -94,12 +94,12 @@ function testGet(params) {
                 qryParam2: "pvalue2"
             }));
 
-        console.log("Swift.httpGet Result: " + responseJSON);
+        console.log("[Script] Swift.httpGet Result: " + responseJSON);
         
         var response = JSON.parse(responseJSON);
         
-        console.log("Response status: " + response.statusCode);
-        console.log("Response body length: " + (response.body ? response.body.length : 0));
+        console.log("[Script] Response status: " + response.statusCode);
+        console.log("[Script] Response body length: " + (response.body ? response.body.length : 0));
         
         if (response.error) {
         	return JSON.stringify({
@@ -143,7 +143,7 @@ function testGet(params) {
 }
 
 function testPost(params) {
-    console.log("--- Testing HTTP POST ---");
+    console.log("[Script] --- Testing HTTP POST ---");
     
     var testUrl = params.postUrl || "https://httpbin.org/post";
     
@@ -153,8 +153,8 @@ function testPost(params) {
         test: true
     };
     
-    console.log("Making POST request to: " + testUrl);
-    console.log("Data: " + JSON.stringify(testData));
+    console.log("[Script] Making POST request to: " + testUrl);
+    console.log("[Script] Data: " + JSON.stringify(testData));
     
     try {
         var body = JSON.stringify(testData);
@@ -165,7 +165,7 @@ function testPost(params) {
         var responseJSON = Swift.httpPost(testUrl, body, headers);
         var response = JSON.parse(responseJSON);
         
-        console.log("Response status: " + response.statusCode);
+        console.log("[Script] Response status: " + response.statusCode);
         
         if (response.error) {
         	return JSON.stringify({
@@ -197,7 +197,7 @@ function testPost(params) {
             responseBody = JSON.parse(response.body);
         } catch(e) {
             responseBody = "{}"
-            console.warn("Could not parse response body as JSON");
+            console.warn("[Script] Could not parse response body as JSON");
         }
         
         return JSON.stringify({
@@ -227,12 +227,12 @@ function testPost(params) {
 }
 
 function testJSON(params) {
-    console.log("\n--- Testing JSON Fetch ---");
+    console.log("[Script] --- Testing JSON Fetch ---");
     
     // Use a public JSON API
     var testUrl = params.jsonUrl || "https://httpbin.org/json";
     
-    console.log("Fetching JSON from: " + testUrl);
+    console.log("[Script] Fetching JSON from: " + testUrl);
     
     try {
         var headers = JSON.stringify({
@@ -242,7 +242,7 @@ function testJSON(params) {
         var responseJSON = Swift.httpGet(testUrl, headers);
         var response = JSON.parse(responseJSON);
         
-        console.log("Response status: " + response.statusCode);
+        console.log("[Script] Response status: " + response.statusCode);
         
         if (response.error) {
         	return JSON.stringify({
@@ -272,7 +272,7 @@ function testJSON(params) {
         var jsonData = null;
         try {
             jsonData = JSON.parse(response.body);
-            console.log("Successfully parsed JSON response");
+            console.log("[Script] Successfully parsed JSON response");
         } catch(e) {
 	        return JSON.stringify({
 	            text: "Exception during JSON test: " + e.toString(),
@@ -313,15 +313,15 @@ function testJSON(params) {
 }
 
 function testDownload(params) {
-    console.log("\n--- Testing File Download ---");
+    console.log("[Script] --- Testing File Download ---");
     
     // Use a small text file for testing
     var testUrl = params.downloadUrl || "https://httpbin.org/robots.txt";
     var tempPath = Swift.getTempPath();
     var destination = tempPath + "/http_test_download.txt";
     
-    console.log("Downloading file from: " + testUrl);
-    console.log("Destination: " + destination);
+    console.log("[Script] Downloading file from: " + testUrl);
+    console.log("[Script] Destination: " + destination);
     
     try {
         // Clean up any existing file
@@ -339,11 +339,11 @@ function testDownload(params) {
             });
         }
         
-        console.log("Download completed");
+        console.log("[Script] Download completed");
         
         // Verify file exists
         var exists = Swift.fileExists(destination);
-        console.log("File exists: " + exists);
+        console.log("[Script] File exists: " + exists);
         
         if (!exists) {
             return JSON.stringify({
@@ -356,7 +356,7 @@ function testDownload(params) {
         var content = Swift.readFile(destination);
         var fileSize = content ? content.length : 0;
         
-        console.log("File size: " + fileSize + " bytes");
+        console.log("[Script] File size: " + fileSize + " bytes");
         
         // Clean up
         Swift.deleteFile(destination);
@@ -383,7 +383,7 @@ function testDownload(params) {
 // ===================================================================
 
 function testCustomHeaders(params) {
-    console.log("--- Testing Custom Headers ---");
+    console.log("[Script] --- Testing Custom Headers ---");
     
     var testUrl = "https://httpbin.org/headers";
     
@@ -395,7 +395,7 @@ function testCustomHeaders(params) {
     
     var headersJSON = JSON.stringify(customHeaders);
     
-    console.log("Sending custom headers to: " + testUrl);
+    console.log("[Script] Sending custom headers to: " + testUrl);
     
     try {
         var responseJSON = Swift.httpGet(testUrl, headersJSON);
@@ -431,7 +431,7 @@ function testCustomHeaders(params) {
 }
 
 function testDifferentMethods(params) {
-    console.log("--- Testing Different HTTP Methods ---");
+    console.log("[Script] --- Testing Different HTTP Methods ---");
     
     var baseUrl = "https://httpbin.org/";
     var methods = ["GET", "POST", "PUT", "DELETE"];
@@ -439,7 +439,7 @@ function testDifferentMethods(params) {
     
     methods.forEach(function(method) {
         var url = baseUrl + method.toLowerCase();
-        console.log("Testing " + method + " request");
+        console.log("[Script] Testing " + method + " request");
         
         try {
             var body = method === "POST" || method === "PUT" ? 
@@ -474,4 +474,4 @@ function testDifferentMethods(params) {
     });
 }
 
-console.log("HTTP test script loaded successfully");
+console.log("[Script] HTTP test script loaded successfully");
