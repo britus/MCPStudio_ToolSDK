@@ -276,7 +276,12 @@ function toolEntry(sid, handlerName, jsonParams) {
     var command = "/usr/bin/ls";
     var args = ["-la", "/tmp"];
     
+    // setup receiver var
+    // ctx.setObject(stdoutLines as NSArray, forKeyedSubscript: stdOutEntry as NSString)
+    // ctx.setObject(stderrLines as NSArray, forKeyedSubscript: stdErrEntry as NSString)
+    var outputLines = Array();
     var stdoutEntry = "outputLines";
+    var errorLines = Array();
     var stderrEntry = "errorLines";
     
     var success = SwiftBridge.process(
