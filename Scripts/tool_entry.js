@@ -75,6 +75,8 @@ function toolEntry(sid, handlerName, jsonParams) {
         		return clangTools.clangCheckSyntax(params);
             case "clangCompile":
         		return clangTools.clangCompile(params);
+            case "clangMake":
+        		return clangTools.clangMake(params);
             
             // MCP Prompt, Resource
             case "fetchPrompt":

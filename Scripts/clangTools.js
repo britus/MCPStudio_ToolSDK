@@ -11,10 +11,11 @@ function clangCheckSyntax(params) {
     console.log("clang: Check syntax: " + sourceFile);
     
     if (!Swift.fileExists(sourceFile)) {
-        return shared.createErrorResult("Project directory not found: " + sourceFile);
+        return shared.createErrorResult("File not found: " + sourceFile);
     }
      
     var shellScript = '#!/bin/bash\n';
+    shellScript += 'set -euo pipefail\n';
     shellScript += 'SOURCE_FILE="' + sourceFile + '"\n';
     shellScript += 'FILE_DIR=$(dirname "${SOURCE_FILE}")\n';
     shellScript += 'cd "${FILE_DIR}" || exit 1\n';
@@ -23,12 +24,12 @@ function clangCheckSyntax(params) {
    	var success = Swift.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
-        	"Syntax check failed:\n" + stdOut.join("\n") + stdErr.join("\n")) 
+        	"Syntax check failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
     }
     
     // Set result using Swift bridge
     Swift.setToolResult(JSON.stringify({
-        text: "Syntax check successfully.",
+        text: "Syntax check successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
         metadata: {
 	        fileName: sourceFile,
 	  		stdout: stdOut.join("\n"),
@@ -47,10 +48,11 @@ function clangCompile(params) {
     console.log("clang: Compile file: " + sourceFile);
     
     if (!Swift.fileExists(sourceFile)) {
-        return shared.createErrorResult("Project directory not found: " + sourceFile);
+        return shared.createErrorResult("File not found: " + sourceFile);
     }
      
     var shellScript = '#!/bin/bash\n';
+    shellScript += 'set -euo pipefail\n';
     shellScript += 'SOURCE_FILE="' + sourceFile + '"\n';
     shellScript += 'FILE_DIR=$(dirname "${SOURCE_FILE}")\n';
     shellScript += 'cd "${FILE_DIR}" || exit 1\n';
@@ -59,12 +61,12 @@ function clangCompile(params) {
    	var success = Swift.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
-        	"Compiler failed:\n" + stdOut.join("\n") + stdErr.join("\n")) 
+        	"Compiler failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
     }
     
     // Set result using Swift bridge
     Swift.setToolResult(JSON.stringify({
-        text: "Compiled successfully.",
+        text: "Compiled successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
         metadata: {
 	        fileName: sourceFile,
 	  		stdout: stdOut.join("\n"),
@@ -77,7 +79,48 @@ function clangCompile(params) {
     return null; // Result already set via Swift.setToolResult
 }
 
+function clangMake(params) {
+	console.log("clang: --[MAKE]----------------------\n" 
+				+ JSON.stringify(params, null, 2));
+	
+    var sourceFile = params.makeFile;
+    
+    console.log("clang: Build with make file: " + sourceFile);
+    
+    if (!Swift.fileExists(sourceFile)) {
+        return shared.createErrorResult("File not found: " + sourceFile);
+    }
+     
+    var shellScript = '#!/bin/bash\n';
+    shellScript += 'set -euo pipefail\n';
+    shellScript += 'MAKE_FILE="' + sourceFile + '"\n';
+    shellScript += 'FILE_DIR=$(dirname "${MAKE_FILE}")\n';
+    shellScript += 'cd "${FILE_DIR}" || exit 1\n';
+    shellScript += 'make -j8 -f "$(basename "${MAKE_FILE}")"\n';
+
+   	var success = Swift.shell(shellScript);
+    if (!success) {
+        return shared.createErrorResult(
+        	"Build failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
+    }
+    
+    // Set result using Swift bridge
+    Swift.setToolResult(JSON.stringify({
+        text: "Build successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
+        metadata: {
+	        fileName: sourceFile,
+	  		stdout: stdOut.join("\n"),
+	   		stderr: stdErr.join("\n"),
+            operation: "clangMake",
+            success: true
+        }
+    }));
+  
+    return null; // Result already set via Swift.setToolResult
+}
+
 module.exports = {
 	clangCheckSyntax,
     clangCompile,
+    clangMake,
 };

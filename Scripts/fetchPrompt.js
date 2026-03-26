@@ -25,6 +25,7 @@ function fetchPrompt(params) {
     var data = {
     	operation: "fetchPrompt",
         message: prompt.name + ": " + prompt.template,
+        prompt: prompt.template,
         name: prompt.name,
         arguments: prompt.arguments
     };
