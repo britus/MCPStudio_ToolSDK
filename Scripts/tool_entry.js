@@ -30,13 +30,23 @@ const clangTools = require('clangTools');
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log("[toolEntry]: sid=" + sid + " handler=" + handlerName);
+    console.log("[toolEntry]: sid=" + (sid || "sid.unknwon") 
+    		+ " handler=" + (handlerName || "Unkown") );
     console.log("[toolEntry]: ctx=" + JSON.stringify(this));
     
     try {
         var params = JSON.parse(jsonParams);
-        
-        switch(handlerName) {
+       
+        //PATCH-BEGIN: Handler injection
+		//  injected testHandler name
+		let testHandler = params.testHandler || "";
+		if (testHandler != "") {
+			console.log("[toolEntry]: Handler injection=" + testHandler);
+		    handlerName = testHandler;
+		 }
+		 //PATCH END
+		        
+		 switch(handlerName) {
         	// -- Tests...
             case "testLogging":
                 return testLogging.testLogging(params);

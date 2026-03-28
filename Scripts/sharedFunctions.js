@@ -79,6 +79,30 @@ function createErrorResult(errorMessage) {
     return json;
 }
 
+/**
+ * Return process stdOut after shell() or process() call
+ */
+function getOutput()
+{
+	return getStandardOutput();
+}
+
+/**
+ * Return process stdOut after shell() or process() call
+ */
+function getStandardOutput()
+{
+	return stdOut || [];
+}
+
+/**
+ * Return process stdErr after shell() or process() call
+ */
+function getErrorOutput()
+{
+	return stdErr || [];
+}
+
 // .............................
 // Available module entry points
 module.exports = {
@@ -88,4 +112,7 @@ module.exports = {
 	countWords,
 	createSuccessResult,
 	createErrorResult,
+	getOutput,
+	getStandardOutput,
+	getErrorOutput,
 };
