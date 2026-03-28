@@ -6,9 +6,8 @@
 
 // Import shared functions
 const shared = require('sharedFunctions');
-const builds = require('listXcodeBuilds');
 
-function buildLog(message) {
+function taskLog(message) {
     console.log(message);
     stdOut.push(message);
 }
@@ -29,9 +28,9 @@ function checkWithXcode(params) {
     var projectName = params.projectName || "";
     var projectDir = params.projectDir || "";
     
-    buildLog("=== Xcode Build Task ===");
-    buildLog("Project: " + projectName);
-    buildLog("Directory: " + projectDir);
+    taskLog("=== Xcode Build Task ===");
+    taskLog("Project: " + projectName);
+    taskLog("Directory: " + projectDir);
 
     // Validate input parameters
     if (!projectDir) {
@@ -53,12 +52,12 @@ function checkWithXcode(params) {
     var cleanBuild = (params.clean === true);
     var showOperationLogs = (params.showOperationLogs === true);
 
-    buildLog("[Script] Scheme: " + scheme);
-    buildLog("[Script] Configuration: " + configuration);
-    buildLog("[Script] Platform: " + platform);
-    buildLog("[Script] Clean Build: " + cleanBuild);
-    buildLog("[Script] Show Operation Logs: " + showOperationLogs);
-    buildLog("[Script] Team Identifier: " + codesign);
+    taskLog("[Script] Scheme: " + scheme);
+    taskLog("[Script] Configuration: " + configuration);
+    taskLog("[Script] Platform: " + platform);
+    taskLog("[Script] Clean Build: " + cleanBuild);
+    taskLog("[Script] Show Operation Logs: " + showOperationLogs);
+    taskLog("[Script] Team Identifier: " + codesign);
 
     var shellScript = '#!/bin/bash\n';
     var success = false
@@ -68,7 +67,7 @@ function checkWithXcode(params) {
         shellScript += 'set -euo pipefail\n\n';
         shellScript += '# Clean previous build artifacts\n';
         shellScript += 'rm -rf DerivedData/ || true\n\n';
-        buildLog("[Script] Cleaning previous builds...");
+        taskLog("[Script] Cleaning previous builds...");
         
         success = Swift.shell(shellScript);
         if (!success) {
@@ -97,7 +96,7 @@ function checkWithXcode(params) {
     shellScript += ' -project "${PROJECT_NAME}.xcodeproj" || exit 1\n';
     shellScript += 'exit 0\n';
 
-    buildLog("[Script] Run: " + shellScript);
+    taskLog("[Script] Run: " + shellScript);
        
     success = Swift.shell(shellScript);
      
@@ -120,7 +119,7 @@ function checkWithXcode(params) {
             			stderr: stdErr,
             	}
 		    }));
-		    buildLog("[Script] Build failed!");
+		    taskLog("[Script] Build failed!");
 		}
 		else {
 			Swift.setToolResult(JSON.stringify({
@@ -141,7 +140,7 @@ function checkWithXcode(params) {
             				stderr: stdErr,
             			}
 		    }));
-		    buildLog("[Script] Build successful!");
+		    taskLog("[Script] Build successful!");
 		}
 
     return null; // Result already set via Swift.setToolResult

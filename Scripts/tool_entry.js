@@ -6,23 +6,28 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
-// Import toolchain
-const testPipeline = require('testPipeline');
-const testPaths = require('testPaths');
-const testLogging = require('testLogging');
-const testFileOps = require('testFileOps');
-const testHttpAll = require('testHttpAll');
-
 // Toolchain
-const mkdir = require('mkdir');
 const analyzedir = require('analyzeDirectory');
 const httpTools = require('httpTools');
 const fetchPrompt = require('fetchPrompt');
 const fetchResource = require('fetchResource');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
+const shellCall = require('shellCall');
 
-/** 
+// File operation handlers
+const mkdir = require('mkdir');
+const fileExists = require('fileExists');
+const readFile = require('fileRead');
+const saveFile = require('fileSave');
+const openFile = require('fileOpen');
+const deleteFile = require('fileDelete');
+const listDirectory = require('directoryList');
+const createDirectory = require('directoryCreate');
+const getDocumentsPath = require('getPathDocuments');
+const getTempPath = require('getPathTemp');
+
+/**
  * Entry point for all script tool calls
  * @param {string} sid - Session identifier
  * @param {string} handlerName - Method/handler name to execute
@@ -30,68 +35,43 @@ const clangTools = require('clangTools');
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log("[toolEntry]: sid=" + (sid || "sid.unknwon") 
-    		+ " handler=" + (handlerName || "Unkown") );
+    console.log("[toolEntry]: sid=" + (sid || "sid.unknwon")
+            + " handler=" + (handlerName || "Unkown") );
     console.log("[toolEntry]: ctx=" + JSON.stringify(this));
-    
+
     try {
         var params = JSON.parse(jsonParams);
-       
+
         //PATCH-BEGIN: Handler injection
-		//  injected testHandler name
-		let testHandler = params.testHandler || "";
-		if (testHandler != "") {
-			console.log("[toolEntry]: Handler injection=" + testHandler);
-		    handlerName = testHandler;
-		 }
-		 //PATCH END
-		        
-		 switch(handlerName) {
-        	// -- Tests...
-            case "testLogging":
-                return testLogging.testLogging(params);
-            case "testFileOps":
-                return testFileOps.testFileOps(params);
-            case "testPaths":
-                return testPaths.testPaths(params);
-            case "testHttpAll":
-                return testHttpAll.testHttpAll(params);
-            case "processPipeline":
-                return testPipeline.testPipeline("processPipeline", params);
-            case "extractData":
-            	params.inputPath = "test_file.txt";
-            	Swift.saveFile(params.inputPath, "Test content");
-                return testPipeline.testPipeline("extractData", params);
-            case "transformData":
-            	params.inputPath = "test_file.txt";
-            	Swift.saveFile(params.inputPath, "Test content");
-                return testPipeline.testPipeline("transformData", params);
-            case "aggregateData":
-                return testPipeline.testPipeline("aggregateData", params);
-            case "generateReport":
-            	params.dataPath = "test_data_file.txt";
-            	params.reportPath = "test_report_file.txt";
-            	Swift.saveFile(params.dataPath, "{}");
-                return testPipeline.testPipeline("generateReport", params);
-                
-			// --
+        //  injected testHandler name
+        let testHandler = params.testHandler || "";
+        if (testHandler != "") {
+            console.log("[toolEntry]: Handler injection=" + testHandler);
+            handlerName = testHandler;
+         }
+         //PATCH END
+
+         switch(handlerName) {
+            // Toolchain
             case "analyzeDirectory":
-        		return analyzedir.analyzeDirectory(params);
+                return analyzedir.analyzeDirectory(params);
             case "mkdir":
-        		return mkdir.mkdir(params);
+                return mkdir.mkdir(params);
             case "checkWithXcode":
-        		return checkWithXcode.checkWithXcode(params);
+                return checkWithXcode.checkWithXcode(params);
             case "clangCheckSyntax":
-        		return clangTools.clangCheckSyntax(params);
+                return clangTools.clangCheckSyntax(params);
             case "clangCompile":
-        		return clangTools.clangCompile(params);
+                return clangTools.clangCompile(params);
             case "clangMake":
-        		return clangTools.clangMake(params);
-            
+                return clangTools.clangMake(params);
+            case "shellCall":
+            	return shellCall.shellCall(params);
+
             // MCP Prompt, Resource
             case "fetchPrompt":
                 return fetchPrompt.fetchPrompt(params);
-                
+
             case "fetchResource":
                 return fetchResource.fetchResource(params);
 
@@ -112,13 +92,37 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return httpTools.httpTools("checkStatus", params);
             case "webhookCall":
                 return httpTools.httpTools("webhookCall", params);
-                
+
+            // File operations
+            case "fileExists":
+                return fileExists.fileExists(params);
+            case "readFile":
+                return readFile.readFile(params);
+            case "saveFile":
+                return saveFile.saveFile(params);
+            case "openFile":
+                return openFile.openFile(params);
+            case "deleteFile":
+                return deleteFile.deleteFile(params);
+            case "listDirectory":
+                return listDirectory.listDirectory(params);
+            case "createDirectory":
+                return createDirectory.createDirectory(params);
+            case "getDocumentsPath":
+                return getDocumentsPath.getDocumentsPath(params);
+            case "getTempPath":
+                return getTempPath.getTempPath(params);
+            case "logMessage":
+                return logMessage.logMessage(params);
+            case "setToolResult":
+                return setToolResult.setToolResult(params);
+
             default:
                 return shared.error("Unknown handler: " + handlerName);
         }
-        
+
     } catch(e) {
-    	console.log("[toolEntry] " + e);
+        console.log("[toolEntry] " + e);
         return shared.error(e.toString());
     }
 }

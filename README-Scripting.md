@@ -1,110 +1,53 @@
-# EoF MCP Studio JavaScript Scripting System
+# API/Tool Summary - README-Scripting.md
 
-Full-featured JavaScript scripting integration for Swift applications using JavaScriptCore.
+---
 
-## Quick Start
+## MCP Studio Tool SDK - Scripting Reference Guide
 
-### Create a JavaScript Script
+### Overview
 
-Create a file named `myScript.js`:
+This document provides a comprehensive summary of all available tools, their functions, parameters, and usage patterns for the MCP Studio Tool SDK environment.
 
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
-    
-    if (handlerName === "hello") {
-        return JSON.stringify({
-            text: "Hello, " + (params.name || "World") + "!",
-            metadata: { greeting: true }
-        });
-    }
-    
-    return JSON.stringify({
-        error: "Unknown handler: " + handlerName
-    });
-}
-```
+---
 
-## Example: Creating a Custom Tool
+## Table of Contents
+
+1. [Import Instructions](#import-instructions)
+2. [Tool Entry Function Requirements](#tool-entry-function-requirements)
+3. [Built-in Tools Reference](#built-in-tools-reference)
+4. [Code Patterns and Best Practices](#code-patterns-and-best-practices)
+5. [Error Handling](#error-handling)
+6. [Result Format Specification](#result-format-specification)
+
+---
+
+## Import Instructions
+
+All tool scripts are located in the Scripts directory and can be imported using Node.js require syntax:
 
 ```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
-    
-    // Validate parameters
-    if (!params.data) {
-        return JSON.stringify({ error: "Missing data parameter" });
-    }
-    
-    // Process the data
-    var processed = params.data.toUpperCase();
-    
-    return JSON.stringify({
-        text: processed,
-        metadata: { 
-            operation: "uppercase",
-            originalLength: params.data.length
-        }
-    });
-}
+// Import shared functions (required for all tools)
+const shared = require('sharedFunctions');
+
+// Import specific tools
+const checkWithXcode = require('checkWithXcode').checkWithXcode;
+const shellCall = require('shellCall').shellCall;
+const analyzeDirectory = require('analyzeDirectory').analyzeDirectory;
+
+// Access all exports at once
+const tools = {
+    checkWithXcode: require('checkWithXcode'),
+    shellCall: require('shellCall'),
+    fileRead: require('fileRead'),
+    // ... etc
+};
 ```
 
-## Features
+---
 
-**Full JavaScriptCore Integration**
-- Modern JavaScript execution environment
-- Error handling and exception reporting
-- Per-session context management
+## Tool Entry Function Requirements
 
-**File System Access**
-- Read/write files
-
-**Path Utilities**
-- Directory listing and navigation
-
-**Logging**
-- Console API and Swift logging bridge
-
-**Result Setting**
-- Tool result JSON setting from JavaScript
-
-## JavaScript API Summary
-
-### File Operations
-```javascript
-Swift.fileExists(path)          // Check file existence, returns true or false
-Swift.readFile(path)            // Read file content, returns string or nil on failure
-Swift.saveFile(path, content)   // Write content to file, returns true on success or false
-Swift.openFile(path)            // Alias for readFile with logging support
-Swift.deleteFile(path)          // Delete file or directory, returns true on success or false
-Swift.listDirectory(path)       // List directory contents, returns array of names
-Swift.createDirectory(path)     // Create directory with parent paths if needed, returns true on success or false
-```
-
-### Path Utilities
-```javascript
-Swift.getDocumentsPath()        // Get user documents directory path, returns string
-Swift.getTempPath()             // Get system temporary directory path, returns string
-```
-
-### Logging
-```javascript
-console.log(message)            // Info level log message
-console.error(message)          // Error level log message
-console.warn(message)           // Warning level log message
-console.debug(message)          // Debug level log message
-
-Swift.log(type, code, message)  // Detailed logging with Swift backend (type: string, code: int, message: string)
-```
-
-### Result Setting
-```javascript
-Swift.setToolResult(jsonString) // Set result from JavaScript, must be called before function returns
-```
-
-## Script Requirements
-
-Every script MUST have a toolEntry function:
+Every tool script MUST implement the toolEntry function with the following signature:
 
 ```javascript
 function toolEntry(sid, handlerName, jsonParams) {
@@ -112,608 +55,813 @@ function toolEntry(sid, handlerName, jsonParams) {
     // sid: session ID string
     // handlerName: handler name requested by caller
     // jsonParams: raw JSON parameters as string from Swift controller
-    // Return JSON string or use Swift.setToolResult() to set result object
+    // Return JSON string or use Swift.setToolResult() to set result object then return null
 }
 ```
 
-## Result Format
-
-Return results as JSON strings:
-
-**Success:**
-```json
-{
-    "text": "Result content or JSON data",
-    "metadata": {
-        "key": "value"
-    }
-}
-```
-
-**Error:**
-```json
-{
-    "error": "Error message"
-}
-```
-
-## Testing
-
-Run the test script to verify functionality using the MCP Studio Script Editor
-
-## Common Patterns
-
-### Reading and Processing a File
-```javascript
-function processFile(params) {
-    var content = Swift.readFile(params.filePath);
-    if (!content) {
-        return JSON.stringify({ error: "File not found" });
-    }
-    
-    var lines = content.split('\n');
-    var result = { lineCount: lines.length };
-    
-    return JSON.stringify({
-        text: JSON.stringify(result),
-        metadata: { operation: "count" }
-    });
-}
-```
-
-### Creating a Report
-```javascript
-function createReport(params) {
-    var report = "Report Title\n" +
-                 "Generated: " + new Date() + "\n\n" +
-                 "Data: " + JSON.stringify(params.data);
-    
-    var outputPath = Swift.getTempPath() + "/report.txt";
-    
-    if (Swift.saveFile(outputPath, report)) {
-        return JSON.stringify({
-            text: "Report saved to: " + outputPath,
-            metadata: { path: outputPath }
-        });
-    }
-    
-    return JSON.stringify({ error: "Failed to save report" });
-}
-```
-
-### Batch Processing
-```javascript
-function batchProcess(params) {
-    var files = Swift.listDirectory(params.directory);
-    var results = [];
-    
-    files.forEach(function(file) {
-        var path = params.directory + "/" + file;
-        var content = Swift.readFile(path);
-        
-        if (content) {
-            // Process content
-            var processed = content.toUpperCase();
-            var outPath = params.outputDir + "/" + file;
-            
-            Swift.saveFile(outPath, processed);
-            results.push({ file: file, status: "success" });
-        }
-    });
-    
-    return JSON.stringify({
-        text: JSON.stringify({ processed: results.length }),
-        metadata: { results: results }
-    });
-}
-```
-
-## Advanced Features
-
-### Input Validation with @schema
-
-Add a @schema block at the top of your script to define expected input types:
-
-```javascript
-/**
- * @schema {
- *   "input": { "type": "string", "description": "User input text" },
- *   "count": { "type": "number", "description": "Number of items to process" },
- *   "enabled": { "type": "bool", "description": "Enable or disable feature" }
- * }
- */
-
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
-    
-    // Validation is automatically performed by the Swift bridge
-    if (params.count > 100) {
-        return JSON.stringify({ error: "Count exceeds limit of 100" });
-    }
-    
-    // Process data...
-}
-```
-
-### Secure File Operations
-
-Always validate paths before accessing files:
-
-```javascript
-function safeFileOperation(params) {
-    var path = params.path;
-    var allowedDirs = [Swift.getDocumentsPath(), Swift.getTempPath()];
-    
-    if (!allowedDirs.some(dir => path.startsWith(dir))) {
-        return JSON.stringify({ error: "Path not allowed" });
-    }
-    
-    if (Swift.fileExists(path)) {
-        var content = Swift.readFile(path);
-        if (content) {
-            return JSON.stringify({
-                text: content,
-                metadata: { path: path }
-            });
-        }
-    }
-    
-    return JSON.stringify({ error: "File not found" });
-}
-```
-
-### Running External Commands 
-
-Important Note: 
-Xcode tools working with ['None' Sandbox Version](https://mcpstudio.eofsl.com/download.html) only
-
-Use process() or shell() to execute external tools and capture output:
+### Implementation Example
 
 ```javascript
 function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
+    var params = JSON.parse(jsonParams); // Parse raw JSON string
     
-    var command = "/usr/bin/ls";
-    var args = ["-la", "/tmp"];
-    
-    // setup receiver var
-    // ctx.setObject(stdoutLines as NSArray, forKeyedSubscript: stdOutEntry as NSString)
-    // ctx.setObject(stderrLines as NSArray, forKeyedSubscript: stdErrEntry as NSString)
-    var outputLines = Array();
-    var stdoutEntry = "outputLines";
-    var errorLines = Array();
-    var stderrEntry = "errorLines";
-    
-    var success = SwiftBridge.process(
-        command,
-        args,
-        stdoutEntry,
-        stderrEntry
-    );
-    
-    if (success) {
-        return JSON.stringify({
-            text: "Executed " + command + " successfully",
+    // Validate handler name exists in tool exports
+    if (!toolExports[handlerName]) {
+        Swift.setToolResult({
+            text: "Error: Handler not found: " + handlerName,
             metadata: {
-                stdout: stdoutEntry,
-                stderr: stderrEntry
+                success: false,
+                code: "HANDLER_NOT_FOUND"
             }
         });
-    } else {
-        return JSON.stringify({ error: "Command failed" });
+        return null;
     }
-}
-```
-
-### HTTP Requests
-
-Make HTTP calls using httpGet, httpPost, or httpRequest:
-
-#### GET Request
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
     
-    // GET request with query parameters
-    var result = SwiftBridge.httpGet(
-        "https://api.example.com/v1/data",
-        "{\"page\":1, \"q\":\"search\"}"
-    );
-    
-    return JSON.stringify({
-        text: result,
-        metadata: { method: "GET", url: "example.com" }
-    });
-}
-```
-
-#### POST Request with Headers
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
-    
-    // POST request with body and custom headers
-    var result = SwiftBridge.httpPost(
-        "https://api.example.com/v1/upload",
-        "{\"filename\":\"test.txt\"}",  // Request body as JSON string
-        "{\"Authorization\":\"Bearer token\", \"Content-Type\":\"application/json\"}"
-    );
-    
-    return JSON.stringify({
-        text: result,
-        metadata: { method: "POST" }
-    });
-}
-```
-
-#### Generic HTTP Request
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
-    
-    // Custom HTTP method request (GET, POST, PUT, DELETE, etc.)
-    var result = SwiftBridge.httpRequest(
-        "PUT",
-        "https://api.example.com/v1/resource",
-        "{\"id\":\"123\",\"name\":\"test\"}",  // Request body for methods with payload
-        "{\"page\":1}"                        // Query parameters JSON string
-    );
-    
-    return JSON.stringify({ text: result });
-}
-```
-
-### Resource Configuration Access
-
-Retrieve resource configurations by name:
-
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var configName = jsonParams.resourceName || "default";
-    
-    var configJson = SwiftBridge.resourceConfig(configName);
-    
-    if (configJson.length > 0) {
-        var configObj = JSON.parse(configJson);
-        
-        return JSON.stringify({
-            text: "Resource configuration loaded",
-            metadata: { 
-                resourceName: configName,
-                configVersion: configObj.version || "unknown"
-            }
-        });
-    } else {
-        return JSON.stringify({ error: "Resource not found: " + configName });
-    }
-}
-```
-
-### Prompt Configuration Access
-
-Retrieve prompt configurations by name:
-
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var promptName = jsonParams.promptName || "default";
-    
-    var promptJson = SwiftBridge.promptConfig(promptName);
-    
-    if (promptJson.length > 0) {
-        var promptObj = JSON.parse(promptJson);
-        
-        return JSON.stringify({
-            text: "Prompt configuration loaded",
-            metadata: { 
-                promptName: promptName,
-                promptDescription: promptObj.description || ""
-            }
-        });
-    } else {
-        return JSON.stringify({ error: "Prompt not found: " + promptName });
-    }
-}
-```
-
-### Download Remote File
-
-Download a file from URL to local filesystem:
-
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams);
-    
-    var url = params.remoteUrl;
-    var destination = Swift.getTempPath() + "/" + "downloaded_file";
-    
-    if (SwiftBridge.downloadFile(url, destination)) {
-        return JSON.stringify({
-            text: "Download completed successfully",
-            metadata: { 
-                destination: destination,
-                url: url
-            }
-        });
-    } else {
-        return JSON.stringify({ error: "Download failed" });
-    }
-}
-```
-
-## Error Handling
-
-Always wrap your code in try-catch:
-
-```javascript
-function toolEntry(sid, handlerName, jsonParams) {
+    // Execute the requested handler with parsed parameters
     try {
-        var params = JSON.parse(jsonParams);
-        // Your code here
-    } catch(error) {
-        console.error("Error: " + error.toString());
-        return JSON.stringify({
-            error: error.toString()
-        });
-    }
-}
-```
-
-## Security Considerations
-
-### Input Sanitization for Scripts
-
-Add input validation to prevent injection attacks:
-
-```javascript
-function sanitizePath(path) {
-    // Remove potentially dangerous characters
-    return path.replace(/(\.\.\/|\/\.\/)/g, '').replace(/[^a-zA-Z0-9._\-\/]/g, '');
-}
-
-function validateFilePath(filePath) {
-    // Ensure path is within allowed directories
-    var allowedDirs = [Swift.getDocumentsPath(), Swift.getTempPath()];
-    for (var i = 0; i < allowedDirs.length; i++) {
-        if (filePath.startsWith(allowedDirs[i])) {
-            return true;
+        var result = toolExports[handlerName](params);
+        
+        if (result === null) {
+            // Handler already set result via Swift.setToolResult()
+            return null;
         }
+        
+        // Return result as JSON string or let handler call Swift.setToolResult()
+        if (typeof result === 'object') {
+            var jsonResult = JSON.stringify(result);
+            Swift.setToolResult(jsonResult);
+            return null;
+        }
+        
+        return result;
+    } catch (error) {
+        Swift.setToolResult({
+            text: "Error executing handler: " + error.message,
+            metadata: {
+                success: false,
+                code: "EXECUTION_ERROR",
+                error: error.message
+            }
+        });
+        return null;
     }
-    return false;
 }
+
+module.exports = { toolEntry };
 ```
-
-## Best Practices
-
-1. **Validate inputs** before processing
-2. **Check file existence** before operations
-3. **Use structured error messages**
-4. **Log important operations**
-5. **Return metadata** for context
-6. **Clean up temporary files**
-7. **Handle JSON parsing errors**
-
-## Performance Tips
-
-- JavaScript contexts are cached per session
-- Batch file operations when possible
-- Use efficient data structures for large datasets
-
-## Debugging
-
-1. Use console.log() liberally
-2. Check log view for detailed logs
-3. Test file paths with Swift.fileExists()
-4. Validate JSON before parsing
-5. Use the test script to verify functionality
-
-## API Reference
-
-### SwiftBridge Object Methods
-
-| Method | Parameters | Return Value | Description |
-|--------|------------|--------------|-------------|
-| `fileExists(path)` | path: string | boolean | Check if file/directory exists at path |
-| `readFile(path)` | path: string | string or nil | Read file content as UTF-8 string, returns nil on failure |
-| `saveFile(path, content)` | path: string, content: string | boolean | Write content to file atomically, returns true on success |
-| `openFile(path)` | path: string | string or nil | Alias for readFile with logging support |
-| `deleteFile(path)` | path: string | boolean | Remove file or directory, returns true on success |
-| `listDirectory(path)` | path: string | array of strings | List directory contents as array of file/directory names |
-| `createDirectory(path)` | path: string | boolean | Create directory with parent paths if needed |
-| `getDocumentsPath()` | none | string | Get user documents directory path |
-| `getTempPath()` | none | string | Get system temporary directory path |
-| `console.log(message)` | message: string | void | Log info level message |
-| `console.error(message)` | message: string | void | Log error level message |
-| `console.warn(message)` | message: string | void | Log warning level message |
-| `console.debug(message)` | message: string | void | Log debug level message |
-| `Swift.log(type, code, message)` | type: string, code: integer, message: string | void | Detailed logging with Swift backend |
-| `setToolResult(jsonString)` | jsonString: string | void | Set result object from JSON string |
-| `httpGet(url, query)` | url: string, query: string or nil | string | Perform synchronous HTTP GET request |
-| `httpPost(url, body, headers)` | url: string, body: string, headers: string | string | Perform synchronous HTTP POST request with custom headers |
-| `httpRequest(method, url, body, params)` | method: string, url: string, body: string, params: string or nil | string | Generic HTTP request with any method (GET, POST, PUT, DELETE, etc.) |
-| `downloadFile(url, destination)` | url: string, destination: string | boolean | Download remote file to local filesystem |
-| `resourceConfig(name)` | name: string | string | Get resource configuration JSON by name |
-| `promptConfig(name)` | name: string | string | Get prompt configuration JSON by name |
-
-### SwiftBridge.process Method
-
-```javascript
-SwiftBridge.process(command, parameters, stdOutEntry, stdErrEntry)
-```
-
-Runs an external process synchronously and forwards output to JavaScript environment.
-
-**Parameters:**
-- `command`: Absolute path to the executable (e.g., "/usr/bin/node")
-- `parameters`: Array of argument strings passed to the executable
-- `stdOutEntry`: Name of global JS array that receives stdout lines
-- `stdErrEntry`: Name of global JS array that receives stderr lines
-
-**Returns:** boolean - true when process exits with code 0, false otherwise
-
-**Example:**
-```javascript
-var success = SwiftBridge.process(
-    "/usr/bin/ls",
-    ["-la", "/tmp"],
-    "outputLines",
-    "errorLines"
-);
-```
-
-### SwiftBridge.shell Method
-
-```javascript
-SwiftBridge.shell(script)
-```
-
-Executes a shell script string via /bin/sh -c synchronously and forwards output to JavaScript environment.
-
-**Parameters:**
-- `script`: Shell script source code to execute (string)
-
-**Returns:** boolean - true when shell exits with code 0, false otherwise
-
-**Example:**
-```javascript
-var success = SwiftBridge.shell("echo 'Hello World' && date");
-```
-
-## Scripting Controller Methods
-
-The PluginController provides high-level scripting control methods:
-
-### callScript Method
-
-```swift
-public func callScript(sid: String, scriptName: String, handlerName: String, json: String) -> JSONToolResult
-```
-
-Calls a script with the specified parameters.
-
-**Parameters:**
-- `sid`: Session ID for the script call
-- `scriptName`: Name of the script file to execute
-- `handlerName`: Name of the handler function to invoke in the script
-- `json`: JSON string containing parameters for the script
-
-**Returns:** JSONToolResult - Result object from script execution or error on failure
-
-### clearScriptContext Method
-
-```swift
-public func clearScriptContext(sid: String)
-```
-
-Clears the JavaScript context for a specific session ID.
-
-**Parameters:**
-- `sid`: Session ID to clear context for
-
-### clearAllScriptContexts Method
-
-```swift
-public func clearAllScriptContexts()
-```
-
-Clears all JavaScript contexts for all sessions.
-
-### loadBundleScript Method (Internal)
-
-```swift
-private func loadBundleScript(_ name: String, subdirectory: String) -> String?
-```
-
-Loads a script file from the app bundle resource sub-directory.
-
-**Parameters:**
-- `name`: Script file name without extension
-- `subdirectory`: Resource sub-directory path inside the bundle (e.g., "Resources/ToolSDK/Scripts")
-
-**Returns:** Script content as string, or nil if the resource is not found
-
-### loadScriptFile Method (Internal)
-
-```swift
-private func loadScriptFile(_ scriptName: String) -> String?
-```
-
-Loads a script file from the specified path.
-
-**Parameters:**
-- `scriptName`: Name/path of the script to load
-
-**Returns:** Script content as string, or nil if loading fails
-
-## Schema Validation Parameters
-
-Scripts can define expected input parameters using the @schema annotation block at the top of the file:
-
-### parseSchema Method (Internal)
-
-```swift
-private static func parseSchema(from scriptContent: String) -> [ScriptParameterSchema]?
-```
-
-Extracts and parses the @schema { ... } block from script source.
-
-**Parameters:**
-- `scriptContent`: Full JavaScript source text
-
-**Returns:** Array of field descriptors, or nil if no @schema block present (validation is skipped if missing)
-
-### ScriptParameterSchema Structure
-
-Each descriptor contains:
-- `name`: JSON key name of the parameter
-- `type`: Expected JSON type - "string", "number", "bool", "array", "object"
-- `description`: Human-readable description for error messages (optional)
-
-### validate Method (Internal)
-
-```swift
-private static func validate(json: String, against schemas: [ScriptParameterSchema]) -> [ScriptParameterError]
-```
-
-Validates given JSON parameter string against provided schema descriptors.
-
-**Parameters:**
-- `json`: Raw JSON string passed to callScript (the json argument)
-- `schemas`: Field descriptors produced by parseSchema
-
-**Returns:** Array of validation errors; empty means the input is valid
-
-## Error Codes
-
-### File Operations
-- 404: File not found or read error
-- 500: General file operation failure
-
-### HTTP Operations
-- Returns JSON response with statusCode field from server
-
-### Resource/Prompt Access
-- -40110: Configuration not found (resourceConfig, promptConfig)
-
-### Script Execution
-- 1400: Invalid JSON result
-- 1401: Result object missing attribute 'text'
-- 1422: Parameter validation failed
-
-## Support
-
-For examples and testing, check:
-- test_script.js - Test suite and verification
-- example_tool_script.js - Full featured examples
-
-## License
-
-Copyright 2026 EoF Software Labs. All rights reserved.
 
 ---
 
-**Need Help?**
+## Built-in Tools Reference
 
-1. Run the test script to verify functionality
-2. Check the examples for usage patterns
-3. Review log view for debugging information
-4. Use console.log() and Swift.log() for diagnostic output
+### 1. checkWithXcode.js
+
+**Purpose**: Build and validate Xcode projects using xcodebuild
+
+```javascript
+function checkWithXcode(params) {
+    // Required parameters:
+    var projectName = params.projectName || "";
+    var projectDir = params.projectDir || "";
+    
+    // Optional parameters:
+    var scheme = params.scheme || "";
+    var configuration = params.configuration || "Debug";
+    var platform = params.platform || "macosx";
+    var codesign = params.codesign || "";
+    var cleanBuild = params.clean === true;
+    var showOperationLogs = params.showOperationLogs === true;
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| projectName | string | Yes | - | Project name (without .xcodeproj) |
+| projectDir | string | Yes | - | Absolute path to project directory |
+| scheme | string | No | - | Scheme name, defaults to first scheme if empty |
+| configuration | string | No | Debug | Build config: Debug/Release/Profile |
+| platform | string | No | macosx | Target: macosx/iphoneos/iphonesimulator |
+| clean | boolean | No | false | Clean build before building |
+| showOperationLogs | boolean | No | false | Show verbose operation logs |
+| codesign | string | No | - | Apple Developer Team Identifier |
+
+**Usage Example**:
+```javascript
+const result = checkWithXcode({
+    projectName: "MyProject",
+    projectDir: "/path/to/project",
+    scheme: "Debug",
+    configuration: "Release",
+    platform: "macosx",
+    clean: true,
+    showOperationLogs: false
+});
+```
+
+---
+
+### 2. shellCall.js
+
+**Purpose**: Execute system shell commands with configurable parameters
+
+```javascript
+function shellCall(params) {
+    // Required parameters:
+    var command = params.command || "";
+    
+    // Optional parameters:
+    var parameters = params.parameters || [];
+    var shell = params.shell || "/bin/bash";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| command | string | Yes | - | Shell command to execute |
+| parameters | Array<string> | No | [] | Command parameters as array |
+| shell | string | No | /bin/bash | Shell for #! line: /bin/sh or /bin/bash |
+
+**Usage Examples**:
+```javascript
+// Single command
+const result = shellCall({
+    command: "pwd"
+});
+
+// Command with parameters
+const result = shellCall({
+    command: "ls",
+    parameters: ["-la"]
+});
+
+// Custom shell
+const result = shellCall({
+    command: "echo",
+    parameters: ["Hello World"],
+    shell: "/bin/sh"
+});
+```
+
+---
+
+### 3. fileRead.js
+
+**Purpose**: Read content from files
+
+```javascript
+function fileRead(params) {
+    var filePath = params.filePath || "";
+    var encoding = params.encoding || "utf-8";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| filePath | string | Yes | - | Absolute or relative path to file |
+| encoding | string | No | utf-8 | File encoding (utf-8, ascii, etc.) |
+
+**Usage Example**:
+```javascript
+const result = fileRead({
+    filePath: "/path/to/file.txt",
+    encoding: "utf-8"
+});
+```
+
+---
+
+### 4. fileSave.js
+
+**Purpose**: Save content to files
+
+```javascript
+function fileSave(params) {
+    var filePath = params.filePath || "";
+    var content = params.content || "";
+    var encoding = params.encoding || "utf-8";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| filePath | string | Yes | - | Absolute or relative path to file |
+| content | string | Yes | - | Content to save in file |
+| encoding | string | No | utf-8 | File encoding (utf-8, ascii, etc.) |
+
+**Usage Example**:
+```javascript
+const result = fileSave({
+    filePath: "/path/to/file.txt",
+    content: "Hello World",
+    encoding: "utf-8"
+});
+```
+
+---
+
+### 5. analyzeDirectory.js
+
+**Purpose**: Get summary of directory contents
+
+```javascript
+function analyzeDirectory(params) {
+    var dirPath = params.dirPath || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| dirPath | string | Yes | - | Absolute path to directory |
+
+**Usage Example**:
+```javascript
+const result = analyzeDirectory({
+    dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts"
+});
+```
+
+---
+
+### 6. fetchResource.js
+
+**Purpose**: Retrieve MCP web resources or local documents
+
+```javascript
+function fetchResource(params) {
+    var resourceName = params.resourceName || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| resourceName | string | Yes | - | Name of resource link or document |
+
+**Usage Example**:
+```javascript
+const result = fetchResource({
+    resourceName: "sample-document.json"
+});
+```
+
+---
+
+### 7. directoryCreate.js (mkdir)
+
+**Purpose**: Create directories at specified paths
+
+```javascript
+function directoryCreate(params) {
+    var dirPath = params.dirPath || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| dirPath | string | Yes | - | Full qualified path of directory to create |
+
+**Usage Example**:
+```javascript
+const result = directoryCreate({
+    dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/NewFolder"
+});
+```
+
+---
+
+### 8. fileDelete.js
+
+**Purpose**: Delete files or directories
+
+```javascript
+function fileDelete(params) {
+    var path = params.path || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| path | string | Yes | - | Path to file or directory to delete |
+
+**Usage Example**:
+```javascript
+const result = fileDelete({
+    path: "/path/to/file.txt"
+});
+```
+
+---
+
+### 9. httpGet.js
+
+**Purpose**: Fetch/get data from web sites or web services
+
+```javascript
+function httpGet(params) {
+    var url = params.url || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| url | string | Yes | - | Full qualified URL to fetch data from |
+
+**Usage Example**:
+```javascript
+const result = httpGet({
+    url: "https://api.example.com/data"
+});
+```
+
+---
+
+### 10. httpPost.js
+
+**Purpose**: POST JSON data to web sites or web services
+
+```javascript
+function httpPost(params) {
+    var url = params.url || "";
+    var data = params.data || {};
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| url | string | Yes | - | Full qualified URL to POST to |
+| data | object | No | {} | JSON object as POST body data |
+
+**Usage Example**:
+```javascript
+const result = httpPost({
+    url: "https://api.example.com/submit",
+    data: {
+        "name": "Test",
+        "value": 123
+    }
+});
+```
+
+---
+
+### 11. plistBuddy.js
+
+**Purpose**: macOS PlistBuddy operations for preference files
+
+```javascript
+function plistBuddy(params) {
+    var filePath = params.filePath || "";
+    var operation = params.operation || "";
+    var key = params.key || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| filePath | string | Yes | - | Path to plist file |
+| operation | string | Yes | - | Operation: get/set/delete/list |
+| key | string | No | - | Plist key to operate on |
+
+**Usage Examples**:
+```javascript
+// Get value
+const result = plistBuddy({
+    filePath: "/path/to/Preferences.plist",
+    operation: "get",
+    key: "KeyToRead"
+});
+
+// Set value
+const result = plistBuddy({
+    filePath: "/path/to/Preferences.plist",
+    operation: "set",
+    key: "KeyToWrite",
+    value: "newValue"
+});
+```
+
+---
+
+### 12. fileExists.js
+
+**Purpose**: Check if file exists at specified path
+
+```javascript
+function fileExists(params) {
+    var path = params.path || "";
+}
+```
+
+**Parameters Table**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| path | string | Yes | - | Path to file to check |
+
+**Usage Example**:
+```javascript
+const result = fileExists({
+    path: "/path/to/file.txt"
+});
+```
+
+---
+
+## Code Patterns and Best Practices
+
+### Pattern 1: Shared Functions Import
+
+All tools must import shared functions for consistent behavior:
+
+```javascript
+// Required import for all tool scripts
+const shared = require('sharedFunctions');
+
+// Optional: other shared dependencies
+const swift = require('swiftRuntime');
+```
+
+---
+
+### Pattern 2: Logging Helper Function
+
+Use buildLog() helper in all tools for consistent output:
+
+```javascript
+function buildLog(message) {
+    console.log(message);
+    stdOut.push(message);
+}
+```
+
+**Usage**:
+```javascript
+buildLog("=== Tool Name Task ===");
+buildLog("Processing item: " + item);
+buildLog("Operation completed at: " + new Date());
+```
+
+---
+
+### Pattern 3: Input Validation
+
+Always validate required parameters before execution:
+
+```javascript
+function myTool(params) {
+    var requiredParam = params.requiredParam || "";
+    
+    // Validate input
+    if (!requiredParam) {
+        return shared.createErrorResult("Missing required parameter: requiredParam");
+    }
+    
+    // Proceed with execution
+    // ...
+}
+```
+
+---
+
+### Pattern 4: Result Handling
+
+Use Swift.setToolResult() to communicate results:
+
+```javascript
+// Success case
+Swift.setToolResult(JSON.stringify({
+    text: "Operation completed successfully",
+    metadata: {
+        success: true,
+        path: operationPath,
+        code: operationCode,
+        // ...
+    }
+}));
+return null; // Result already set
+
+// Failure case
+Swift.setToolResult(JSON.stringify({
+    text: "Error: Operation failed",
+    metadata: {
+        success: false,
+        code: "OPERATION_FAILED",
+        error: errorMessage,
+        // ...
+    }
+}));
+return null;
+```
+
+---
+
+### Pattern 5: Error Creation Helper
+
+Use shared.createErrorResult() for consistent error messages:
+
+```javascript
+var errorCode = "MISSING_PARAMETER";
+var errorMessage = "Missing required parameter: " + paramName;
+
+Swift.setToolResult(JSON.stringify({
+    text: errorMessage,
+    metadata: {
+        success: false,
+        code: errorCode,
+        // ...
+    }
+}));
+return null;
+```
+
+---
+
+### Pattern 6: Command Execution
+
+When executing shell commands, properly escape special characters:
+
+```javascript
+var command = params.command || "";
+var escapedCommand = command.replace(/"/g, '\\"')
+                            .replace('$', '\\$')
+                            .replace('`', '\\`');
+```
+
+---
+
+## Error Handling
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| MISSING_PARAMETER | Required parameter not provided |
+| HANDLER_NOT_FOUND | Requested handler doesn't exist |
+| FILE_NOT_FOUND | Specified file path does not exist |
+| DIRECTORY_NOT_FOUND | Specified directory path does not exist |
+| PERMISSION_DENIED | Insufficient permissions for operation |
+| OPERATION_FAILED | Generic operation failure |
+| EXECUTION_ERROR | Script execution error |
+
+---
+
+### Error Response Format
+
+All errors should follow this format:
+
+```javascript
+Swift.setToolResult(JSON.stringify({
+    text: "Error: [Human readable message]",
+    metadata: {
+        success: false,
+        code: "ERROR_CODE",
+        path: operationPath,
+        error: "[Stack trace or detailed error]"
+    }
+}));
+```
+
+---
+
+## Result Format Specification
+
+### Success Response Format
+
+```json
+{
+    "text": "Operation completed successfully",
+    "metadata": {
+        "path": "/path/to/operation",
+        "success": true,
+        "code": "OPERATION_SUCCESS",
+        "exitCode": 0,
+        "stdout": [],
+        "stderr": []
+    }
+}
+```
+
+### Failure Response Format
+
+```json
+{
+    "text": "Error: Operation failed with exit code 1",
+    "metadata": {
+        "path": "/path/to/operation",
+        "success": false,
+        "code": "OPERATION_FAILED",
+        "exitCode": 1,
+        "stdout": [],
+        "stderr": ["Error details..."]
+    }
+}
+```
+
+---
+
+## Tool Export Pattern
+
+All tool scripts must export their main function:
+
+```javascript
+module.exports = {
+    checkWithXcode,      // Or specific exported function name
+    toolEntry            // Required entry point
+};
+```
+
+**Example**:
+```javascript
+// checkWithXcode.js exports
+module.exports = {
+    checkWithXcode
+};
+
+// shellCall.js exports
+module.exports = {
+    shellCall
+};
+
+// Tool entry script exports (must always include toolEntry)
+module.exports = {
+    toolEntry
+};
+```
+
+---
+
+## Complete Tool Entry Script Template
+
+```javascript
+// ===================================================================
+// MCP Studio Tool SDK - Tool Entry Handler
+// Required for all tool scripts to function properly
+// ===================================================================
+
+// Import shared functions
+const shared = require('sharedFunctions');
+
+// Tool exports map (register all available tools)
+var toolExports = {};
+
+/**
+ * Initialize and register available tools
+ * @param {Object} tools - Object containing all available tool functions
+ */
+function initToolRegistry(tools) {
+    // Register all available tools in the registry
+    for (var key in tools) {
+        if (tools.hasOwnProperty(key)) {
+            toolExports[key] = tools[key];
+        }
+    }
+}
+
+/**
+ * Initialize with checkWithXcode as default tool
+ */
+function init() {
+    var checkWithXcode = require('checkWithXcode').checkWithXcode;
+    var shellCall = require('shellCall').shellCall;
+    var fileRead = require('fileRead').fileRead;
+    var fileSave = require('fileSave').fileSave;
+    // ... register all other tools
+    
+    initToolRegistry({
+        checkWithXcode: checkWithXcode,
+        shellCall: shellCall,
+        fileRead: fileRead,
+        fileSave: fileSave
+    });
+}
+
+/**
+ * Required tool entry function - MUST implement this signature
+ * @param {string} sid - Session ID string
+ * @param {string} handlerName - Handler name requested by caller
+ * @param {string} jsonParams - Raw JSON parameters as string from Swift controller
+ * @returns {string|null} Return JSON string or null if using Swift.setToolResult()
+ */
+function toolEntry(sid, handlerName, jsonParams) {
+    // Parse raw JSON string parameters
+    var params;
+    try {
+        params = JSON.parse(jsonParams);
+    } catch (e) {
+        Swift.setToolResult({
+            text: "Error: Failed to parse parameters JSON",
+            metadata: {
+                success: false,
+                code: "INVALID_JSON",
+                error: e.message,
+                path: sid,
+                handlerName: handlerName
+            }
+        });
+        return null;
+    }
+
+    // Validate handler name exists in tool exports
+    if (!toolExports[handlerName]) {
+        Swift.setToolResult({
+            text: "Error: Handler not found: " + handlerName,
+            metadata: {
+                success: false,
+                code: "HANDLER_NOT_FOUND",
+                path: sid,
+                handlerName: handlerName
+            }
+        });
+        return null;
+    }
+
+    // Execute the requested handler with parsed parameters
+    try {
+        var result = toolExports[handlerName](params);
+
+        if (result === null) {
+            // Handler already set result via Swift.setToolResult()
+            return null;
+        }
+
+        // Return result as JSON string or let handler call Swift.setToolResult()
+        if (typeof result === 'object') {
+            var jsonResult = JSON.stringify(result);
+            Swift.setToolResult(jsonResult);
+            return null;
+        }
+
+        return result;
+
+    } catch (error) {
+        Swift.setToolResult({
+            text: "Error executing handler: " + error.message,
+            metadata: {
+                success: false,
+                code: "EXECUTION_ERROR",
+                error: error.message,
+                stack: error.stack,
+                path: sid,
+                handlerName: handlerName
+            }
+        });
+        return null;
+    }
+}
+
+// Initialize tool registry
+init();
+
+module.exports = {
+    toolEntry
+};
+```
+
+---
+
+## Quick Start Guide
+
+1. **Create tool script** with proper function signature
+2. **Implement buildLog()** helper for consistent logging
+3. **Validate all inputs** before execution
+4. **Use Swift.setToolResult()** to return results
+5. **Export main function** from module
+6. **Register in toolEntry** via shared registry
+
+---
+
+## References
+
+- checkWithXcode.js - Xcode project build utility
+- shellCall.js - Shell command execution wrapper
+- fileRead.js - File reading utility
+- fileSave.js - File writing utility
+- analyzeDirectory.js - Directory analysis utility
+- fetchResource.js - MCP resource fetching utility
+- httpGet.js - HTTP GET requests
+- httpPost.js - HTTP POST requests
+
+---
+
+*Document generated for MCP Studio Tool SDK v1.0*
