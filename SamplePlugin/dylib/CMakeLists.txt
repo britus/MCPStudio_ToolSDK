@@ -14,7 +14,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0")
 
 # Find ToolSDK includes
 include_directories(../../include)
-include_directories(../../ToolJSONBridge)
+include_directories(../../../ToolJSONBridge)
 
 add_library(SampleTool SHARED
     ToolDescriptor.c

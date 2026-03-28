@@ -20,11 +20,15 @@ include_directories(../../ToolJSONBridge)
 add_library(SampleToolBundle MODULE
     ToolDescriptor.c
     PluginMain.mm
+    ToolEntryHandler.mm
+    ../../ToolJSONBridge/ToolJSONBridge.mm
 )
 
-# Include directories
-target_include_directories(SampleToolBundle PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+# Include directories - add the source directory and include paths
+target_include_directories(SampleToolBundle PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ../../include
+    ../../ToolJSONBridge
 )
 
 set_target_properties(SampleToolBundle PROPERTIES
@@ -33,16 +37,13 @@ set_target_properties(SampleToolBundle PROPERTIES
     BUNDLE_EXTENSION bundle
 )
 
-#set_target_properties(SampleToolBundle PROPERTIES
-#    SUFFIX ".plugin"
-#)
-
-set_target_properties(SampleToolBundle PROPERTIES COMPILE_DEFINITIONS
-    "TOOL_BUNDLE=1"
-)
-
+# Link against frameworks
 target_link_libraries(SampleToolBundle
     PRIVATE "-framework Cocoa"
     PRIVATE "-framework Foundation"
     PRIVATE "-framework AppKit"
+)
+
+set_target_properties(SampleToolBundle PROPERTIES COMPILE_DEFINITIONS
+    "TOOL_BUNDLE=1"
 )

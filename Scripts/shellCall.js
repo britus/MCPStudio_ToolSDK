@@ -67,6 +67,7 @@ function shellCall(params) {
             var arg = parameters[i];
             if (arg != null) {
                 var argStr = String(arg);
+                // cleanup JSON escapings
                 var escapedArg = argStr
                     .replace(/"/g, '\\"')
                     .replace(/\$/g, '\\$')
@@ -91,7 +92,7 @@ function shellCall(params) {
             text: "[Script] Command executed successfully\n" + 
                    stdOut.join("\n"),
             metadata: {
-                path: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts/",
+                path: ".",
                 command: command,
                 shell: shell,
                 parameters: parameters,
@@ -108,7 +109,7 @@ function shellCall(params) {
                    stdOut.join("\n") + "\n--- Stderr ---\n" + 
                    (stdErr && stdErr.length > 0 ? stdErr.join("\n") : ""),
             metadata: {
-                path: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts/",
+                path: ".",
                 command: command,
                 shell: shell,
                 parameters: parameters,

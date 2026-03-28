@@ -14,6 +14,7 @@ const fetchResource = require('fetchResource');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
 const shellCall = require('shellCall');
+const cmakeBuild = require('cmakeBuild')
 
 // File operation handlers
 const mkdir = require('mkdir');
@@ -67,6 +68,8 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return clangTools.clangMake(params);
             case "shellCall":
             	return shellCall.shellCall(params);
+            case "cmakeBuild":
+            	return cmakeBuild.cmakeBuild(params);
 
             // MCP Prompt, Resource
             case "fetchPrompt":

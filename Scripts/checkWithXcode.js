@@ -48,9 +48,10 @@ function checkWithXcode(params) {
     var scheme = params.scheme || "";
     var configuration = params.configuration || "Debug";
     var platform = params.platform || "macosx";
-    var codesign = params.codesign || "";
+    var codesign = params.codesign || params.codeSigningIdentity || "";
     var cleanBuild = (params.clean === true);
     var showOperationLogs = (params.showOperationLogs === true);
+    var alltargets = (params.alltargets === true);
 
     taskLog("[Script] Scheme: " + scheme);
     taskLog("[Script] Configuration: " + configuration);
@@ -60,9 +61,9 @@ function checkWithXcode(params) {
     taskLog("[Script] Team Identifier: " + codesign);
 
     var shellScript = '#!/bin/bash\n';
-    var success = false
+    var success = false;
 
-        // Clean build artifacts if requested
+    // Clean build artifacts if requested
     if (cleanBuild) {
         shellScript += 'set -euo pipefail\n\n';
         shellScript += '# Clean previous build artifacts\n';
@@ -81,67 +82,83 @@ function checkWithXcode(params) {
     shellScript += 'ARCH=`uname -m`\n';
     shellScript += 'cd "${PROJECT_DIR}" || exit 1\n';
     shellScript += 'xcodebuild';
-    /* ADDITIONAL PARAMETERS FROM FUNCTION params */
+    // Use only valid xcodebuild parameters
+    shellScript += ' -project "${PROJECT_NAME}.xcodeproj"';
+    
+    /* additional xcodebuild params */
     shellScript += ' -arch ${ARCH}';
-    shellScript += ' -alltargets -quiet ';
-    //shellScript += ' -quiet ';
-    shellScript += ' -only-active-architectures';
-	shellScript += ' -verbose -showDeps -showIcons';
-   
+
+    if (alltargets === true) {
+        shellScript += ' -alltargets ';
+    }
+    
     if (codesign.length > 0) {
-    	shellScript += ' --codeSigningIdentity="' + codesign + '"';
-	}
-	
-	/* PARAMETER-END */
-    shellScript += ' -project "${PROJECT_NAME}.xcodeproj" || exit 1\n';
+        shellScript += ' --codeSigningIdentity="' + codesign + '"';
+    }
+    if (scheme.length > 0) {
+        shellScript += ' -scheme ' + scheme;
+    }
+    if (platform.length > 0) {
+        shellScript += ' -sdk ' + platform;
+    }
+    // Fixed: check if configuration is not empty string instead of numeric comparison
+    if (configuration && configuration.length > 0) {
+        shellScript += ' -configuration ' + configuration;
+    }
+    /* end */
+    if (codesign && codesign.length === 0) {
+    	shellScript += ' CODE_SIGNING_ALLOWED=NO build || exit 1\n';
+    } else {
+    	shellScript += ' build || exit 1\n';
+    }
     shellScript += 'exit 0\n';
 
     taskLog("[Script] Run: " + shellScript);
-       
+    
     success = Swift.shell(shellScript);
-     
-		if (!success || stdErr.length > 0) {
-			Swift.setToolResult(JSON.stringify({
-		        text: "[Script] Build FAILED for " + projectName + "\n" + 
-		               stdOut.join("\n") + 
-		               (stdErr && stdErr.length > 0 
-		               		? "\n--- Stderr ---\n" + stdErr.join("\n") 
-		               		: ""),
-		        metadata: {
-            			path: projectDir,
-            			projectName: projectName,
-            			configuration: configuration,
-            			platform: platform,
-            			operation: "checkWithXcode",
-            			codesign: codesign,
-            			success: true,
-            			stdout: stdOut,
-            			stderr: stdErr,
-            	}
-		    }));
-		    taskLog("[Script] Build failed!");
-		}
-		else {
-			Swift.setToolResult(JSON.stringify({
-		        text: "Build completed successfully for " + projectName + "\n" + 
-		               stdOut.join("\n") + 
-		               (stdErr && stdErr.length > 0 
-		               		? "\n--- Stderr ---\n" + stdErr.join("\n") 
-		               		: ""),
-		                metadata: {
-            				path: projectDir,
-            				projectName: projectName,
-            				configuration: configuration,
-            				platform: platform,
-            				operation: "checkWithXcode",
-            				codesign: codesign,
-            				success: true,
-            				stdout: stdOut,
-            				stderr: stdErr,
-            			}
-		    }));
-		    taskLog("[Script] Build successful!");
-		}
+    
+    if (!success) {
+        Swift.setToolResult(JSON.stringify({
+            text: "[Script] Build FAILED for " + projectName + "\n" + 
+                   stdOut.join("\n") + 
+                   (stdErr && stdErr.length > 0 
+                   ? "\n--- Stderr ---\n" + stdErr.join("\n") 
+                   : ""),
+            metadata: {
+                path: projectDir,
+                projectName: projectName,
+                configuration: configuration,
+                platform: platform,
+                operation: "checkWithXcode",
+                codesign: codesign,
+                success: false,
+                stdout: stdOut,
+                stderr: stdErr,
+            }
+        }));
+        taskLog("[Script] Build failed!");
+    }
+    else {
+        Swift.setToolResult(JSON.stringify({
+            text: "Build completed successfully for " + projectName + "\n" + 
+                   stdOut.join("\n") + 
+                   (stdErr && stdErr.length > 0 
+                   ? "\n--- Stderr ---\n" + stdErr.join("\n") 
+                   : ""),
+            metadata: {
+                path: projectDir,
+                projectName: projectName,
+                configuration: configuration,
+                platform: platform,
+                operation: "checkWithXcode",
+                codesign: codesign,
+                success: true,
+                stdout: stdOut,
+                stderr: stdErr,
+            }
+        }));
+        taskLog("[Script] Build successful!");
+    }
 
     return null; // Result already set via Swift.setToolResult
 }

@@ -41,6 +41,7 @@ function previewFile(params) {
     Swift.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
+            filePath: filePath,
             operation: "processFile",
             success: true
         }

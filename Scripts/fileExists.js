@@ -26,6 +26,8 @@ function fileExists(params) {
     Swift.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
+        	exists: exists,
+            path: path,
             operation: "fileExists",
             success: true
         }

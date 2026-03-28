@@ -10,14 +10,14 @@ function createDirectory(params) {
     
     console.log("Create directory: " + dirPath);
     
-    if (Swift.fileExists(dirPath)) {
+    if (!Swift.fileExists(dirPath)) {
         return shared.createErrorResult("Directory already exists: " + dirPath);
-    }
     
-    // Create directory
-    var success = Swift.createDirectory(dirPath);
-    if (!success) {
-        return shared.createErrorResult("Failed to create directory: " + dirPath);
+	    // Create directory
+	    var success = Swift.createDirectory(dirPath);
+	    if (!success) {
+	        return shared.createErrorResult("Failed to create directory: " + dirPath);
+    	}
     }
     
     var result = {
@@ -29,6 +29,7 @@ function createDirectory(params) {
     Swift.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
+            path: dirPath,
             operation: "createDirectory",
             success: true
         }

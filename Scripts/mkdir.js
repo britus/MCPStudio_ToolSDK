@@ -29,6 +29,7 @@ function mkdir(params) {
     Swift.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
+        	path: dirPath,
             operation: "mkdir",
             success: true
         }
