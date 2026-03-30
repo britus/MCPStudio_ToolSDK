@@ -167,13 +167,13 @@
         //  1. Builtin virtual module 
         if (resolved.indexOf('__builtin__:') === 0) {
             var builtinName = resolved.substring('__builtin__:'.length);
-            MCPStudio.log('debug', -1, '[PreProcessor] require builtin: ' + builtinName);
+            //MCPStudio.log('debug', -1, '[PreProcessor] require builtin: ' + builtinName);
             return _builtins[builtinName];
         }
 
         //  2. Cache hit 
         if (_moduleCache.hasOwnProperty(resolved)) {
-            MCPStudio.log('debug', -1, '[PreProcessor] require cached: ' + resolved);
+            //MCPStudio.log('debug', -1, '[PreProcessor] require cached: ' + resolved);
             return _moduleCache[resolved];
         }
 
@@ -192,7 +192,7 @@
             throw new Error(msg2);
         }
 
-        MCPStudio.log('debug', -1, '[PreProcessor] require load: ' + resolved);
+        //MCPStudio.log('debug', -1, '[PreProcessor] require load: ' + resolved);
 
         //  4. Compile in a CommonJS wrapper 
         // Wrap in an IIFE that receives (module, exports, require, __filename, __dirname)
@@ -299,6 +299,6 @@
         globalScope.exports = globalScope.module.exports;
     }
 
-    MCPStudio.log('info', 0, '[PreProcessor] Module system initialised. require() is ready.');
+    //MCPStudio.log('info', 0, '[PreProcessor] Module system initialised. require() is ready.');
 
 }(this)); // `this` is the global JSContext object in JavaScriptCore
