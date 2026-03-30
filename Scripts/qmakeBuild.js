@@ -96,7 +96,8 @@ function qmakeBuild(params) {
   if (success) {
     MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] QMake project built successfully.\n\n" + 
-                (stdOut && stdOut.length > 0 ? stdOut.join("\n") : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
             operation: "qmakeBuild",
             shellScript: shellScript,
@@ -108,8 +109,8 @@ function qmakeBuild(params) {
   } else {    
     MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] QMake project build failed.\n\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") + "\n--- Stderr ---\n" + 
-               (stdErr && stdErr.length > 0 ? stdErr.join("\n") : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
             operation: "qmakeBuild",
             shellScript: shellScript,

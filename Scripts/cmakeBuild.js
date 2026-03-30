@@ -89,7 +89,8 @@ function cmakeBuild(params) {
   if (success) {
     MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] cmake successfully\n" + 
-                (stdOut && stdOut.length > 0 ? stdOut.join("\n") : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
             operation: "cmakeBuild",
             shellScript: shellScript,
@@ -101,8 +102,8 @@ function cmakeBuild(params) {
   } else {    
     MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] cmake failed.\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") + "\n--- Stderr ---\n" + 
-               (stdErr && stdErr.length > 0 ? stdErr.join("\n") : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
             operation: "cmakeBuild",
             shellScript: shellScript,

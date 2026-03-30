@@ -24,12 +24,16 @@ function clangCheckSyntax(params) {
    	var success = MCPStudio.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
-        	"Syntax check failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
+        	"Syntax check failed:\n" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
     }
     
     // Set result using MCPStudio bridge
     MCPStudio.setToolResult(JSON.stringify({
-        text: "Syntax check successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
+        text: "Syntax check successfully.\n" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
 	        fileName: sourceFile,
 	  		stdout: stdOut.join("\n"),
@@ -61,12 +65,16 @@ function clangCompile(params) {
    	var success = MCPStudio.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
-        	"Compiler failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
+        	"Compiler failed:\n" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
     }
     
     // Set result using MCPStudio bridge
     MCPStudio.setToolResult(JSON.stringify({
-        text: "Compiled successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
+        text: "Compiled successfully.\n" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
 	        fileName: sourceFile,
 	  		stdout: stdOut.join("\n"),
@@ -101,12 +109,16 @@ function clangMake(params) {
    	var success = MCPStudio.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
-        	"Build failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
+        	"Build failed:\n" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
     }
     
     // Set result using MCPStudio bridge
     MCPStudio.setToolResult(JSON.stringify({
-        text: "Build successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
+        text: "Build successfully.\n" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {
 	        fileName: sourceFile,
 	  		stdout: stdOut.join("\n"),

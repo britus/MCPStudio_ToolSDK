@@ -87,7 +87,8 @@ function shellCall(params) {
     if (success) {
         MCPStudio.setToolResult(JSON.stringify({
             text: "[Script] Command executed successfully\n" + 
-                   stdOut.join("\n"),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
             metadata: {
                 path: ".",
                 command: command,
@@ -103,8 +104,8 @@ function shellCall(params) {
     } else {
         MCPStudio.setToolResult(JSON.stringify({
             text: "[Script] Command failed.\n" + 
-                   stdOut.join("\n") + "\n--- Stderr ---\n" + 
-                   (stdErr && stdErr.length > 0 ? stdErr.join("\n") : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
             metadata: {
                 path: ".",
                 command: command,
@@ -116,7 +117,9 @@ function shellCall(params) {
                 stderr: stdErr,
             }
         }));
-        taskLog("[Script] Command failed!");
+        taskLog("[Script] Command failed!" + 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
     }
 
     return null; // Result already set via MCPStudio.setToolResult

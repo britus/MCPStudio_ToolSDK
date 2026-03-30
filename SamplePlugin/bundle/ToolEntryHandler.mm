@@ -7,6 +7,7 @@
 @property (nonatomic, retain) NSString *toolName;
 @property (nonatomic, retain) NSDictionary *params;
 @property (nonatomic, retain) NSError *error;
+@property (nonatomic, retain) NSString *info;
 
 @end
 
@@ -43,8 +44,9 @@
     
     // Process the tool entry
     NSString *content = [self stringForKey:@"content"];
+    NSString *self.info = [self stringForKey:@"info"];
     if (content) {
-        NSLog(@"Content: %@", content);
+        NSLog(@"Content: %@", [content stringByAppendingString:self._info]);
     }
     
     return nil;

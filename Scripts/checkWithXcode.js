@@ -62,21 +62,23 @@ function checkWithXcode(params) {
 
     var shellScript = '#!/bin/bash\n';
     var success = false;
+    
+    // get notified
+    shellScript += 'set -euo pipefail\n';
 
     // Clean build artifacts if requested
     if (cleanBuild) {
-        shellScript += 'set -euo pipefail\n\n';
         shellScript += '# Clean previous build artifacts\n';
         shellScript += 'rm -rf DerivedData/ || true\n\n';
+        shellScript += 'rm -rf build/DerivedData/ || true\n\n';
+        shellScript += 'rm -rf Build/DerivedData/ || true\n\n';
         taskLog("[Script] Cleaning previous builds...");
-        
         success = MCPStudio.shell(shellScript);
         if (!success) {
             return shared.createErrorResult("Failed to clean build directory");
         }
     }
     
-    shellScript += 'set -euo pipefail\n';
     shellScript += 'PROJECT_NAME="' + projectName + '"\n';
     shellScript += 'PROJECT_DIR="' + projectDir + '"\n';
     shellScript += 'ARCH=`uname -m`\n';
@@ -120,10 +122,8 @@ function checkWithXcode(params) {
     if (!success) {
         MCPStudio.setToolResult(JSON.stringify({
             text: "[Script] Build FAILED for " + projectName + "\n" + 
-                   stdOut.join("\n") + 
-                   (stdErr && stdErr.length > 0 
-                   ? "\n--- Stderr ---\n" + stdErr.join("\n") 
-                   : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
             metadata: {
                 path: projectDir,
                 projectName: projectName,
@@ -136,15 +136,15 @@ function checkWithXcode(params) {
                 stderr: stdErr,
             }
         }));
-        taskLog("[Script] Build failed!");
+        taskLog("[Script] Build failed!"+ 
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
     }
     else {
         MCPStudio.setToolResult(JSON.stringify({
             text: "Build completed successfully for " + projectName + "\n" + 
-                   stdOut.join("\n") + 
-                   (stdErr && stdErr.length > 0 
-                   ? "\n--- Stderr ---\n" + stdErr.join("\n") 
-                   : ""),
+               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
+               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
             metadata: {
                 path: projectDir,
                 projectName: projectName,
