@@ -32,7 +32,7 @@ const result = toolEntry(sessionId, handlerName, JSON.stringify(params));
 Example:
 ```javascript
 toolEntry("session123", "fileExists", JSON.stringify({
-    "path": "/Users/eofmc/test/file.txt"
+    "path": "/path/to/test/file.txt"
 }));
 ```
 
@@ -59,7 +59,7 @@ toolEntry("session123", "fileExists", JSON.stringify({
 **Example**:
 ```json
 {
-  "dirPath": "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts",
+  "dirPath": "/path/to/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts",
   "fileCount": 45,
   "totalSize": 234567,
   "files": [...]
@@ -226,7 +226,7 @@ toolEntry("session123", "fileExists", JSON.stringify({
 ```json
 {
   "exists": true,
-  "path": "/Users/eofmc/test/file.txt",
+  "path": "/path/to/test/file.txt",
   "size": 1024,
   "modified": "2026-03-30T16:09:03.417Z"
 }
