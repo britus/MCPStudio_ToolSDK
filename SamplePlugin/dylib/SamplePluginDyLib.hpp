@@ -1,9 +1,6 @@
 //
 //  SamplePluginDyLib.hpp
 //  SamplePluginDyLib
-//
-//  Created by Björn Eschrich on 16.02.26.
-//
 
 #ifndef SamplePluginDyLib_
 #define SamplePluginDyLib_

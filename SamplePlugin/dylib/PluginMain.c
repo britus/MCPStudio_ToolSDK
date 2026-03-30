@@ -1,5 +1,5 @@
 // ===================================================================
-//  PluginMain.mm
+//  PluginMain.c
 //  MCPStudio - Custom Tool SDK - SamplePlugin
 //
 //  Created by EoF Software Labs on 2026.

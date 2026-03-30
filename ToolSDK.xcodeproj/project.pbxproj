@@ -7,6 +7,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F71170FE2F7AA79A00F39DFE /* testGet.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F52F7AA79A00F39DFE /* testGet.js */; };
+		F71170FF2F7AA79A00F39DFE /* tool_entry.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170FD2F7AA79A00F39DFE /* tool_entry.js */; };
+		F71171002F7AA79A00F39DFE /* testDownload.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F32F7AA79A00F39DFE /* testDownload.js */; };
+		F71171012F7AA79A00F39DFE /* plistBuddy.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EC2F7AA79A00F39DFE /* plistBuddy.js */; };
+		F71171022F7AA79A00F39DFE /* qmakeBuild.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */; };
+		F71171032F7AA79A00F39DFE /* testPaths.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F92F7AA79A00F39DFE /* testPaths.js */; };
+		F71171042F7AA79A00F39DFE /* previewFile.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170ED2F7AA79A00F39DFE /* previewFile.js */; };
+		F71171052F7AA79A00F39DFE /* testPost.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170FB2F7AA79A00F39DFE /* testPost.js */; };
+		F71171062F7AA79A00F39DFE /* testPipeline.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170FA2F7AA79A00F39DFE /* testPipeline.js */; };
+		F71171072F7AA79A00F39DFE /* mkdir.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EB2F7AA79A00F39DFE /* mkdir.js */; };
+		F71171082F7AA79A00F39DFE /* getPathTemp.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E92F7AA79A00F39DFE /* getPathTemp.js */; };
+		F71171092F7AA79A00F39DFE /* fetchPrompt.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E12F7AA79A00F39DFE /* fetchPrompt.js */; };
+		F711710A2F7AA79A00F39DFE /* testLogging.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F82F7AA79A00F39DFE /* testLogging.js */; };
+		F711710B2F7AA79A00F39DFE /* fileDelete.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E32F7AA79A00F39DFE /* fileDelete.js */; };
+		F711710C2F7AA79A00F39DFE /* testDifferentMethods.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F22F7AA79A00F39DFE /* testDifferentMethods.js */; };
+		F711710D2F7AA79A00F39DFE /* sharedFunctions.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */; };
+		F711710E2F7AA79A00F39DFE /* directoryCreate.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DF2F7AA79A00F39DFE /* directoryCreate.js */; };
+		F711710F2F7AA79A00F39DFE /* testFileOps.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F42F7AA79A00F39DFE /* testFileOps.js */; };
+		F71171102F7AA79A00F39DFE /* fileRead.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E62F7AA79A00F39DFE /* fileRead.js */; };
+		F71171112F7AA79A00F39DFE /* testHttpAll.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F62F7AA79A00F39DFE /* testHttpAll.js */; };
+		F71171122F7AA79A00F39DFE /* cmakeBuild.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DE2F7AA79A00F39DFE /* cmakeBuild.js */; };
+		F71171132F7AA79A00F39DFE /* fetchResource.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E22F7AA79A00F39DFE /* fetchResource.js */; };
+		F71171142F7AA79A00F39DFE /* fileExists.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E42F7AA79A00F39DFE /* fileExists.js */; };
+		F71171152F7AA79A00F39DFE /* analyzeDirectory.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */; };
+		F71171162F7AA79A00F39DFE /* fileOpen.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E52F7AA79A00F39DFE /* fileOpen.js */; };
+		F71171172F7AA79A00F39DFE /* clangTools.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DD2F7AA79A00F39DFE /* clangTools.js */; };
+		F71171182F7AA79A00F39DFE /* bootstrap.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DB2F7AA79A00F39DFE /* bootstrap.js */; };
+		F71171192F7AA79A00F39DFE /* checkWithXcode.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */; };
+		F711711A2F7AA79A00F39DFE /* httpTools.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EA2F7AA79A00F39DFE /* httpTools.js */; };
+		F711711B2F7AA79A00F39DFE /* testJSON.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F72F7AA79A00F39DFE /* testJSON.js */; };
+		F711711C2F7AA79A00F39DFE /* shellCall.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F02F7AA79A00F39DFE /* shellCall.js */; };
+		F711711D2F7AA79A00F39DFE /* getPathDocuments.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E82F7AA79A00F39DFE /* getPathDocuments.js */; };
+		F711711E2F7AA79A00F39DFE /* fileSave.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E72F7AA79A00F39DFE /* fileSave.js */; };
+		F711711F2F7AA79A00F39DFE /* testCustomHeaders.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F12F7AA79A00F39DFE /* testCustomHeaders.js */; };
+		F71171202F7AA79A00F39DFE /* directoryList.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E02F7AA79A00F39DFE /* directoryList.js */; };
 		F75EE2782F436EE7009908F1 /* ToolCapabilities.json in Resources */ = {isa = PBXBuildFile; fileRef = F75EE26A2F436EE7009908F1 /* ToolCapabilities.json */; };
 		F75EE2B82F436EE7009908F1 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
 		F75EE2C12F436EE7009908F1 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2622F436EE7009908F1 /* PluginMain.mm */; };
@@ -31,6 +66,41 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analyzeDirectory.js; sourceTree = "<group>"; };
+		F71170DB2F7AA79A00F39DFE /* bootstrap.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = bootstrap.js; sourceTree = "<group>"; };
+		F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = checkWithXcode.js; sourceTree = "<group>"; };
+		F71170DD2F7AA79A00F39DFE /* clangTools.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = clangTools.js; sourceTree = "<group>"; };
+		F71170DE2F7AA79A00F39DFE /* cmakeBuild.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = cmakeBuild.js; sourceTree = "<group>"; };
+		F71170DF2F7AA79A00F39DFE /* directoryCreate.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = directoryCreate.js; sourceTree = "<group>"; };
+		F71170E02F7AA79A00F39DFE /* directoryList.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = directoryList.js; sourceTree = "<group>"; };
+		F71170E12F7AA79A00F39DFE /* fetchPrompt.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fetchPrompt.js; sourceTree = "<group>"; };
+		F71170E22F7AA79A00F39DFE /* fetchResource.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fetchResource.js; sourceTree = "<group>"; };
+		F71170E32F7AA79A00F39DFE /* fileDelete.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileDelete.js; sourceTree = "<group>"; };
+		F71170E42F7AA79A00F39DFE /* fileExists.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileExists.js; sourceTree = "<group>"; };
+		F71170E52F7AA79A00F39DFE /* fileOpen.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileOpen.js; sourceTree = "<group>"; };
+		F71170E62F7AA79A00F39DFE /* fileRead.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileRead.js; sourceTree = "<group>"; };
+		F71170E72F7AA79A00F39DFE /* fileSave.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileSave.js; sourceTree = "<group>"; };
+		F71170E82F7AA79A00F39DFE /* getPathDocuments.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = getPathDocuments.js; sourceTree = "<group>"; };
+		F71170E92F7AA79A00F39DFE /* getPathTemp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = getPathTemp.js; sourceTree = "<group>"; };
+		F71170EA2F7AA79A00F39DFE /* httpTools.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = httpTools.js; sourceTree = "<group>"; };
+		F71170EB2F7AA79A00F39DFE /* mkdir.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mkdir.js; sourceTree = "<group>"; };
+		F71170EC2F7AA79A00F39DFE /* plistBuddy.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = plistBuddy.js; sourceTree = "<group>"; };
+		F71170ED2F7AA79A00F39DFE /* previewFile.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = previewFile.js; sourceTree = "<group>"; };
+		F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = qmakeBuild.js; sourceTree = "<group>"; };
+		F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = sharedFunctions.js; sourceTree = "<group>"; };
+		F71170F02F7AA79A00F39DFE /* shellCall.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = shellCall.js; sourceTree = "<group>"; };
+		F71170F12F7AA79A00F39DFE /* testCustomHeaders.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testCustomHeaders.js; sourceTree = "<group>"; };
+		F71170F22F7AA79A00F39DFE /* testDifferentMethods.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testDifferentMethods.js; sourceTree = "<group>"; };
+		F71170F32F7AA79A00F39DFE /* testDownload.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testDownload.js; sourceTree = "<group>"; };
+		F71170F42F7AA79A00F39DFE /* testFileOps.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testFileOps.js; sourceTree = "<group>"; };
+		F71170F52F7AA79A00F39DFE /* testGet.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testGet.js; sourceTree = "<group>"; };
+		F71170F62F7AA79A00F39DFE /* testHttpAll.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testHttpAll.js; sourceTree = "<group>"; };
+		F71170F72F7AA79A00F39DFE /* testJSON.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testJSON.js; sourceTree = "<group>"; };
+		F71170F82F7AA79A00F39DFE /* testLogging.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testLogging.js; sourceTree = "<group>"; };
+		F71170F92F7AA79A00F39DFE /* testPaths.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testPaths.js; sourceTree = "<group>"; };
+		F71170FA2F7AA79A00F39DFE /* testPipeline.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testPipeline.js; sourceTree = "<group>"; };
+		F71170FB2F7AA79A00F39DFE /* testPost.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testPost.js; sourceTree = "<group>"; };
+		F71170FD2F7AA79A00F39DFE /* tool_entry.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = tool_entry.js; sourceTree = "<group>"; };
 		F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SamplePluginBundle.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		F75EE1FE2F436EE7009908F1 /* CustomToolExports.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomToolExports.h; sourceTree = "<group>"; };
 		F75EE1FF2F436EE7009908F1 /* ToolABI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolABI.h; sourceTree = "<group>"; };
@@ -76,6 +146,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F71170FC2F7AA79A00F39DFE /* test-scripts */ = {
+			isa = PBXGroup;
+			children = (
+				F71170F12F7AA79A00F39DFE /* testCustomHeaders.js */,
+				F71170F22F7AA79A00F39DFE /* testDifferentMethods.js */,
+				F71170F32F7AA79A00F39DFE /* testDownload.js */,
+				F71170F42F7AA79A00F39DFE /* testFileOps.js */,
+				F71170F52F7AA79A00F39DFE /* testGet.js */,
+				F71170F62F7AA79A00F39DFE /* testHttpAll.js */,
+				F71170F72F7AA79A00F39DFE /* testJSON.js */,
+				F71170F82F7AA79A00F39DFE /* testLogging.js */,
+				F71170F92F7AA79A00F39DFE /* testPaths.js */,
+				F71170FA2F7AA79A00F39DFE /* testPipeline.js */,
+				F71170FB2F7AA79A00F39DFE /* testPost.js */,
+			);
+			path = "test-scripts";
+			sourceTree = "<group>";
+		};
 		F75EE1EE2F436EAB009908F1 = {
 			isa = PBXGroup;
 			children = (
@@ -150,6 +238,31 @@
 		F75EE2712F436EE7009908F1 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
+				F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */,
+				F71170DB2F7AA79A00F39DFE /* bootstrap.js */,
+				F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */,
+				F71170DD2F7AA79A00F39DFE /* clangTools.js */,
+				F71170DE2F7AA79A00F39DFE /* cmakeBuild.js */,
+				F71170DF2F7AA79A00F39DFE /* directoryCreate.js */,
+				F71170E02F7AA79A00F39DFE /* directoryList.js */,
+				F71170E12F7AA79A00F39DFE /* fetchPrompt.js */,
+				F71170E22F7AA79A00F39DFE /* fetchResource.js */,
+				F71170E32F7AA79A00F39DFE /* fileDelete.js */,
+				F71170E42F7AA79A00F39DFE /* fileExists.js */,
+				F71170E52F7AA79A00F39DFE /* fileOpen.js */,
+				F71170E62F7AA79A00F39DFE /* fileRead.js */,
+				F71170E72F7AA79A00F39DFE /* fileSave.js */,
+				F71170E82F7AA79A00F39DFE /* getPathDocuments.js */,
+				F71170E92F7AA79A00F39DFE /* getPathTemp.js */,
+				F71170EA2F7AA79A00F39DFE /* httpTools.js */,
+				F71170EB2F7AA79A00F39DFE /* mkdir.js */,
+				F71170EC2F7AA79A00F39DFE /* plistBuddy.js */,
+				F71170ED2F7AA79A00F39DFE /* previewFile.js */,
+				F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */,
+				F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */,
+				F71170F02F7AA79A00F39DFE /* shellCall.js */,
+				F71170FC2F7AA79A00F39DFE /* test-scripts */,
+				F71170FD2F7AA79A00F39DFE /* tool_entry.js */,
 			);
 			path = Scripts;
 			sourceTree = "<group>";
@@ -259,6 +372,41 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F71170FE2F7AA79A00F39DFE /* testGet.js in Resources */,
+				F71170FF2F7AA79A00F39DFE /* tool_entry.js in Resources */,
+				F71171002F7AA79A00F39DFE /* testDownload.js in Resources */,
+				F71171012F7AA79A00F39DFE /* plistBuddy.js in Resources */,
+				F71171022F7AA79A00F39DFE /* qmakeBuild.js in Resources */,
+				F71171032F7AA79A00F39DFE /* testPaths.js in Resources */,
+				F71171042F7AA79A00F39DFE /* previewFile.js in Resources */,
+				F71171052F7AA79A00F39DFE /* testPost.js in Resources */,
+				F71171062F7AA79A00F39DFE /* testPipeline.js in Resources */,
+				F71171072F7AA79A00F39DFE /* mkdir.js in Resources */,
+				F71171082F7AA79A00F39DFE /* getPathTemp.js in Resources */,
+				F71171092F7AA79A00F39DFE /* fetchPrompt.js in Resources */,
+				F711710A2F7AA79A00F39DFE /* testLogging.js in Resources */,
+				F711710B2F7AA79A00F39DFE /* fileDelete.js in Resources */,
+				F711710C2F7AA79A00F39DFE /* testDifferentMethods.js in Resources */,
+				F711710D2F7AA79A00F39DFE /* sharedFunctions.js in Resources */,
+				F711710E2F7AA79A00F39DFE /* directoryCreate.js in Resources */,
+				F711710F2F7AA79A00F39DFE /* testFileOps.js in Resources */,
+				F71171102F7AA79A00F39DFE /* fileRead.js in Resources */,
+				F71171112F7AA79A00F39DFE /* testHttpAll.js in Resources */,
+				F71171122F7AA79A00F39DFE /* cmakeBuild.js in Resources */,
+				F71171132F7AA79A00F39DFE /* fetchResource.js in Resources */,
+				F71171142F7AA79A00F39DFE /* fileExists.js in Resources */,
+				F71171152F7AA79A00F39DFE /* analyzeDirectory.js in Resources */,
+				F71171162F7AA79A00F39DFE /* fileOpen.js in Resources */,
+				F71171172F7AA79A00F39DFE /* clangTools.js in Resources */,
+				F71171182F7AA79A00F39DFE /* bootstrap.js in Resources */,
+				F71171192F7AA79A00F39DFE /* checkWithXcode.js in Resources */,
+				F711711A2F7AA79A00F39DFE /* httpTools.js in Resources */,
+				F711711B2F7AA79A00F39DFE /* testJSON.js in Resources */,
+				F711711C2F7AA79A00F39DFE /* shellCall.js in Resources */,
+				F711711D2F7AA79A00F39DFE /* getPathDocuments.js in Resources */,
+				F711711E2F7AA79A00F39DFE /* fileSave.js in Resources */,
+				F711711F2F7AA79A00F39DFE /* testCustomHeaders.js in Resources */,
+				F71171202F7AA79A00F39DFE /* directoryList.js in Resources */,
 				F75EE2782F436EE7009908F1 /* ToolCapabilities.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

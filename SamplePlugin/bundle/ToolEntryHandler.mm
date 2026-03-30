@@ -15,7 +15,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        error = nil;
+        _error = nil;
     }
     return self;
 }

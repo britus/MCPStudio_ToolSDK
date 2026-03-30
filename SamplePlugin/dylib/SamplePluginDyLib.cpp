@@ -1,9 +1,6 @@
 //
 //  SamplePluginDyLib.cpp
 //  SamplePluginDyLib
-//
-//  Created by Björn Eschrich on 16.02.26.
-//
 
 #include <iostream>
 #include "SamplePluginDyLib.hpp"
