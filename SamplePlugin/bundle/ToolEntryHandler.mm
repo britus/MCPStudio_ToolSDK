@@ -44,9 +44,9 @@
     
     // Process the tool entry
     NSString *content = [self stringForKey:@"content"];
-    NSString *self.info = [self stringForKey:@"info"];
+    NSString *info = [self stringForKey:@"info"];
     if (content) {
-        NSLog(@"Content: %@", [content stringByAppendingString:self._info]);
+        NSLog(@"Content: %@", [content stringByAppendingString:self.info]);
     }
     
     return nil;

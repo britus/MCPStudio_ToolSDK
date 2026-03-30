@@ -21,6 +21,7 @@ function taskLog(message) {
 
 function checkWithGcc(params) {
     var arch = params.arch || "";
+    var compilerPath = params. compilerPath || "/usr/local/bin";
     var verbose = (params.verbose === true);
     
     taskLog("=== GCC Compiler Detection Task ===");
@@ -28,9 +29,9 @@ function checkWithGcc(params) {
     taskLog("Verbose: " + verbose);
 
     // Validate input parameters
-    if (!MCPStudio.fileExists("/usr/bin/gcc")) {
-        return shared.createErrorResult("GCC compiler not found at /usr/bin/gcc. Please install GCC using: brew install gcc or sudo apt-get install gcc");
-    }
+    // if (!MCPStudio.fileExists("/usr/bin/gcc")) {
+    //     return shared.createErrorResult("GCC compiler not found at /usr/bin/gcc. Please install GCC using: brew install gcc or sudo apt-get install gcc");
+    // }
 
     taskLog("[Script] GCC compiler detected at /usr/bin/gcc");
 
@@ -40,6 +41,7 @@ function checkWithGcc(params) {
     
     // Get notified
     shellScript += 'set -euo pipefail\n';
+    shellScript += 'which gcc 2>&1\n';
 
     // Basic version check
     shellScript += 'echo "=== GCC Version Information ==="\n';
@@ -143,7 +145,7 @@ function checkWithGcc(params) {
                (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
                (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
             metadata: {
-                path: "/usr/bin/gcc",
+                path: "gcc",
                 arch: arch,
                 operation: "checkWithGcc",
                 success: false,
@@ -161,7 +163,7 @@ function checkWithGcc(params) {
                (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
                (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
             metadata: {
-                path: "/usr/bin/gcc",
+                path: "gcc",
                 arch: arch,
                 operation: "checkWithGcc",
                 success: true,

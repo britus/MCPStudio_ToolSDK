@@ -25,7 +25,7 @@ function getGccInfo(params) {
     taskLog("Compiler: " + compiler);
 
     // Validate input parameters
-    var compilerPath = "/usr/bin/" + compiler;
+    var compilerPath = compiler;
     
     if (!MCPStudio.fileExists(compilerPath)) {
         return shared.createErrorResult("GCC compiler not found at " + compilerPath + ". Please install GCC using: brew install gcc or sudo apt-get install gcc");
@@ -42,19 +42,19 @@ function getGccInfo(params) {
 
     // Basic version information
     shellScript += 'echo "=== Basic Version Information ==="\n';
-    shellScript += '"'"' + compiler + "'"' --version 2>&1 || echo "Version info not available"\n\n';
+    shellScript += compiler + ' --version 2>&1 || echo "Version info not available"\n\n';
 
     // Compiler location
     shellScript += 'echo "=== Compiler Location ==="\n';
-    shellScript += '"'"'which '"'"' + compiler + "'"' || echo "Not found in PATH"\n\n';
+    shellScript += 'which ' + compiler + ' || echo "Not found in PATH"\n\n';
 
     // Target architecture
     shellScript += 'echo "=== Target Architecture ==="\n';
-    shellScript += '"'"' + compiler + "'"' -dumpmachine 2>&1 || true\n\n';
+    shellScript += compiler + ' -dumpmachine 2>&1 || true\n\n';
 
     // Compiler version
     shellScript += 'echo "=== Compiler Version ==="\n';
-    shellScript += '"'"' + compiler + "'"' -dumpversion 2>&1 || true\n\n';
+    shellScript += compiler + ' -dumpversion 2>&1 || true\n\n';
 
     taskLog("[Script] Running basic GCC info script...");
     

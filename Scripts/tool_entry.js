@@ -16,6 +16,9 @@ const clangTools = require('clangTools');
 const shellCall = require('shellCall');
 const cmakeBuild = require('cmakeBuild');
 const qmakeBuild = require('qmakeBuild');
+const checkWithGcc = require('checkWithGcc');
+const gccSettings = require('gccSettings');
+const getGccInfo = require('getGccInfo');
 
 // File operation handlers
 const mkdir = require('mkdir');
@@ -73,6 +76,12 @@ function toolEntry(sid, handlerName, jsonParams) {
             	return cmakeBuild.cmakeBuild(params);
             case "qmakeBuild":
             	return qmakeBuild.qmakeBuild(params);
+            case "checkWithGcc":
+                return checkWithGcc.checkWithGcc(params);
+            case "gccSettings": 
+                return gccSettings.gccSettings(params);
+            case "getGccInfo":
+                return getGccInfo.getGccInfo(params);
 
             // MCP Prompt, Resource
             case "fetchPrompt":
