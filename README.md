@@ -171,7 +171,7 @@ Prompts/   - Prompt templates and configurations
 2. **Review the README files** linked above for detailed documentation
 3. **Build the SamplePlugin** to understand plugin structure
 4. **Create custom scripts** in the Scripts/ directory
-5. **Configure tools** via [MCP Studio App](https://mcpstudio.eofsl.com/download.hml) or configuration files
+5. **Configure tools** via [MCP Studio App](https://mcpstudio.eofsl.com/download.html) or configuration files
 
 ## License
 
