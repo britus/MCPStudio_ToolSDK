@@ -8,8 +8,8 @@ const shared = require('sharedFunctions');
 function testPaths() {
     console.log("--- Testing Path Functions ---");
     
-    var docsPath = Swift.getDocumentsPath();
-    var tempPath = Swift.getTempPath();
+    var docsPath = MCPStudio.getDocumentsPath();
+    var tempPath = MCPStudio.getTempPath();
     
     console.log("Documents path: " + docsPath);
     console.log("Temp path: " + tempPath);
@@ -17,8 +17,8 @@ function testPaths() {
     var results = {
         documentsPath: docsPath,
         tempPath: tempPath,
-        documentsExists: Swift.fileExists(docsPath),
-        tempExists: Swift.fileExists(tempPath)
+        documentsExists: MCPStudio.fileExists(docsPath),
+        tempExists: MCPStudio.fileExists(tempPath)
     };
     
     return JSON.stringify({

@@ -15,7 +15,7 @@ function deleteFile(params) {
     console.log("Delete file: " + path);
     
     // Delete file
-    var success = Swift.deleteFile(path);
+    var success = MCPStudio.deleteFile(path);
     
     if (!success) {
         return shared.createErrorResult("Failed to delete file: " + path);
@@ -26,8 +26,8 @@ function deleteFile(params) {
         path: path,
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
         	path: path,
@@ -36,7 +36,7 @@ function deleteFile(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

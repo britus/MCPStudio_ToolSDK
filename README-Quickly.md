@@ -1,7 +1,7 @@
 # EoF MCP Studio
 
 This is a implementation of the Model Context Protocol (MCP) server 
-for macOS using AppKit and Cocoa SDK, Swift and SwiftUI.
+for macOS using AppKit and Cocoa SDK, MCPStudio and MCPStudioUI.
 
 ## Features Implemented
 

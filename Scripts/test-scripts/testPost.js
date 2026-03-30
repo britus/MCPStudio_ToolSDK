@@ -25,7 +25,7 @@ function testPost(params) {
             "Content-Type": "application/json"
         });
         
-        var responseJSON = Swift.httpPost(testUrl, body, headers);
+        var responseJSON = MCPStudio.httpPost(testUrl, body, headers);
         var response = JSON.parse(responseJSON);
         
         console.log("Response status: " + response.statusCode);

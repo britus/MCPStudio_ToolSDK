@@ -10,7 +10,7 @@ function testDownload(params) {
     
     // Use a small text file for testing
     var testUrl = params.downloadUrl || "https://httpbin.org/robots.txt";
-    var tempPath = Swift.getTempPath();
+    var tempPath = MCPStudio.getTempPath();
     var destination = tempPath + "/http_test_download.txt";
     
     console.log("Downloading file from: " + testUrl);
@@ -18,11 +18,11 @@ function testDownload(params) {
     
     try {
         // Clean up any existing file
-        if (Swift.fileExists(destination)) {
-            Swift.deleteFile(destination);
+        if (MCPStudio.fileExists(destination)) {
+            MCPStudio.deleteFile(destination);
         }
         
-        var success = Swift.downloadFile(testUrl, destination);
+        var success = MCPStudio.downloadFile(testUrl, destination);
         
         if (!success) {
             return JSON.stringify({
@@ -35,7 +35,7 @@ function testDownload(params) {
         console.log("Download completed");
         
         // Verify file exists
-        var exists = Swift.fileExists(destination);
+        var exists = MCPStudio.fileExists(destination);
         console.log("File exists: " + exists);
         
         if (!exists) {
@@ -46,13 +46,13 @@ function testDownload(params) {
         }
         
         // Read file content
-        var content = Swift.readFile(destination);
+        var content = MCPStudio.readFile(destination);
         var fileSize = content ? content.length : 0;
         
         console.log("File size: " + fileSize + " bytes");
         
         // Clean up
-        Swift.deleteFile(destination);
+        MCPStudio.deleteFile(destination);
         
         return JSON.stringify({
             text: JSON.stringify({

@@ -15,12 +15,12 @@ function previewFile(params) {
     console.log("Processing file: " + filePath);
     
     // Check if file exists
-    if (!Swift.fileExists(filePath)) {
+    if (!MCPStudio.fileExists(filePath)) {
         return shared.createErrorResult("File not found: " + filePath);
     }
     
     // Read file content
-    var content = Swift.readFile(filePath);
+    var content = MCPStudio.readFile(filePath);
     if (!content) {
         return shared.createErrorResult("Failed to read file: " + filePath);
     }
@@ -37,8 +37,8 @@ function previewFile(params) {
         preview: lines.slice(0, 10).join('\n')
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
             filePath: filePath,
@@ -47,7 +47,7 @@ function previewFile(params) {
         }
     }));
     
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

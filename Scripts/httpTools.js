@@ -64,7 +64,7 @@ function fetchData(params) {
     var headersJSON = JSON.stringify(headers);
     
     // Make GET request
-    var responseJSON = Swift.httpGet(url, headersJSON);
+    var responseJSON = MCPStudio.httpGet(url, headersJSON);
     var response = JSON.parse(responseJSON);
     
     if (response.error) {
@@ -77,7 +77,7 @@ function fetchData(params) {
     
     // Optional: Save to file
     if (params.saveToFile) {
-        var saved = Swift.saveFile(params.saveToFile, response.body);
+        var saved = MCPStudio.saveFile(params.saveToFile, response.body);
         if (!saved) {
             console.warn("[Script] Failed to save response to file");
         }
@@ -112,7 +112,7 @@ function postData(params) {
     var headersJSON = JSON.stringify(headers);
     
     // Make POST request
-    var responseJSON = Swift.httpPost(url, body, headersJSON);
+    var responseJSON = MCPStudio.httpPost(url, body, headersJSON);
     var response = JSON.parse(responseJSON);
     
     if (response.error) {
@@ -145,7 +145,7 @@ function fetchJSON(params) {
     var headersJSON = JSON.stringify(headers);
     
     // Make GET request
-    var responseJSON = Swift.httpGet(url, headersJSON);
+    var responseJSON = MCPStudio.httpGet(url, headersJSON);
     var response = JSON.parse(responseJSON);
     
     if (response.error) {
@@ -167,7 +167,7 @@ function fetchJSON(params) {
         
         // Optional: Save to file
         if (params.saveToFile) {
-            Swift.saveFile(params.saveToFile, JSON.stringify(jsonData, null, 2));
+            MCPStudio.saveFile(params.saveToFile, JSON.stringify(jsonData, null, 2));
         }
         
         return success({
@@ -190,25 +190,25 @@ function downloadFile(params) {
     if (!destination) {
         // Generate default destination in temp directory
         var filename = url.split('/').pop() || 'download.txt';
-        destination = Swift.getTempPath() + "/" + filename;
+        destination = MCPStudio.getTempPath() + "/" + filename;
     }
     
     console.log("[Script] Downloading file from: " + url);
     console.log("[Script] Destination: " + destination);
     
-    var success = Swift.downloadFile(url, destination);
+    var success = MCPStudio.downloadFile(url, destination);
     
     if (!success) {
         return error("Failed to download file");
     }
     
     // Get file info
-    var exists = Swift.fileExists(destination);
+    var exists = MCPStudio.fileExists(destination);
     var content = null;
     var size = 0;
     
     if (exists) {
-        content = Swift.readFile(destination);
+        content = MCPStudio.readFile(destination);
         size = content ? content.length : 0;
     }
     
@@ -244,7 +244,7 @@ function apiRequest(params) {
     var headersJSON = JSON.stringify(headers);
     
     // Make request
-    var responseJSON = Swift.httpRequest(method, url, body, headersJSON);
+    var responseJSON = MCPStudio.httpRequest(method, url, body, headersJSON);
     var response = JSON.parse(responseJSON);
     
     if (response.error) {
@@ -290,7 +290,7 @@ function scrapeWebpage(params) {
     };
     var headersJSON = JSON.stringify(headers);
     
-    var responseJSON = Swift.httpGet(url, headersJSON);
+    var responseJSON = MCPStudio.httpGet(url, headersJSON);
     var response = JSON.parse(responseJSON);
     
     if (response.error) {
@@ -319,7 +319,7 @@ function scrapeWebpage(params) {
     
     // Optional: Save HTML to file
     if (params.saveHTML) {
-        Swift.saveFile(params.saveHTML, html);
+        MCPStudio.saveFile(params.saveHTML, html);
     }
     
     return success(extracted, { 
@@ -340,7 +340,7 @@ function checkStatus(params) {
     var results = [];
     
     urls.forEach(function(url) {
-        var responseJSON = Swift.httpGet(url, null);
+        var responseJSON = MCPStudio.httpGet(url, null);
         var response = JSON.parse(responseJSON);
         
         results.push({
@@ -383,9 +383,9 @@ function webhookCall(params) {
     
     var responseJSON;
     if (method === 'POST') {
-        responseJSON = Swift.httpPost(url, body, headersJSON);
+        responseJSON = MCPStudio.httpPost(url, body, headersJSON);
     } else if (method === 'PUT') {
-        responseJSON = Swift.httpPut(url, body, headersJSON);
+        responseJSON = MCPStudio.httpPut(url, body, headersJSON);
     } else {
         return error("Webhook method must be POST or PUT");
     }

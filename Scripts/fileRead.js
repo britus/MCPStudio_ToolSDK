@@ -15,7 +15,7 @@ function readFile(params) {
     console.log("Read file: " + path);
     
     // Read file content
-    var content = Swift.readFile(path);
+    var content = MCPStudio.readFile(path);
     
     if (content === null) {
         return shared.createErrorResult("Failed to read file: " + path);
@@ -26,8 +26,8 @@ function readFile(params) {
         path: path,
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
     	    path: path,
@@ -37,7 +37,7 @@ function readFile(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

@@ -38,7 +38,6 @@
 		F75EE2022F436EE7009908F1 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		F75EE2032F436EE7009908F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F75EE2042F436EE7009908F1 /* README-MCPServer.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-MCPServer.md"; sourceTree = "<group>"; };
-		F75EE2052F436EE7009908F1 /* README-REPO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-REPO.md"; sourceTree = "<group>"; };
 		F75EE2062F436EE7009908F1 /* README-SamplePlugin.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-SamplePlugin.md"; sourceTree = "<group>"; };
 		F75EE2072F436EE7009908F1 /* README-Scripting.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-Scripting.md"; sourceTree = "<group>"; };
 		F75EE2612F436EE7009908F1 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -49,11 +48,6 @@
 		F75EE2672F436EE7009908F1 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
 		F75EE2692F436EE7009908F1 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		F75EE26A2F436EE7009908F1 /* ToolCapabilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ToolCapabilities.json; sourceTree = "<group>"; };
-		F75EE26C2F436EE7009908F1 /* data_pipeline_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = data_pipeline_script.js; sourceTree = "<group>"; };
-		F75EE26D2F436EE7009908F1 /* example_tool_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = example_tool_script.js; sourceTree = "<group>"; };
-		F75EE26E2F436EE7009908F1 /* http_test_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = http_test_script.js; sourceTree = "<group>"; };
-		F75EE26F2F436EE7009908F1 /* http_tool_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = http_tool_script.js; sourceTree = "<group>"; };
-		F75EE2702F436EE7009908F1 /* test_script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = test_script.js; sourceTree = "<group>"; };
 		F75EE2722F436EE7009908F1 /* ToolJSONBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolJSONBridge.h; sourceTree = "<group>"; };
 		F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolJSONBridge.mm; sourceTree = "<group>"; };
 		F75EE2D12F436FA2009908F1 /* libSamplePluginDyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSamplePluginDyLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,7 +86,6 @@
 				F75EE2022F436EE7009908F1 /* LICENSE */,
 				F75EE2032F436EE7009908F1 /* README.md */,
 				F75EE2042F436EE7009908F1 /* README-MCPServer.md */,
-				F75EE2052F436EE7009908F1 /* README-REPO.md */,
 				F75EE2062F436EE7009908F1 /* README-SamplePlugin.md */,
 				F75EE2072F436EE7009908F1 /* README-Scripting.md */,
 				F75EE1F82F436EAB009908F1 /* Products */,
@@ -157,11 +150,6 @@
 		F75EE2712F436EE7009908F1 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
-				F75EE26C2F436EE7009908F1 /* data_pipeline_script.js */,
-				F75EE26D2F436EE7009908F1 /* example_tool_script.js */,
-				F75EE26E2F436EE7009908F1 /* http_test_script.js */,
-				F75EE26F2F436EE7009908F1 /* http_tool_script.js */,
-				F75EE2702F436EE7009908F1 /* test_script.js */,
 			);
 			path = Scripts;
 			sourceTree = "<group>";

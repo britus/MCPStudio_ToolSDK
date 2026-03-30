@@ -6,16 +6,16 @@
 const shared = require('sharedFunctions');
 
 function mkdir(params) {
-    var dirPath = params.dirPath || Swift.getDocumentsPath();
+    var dirPath = params.dirPath || MCPStudio.getDocumentsPath();
     
     console.log("Create directory: " + dirPath);
     
-    if (Swift.fileExists(dirPath)) {
+    if (MCPStudio.fileExists(dirPath)) {
         return shared.createErrorResult("Directory already exist: " + dirPath);
     }
     
     // Create directory
-    var success = Swift.createDirectory(dirPath);
+    var success = MCPStudio.createDirectory(dirPath);
     if (!success) {
         return shared.createErrorResult("Failed to create directory: " + dirPath);
     }
@@ -25,8 +25,8 @@ function mkdir(params) {
         path: dirPath,
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
         	path: dirPath,
@@ -35,7 +35,7 @@ function mkdir(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

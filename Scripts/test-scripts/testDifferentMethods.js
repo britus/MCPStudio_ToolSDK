@@ -20,7 +20,7 @@ function testDifferentMethods(params) {
             var body = method === "POST" || method === "PUT" ? 
                 JSON.stringify({ test: true }) : null;
             
-            var responseJSON = Swift.httpRequest(method, url, body, null);
+            var responseJSON = MCPStudio.httpRequest(method, url, body, null);
             var response = JSON.parse(responseJSON);
             
             results[method] = {

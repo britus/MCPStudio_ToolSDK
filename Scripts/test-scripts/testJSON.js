@@ -18,7 +18,7 @@ function testJSON(params) {
             "Accept": "application/json"
         });
         
-        var responseJSON = Swift.httpGet(testUrl, headers);
+        var responseJSON = MCPStudio.httpGet(testUrl, headers);
         var response = JSON.parse(responseJSON);
         
         console.log("Response status: " + response.statusCode);

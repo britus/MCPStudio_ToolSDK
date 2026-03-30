@@ -10,7 +10,7 @@ techniques copied from qmcp project. Thank's ;)
 **HTTP/1.1 Transport** - Native socket-based HTTP server with high concurrency  
 **Three Core Services** - Tools, Resources, and Prompts  
 **Native macOS Integration** - Uses Foundation/Cocoa/AppKit instead of Qt  
-**Swift-Friendly API** - Modern async/await Swift interface  
+**MCPStudio-Friendly API** - Modern async/await MCPStudio interface  
 **Thread-Safe** - Proper synchronization using GCD and mutexes  
 **Zero Dependencies** - No external libraries required  
 
@@ -18,8 +18,8 @@ techniques copied from qmcp project. Thank's ;)
 
 ```
 ┌─────────────────────────────────────┐
-│      Swift Application Layer        │
-│    (MCPServer.swift wrapper)        │
+│      MCPStudio Application Layer        │
+│    (MCPServer.MCPStudio wrapper)        │
 └──────────────┬──────────────────────┘
                │
 ┌──────────────▼──────────────────────┐

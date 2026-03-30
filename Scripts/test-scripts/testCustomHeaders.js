@@ -21,7 +21,7 @@ function testCustomHeaders(params) {
     console.log("Sending custom headers to: " + testUrl);
     
     try {
-        var responseJSON = Swift.httpGet(testUrl, headersJSON);
+        var responseJSON = MCPStudio.httpGet(testUrl, headersJSON);
         var response = JSON.parse(responseJSON);
         
         if (response.error) {

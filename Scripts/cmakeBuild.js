@@ -23,7 +23,7 @@ const shellCall = require('shellCall').shellCall;
 function cmakeBuild(params) {
   // Validate required parameters
   if (!params || !params.projectDir) {
-    Swift.setToolResult(JSON.stringify({
+    MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] cmake Project directory parameter required.\n",
         metadata: {
             operation: "cmakeBuild",
@@ -42,9 +42,9 @@ function cmakeBuild(params) {
   const cmakeArgs = params.cmakeArgs || '';
   const verbose = params.verbose !== undefined ? params.verbose : false;
 
-  // Validate directory exists using Swift API
-  if (!Swift.fileExists(projectDir)) {
-    Swift.setToolResult(JSON.stringify({
+  // Validate directory exists using MCPStudio API
+  if (!MCPStudio.fileExists(projectDir)) {
+    MCPStudio.setToolResult(JSON.stringify({
         text: "cmake Project directory '"+ projectDir+"' not found.",
         metadata: {
             operation: "cmakeBuild",
@@ -58,8 +58,8 @@ function cmakeBuild(params) {
 
   // Ensure build directory exists
   const buildPath = projectDir + '/build';
-  if (!Swift.fileExists(buildPath)) {
-    Swift.createDirectory(buildPath);
+  if (!MCPStudio.fileExists(buildPath)) {
+    MCPStudio.createDirectory(buildPath);
   }
 
   // Set default CMAKE_FLAGS if empty
@@ -83,11 +83,11 @@ function cmakeBuild(params) {
     `echo 'Build completed successfully.'`
   ].join('\n');
 
-  var success = Swift.shell(shellScript);
+  var success = MCPStudio.shell(shellScript);
 
   // Return result as JSON (success/failure)
   if (success) {
-    Swift.setToolResult(JSON.stringify({
+    MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] cmake successfully\n" + 
                 (stdOut && stdOut.length > 0 ? stdOut.join("\n") : ""),
         metadata: {
@@ -99,7 +99,7 @@ function cmakeBuild(params) {
         }
     }));
   } else {    
-    Swift.setToolResult(JSON.stringify({
+    MCPStudio.setToolResult(JSON.stringify({
         text: "[Script] cmake failed.\n" + 
                (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") + "\n--- Stderr ---\n" + 
                (stdErr && stdErr.length > 0 ? stdErr.join("\n") : ""),

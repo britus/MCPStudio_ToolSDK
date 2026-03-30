@@ -16,7 +16,7 @@ function saveFile(params) {
     console.log("Save file: " + path);
     
     // Save file content
-    var success = Swift.saveFile(path, content);
+    var success = MCPStudio.saveFile(path, content);
     
     if (!success) {
         return shared.createErrorResult("Failed to save file: " + path);
@@ -27,8 +27,8 @@ function saveFile(params) {
         path: path,
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
 	        path: path,
@@ -37,7 +37,7 @@ function saveFile(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

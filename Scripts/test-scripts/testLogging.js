@@ -14,11 +14,11 @@ function testLogging() {
     console.warn("Console.warn test");
     console.debug("Console.debug test");
     
-    // Test Swift.log with different types
-    Swift.log('debug', -1, 'Swift debug log test');
-    Swift.log('info', 100, 'Swift info log test with code');
-    Swift.log('warning', 200, 'Swift warning log test');
-    Swift.log('error', 500, 'Swift error log test');
+    // Test MCPStudio.log with different types
+    MCPStudio.log('debug', -1, 'MCPStudio debug log test');
+    MCPStudio.log('info', 100, 'MCPStudio info log test with code');
+    MCPStudio.log('warning', 200, 'MCPStudio warning log test');
+    MCPStudio.log('error', 500, 'MCPStudio error log test');
     
     return JSON.stringify({
         text: "Logging tests completed - check logs",

@@ -37,7 +37,7 @@ function checkWithXcode(params) {
         return shared.createErrorResult("Missing required parameter: projectDir");
     }
     
-    if (!Swift.fileExists(projectDir)) {
+    if (!MCPStudio.fileExists(projectDir)) {
         return shared.createErrorResult("Project directory not found: " + projectDir);
     }
 
@@ -70,7 +70,7 @@ function checkWithXcode(params) {
         shellScript += 'rm -rf DerivedData/ || true\n\n';
         taskLog("[Script] Cleaning previous builds...");
         
-        success = Swift.shell(shellScript);
+        success = MCPStudio.shell(shellScript);
         if (!success) {
             return shared.createErrorResult("Failed to clean build directory");
         }
@@ -115,10 +115,10 @@ function checkWithXcode(params) {
 
     taskLog("[Script] Run: " + shellScript);
     
-    success = Swift.shell(shellScript);
+    success = MCPStudio.shell(shellScript);
     
     if (!success) {
-        Swift.setToolResult(JSON.stringify({
+        MCPStudio.setToolResult(JSON.stringify({
             text: "[Script] Build FAILED for " + projectName + "\n" + 
                    stdOut.join("\n") + 
                    (stdErr && stdErr.length > 0 
@@ -139,7 +139,7 @@ function checkWithXcode(params) {
         taskLog("[Script] Build failed!");
     }
     else {
-        Swift.setToolResult(JSON.stringify({
+        MCPStudio.setToolResult(JSON.stringify({
             text: "Build completed successfully for " + projectName + "\n" + 
                    stdOut.join("\n") + 
                    (stdErr && stdErr.length > 0 
@@ -160,7 +160,7 @@ function checkWithXcode(params) {
         taskLog("[Script] Build successful!");
     }
 
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

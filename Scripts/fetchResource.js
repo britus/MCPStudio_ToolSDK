@@ -6,31 +6,54 @@
 const shared = require('sharedFunctions');
 
 function fetchResource(params) {
-    var resourceName = params.resourceName;
-    
-    if (!resourceName) {
-        return shared.createErrorResult("Resource name requiered");
-    }
-    
-    var json = Swift.resourceConfig(resourceName);
+    var resourceName = params.resourceName || "MCP resource name required";
+
+    var json = MCPStudio.resourceConfig(resourceName);
     if (!json) {
-    	return shared.createErrorResult("Failed to get resource " + promptName);
+    	let msg = "Failed to load resource: " + resourceName;
+    	MCPStudio.setToolResult(JSON.stringify({
+	        text: msg,
+	        metadata: {
+	        	error: msg,
+	            operation: "fetchResource",
+	            success: false,
+		        mimeType: "plain/text",
+	            uri: "",
+	            name: "",
+	        }
+	    }));
+    	return null;
     }
     
     var resource = JSON.parse(json);
     if (!resource) {
-    	return shared.createErrorResult("Failed to parse resource " + promptName);
+    	let msg = "Failed to parse resource: " + resourceName;
+        MCPStudio.setToolResult(JSON.stringify({
+	        text: msg,
+	        metadata: {
+	        	error: msg,
+	            operation: "fetchResource",
+	            success: false,
+		        mimeType: "plain/text",
+	            uri: "",
+	            name: "",
+	        }
+	    }));
+    	return null;
     }
-    
-    var data = {
-    	operation: "fetchResource",
-        message: resource.name + " URL: " + resource.uri,
-        name: resource.name,
-        uri: resource.uri,
-        mimeType: resource.mimeType
-    };
-    
-    return shared.createSuccessResult(data, data);
+     
+    MCPStudio.setToolResult(JSON.stringify({
+        text: resource.name + ": take a look following link:\n" + resource.uri,
+        metadata: {
+            operation: "fetchResource",
+            success: true,
+	        mimeType: resource.mimeType,
+            uri: resource.uri,
+            name: resource.name,
+        }
+    }));
+
+    return null;
 }
 
 module.exports = {

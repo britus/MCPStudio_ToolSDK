@@ -48,8 +48,8 @@ function testPipeline(handlerName, params) {
 function processPipeline(params) {
     console.log("[Script] === Starting Data Processing Pipeline ===");
     
-    var inputDir = params.inputDir || Swift.getDocumentsPath() + "/input";
-    var outputDir = params.outputDir || Swift.getDocumentsPath() + "/output";
+    var inputDir = params.inputDir || MCPStudio.getDocumentsPath() + "/input";
+    var outputDir = params.outputDir || MCPStudio.getDocumentsPath() + "/output";
     var reportPath = params.reportPath || outputDir + "/pipeline_report.txt";
     
     // Ensure directories exist
@@ -119,20 +119,20 @@ function processPipeline(params) {
 function extractStage(inputDir, outputDir) {
     console.log("[Script] Extracting from: " + inputDir);
     
-    if (!Swift.fileExists(inputDir)) {
+    if (!MCPStudio.fileExists(inputDir)) {
         return { error: "Input directory not found: " + inputDir };
     }
     
     ensureDirectory(outputDir);
     
-    var files = Swift.listDirectory(inputDir);
+    var files = MCPStudio.listDirectory(inputDir);
     var extracted = [];
     
     files.forEach(function(filename) {
         var inputPath = inputDir + "/" + filename;
         
-        if (Swift.fileExists(inputPath)) {
-            var content = Swift.readFile(inputPath);
+        if (MCPStudio.fileExists(inputPath)) {
+            var content = MCPStudio.readFile(inputPath);
             
             if (content) {
                 // Extract key data from file
@@ -161,7 +161,7 @@ function extractStage(inputDir, outputDir) {
                 
                 // Save extracted data
                 var outputPath = outputDir + "/" + filename + ".extracted.json";
-                Swift.saveFile(outputPath, JSON.stringify(data, null, 2));
+                MCPStudio.saveFile(outputPath, JSON.stringify(data, null, 2));
             }
         }
     });
@@ -178,19 +178,19 @@ function extractStage(inputDir, outputDir) {
 function transformStage(inputDir, outputDir, rules) {
     console.log("[Script] Transforming data from: " + inputDir);
     
-    if (!Swift.fileExists(inputDir)) {
+    if (!MCPStudio.fileExists(inputDir)) {
         return { error: "Input directory not found" };
     }
     
     ensureDirectory(outputDir);
     
-    var files = Swift.listDirectory(inputDir);
+    var files = MCPStudio.listDirectory(inputDir);
     var transformed = [];
     
     files.forEach(function(filename) {
         if (filename.endsWith('.json')) {
             var inputPath = inputDir + "/" + filename;
-            var content = Swift.readFile(inputPath);
+            var content = MCPStudio.readFile(inputPath);
             
             if (content) {
                 try {
@@ -202,7 +202,7 @@ function transformStage(inputDir, outputDir, rules) {
                     // Save transformed data
                     var outputPath = outputDir + "/" + 
                         filename.replace('.extracted.json', '.transformed.json');
-                    Swift.saveFile(outputPath, JSON.stringify(result, null, 2));
+                    MCPStudio.saveFile(outputPath, JSON.stringify(result, null, 2));
                     
                     transformed.push({
                         filename: filename,
@@ -231,11 +231,11 @@ function transformStage(inputDir, outputDir, rules) {
 function aggregateStage(inputDir, outputPath) {
     console.log("[Script] Aggregating data from: " + inputDir);
     
-    if (!Swift.fileExists(inputDir)) {
+    if (!MCPStudio.fileExists(inputDir)) {
         return { error: "Input directory not found" };
     }
     
-    var files = Swift.listDirectory(inputDir);
+    var files = MCPStudio.listDirectory(inputDir);
     var aggregated = {
         generatedAt: new Date().toISOString(),
         totalFiles: 0,
@@ -249,7 +249,7 @@ function aggregateStage(inputDir, outputPath) {
     files.forEach(function(filename) {
         if (filename.endsWith('.json')) {
             var filePath = inputDir + "/" + filename;
-            var content = Swift.readFile(filePath);
+            var content = MCPStudio.readFile(filePath);
             
             if (content) {
                 try {
@@ -288,7 +288,7 @@ function aggregateStage(inputDir, outputPath) {
     }
     
     // Save aggregated data
-    Swift.saveFile(outputPath, JSON.stringify(aggregated, null, 2));
+    MCPStudio.saveFile(outputPath, JSON.stringify(aggregated, null, 2));
     
     console.log("[Script] Aggregated " + aggregated.totalFiles + " files");
     
@@ -307,11 +307,11 @@ function extractData(params) {
     var inputPath = params.inputPath;
     var outputPath = params.outputPath;
     
-    if (!inputPath || !Swift.fileExists(inputPath)) {
+    if (!inputPath || !MCPStudio.fileExists(inputPath)) {
         return error("Input file not found: " + inputPath);
     }
     
-    var content = Swift.readFile(inputPath);
+    var content = MCPStudio.readFile(inputPath);
     if (!content) {
         return error("Failed to read file");
     }
@@ -325,7 +325,7 @@ function extractData(params) {
     };
     
     if (outputPath) {
-        Swift.saveFile(outputPath, JSON.stringify(extracted, null, 2));
+        MCPStudio.saveFile(outputPath, JSON.stringify(extracted, null, 2));
     }
     
     return success(extracted, { operation: "extractData" });
@@ -336,7 +336,7 @@ function transformData(params) {
     var outputPath = params.outputPath;
     var rules = params.rules || {};
     
-    var content = Swift.readFile(inputPath);
+    var content = MCPStudio.readFile(inputPath);
     if (!content) {
         return error("Failed to read input file");
     }
@@ -346,7 +346,7 @@ function transformData(params) {
         var transformed = applyTransformRules(data, rules);
         
         if (outputPath) {
-            Swift.saveFile(outputPath, JSON.stringify(transformed, null, 2));
+            MCPStudio.saveFile(outputPath, JSON.stringify(transformed, null, 2));
         }
         
         return success(transformed, { operation: "transformData" });
@@ -366,7 +366,7 @@ function aggregateData(params) {
     };
     
     inputPaths.forEach(function(path) {
-        var content = Swift.readFile(path);
+        var content = MCPStudio.readFile(path);
         if (content) {
             try {
                 aggregated.data.push(JSON.parse(content));
@@ -377,7 +377,7 @@ function aggregateData(params) {
     });
     
     if (outputPath) {
-        Swift.saveFile(outputPath, JSON.stringify(aggregated, null, 2));
+        MCPStudio.saveFile(outputPath, JSON.stringify(aggregated, null, 2));
     }
     
     return success(aggregated, { operation: "aggregateData" });
@@ -388,7 +388,7 @@ function generateReport(params) {
     var reportPath = params.reportPath;
     var format = params.format || "text";
     
-    var content = Swift.readFile(dataPath);
+    var content = MCPStudio.readFile(dataPath);
     if (!content) {
         return error("Failed to read data file");
     }
@@ -397,7 +397,7 @@ function generateReport(params) {
         var data = JSON.parse(content);
         var report = createReport(data, format);
         
-        Swift.saveFile(reportPath, report);
+        MCPStudio.saveFile(reportPath, report);
         
         return success({
             reportPath: reportPath,
@@ -461,8 +461,8 @@ function countWords(text) {
 }
 
 function ensureDirectory(path) {
-    if (!Swift.fileExists(path)) {
-        Swift.createDirectory(path);
+    if (!MCPStudio.fileExists(path)) {
+        MCPStudio.createDirectory(path);
     }
 }
 
@@ -518,7 +518,7 @@ function generatePipelineReport(pipeline, reportPath) {
     
     report += "========================================\n";
     
-    Swift.saveFile(reportPath, report);
+    MCPStudio.saveFile(reportPath, report);
     
     return report;
 }

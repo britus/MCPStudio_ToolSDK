@@ -6,16 +6,16 @@
 const shared = require('sharedFunctions');
 
 function analyzeDirectory(params) {
-    var dirPath = params.dirPath || Swift.getDocumentsPath();
+    var dirPath = params.dirPath || MCPStudio.getDocumentsPath();
     
     console.log("Analyzing directory: " + dirPath);
     
-    if (!Swift.fileExists(dirPath)) {
+    if (!MCPStudio.fileExists(dirPath)) {
         return shared.createErrorResult("Directory not found: " + dirPath);
     }
     
     // List directory contents
-    var items = Swift.listDirectory(dirPath);
+    var items = MCPStudio.listDirectory(dirPath);
     
     var analysis = {
         path: dirPath,
@@ -24,7 +24,7 @@ function analyzeDirectory(params) {
             var fullPath = dirPath + "/" + item;
             return {
                 name: item,
-                exists: Swift.fileExists(fullPath)
+                exists: MCPStudio.fileExists(fullPath)
             };
         })
     };

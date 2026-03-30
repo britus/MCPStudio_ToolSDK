@@ -54,8 +54,8 @@ function toolEntry(sid, handlerName, jsonParams) {
     // Required signature
     // sid: session ID string
     // handlerName: handler name requested by caller
-    // jsonParams: raw JSON parameters as string from Swift controller
-    // Return JSON string or use Swift.setToolResult() to set result object then return null
+    // jsonParams: raw JSON parameters as string from MCPStudio controller
+    // Return JSON string or use MCPStudio.setToolResult() to set result object then return null
 }
 ```
 
@@ -67,7 +67,7 @@ function toolEntry(sid, handlerName, jsonParams) {
     
     // Validate handler name exists in tool exports
     if (!toolExports[handlerName]) {
-        Swift.setToolResult({
+        MCPStudio.setToolResult({
             text: "Error: Handler not found: " + handlerName,
             metadata: {
                 success: false,
@@ -82,20 +82,20 @@ function toolEntry(sid, handlerName, jsonParams) {
         var result = toolExports[handlerName](params);
         
         if (result === null) {
-            // Handler already set result via Swift.setToolResult()
+            // Handler already set result via MCPStudio.setToolResult()
             return null;
         }
         
-        // Return result as JSON string or let handler call Swift.setToolResult()
+        // Return result as JSON string or let handler call MCPStudio.setToolResult()
         if (typeof result === 'object') {
             var jsonResult = JSON.stringify(result);
-            Swift.setToolResult(jsonResult);
+            MCPStudio.setToolResult(jsonResult);
             return null;
         }
         
         return result;
     } catch (error) {
-        Swift.setToolResult({
+        MCPStudio.setToolResult({
             text: "Error executing handler: " + error.message,
             metadata: {
                 success: false,
@@ -499,7 +499,7 @@ All tools must import shared functions for consistent behavior:
 const shared = require('sharedFunctions');
 
 // Optional: other shared dependencies
-const swift = require('swiftRuntime');
+const MCPStudio = require('MCPStudioRuntime');
 ```
 
 ---
@@ -546,11 +546,11 @@ function myTool(params) {
 
 ### Pattern 4: Result Handling
 
-Use Swift.setToolResult() to communicate results:
+Use MCPStudio.setToolResult() to communicate results:
 
 ```javascript
 // Success case
-Swift.setToolResult(JSON.stringify({
+MCPStudio.setToolResult(JSON.stringify({
     text: "Operation completed successfully",
     metadata: {
         success: true,
@@ -562,7 +562,7 @@ Swift.setToolResult(JSON.stringify({
 return null; // Result already set
 
 // Failure case
-Swift.setToolResult(JSON.stringify({
+MCPStudio.setToolResult(JSON.stringify({
     text: "Error: Operation failed",
     metadata: {
         success: false,
@@ -584,7 +584,7 @@ Use shared.createErrorResult() for consistent error messages:
 var errorCode = "MISSING_PARAMETER";
 var errorMessage = "Missing required parameter: " + paramName;
 
-Swift.setToolResult(JSON.stringify({
+MCPStudio.setToolResult(JSON.stringify({
     text: errorMessage,
     metadata: {
         success: false,
@@ -631,7 +631,7 @@ var escapedCommand = command.replace(/"/g, '\\"')
 All errors should follow this format:
 
 ```javascript
-Swift.setToolResult(JSON.stringify({
+MCPStudio.setToolResult(JSON.stringify({
     text: "Error: [Human readable message]",
     metadata: {
         success: false,
@@ -760,8 +760,8 @@ function init() {
  * Required tool entry function - MUST implement this signature
  * @param {string} sid - Session ID string
  * @param {string} handlerName - Handler name requested by caller
- * @param {string} jsonParams - Raw JSON parameters as string from Swift controller
- * @returns {string|null} Return JSON string or null if using Swift.setToolResult()
+ * @param {string} jsonParams - Raw JSON parameters as string from MCPStudio controller
+ * @returns {string|null} Return JSON string or null if using MCPStudio.setToolResult()
  */
 function toolEntry(sid, handlerName, jsonParams) {
     // Parse raw JSON string parameters
@@ -769,7 +769,7 @@ function toolEntry(sid, handlerName, jsonParams) {
     try {
         params = JSON.parse(jsonParams);
     } catch (e) {
-        Swift.setToolResult({
+        MCPStudio.setToolResult({
             text: "Error: Failed to parse parameters JSON",
             metadata: {
                 success: false,
@@ -784,7 +784,7 @@ function toolEntry(sid, handlerName, jsonParams) {
 
     // Validate handler name exists in tool exports
     if (!toolExports[handlerName]) {
-        Swift.setToolResult({
+        MCPStudio.setToolResult({
             text: "Error: Handler not found: " + handlerName,
             metadata: {
                 success: false,
@@ -801,21 +801,21 @@ function toolEntry(sid, handlerName, jsonParams) {
         var result = toolExports[handlerName](params);
 
         if (result === null) {
-            // Handler already set result via Swift.setToolResult()
+            // Handler already set result via MCPStudio.setToolResult()
             return null;
         }
 
-        // Return result as JSON string or let handler call Swift.setToolResult()
+        // Return result as JSON string or let handler call MCPStudio.setToolResult()
         if (typeof result === 'object') {
             var jsonResult = JSON.stringify(result);
-            Swift.setToolResult(jsonResult);
+            MCPStudio.setToolResult(jsonResult);
             return null;
         }
 
         return result;
 
     } catch (error) {
-        Swift.setToolResult({
+        MCPStudio.setToolResult({
             text: "Error executing handler: " + error.message,
             metadata: {
                 success: false,
@@ -845,7 +845,7 @@ module.exports = {
 1. **Create tool script** with proper function signature
 2. **Implement buildLog()** helper for consistent logging
 3. **Validate all inputs** before execution
-4. **Use Swift.setToolResult()** to return results
+4. **Use MCPStudio.setToolResult()** to return results
 5. **Export main function** from module
 6. **Register in toolEntry** via shared registry
 

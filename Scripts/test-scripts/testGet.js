@@ -16,13 +16,13 @@ function testGet(params) {
     console.log("Making GET request to: " + testUrl);
     
     try {
-        //var responseJSON = Swift.httpGet(testUrl, "{}");
-        var responseJSON = Swift.httpGet(testUrl, JSON.stringify({
+        //var responseJSON = MCPStudio.httpGet(testUrl, "{}");
+        var responseJSON = MCPStudio.httpGet(testUrl, JSON.stringify({
                 qryParam1: "pvalue1",
                 qryParam2: "pvalue2"
             }));
 
-        console.log("Swift.httpGet Result: " + responseJSON);
+        console.log("MCPStudio.httpGet Result: " + responseJSON);
         
         var response = JSON.parse(responseJSON);
         

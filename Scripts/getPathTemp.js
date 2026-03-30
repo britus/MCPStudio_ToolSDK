@@ -9,15 +9,15 @@ function getTempPath(params) {
     console.log("Get temporary path");
     
     // Get temp directory
-    var path = Swift.getTempPath();
+    var path = MCPStudio.getTempPath();
     
     var result = {
         path: path,
         type: "temporary"
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
         	path: path,
@@ -26,7 +26,7 @@ function getTempPath(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

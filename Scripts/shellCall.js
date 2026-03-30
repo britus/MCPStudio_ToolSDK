@@ -45,15 +45,12 @@ function shellCall(params) {
     // Parameter 3 : string : shell (/bin/sh /bin/bash)
     //  -> Optional -> default /bin/bash This is used at #! first line
     
-    var shellScript = "#!/usr/bin/env bash\n";
-    
     // Check if shell parameter differs from default - treat as custom shell
-    if (shell !== "/bin/bash") {
-        shellScript += shell + "\n";
+    var shellScript = "#!/usr/bin/env bash\n";
+    if (shell === "/bin/bash") {
+        shellScript += "#!/bin/bash -e\n";
         isCustomShell = true;
-    } else {
-        shellScript += "/bin/bash\n";
-    }
+    } 
     
     // Build command with parameters based on function parameters
     shellScript += 'set -euo pipefail\n';
@@ -77,18 +74,18 @@ function shellCall(params) {
                 paramString += " \"\"";
             }
         }
-        shellScript += 'exec ' + command + paramString + '\n';
+        shellScript += command + paramString + '\n';
     } else {
         // Single command without additional parameters
-        shellScript += 'exec ' + command + '\n';
+        shellScript += command + '\n';
     }
 
     taskLog("[Script] Run: " + shellScript);
     
-    var success = Swift.shell(shellScript);
+    var success = MCPStudio.shell(shellScript);
 
     if (success) {
-        Swift.setToolResult(JSON.stringify({
+        MCPStudio.setToolResult(JSON.stringify({
             text: "[Script] Command executed successfully\n" + 
                    stdOut.join("\n"),
             metadata: {
@@ -104,8 +101,8 @@ function shellCall(params) {
         }));
         taskLog("[Script] Command successful!");
     } else {
-        Swift.setToolResult(JSON.stringify({
-            text: "[Script] Command failed with exit code " + exitCode + "\n" + 
+        MCPStudio.setToolResult(JSON.stringify({
+            text: "[Script] Command failed.\n" + 
                    stdOut.join("\n") + "\n--- Stderr ---\n" + 
                    (stdErr && stdErr.length > 0 ? stdErr.join("\n") : ""),
             metadata: {
@@ -115,7 +112,6 @@ function shellCall(params) {
                 parameters: parameters,
                 operation: "shellCall",
                 success: false,
-                exitCode: exitCode,
                 stdout: stdOut,
                 stderr: stdErr,
             }
@@ -123,7 +119,7 @@ function shellCall(params) {
         taskLog("[Script] Command failed!");
     }
 
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

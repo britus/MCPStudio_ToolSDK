@@ -12,7 +12,7 @@ function fetchPrompt(params) {
         return shared.createErrorResult("Prompt name requiered");
     }
     
-    var json = Swift.promptConfig(promptName);
+    var json = MCPStudio.promptConfig(promptName);
     if (!json) {
     	return shared.createErrorResult("Failed to get prompt " + promptName);
     }

@@ -6,12 +6,12 @@
 const shared = require('sharedFunctions');
 
 function listDirectory(params) {
-    var path = params.path || Swift.getDocumentsPath();
+    var path = params.path || MCPStudio.getDocumentsPath();
     
     console.log("List directory: " + path);
     
     // List directory contents
-    var contents = Swift.listDirectory(path);
+    var contents = MCPStudio.listDirectory(path);
     
     if (contents === null) {
         return shared.createErrorResult("Failed to list directory: " + path);
@@ -22,8 +22,8 @@ function listDirectory(params) {
         path: path,
     };
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
         	contents: contents,
@@ -33,7 +33,7 @@ function listDirectory(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {

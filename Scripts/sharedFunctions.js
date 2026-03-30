@@ -28,8 +28,8 @@ function error(message) {
  * @param {string} path - The path to check or create
  */
 function ensureDirectory(path) {
-    if (!Swift.fileExists(path)) {
-        Swift.createDirectory(path);
+    if (!MCPStudio.fileExists(path)) {
+        MCPStudio.createDirectory(path);
     }
 }
 

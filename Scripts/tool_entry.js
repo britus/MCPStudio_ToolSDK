@@ -14,7 +14,8 @@ const fetchResource = require('fetchResource');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
 const shellCall = require('shellCall');
-const cmakeBuild = require('cmakeBuild')
+const cmakeBuild = require('cmakeBuild');
+const qmakeBuild = require('qmakeBuild');
 
 // File operation handlers
 const mkdir = require('mkdir');
@@ -40,7 +41,7 @@ function toolEntry(sid, handlerName, jsonParams) {
             + " handler=" + (handlerName || "Unkown") );
     console.log("[toolEntry]: ctx=" + JSON.stringify(this));
 
-    try {
+    try {   	
         var params = JSON.parse(jsonParams);
 
         //PATCH-BEGIN: Handler injection
@@ -70,6 +71,8 @@ function toolEntry(sid, handlerName, jsonParams) {
             	return shellCall.shellCall(params);
             case "cmakeBuild":
             	return cmakeBuild.cmakeBuild(params);
+            case "qmakeBuild":
+            	return qmakeBuild.qmakeBuild(params);
 
             // MCP Prompt, Resource
             case "fetchPrompt":

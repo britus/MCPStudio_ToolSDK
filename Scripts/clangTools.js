@@ -10,7 +10,7 @@ function clangCheckSyntax(params) {
     
     console.log("clang: Check syntax: " + sourceFile);
     
-    if (!Swift.fileExists(sourceFile)) {
+    if (!MCPStudio.fileExists(sourceFile)) {
         return shared.createErrorResult("File not found: " + sourceFile);
     }
      
@@ -21,14 +21,14 @@ function clangCheckSyntax(params) {
     shellScript += 'cd "${FILE_DIR}" || exit 1\n';
     shellScript += 'clang -fsyntax-only "$(basename "${SOURCE_FILE}")"\n';
 
-   	var success = Swift.shell(shellScript);
+   	var success = MCPStudio.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
         	"Syntax check failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
     }
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: "Syntax check successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
         metadata: {
 	        fileName: sourceFile,
@@ -39,7 +39,7 @@ function clangCheckSyntax(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 function clangCompile(params) {
@@ -47,7 +47,7 @@ function clangCompile(params) {
     
     console.log("clang: Compile file: " + sourceFile);
     
-    if (!Swift.fileExists(sourceFile)) {
+    if (!MCPStudio.fileExists(sourceFile)) {
         return shared.createErrorResult("File not found: " + sourceFile);
     }
      
@@ -58,14 +58,14 @@ function clangCompile(params) {
     shellScript += 'cd "${FILE_DIR}" || exit 1\n';
     shellScript += 'clang -fsyntax-only "$(basename "${SOURCE_FILE}")"\n';
 
-   	var success = Swift.shell(shellScript);
+   	var success = MCPStudio.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
         	"Compiler failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
     }
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: "Compiled successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
         metadata: {
 	        fileName: sourceFile,
@@ -76,7 +76,7 @@ function clangCompile(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 function clangMake(params) {
@@ -87,7 +87,7 @@ function clangMake(params) {
     
     console.log("clang: Build with make file: " + sourceFile);
     
-    if (!Swift.fileExists(sourceFile)) {
+    if (!MCPStudio.fileExists(sourceFile)) {
         return shared.createErrorResult("File not found: " + sourceFile);
     }
      
@@ -98,14 +98,14 @@ function clangMake(params) {
     shellScript += 'cd "${FILE_DIR}" || exit 1\n';
     shellScript += 'make -j8 -f "$(basename "${MAKE_FILE}")"\n';
 
-   	var success = Swift.shell(shellScript);
+   	var success = MCPStudio.shell(shellScript);
     if (!success) {
         return shared.createErrorResult(
         	"Build failed:\n" + stdOut.join("\n") + stdErr.join("\n"));
     }
     
-    // Set result using Swift bridge
-    Swift.setToolResult(JSON.stringify({
+    // Set result using MCPStudio bridge
+    MCPStudio.setToolResult(JSON.stringify({
         text: "Build successfully.\n" + stdOut.join("\n") + stdErr.join("\n"),
         metadata: {
 	        fileName: sourceFile,
@@ -116,7 +116,7 @@ function clangMake(params) {
         }
     }));
   
-    return null; // Result already set via Swift.setToolResult
+    return null; // Result already set via MCPStudio.setToolResult
 }
 
 module.exports = {
