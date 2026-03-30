@@ -59,7 +59,7 @@ toolEntry("session123", "fileExists", JSON.stringify({
 **Example**:
 ```json
 {
-  "dirPath": "/path/to/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts",
+  "dirPath": "/path/to/directory",
   "fileCount": 45,
   "totalSize": 234567,
   "files": [...]
