@@ -1,23 +1,27 @@
 // ===================================================================
-// Handler Function: createDirectory
+// Handler Function: createDirectory -p
 // ===================================================================
 
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Creates a directory at the specified path, including parent directories if needed
+ * @param {Object} params - Command parameters
+ * @param {string} [params.dirPath] - Path to create (optional, defaults to documents path/.eof.mcpstudio)
+ * @returns {null|null} Returns null after setting tool result with directory creation status or error
+ */
 function createDirectory(params) {
-    var dirPath = params.dirPath || MCPStudio.getDocumentsPath();
-    
+    var dirPath = params.dirPath || MCPStudio.getDocumentsPath() + "/.eof.mcpstudio";
+
     console.log("Create directory: " + dirPath);
     
+        // Create directory
     if (!MCPStudio.fileExists(dirPath)) {
-        return shared.createErrorResult("Directory already exists: " + dirPath);
-    
-	    // Create directory
-	    var success = MCPStudio.createDirectory(dirPath);
-	    if (!success) {
-	        return shared.createErrorResult("Failed to create directory: " + dirPath);
-    	}
+        var success = MCPStudio.createDirectory(dirPath);
+        if (!success) {
+            return shared.createErrorResult("Failed to create directory: " + dirPath);
+        }
     }
     
     var result = {
@@ -34,7 +38,7 @@ function createDirectory(params) {
             success: true
         }
     }));
-  
+    
     return null; // Result already set via MCPStudio.setToolResult
 }
 

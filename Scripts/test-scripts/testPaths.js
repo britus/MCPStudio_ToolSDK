@@ -5,7 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
-function testPaths() {
+/**
+ * Tests path retrieval functions (getDocumentsPath, getTempPath)
+ * @param {Object} params - Command parameters (currently unused, for future extension)
+ * @returns {string} JSON string representing path test results
+ */
+function testPaths(params) {
     console.log("--- Testing Path Functions ---");
     
     var docsPath = MCPStudio.getDocumentsPath();

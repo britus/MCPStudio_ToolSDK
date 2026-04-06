@@ -5,6 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests all file operations (create, read, write, delete, etc.)
+ * @param {Object} params - Command parameters
+ * @param {string} [params.testDir] - Path for test directory (optional, defaults to temp path/scriptTest)
+ * @returns {string} JSON string representing file operations test results
+ */
 function testFileOps(params) {
     console.log("--- Testing File Operations ---");
     

@@ -5,6 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests file download functionality
+ * @param {Object} params - Command parameters
+ * @param {string} [params.downloadUrl] - URL to download from (optional, defaults to httpbin.org/robots.txt)
+ * @returns {string} JSON string representing download test result
+ */
 function testDownload(params) {
     console.log("--- Testing File Download ---");
     
@@ -74,4 +80,3 @@ function testDownload(params) {
 module.exports = {
 	testDownload
 };
-

@@ -5,12 +5,19 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Saves content to a file at the specified path
+ * @param {Object} params - Command parameters
+ * @param {string} params.file_path - Path where to save the file (required)
+ * @param {string} params.content - Content to write to the file (required)
+ * @returns {null|null} Returns null after setting tool result with save status or error
+ */
 function saveFile(params) {
-    var path = params.path || "";
+    var path = params.file_path || "";
     var content = params.content || "";
     
     if (path === "") {
-        return shared.createErrorResult("Missing path parameter");
+        return shared.createErrorResult("Missing parameter: file_path");
     }
     
     console.log("Save file: " + path);
@@ -31,12 +38,12 @@ function saveFile(params) {
     MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
-	        path: path,
+            path: path,
             operation: "saveFile",
             success: true
         }
     }));
-  
+    
     return null; // Result already set via MCPStudio.setToolResult
 }
 

@@ -5,6 +5,11 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests HTTP POST requests
+ * @param {Object} params - Command parameters (currently unused, for future extension)
+ * @returns {string} JSON string representing POST request test result
+ */
 function testPost(params) {
     console.log("--- Testing HTTP POST ---");
     
@@ -31,7 +36,7 @@ function testPost(params) {
         console.log("Response status: " + response.statusCode);
         
         if (response.error) {
-        	return JSON.stringify({
+            return JSON.stringify({
                 text: "POST request failed: " + response.error,
                 metadata: {
                     error: "POST request failed: " + response.error,

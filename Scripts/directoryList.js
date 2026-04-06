@@ -5,8 +5,14 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Lists the contents of a directory at the specified path
+ * @param {Object} params - Command parameters
+ * @param {string} [params.path] - Path to the directory to list (optional, defaults to documents path/.eof.mcpstudio)
+ * @returns {null|null} Returns null after setting tool result with directory contents or error
+ */
 function listDirectory(params) {
-    var path = params.path || MCPStudio.getDocumentsPath();
+    var path = params.path || MCPStudio.getDocumentsPath() + "/.eof.mcpstudio";
     
     console.log("List directory: " + path);
     
@@ -26,13 +32,13 @@ function listDirectory(params) {
     MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
-        	contents: contents,
-        	path: path,
+            contents: contents,
+            path: path,
             operation: "listDirectory",
             success: true
         }
     }));
-  
+    
     return null; // Result already set via MCPStudio.setToolResult
 }
 

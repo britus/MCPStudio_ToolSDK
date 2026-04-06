@@ -5,6 +5,11 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests HTTP requests with different methods (GET, POST, PUT, DELETE)
+ * @param {Object} params - Command parameters (currently unused, for future extension)
+ * @returns {string} JSON string representing test results for each method
+ */
 function testDifferentMethods(params) {
     console.log("--- Testing Different HTTP Methods ---");
     

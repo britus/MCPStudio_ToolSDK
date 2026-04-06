@@ -5,6 +5,11 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests HTTP requests with custom headers
+ * @param {Object} params - Command parameters (currently unused, for future extension)
+ * @returns {string} JSON string representing test result
+ */
 function testCustomHeaders(params) {
     console.log("--- Testing Custom Headers ---");
     

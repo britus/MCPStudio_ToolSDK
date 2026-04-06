@@ -5,6 +5,13 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests HTTP GET requests
+ * @param {Object} params - Command parameters
+ * @param {string} [params.testUrl] - URL to test (optional, defaults to httpbin.org/get)
+ * @param {string} [params.url] - Alternative URL to test (optional, overrides testUrl)
+ * @returns {string} JSON string representing GET request test result
+ */
 function testGet(params) {
     console.log("--- Testing HTTP GET ---");
     
@@ -30,7 +37,7 @@ function testGet(params) {
         console.log("Response body length: " + (response.body ? response.body.length : 0));
         
         if (response.error) {
-        	return JSON.stringify({
+            return JSON.stringify({
                 text: "GET request failed: " + response.error,
                 metadata: {
                     error: "GET request failed: " + response.error,

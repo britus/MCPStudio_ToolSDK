@@ -1,5 +1,5 @@
 // ===================================================================
-// Handler Function: testAll
+// Handler Function: testHttpAll
 // ===================================================================
 
 // Import shared functions
@@ -13,6 +13,11 @@ const testJSON = require('testJSON');
 const testDifferentMethods = require('testDifferentMethods');
 const testCustomHeaders = require('testCustomHeaders');
 
+/**
+ * Runs all HTTP tests and returns combined results
+ * @param {Object} params - Command parameters passed to individual test functions
+ * @returns {string} JSON string representing combined test results summary
+ */
 function testHttpAll(params) {
     console.log("=== Running All HTTP Tests ===");
     

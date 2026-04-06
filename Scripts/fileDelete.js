@@ -5,6 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Deletes a file at the specified path
+ * @param {Object} params - Command parameters
+ * @param {string} params.path - Path to the file to delete (required)
+ * @returns {null|null} Returns null after setting tool result with deletion status or error
+ */
 function deleteFile(params) {
     var path = params.path || "";
     
@@ -30,12 +36,12 @@ function deleteFile(params) {
     MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
-        	path: path,
+            path: path,
             operation: "deleteFile",
             success: true
         }
     }));
-  
+    
     return null; // Result already set via MCPStudio.setToolResult
 }
 

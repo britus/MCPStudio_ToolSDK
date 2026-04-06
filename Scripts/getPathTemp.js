@@ -5,6 +5,11 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Gets the system temporary directory path
+ * @param {Object} params - Command parameters (currently unused)
+ * @returns {null|null} Returns null after setting tool result with temp path or error
+ */
 function getTempPath(params) {
     console.log("Get temporary path");
     
@@ -20,12 +25,12 @@ function getTempPath(params) {
     MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
-        	path: path,
+            path: path,
             operation: "getTempPath",
             success: true
         }
     }));
-  
+    
     return null; // Result already set via MCPStudio.setToolResult
 }
 

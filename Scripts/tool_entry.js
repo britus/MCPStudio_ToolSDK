@@ -1,6 +1,5 @@
 // ===================================================================
-// Data Processing Pipeline Script
-// Demonstrates advanced file processing, JSON manipulation
+// Tool entry main script
 // ===================================================================
 
 // Import shared functions
@@ -115,6 +114,8 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return readFile.readFile(params);
             case "saveFile":
                 return saveFile.saveFile(params);
+            case "writeFile":
+                return saveFile.saveFile(params);
             case "openFile":
                 return openFile.openFile(params);
             case "deleteFile":
@@ -142,4 +143,3 @@ function toolEntry(sid, handlerName, jsonParams) {
     }
 }
 
-console.log("Tool handler script loaded");

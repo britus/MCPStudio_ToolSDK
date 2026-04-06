@@ -18,7 +18,6 @@ function taskLog(message) {
  * @param {string} [params.arch=""] - Target architecture (x86_64, arm64, etc.)
  * @param {boolean} [params.verbose=false] - Show verbose output during detection
  */
-
 function checkWithGcc(params) {
     var arch = params.arch || "";
     var compilerPath = params. compilerPath || "/usr/local/bin";

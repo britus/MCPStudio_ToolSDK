@@ -5,6 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Analyzes a directory and returns information about its contents
+ * @param {Object} params - Command parameters
+ * @param {string} [params.dirPath] - Path to the directory to analyze (optional, defaults to documents path)
+ * @returns {string} JSON string representing analysis result
+ */
 function analyzeDirectory(params) {
     var dirPath = params.dirPath || MCPStudio.getDocumentsPath();
     
@@ -35,4 +41,3 @@ function analyzeDirectory(params) {
 module.exports = {
 	analyzeDirectory
 };
-

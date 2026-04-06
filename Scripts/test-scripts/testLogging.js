@@ -5,7 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
-function testLogging() {
+/**
+ * Tests logging functionality (console.log, MCPStudio.log)
+ * @param {Object} params - Command parameters (currently unused, for future extension)
+ * @returns {string} JSON string representing logging test completion status
+ */
+function testLogging(params) {
     console.log("\n--- Testing Logging ---");
     
     // Test console methods

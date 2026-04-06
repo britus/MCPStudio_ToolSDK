@@ -5,6 +5,11 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Gets the system documents directory path
+ * @param {Object} params - Command parameters (currently unused)
+ * @returns {null|null} Returns null after setting tool result with documents path or error
+ */
 function getDocumentsPath(params) {
     console.log("Get documents path");
     
@@ -20,12 +25,12 @@ function getDocumentsPath(params) {
     MCPStudio.setToolResult(JSON.stringify({
         text: JSON.stringify(result, null, 2),
         metadata: {
-        	path: path,
+            path: path,
             operation: "getDocumentsPath",
             success: true
         }
     }));
-  
+    
     return null; // Result already set via MCPStudio.setToolResult
 }
 

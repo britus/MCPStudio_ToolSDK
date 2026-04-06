@@ -5,6 +5,12 @@
 // Import shared functions
 const shared = require('sharedFunctions');
 
+/**
+ * Tests JSON fetching and parsing from HTTP responses
+ * @param {Object} params - Command parameters
+ * @param {string} [params.jsonUrl] - URL to fetch JSON from (optional, defaults to httpbin.org/json)
+ * @returns {string} JSON string representing JSON fetch test result
+ */
 function testJSON(params) {
     console.log("--- Testing JSON Fetch ---");
     
@@ -24,7 +30,7 @@ function testJSON(params) {
         console.log("Response status: " + response.statusCode);
         
         if (response.error) {
-        	return JSON.stringify({
+            return JSON.stringify({
                 text: "GET request failed: " + response.error,
                 metadata: {
                     error: "GET request failed: " + response.error,
@@ -53,17 +59,17 @@ function testJSON(params) {
             jsonData = JSON.parse(response.body);
             console.log("Successfully parsed JSON response");
         } catch(e) {
-	        return JSON.stringify({
-	            text: "Exception during JSON test: " + e.toString(),
-	            metadata: {
-	                passed: false,
-	                status: -1,
-	                success: false,
-	                error: "Exception during JSON test: " + e.toString(),
-	                operation: "jsonFetch"
-	            }
-	        });
-	    }
+            return JSON.stringify({
+                text: "Exception during JSON test: " + e.toString(),
+                metadata: {
+                    passed: false,
+                    status: -1,
+                    success: false,
+                    error: "Exception during JSON test: " + e.toString(),
+                    operation: "jsonFetch"
+                }
+            });
+        }
         return JSON.stringify({
             text: response.body,
             metadata: { 

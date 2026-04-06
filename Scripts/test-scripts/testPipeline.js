@@ -8,9 +8,8 @@ const shared = require('sharedFunctions');
 
 /**
  * Entry point for all script tool calls
- * @param {string} sid - Session identifier
- * @param {string} handlerName - Method/handler name to execute
- * @param {string} jsonParams - JSON string with parameters
+ * @param {string} handlerName - Method/handler name to execute (required)
+ * @param {Object} params - Parameters object containing operation-specific parameters
  * @returns {string} JSON result or plain text
  */
 function testPipeline(handlerName, params) {
@@ -45,6 +44,15 @@ function testPipeline(handlerName, params) {
 // Main Pipeline Function
 // ===================================================================
 
+/**
+ * Processes a complete data pipeline through multiple stages
+ * @param {Object} params - Command parameters
+ * @param {string} [params.inputDir] - Path to input directory (optional, defaults to documents/input)
+ * @param {string} [params.outputDir] - Path to output directory (optional, defaults to documents/output)
+ * @param {string} [params.reportPath] - Path for pipeline report (optional, defaults to output/pipeline_report.txt)
+ * @param {Object} [params.transformRules] - Transformation rules for data processing stage (optional)
+ * @returns {string} JSON result with pipeline execution summary or error message
+ */
 function processPipeline(params) {
     console.log("[Script] === Starting Data Processing Pipeline ===");
     
@@ -116,6 +124,13 @@ function processPipeline(params) {
 // ===================================================================
 // Stage Functions
 // ===================================================================
+
+/**
+ * Extracts and processes data from input files
+ * @param {string} inputDir - Path to input directory (required)
+ * @param {string} outputDir - Path to output directory for extracted files (required)
+ * @returns {Object} Result object with extraction status or error message
+ */
 function extractStage(inputDir, outputDir) {
     console.log("[Script] Extracting from: " + inputDir);
     
@@ -175,6 +190,13 @@ function extractStage(inputDir, outputDir) {
     };
 }
 
+/**
+ * Transforms data in input files based on transformation rules
+ * @param {string} inputDir - Path to input directory (required)
+ * @param {string} outputDir - Path to output directory for transformed files (required)
+ * @param {Object} [rules] - Transformation rules to apply (optional)
+ * @returns {Object} Result object with transformation status or error message
+ */
 function transformStage(inputDir, outputDir, rules) {
     console.log("[Script] Transforming data from: " + inputDir);
     
@@ -228,6 +250,12 @@ function transformStage(inputDir, outputDir, rules) {
     };
 }
 
+/**
+ * Aggregates data from input files and computes statistics
+ * @param {string} inputDir - Path to input directory (required)
+ * @param {string} outputPath - Path for aggregated output file (required)
+ * @returns {Object} Result object with aggregation status or error message
+ */
 function aggregateStage(inputDir, outputPath) {
     console.log("[Script] Aggregating data from: " + inputDir);
     
@@ -303,6 +331,13 @@ function aggregateStage(inputDir, outputPath) {
 // Individual Handler Functions
 // ===================================================================
 
+/**
+ * Extracts data from a single input file
+ * @param {Object} params - Command parameters
+ * @param {string} params.inputPath - Path to input file (required)
+ * @param {string} [params.outputPath] - Path for extracted output file (optional)
+ * @returns {string} JSON result with extraction status or error message
+ */
 function extractData(params) {
     var inputPath = params.inputPath;
     var outputPath = params.outputPath;
@@ -331,6 +366,14 @@ function extractData(params) {
     return success(extracted, { operation: "extractData" });
 }
 
+/**
+ * Transforms data from a single input file based on rules
+ * @param {Object} params - Command parameters
+ * @param {string} params.inputPath - Path to input file (required)
+ * @param {string} [params.outputPath] - Path for transformed output file (optional)
+ * @param {Object} [params.rules] - Transformation rules to apply (optional)
+ * @returns {string} JSON result with transformation status or error message
+ */
 function transformData(params) {
     var inputPath = params.inputPath;
     var outputPath = params.outputPath;
@@ -355,6 +398,13 @@ function transformData(params) {
     }
 }
 
+/**
+ * Aggregates data from multiple input files
+ * @param {Object} params - Command parameters
+ * @param {Array<string>} params.inputPaths - Array of input file paths (required)
+ * @param {string} [params.outputPath] - Path for aggregated output file (optional)
+ * @returns {string} JSON result with aggregation status or error message
+ */
 function aggregateData(params) {
     var inputPaths = params.inputPaths || [];
     var outputPath = params.outputPath;
@@ -383,6 +433,14 @@ function aggregateData(params) {
     return success(aggregated, { operation: "aggregateData" });
 }
 
+/**
+ * Generates a report from data in a file
+ * @param {Object} params - Command parameters
+ * @param {string} params.dataPath - Path to data file (required)
+ * @param {string} params.reportPath - Path for generated report (required)
+ * @param {string} [params.format='text'] - Report format (text or json) (optional, default text)
+ * @returns {string} JSON result with report generation status or error message
+ */
 function generateReport(params) {
     var dataPath = params.dataPath;
     var reportPath = params.reportPath;
@@ -413,6 +471,12 @@ function generateReport(params) {
 // Utility Functions
 // ===================================================================
 
+/**
+ * Applies transformation rules to data object
+ * @param {Object} data - Source data object (required)
+ * @param {Object} rules - Transformation rules to apply (optional)
+ * @returns {Object} Transformed data object or original if no rules provided
+ */
 function applyTransformRules(data, rules) {
     var result = {};
     
@@ -454,18 +518,33 @@ function applyTransformRules(data, rules) {
     return result;
 }
 
+/**
+ * Counts the number of words in a text string
+ * @param {string} text - Text to analyze (required)
+ * @returns {number} Word count
+ */
 function countWords(text) {
     return text.split(/\s+/).filter(function(w) {
         return w.length > 0;
     }).length;
 }
 
+/**
+ * Ensures that a directory exists, creating it if necessary
+ * @param {string} path - The path to check or create (required)
+ */
 function ensureDirectory(path) {
     if (!MCPStudio.fileExists(path)) {
         MCPStudio.createDirectory(path);
     }
 }
 
+/**
+ * Creates a text or JSON report from data object
+ * @param {Object} data - Data to include in report (required)
+ * @param {string} format - Report format: 'text' or 'json' (optional, default 'text')
+ * @returns {string} Formatted report string
+ */
 function createReport(data, format) {
     if (format === "json") {
         return JSON.stringify(data, null, 2);
@@ -494,6 +573,12 @@ function createReport(data, format) {
     return report;
 }
 
+/**
+ * Generates a pipeline execution report and saves it to file
+ * @param {Object} pipeline - Pipeline execution data with stages (required)
+ * @param {string} reportPath - Path to save the report file (required)
+ * @returns {string} Report content string
+ */
 function generatePipelineReport(pipeline, reportPath) {
     var report = "";
     report += "========================================\n";
@@ -535,4 +620,3 @@ function error(message) {
 module.exports = {
 	testPipeline
 };
-

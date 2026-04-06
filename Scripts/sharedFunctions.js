@@ -25,7 +25,7 @@ function error(message) {
 
 /**
  * Ensures that a directory exists, creating it if necessary
- * @param {string} path - The path to check or create
+ * @param {string} path - The path to check or create (required)
  */
 function ensureDirectory(path) {
     if (!MCPStudio.fileExists(path)) {
@@ -35,7 +35,7 @@ function ensureDirectory(path) {
 
 /**
  * Counts the number of words in a string
- * @param {string} text - The text to analyze
+ * @param {string} text - The text to analyze (required)
  * @returns {number} Word count
  */
 function countWords(text) {
@@ -44,7 +44,7 @@ function countWords(text) {
 
 /**
  * Creates a success result with the given data and metadata
- * @param {Object} data - The main data to include in the result
+ * @param {Object} data - The main data to include in the result (required)
  * @param {Object} [metadata] - Optional metadata about the operation
  * @returns {string} JSON string representing a successful result
  */
@@ -63,7 +63,7 @@ function createSuccessResult(data, metadata) {
 
 /**
  * Creates an error result with the given message
- * @param {string} message - The error message to include in the result
+ * @param {string} message - The error message to include in the result (required)
  * @returns {string} JSON string representing an error result
  */
 function createErrorResult(errorMessage) {
@@ -81,38 +81,38 @@ function createErrorResult(errorMessage) {
 
 /**
  * Return process stdOut after shell() or process() call
+ * @returns {Array<string>} Array of stdout messages
  */
-function getOutput()
-{
-	return getStandardOutput();
+function getOutput() {
+    return getStandardOutput();
 }
 
 /**
  * Return process stdOut after shell() or process() call
+ * @returns {Array<string>} Array of stdout messages
  */
-function getStandardOutput()
-{
-	return stdOut || [];
+function getStandardOutput() {
+    return stdOut || [];
 }
 
 /**
  * Return process stdErr after shell() or process() call
+ * @returns {Array<string>} Array of stderr messages
  */
-function getErrorOutput()
-{
-	return stdErr || [];
+function getErrorOutput() {
+    return stdErr || [];
 }
 
 // .............................
 // Available module entry points
 module.exports = {
-	success, 
-	error, 
-	ensureDirectory,
-	countWords,
-	createSuccessResult,
-	createErrorResult,
-	getOutput,
-	getStandardOutput,
-	getErrorOutput,
+    success, 
+    error, 
+    ensureDirectory,
+    countWords,
+    createSuccessResult,
+    createErrorResult,
+    getOutput,
+    getStandardOutput,
+    getErrorOutput,
 };
