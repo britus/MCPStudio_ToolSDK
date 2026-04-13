@@ -1,0 +1,49 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.898Z",
+    "priority" : 0.9
+  },
+  "description" : "Delete a reminder.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "deleteReminder",
+  "inputSchema" : {
+    "properties" : {
+      "reminder_id" : {
+        "description" : "reminder_id parameter",
+        "name" : "reminder_id",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "reminder_id"
+    ],
+    "type" : "object"
+  },
+  "name" : "delete_reminder",
+  "outputSchema" : {
+    "properties" : {
+      "reminder_id" : {
+        "description" : "reminder_id result field",
+        "name" : "reminder_id",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "reminder_id"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

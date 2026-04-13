@@ -1,0 +1,56 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.899Z",
+    "priority" : 0.9
+  },
+  "description" : "Use this tool to check source code syntax with clang compiler. This tool is applicable for C, CPP, Objective-C source code. This tool provides information about the validity of the changes. If errors occur, try to fix them.",
+  "execHandler" : "clangCheckSyntax",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "sourceFile" : {
+        "description" : "This parameter defines the source code file to check syntax with clang",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "sourceFile",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "sourceFile"
+    ],
+    "type" : "object"
+  },
+  "name" : "clang_check_syntax",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

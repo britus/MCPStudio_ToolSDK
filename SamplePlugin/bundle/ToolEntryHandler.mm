@@ -36,12 +36,12 @@
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:resultDict options:NSJSONWritingPrettyPrinted error:&error];
     if (error) {
-        NSLog(@"[Script] JSON Serialization Error: %@", error.localizedDescription);
+        NSLog(@"[Plugin] JSON Serialization Error: %@", error.localizedDescription);
         return @"{}";
     }
     
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    NSLog(@"[Script] Result:\n%@", jsonString);
+    NSLog(@"[Plugin] Result:\n%@", jsonString);
     return jsonString;
 }
 
@@ -66,12 +66,12 @@
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:resultDict options:NSJSONWritingPrettyPrinted error:&error];
     if (error) {
-        NSLog(@"[Script] JSON Serialization Error: %@", error.localizedDescription);
+        NSLog(@"[Plugin] JSON Serialization Error: %@", error.localizedDescription);
         return @"{}";
     }
     
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    NSLog(@"[Script] Result:\n%@", jsonString);
+    NSLog(@"[Plugin] Result:\n%@", jsonString);
     return jsonString;
 }
 

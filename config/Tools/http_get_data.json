@@ -1,0 +1,50 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.904Z",
+    "priority" : 0.9
+  },
+  "description" : "Fetch\/Get any data from web site, web page or web service using specified ‚url‘ parameter.",
+  "execHandler" : "fetchData",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "url" : {
+        "description" : "Full qualified web site or web service url.",
+        "name" : "url",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "url"
+    ],
+    "type" : "object"
+  },
+  "name" : "http_get_data",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation status message",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Operation name",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Operation status",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

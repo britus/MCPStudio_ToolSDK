@@ -1,0 +1,85 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.905Z",
+    "priority" : 0.9
+  },
+  "description" : "Update a contact.",
+  "execHandler" : "ContactsToolHandler",
+  "execMethod" : "updateContact",
+  "inputSchema" : {
+    "properties" : {
+      "contact_id" : {
+        "description" : "contact_id parameter",
+        "name" : "contact_id",
+        "type" : "string"
+      },
+      "email_addresses" : {
+        "description" : "email_addresses parameter",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "email_addresses",
+        "type" : "array"
+      },
+      "family_name" : {
+        "description" : "family_name parameter",
+        "name" : "family_name",
+        "type" : "string"
+      },
+      "given_name" : {
+        "description" : "given_name parameter",
+        "name" : "given_name",
+        "type" : "string"
+      },
+      "note" : {
+        "description" : "note parameter",
+        "name" : "note",
+        "type" : "string"
+      },
+      "organization_name" : {
+        "description" : "organization_name parameter",
+        "name" : "organization_name",
+        "type" : "string"
+      },
+      "phone_numbers" : {
+        "description" : "phone_numbers parameter",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "phone_numbers",
+        "type" : "array"
+      }
+    },
+    "required" : [
+      "contact_id"
+    ],
+    "type" : "object"
+  },
+  "name" : "update_contact",
+  "outputSchema" : {
+    "properties" : {
+      "contact" : {
+        "description" : "contact result field",
+        "name" : "contact",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "contact"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

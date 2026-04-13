@@ -1,0 +1,49 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.892Z",
+    "priority" : 0.9
+  },
+  "description" : "Check if a file exists at the specified path",
+  "execHandler" : "fileExists",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "path" : {
+        "description" : "Path to the file to check",
+        "name" : "path",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "path"
+    ],
+    "type" : "object"
+  },
+  "name" : "file_exists",
+  "outputSchema" : {
+    "properties" : {
+      "exists" : {
+        "description" : "True if file exists, false otherwise",
+        "name" : "exists",
+        "type" : "boolean"
+      },
+      "path" : {
+        "description" : "The path that was checked",
+        "name" : "path",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "exists",
+      "path"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

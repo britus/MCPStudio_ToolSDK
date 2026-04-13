@@ -1,0 +1,72 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.894Z",
+    "priority" : 0.9
+  },
+  "description" : "Use this tool to build a project using Unix make named ‚Makefile‘. The Parameter ‚makeFile‘ must contain a full qualfied file name. This tool is applicable for Unix make file projects. This tool provides information about the validity of the changes. If errors occur, try to fix them. Always show the content of parameter ‚stdout’ and ‚stderr‘. ",
+  "execHandler" : "clangMake",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "makeFile" : {
+        "description" : "This parameter defines the Unix make file ‚Makefile’ to build a project.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "makeFile",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "makeFile"
+    ],
+    "type" : "object"
+  },
+  "name" : "clang_make",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "stderr" : {
+        "description" : "Always show the content of parameter ‚stderr‘. ",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "stderr",
+        "type" : "string"
+      },
+      "stdout" : {
+        "description" : "Always show the content of parameter ‚stdout‘. ",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "stdout",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

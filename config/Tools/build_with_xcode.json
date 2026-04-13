@@ -1,0 +1,124 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.901Z",
+    "priority" : 0.9
+  },
+  "description" : "Use this tool every time you finish modifying source code files in a project folder or if the user request to build a Xcode project with ‚xcodebuild’. This tool provides information about the validity of the build. If errors occur, try to fix them.",
+  "execHandler" : "checkWithXcode",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "archive" : {
+        "defaultValue" : "false",
+        "description" : "Whether to build for distribution (archive mode)\nboolen value true or false",
+        "name" : "archive",
+        "type" : "boolean"
+      },
+      "clean" : {
+        "defaultValue" : "false",
+        "description" : "Clean build before build operation\nboolen value true or false",
+        "name" : "clean",
+        "type" : "boolean"
+      },
+      "codeSigningIdentity" : {
+        "description" : "Code signing identity for code signing",
+        "name" : "codeSigningIdentity",
+        "type" : "string"
+      },
+      "codesign" : {
+        "defaultValue" : "83NQU389JN",
+        "description" : "Apple Developer Team Identifier for code signing and notarization.",
+        "name" : "codesign",
+        "type" : "string"
+      },
+      "configuration" : {
+        "defaultValue" : "Debug",
+        "description" : "Build configuration (Debug\/Release\/Profile)",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "configuration",
+        "type" : "string"
+      },
+      "derivedDataPath" : {
+        "description" : "Path to derived data directory",
+        "name" : "derivedDataPath",
+        "type" : "string"
+      },
+      "onlyActiveArchs" : {
+        "description" : "Only build active architectures\nboolen value true or false",
+        "name" : "onlyActiveArchs",
+        "type" : "boolean"
+      },
+      "platform" : {
+        "defaultValue" : "macosx",
+        "description" : "Target platform (macosx\/iphoneos\/iphonesimulator)",
+        "name" : "platform",
+        "type" : "string"
+      },
+      "projectDir" : {
+        "description" : "This parameter defines the location of the Xcode project.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "projectDir",
+        "type" : "string"
+      },
+      "projectName" : {
+        "description" : "This parameter defines Xcode project name to build.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "projectName",
+        "type" : "string"
+      },
+      "scheme" : {
+        "description" : "Scheme name (defaults to first scheme if empty)",
+        "name" : "scheme",
+        "type" : "string"
+      },
+      "showOperationLogs" : {
+        "defaultValue" : "false",
+        "description" : "Show verbose operation logs\nboolen value true or false",
+        "name" : "showOperationLogs",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "projectDir",
+      "projectName"
+    ],
+    "type" : "object"
+  },
+  "name" : "build_with_xcode",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

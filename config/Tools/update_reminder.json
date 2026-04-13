@@ -1,0 +1,74 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.904Z",
+    "priority" : 0.9
+  },
+  "description" : "Update a reminder.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "updateReminder",
+  "inputSchema" : {
+    "properties" : {
+      "completed" : {
+        "description" : "completed parameter",
+        "name" : "completed",
+        "type" : "boolean"
+      },
+      "due_date" : {
+        "description" : "due_date parameter",
+        "name" : "due_date",
+        "type" : "string"
+      },
+      "list_id" : {
+        "description" : "list_id parameter",
+        "name" : "list_id",
+        "type" : "string"
+      },
+      "notes" : {
+        "description" : "notes parameter",
+        "name" : "notes",
+        "type" : "string"
+      },
+      "reminder_id" : {
+        "description" : "reminder_id parameter",
+        "name" : "reminder_id",
+        "type" : "string"
+      },
+      "title" : {
+        "description" : "title parameter",
+        "name" : "title",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "reminder_id"
+    ],
+    "type" : "object"
+  },
+  "name" : "update_reminder",
+  "outputSchema" : {
+    "properties" : {
+      "reminder" : {
+        "description" : "reminder result field",
+        "name" : "reminder",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "reminder"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

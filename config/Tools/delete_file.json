@@ -1,0 +1,49 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.897Z",
+    "priority" : 0.9
+  },
+  "description" : "Deletes a file or directory at the specified path",
+  "execHandler" : "deleteFile",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "path" : {
+        "description" : "Path to the file or directory to delete",
+        "name" : "path",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "path"
+    ],
+    "type" : "object"
+  },
+  "name" : "delete_file",
+  "outputSchema" : {
+    "properties" : {
+      "path" : {
+        "description" : "The path that was deleted",
+        "name" : "path",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Success message",
+        "name" : "success",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "success",
+      "path"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

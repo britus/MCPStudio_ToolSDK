@@ -1,0 +1,49 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.903Z",
+    "priority" : 0.9
+  },
+  "description" : "Creates a directory at the specified path",
+  "execHandler" : "createDirectory",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "dirPath" : {
+        "description" : "Path to the directory to create",
+        "name" : "dirPath",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "dirPath"
+    ],
+    "type" : "object"
+  },
+  "name" : "create_directory",
+  "outputSchema" : {
+    "properties" : {
+      "path" : {
+        "description" : "The path that was created",
+        "name" : "path",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Success message",
+        "name" : "success",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "success",
+      "path"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

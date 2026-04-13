@@ -1,0 +1,16 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user"
+    ],
+    "lastModified" : "2026-02-18T18:48:00.008Z",
+    "priority" : 0.8
+  },
+  "contextTags" : "[\"Resource\",\"Files\",\"Readme\"]",
+  "description" : "Static document provide information about something",
+  "mimeType" : "text\/html",
+  "name" : "EoF MCP Studio Home Page",
+  "relatedResources" : "[]",
+  "type" : "resourceLink",
+  "uri" : "http:\/\/mcpstudio.eofsl.com\/index.html"
+}

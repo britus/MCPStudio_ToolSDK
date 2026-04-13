@@ -1,0 +1,84 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.895Z",
+    "priority" : 0.9
+  },
+  "description" : "Update a calendar event.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "updateEvent",
+  "inputSchema" : {
+    "properties" : {
+      "all_day" : {
+        "description" : "all_day parameter",
+        "name" : "all_day",
+        "type" : "boolean"
+      },
+      "calendar_id" : {
+        "description" : "calendar_id parameter",
+        "name" : "calendar_id",
+        "type" : "string"
+      },
+      "end_date" : {
+        "description" : "end_date parameter",
+        "name" : "end_date",
+        "type" : "string"
+      },
+      "event_id" : {
+        "description" : "event_id parameter",
+        "name" : "event_id",
+        "type" : "string"
+      },
+      "location" : {
+        "description" : "location parameter",
+        "name" : "location",
+        "type" : "string"
+      },
+      "notes" : {
+        "description" : "notes parameter",
+        "name" : "notes",
+        "type" : "string"
+      },
+      "start_date" : {
+        "description" : "start_date parameter",
+        "name" : "start_date",
+        "type" : "string"
+      },
+      "title" : {
+        "description" : "title parameter",
+        "name" : "title",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "event_id"
+    ],
+    "type" : "object"
+  },
+  "name" : "update_event",
+  "outputSchema" : {
+    "properties" : {
+      "event" : {
+        "description" : "event result field",
+        "name" : "event",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "event"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

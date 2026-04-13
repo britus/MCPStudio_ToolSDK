@@ -1,0 +1,53 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.893Z",
+    "priority" : 0.9
+  },
+  "description" : "Use this create a directory specified by ‚dirPath‘ parameter.",
+  "execHandler" : "mkdir",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "dirPath" : {
+        "description" : "Full qualified path name ",
+        "name" : "dirPath",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "dirPath"
+    ],
+    "type" : "object"
+  },
+  "name" : "mkdir",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation status message",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Script operation meta data",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Operation status",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

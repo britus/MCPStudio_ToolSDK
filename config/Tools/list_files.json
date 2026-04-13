@@ -1,0 +1,96 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.900Z",
+    "priority" : 0.9
+  },
+  "description" : "Lists all files in the specified directory using a string list of file extensions (i.e. „.cpp“ or „.js“)",
+  "execHandler" : "FileResourceHandler",
+  "execMethod" : "listFiles",
+  "inputSchema" : {
+    "properties" : {
+      "extensions" : {
+        "description" : "List of file extensions to be filtered, in the form e.g. \".js\" or \".cpp\"",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "extensions",
+        "type" : "array"
+      },
+      "project_path" : {
+        "description" : "Path to the project directory",
+        "name" : "project_path",
+        "type" : "string"
+      },
+      "recursive" : {
+        "defaultValue" : "true",
+        "description" : "Boolean parameter to enable recursive traversal of the directory tree. Set the value 'false' to list the contents of the directory or the value 'true' to include subdirectories.",
+        "name" : "recursive",
+        "type" : "boolean"
+      },
+      "sort" : {
+        "description" : "Sort by name, date, size",
+        "name" : "sort",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "project_path"
+    ],
+    "type" : "object"
+  },
+  "name" : "list_files",
+  "outputSchema" : {
+    "properties" : {
+      "files" : {
+        "description" : "List of found source code files",
+        "items" : {
+          "properties" : {
+            "last_modified" : {
+              "description" : "Last modified date (ISO 8601 format)",
+              "type" : "string"
+            },
+            "path" : {
+              "description" : "Absolute path to the file",
+              "type" : "string"
+            },
+            "relative_path" : {
+              "description" : "Relative path from the project directory",
+              "type" : "string"
+            },
+            "size" : {
+              "description" : "File size in bytes",
+              "type" : "number"
+            }
+          },
+          "type" : "object"
+        },
+        "name" : "files",
+        "type" : "array"
+      },
+      "project_path" : {
+        "description" : "The project directory used",
+        "name" : "project_path",
+        "type" : "string"
+      },
+      "total_files" : {
+        "defaultValue" : "0",
+        "description" : "Total number of files found",
+        "name" : "total_files",
+        "type" : "number"
+      }
+    },
+    "required" : [
+      "files",
+      "total_files",
+      "project_path"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

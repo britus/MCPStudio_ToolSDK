@@ -1,0 +1,49 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.896Z",
+    "priority" : 0.9
+  },
+  "description" : "Delete a calendar event.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "deleteEvent",
+  "inputSchema" : {
+    "properties" : {
+      "event_id" : {
+        "description" : "event_id parameter",
+        "name" : "event_id",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "event_id"
+    ],
+    "type" : "object"
+  },
+  "name" : "delete_event",
+  "outputSchema" : {
+    "properties" : {
+      "event_id" : {
+        "description" : "event_id result field",
+        "name" : "event_id",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "event_id"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

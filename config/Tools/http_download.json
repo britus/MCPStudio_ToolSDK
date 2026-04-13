@@ -1,0 +1,50 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.903Z",
+    "priority" : 0.9
+  },
+  "description" : "Download any data from web site or web service using specified ‚url‘ parameter.",
+  "execHandler" : "downloadFile",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "url" : {
+        "description" : "Full qualified web site or web service url.",
+        "name" : "url",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "url"
+    ],
+    "type" : "object"
+  },
+  "name" : "http_download",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation status message",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Operation name",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Operation status",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

@@ -1,0 +1,81 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.896Z",
+    "priority" : 0.9
+  },
+  "description" : "Create a calendar event.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "createEvent",
+  "inputSchema" : {
+    "properties" : {
+      "all_day" : {
+        "description" : "all_day parameter",
+        "name" : "all_day",
+        "type" : "boolean"
+      },
+      "calendar_id" : {
+        "description" : "calendar_id parameter",
+        "name" : "calendar_id",
+        "type" : "string"
+      },
+      "end_date" : {
+        "description" : "ISO 8601 date",
+        "name" : "end_date",
+        "type" : "string"
+      },
+      "location" : {
+        "description" : "location parameter",
+        "name" : "location",
+        "type" : "string"
+      },
+      "notes" : {
+        "description" : "notes parameter",
+        "name" : "notes",
+        "type" : "string"
+      },
+      "start_date" : {
+        "description" : "ISO 8601 date",
+        "name" : "start_date",
+        "type" : "string"
+      },
+      "title" : {
+        "description" : "title parameter",
+        "name" : "title",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "title",
+      "start_date",
+      "end_date"
+    ],
+    "type" : "object"
+  },
+  "name" : "create_event",
+  "outputSchema" : {
+    "properties" : {
+      "event" : {
+        "description" : "event result field",
+        "name" : "event",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "event"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

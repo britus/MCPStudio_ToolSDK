@@ -1,0 +1,64 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.892Z",
+    "priority" : 0.9
+  },
+  "description" : "List available macOS calendars.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "listCalendars",
+  "inputSchema" : {
+    "properties" : {
+
+    },
+    "type" : "object"
+  },
+  "name" : "list_calendars",
+  "outputSchema" : {
+    "properties" : {
+      "calendars" : {
+        "description" : "calendars result field",
+        "items" : {
+          "properties" : {
+            "calendar_id" : {
+              "type" : "string"
+            },
+            "source" : {
+              "type" : "string"
+            },
+            "title" : {
+              "type" : "string"
+            },
+            "type" : {
+              "type" : "string"
+            }
+          },
+          "type" : "object"
+        },
+        "name" : "calendars",
+        "type" : "array"
+      },
+      "count" : {
+        "description" : "count result field",
+        "name" : "count",
+        "type" : "number"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "calendars"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

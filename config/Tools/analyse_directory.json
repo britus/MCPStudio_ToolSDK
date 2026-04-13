@@ -1,0 +1,56 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.889Z",
+    "priority" : 0.9
+  },
+  "description" : "Use this to to get a summer of the directory content specified by ‚dirPath‘ parameter.",
+  "execHandler" : "analyzeDirectory",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "dirPath" : {
+        "description" : "",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "dirPath",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "dirPath"
+    ],
+    "type" : "object"
+  },
+  "name" : "analyse_directory",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation status message",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Script operation meta data",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Operation status",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

@@ -1,0 +1,69 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.891Z",
+    "priority" : 0.9
+  },
+  "description" : "Create a reminder.",
+  "execHandler" : "CalendarToolHandler",
+  "execMethod" : "createReminder",
+  "inputSchema" : {
+    "properties" : {
+      "completed" : {
+        "description" : "completed parameter",
+        "name" : "completed",
+        "type" : "boolean"
+      },
+      "due_date" : {
+        "description" : "ISO 8601 date",
+        "name" : "due_date",
+        "type" : "string"
+      },
+      "list_id" : {
+        "description" : "list_id parameter",
+        "name" : "list_id",
+        "type" : "string"
+      },
+      "notes" : {
+        "description" : "notes parameter",
+        "name" : "notes",
+        "type" : "string"
+      },
+      "title" : {
+        "description" : "title parameter",
+        "name" : "title",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "title"
+    ],
+    "type" : "object"
+  },
+  "name" : "create_reminder",
+  "outputSchema" : {
+    "properties" : {
+      "reminder" : {
+        "description" : "reminder result field",
+        "name" : "reminder",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "reminder"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

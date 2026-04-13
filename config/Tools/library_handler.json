@@ -1,0 +1,59 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.901Z",
+    "priority" : 0.9
+  },
+  "description" : "Calls a macOS Plugin Bundle for resource access",
+  "execHandler" : "doSomething",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "path_name" : {
+        "description" : "Full path of directory",
+        "name" : "path_name",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "path_name"
+    ],
+    "type" : "object"
+  },
+  "name" : "library_handler",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation status message",
+        "name" : "error",
+        "type" : "string"
+      },
+      "metadata" : {
+        "description" : "Metadata of result",
+        "items" : {
+          "properties" : {
+
+          },
+          "type" : "object"
+        },
+        "name" : "metadata",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "Operation status",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "SampleTool_Bundle_Handler",
+  "scriptName" : "",
+  "toolType" : "CustomTool"
+}

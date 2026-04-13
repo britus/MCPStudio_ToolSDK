@@ -1,0 +1,77 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.902Z",
+    "priority" : 0.9
+  },
+  "description" : "Create a contact.",
+  "execHandler" : "ContactsToolHandler",
+  "execMethod" : "createContact",
+  "inputSchema" : {
+    "properties" : {
+      "email_addresses" : {
+        "description" : "email_addresses parameter",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "email_addresses",
+        "type" : "array"
+      },
+      "family_name" : {
+        "description" : "family_name parameter",
+        "name" : "family_name",
+        "type" : "string"
+      },
+      "given_name" : {
+        "description" : "given_name parameter",
+        "name" : "given_name",
+        "type" : "string"
+      },
+      "note" : {
+        "description" : "note parameter",
+        "name" : "note",
+        "type" : "string"
+      },
+      "organization_name" : {
+        "description" : "organization_name parameter",
+        "name" : "organization_name",
+        "type" : "string"
+      },
+      "phone_numbers" : {
+        "description" : "phone_numbers parameter",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "phone_numbers",
+        "type" : "array"
+      }
+    },
+    "type" : "object"
+  },
+  "name" : "create_contact",
+  "outputSchema" : {
+    "properties" : {
+      "contact" : {
+        "description" : "contact result field",
+        "name" : "contact",
+        "type" : "object"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "contact"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

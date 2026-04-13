@@ -1,0 +1,49 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.894Z",
+    "priority" : 0.9
+  },
+  "description" : "Delete a contact.",
+  "execHandler" : "ContactsToolHandler",
+  "execMethod" : "deleteContact",
+  "inputSchema" : {
+    "properties" : {
+      "contact_id" : {
+        "description" : "contact_id parameter",
+        "name" : "contact_id",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "contact_id"
+    ],
+    "type" : "object"
+  },
+  "name" : "delete_contact",
+  "outputSchema" : {
+    "properties" : {
+      "contact_id" : {
+        "description" : "contact_id result field",
+        "name" : "contact_id",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "contact_id"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

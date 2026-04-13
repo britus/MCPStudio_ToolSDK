@@ -1,0 +1,16 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user"
+    ],
+    "lastModified" : "2026-02-18T18:48:00.009Z",
+    "priority" : 1
+  },
+  "contextTags" : "[\"MCP\",\"Protocol\",\"Specification\"]",
+  "description" : "Provide information and the specification about the Message Context \nProtocol (MCP) including related document resources. \nVersion 2025-06-18",
+  "mimeType" : "text\/html",
+  "name" : "Message Context Protocol (MCP) Specification",
+  "relatedResources" : "[{\"resourceType\":\"text\\\/html\",\"resourceId\":\"D09E9FBA-BF8E-4CEE-B4D7-2BE5A2883EF0\",\"url\":\"https:\\\/\\\/modelcontextprotocol.io\\\/specification\\\/2025-06-18\\\/server\\\/prompts\"},{\"resourceType\":\"text\\\/html\",\"resourceId\":\"4DAC1DD1-7774-4E03-9CDB-2542093C10B4\",\"url\":\"https:\\\/\\\/modelcontextprotocol.io\\\/specification\\\/2025-06-18\\\/server\\\/tools\"},{\"resourceType\":\"text\\\/html\",\"resourceId\":\"75F7625B-0C7F-4557-A870-1AAC0DD31B59\",\"url\":\"https:\\\/\\\/modelcontextprotocol.io\\\/specification\\\/2025-06-18\\\/server\\\/resources\"}]",
+  "type" : "resourceLink",
+  "uri" : "https:\/\/modelcontextprotocol.io\/specification\/2025-06-18\/server"
+}

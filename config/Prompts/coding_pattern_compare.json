@@ -1,0 +1,12 @@
+{
+  "arguments" : [
+    {
+      "description" : "Project working directory name",
+      "name" : "project_path",
+      "required" : true
+    }
+  ],
+  "description" : "Use this instruction text next time for the same file analysis workflow:\nCompare Swift code patterns between UI directories in MCPStudio project.",
+  "name" : "coding_pattern_compare",
+  "template" : "Use this instruction text next time for the same file analysis workflow:\nCompare Swift code patterns between UI directories in MCPStudio project.\n\nTask:\n- Read and compare controller\/view files provided by the user\n- Check Swift import compliance: internal import Combine, internal import UniformTypeIdentifiers\n- Verify English comments and existing code patterns are followed\n- Analyze FocusState usage patterns (@FocusState vs @FocusState.Binding)\n- Identify EnvironmentKey declarations that are unused\n\nFiles to analyze:\n[Files or directories provided by the user]\n\nOutput requirements:\n1. List all files found in each directory\n2. Show side-by-side code comparison for controllers and views\n3. Identify pattern violations (missing imports, wrong patterns, unused declarations)\n4. Provide numbered recommendations with specific file paths for fixes\n5. Include complete code snippets for problematic sections\n6. No emojis or decorative characters anywhere in response\n\nAnalysis focus:\n- Import statements at top of files\n- Controller class inheritance and published properties\n- View structure and FocusState implementation\n- EnvironmentKey usage consistency\n- Property naming conventions (Controller suffix, View suffix)\n- Comment header formatting\n\nDeliverable:\nStructured comparison report with clear pattern mismatches and fix instructions.\n"
+}

@@ -32,8 +32,10 @@ function qmakeBuild(params) {
     return;
   }
 
-  const qtPlatformDir = "/Users/eofmc/Qt/6.11.0/macos";
-
+  const qtVersion = "6.11.0";
+  const homePath = MCPStudio.getHomePath();
+  
+  const qtPlatformDir = homePath + "/Qt/" + qtVersion + "/macos";
   const projectDir = params.projectDir;
   const projectTarget = params.projectTarget || 'QMAKE project target name missing';
   const projectFile = params.projectFile || projectTarget + '.pro';

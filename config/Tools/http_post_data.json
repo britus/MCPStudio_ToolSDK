@@ -1,0 +1,62 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.900Z",
+    "priority" : 0.9
+  },
+  "description" : "Post any JSON code to web site or web service using specified ‚url‘ parameter and json code ‚data‘ parameter",
+  "execHandler" : "postData",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "data" : {
+        "description" : "JSON source code as post body data.",
+        "items" : {
+          "properties" : {
+
+          },
+          "type" : "object"
+        },
+        "name" : "data",
+        "type" : "object"
+      },
+      "url" : {
+        "description" : "Full qualified web site or web service url.",
+        "name" : "url",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "url",
+      "data"
+    ],
+    "type" : "object"
+  },
+  "name" : "http_post_data",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation status message",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Operation name",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Operation status",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "Scripts\/tool_entry.js",
+  "toolType" : "ScriptTool"
+}

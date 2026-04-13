@@ -1,0 +1,57 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-04-07T04:25:53.897Z",
+    "priority" : 0.9
+  },
+  "description" : "List contacts from macOS Contacts.",
+  "execHandler" : "ContactsToolHandler",
+  "execMethod" : "listContacts",
+  "inputSchema" : {
+    "properties" : {
+      "limit" : {
+        "description" : "limit parameter",
+        "name" : "limit",
+        "type" : "number"
+      },
+      "query" : {
+        "description" : "query parameter",
+        "name" : "query",
+        "type" : "string"
+      }
+    },
+    "type" : "object"
+  },
+  "name" : "list_contacts",
+  "outputSchema" : {
+    "properties" : {
+      "contacts" : {
+        "description" : "contacts result field",
+        "items" : {
+          "properties" : {
+
+          },
+          "type" : "object"
+        },
+        "name" : "contacts",
+        "type" : "array"
+      },
+      "success" : {
+        "description" : "success result field",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success",
+      "contacts"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}
