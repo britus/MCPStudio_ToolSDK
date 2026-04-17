@@ -1,0 +1,51 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
+  },
+  "description": "Analyze a directory and report its contents.",
+  "execHandler": "analyze_directory",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "dirPath": {
+        "name": "dirPath",
+        "description": "Directory path to analyze.",
+        "type": "string"
+      }
+    },
+    "required": []
+  },
+  "name": "analyze_directory",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ]
+  },
+  "pluginName": "",
+  "scriptName": "tool_entry.js",
+  "toolType": "ScriptTool"
+}

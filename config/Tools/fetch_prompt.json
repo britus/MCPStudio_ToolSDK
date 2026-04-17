@@ -1,0 +1,53 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
+  },
+  "description": "Fetch an MCP prompt definition by name.",
+  "execHandler": "fetch_prompt",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "promptName": {
+        "name": "promptName",
+        "description": "Prompt name to fetch.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "promptName"
+    ]
+  },
+  "name": "fetch_prompt",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ]
+  },
+  "pluginName": "",
+  "scriptName": "tool_entry.js",
+  "toolType": "ScriptTool"
+}

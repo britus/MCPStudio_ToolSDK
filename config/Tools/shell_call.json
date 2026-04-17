@@ -1,0 +1,66 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
+  },
+  "description": "Execute a shell command with optional parameters.",
+  "execHandler": "shell_call",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "command": {
+        "name": "command",
+        "description": "Shell command to execute.",
+        "type": "string"
+      },
+      "parameters": {
+        "name": "parameters",
+        "description": "Array of command arguments.",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "shell": {
+        "name": "shell",
+        "description": "Absolute path to the shell interpreter.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "command"
+    ]
+  },
+  "name": "shell_call",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ]
+  },
+  "pluginName": "",
+  "scriptName": "tool_entry.js",
+  "toolType": "ScriptTool"
+}

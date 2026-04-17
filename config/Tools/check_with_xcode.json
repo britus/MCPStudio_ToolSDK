@@ -1,0 +1,99 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
+  },
+  "description": "Build an Xcode project with xcodebuild and return the build result.",
+  "execHandler": "check_with_xcode",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "projectName": {
+        "name": "projectName",
+        "description": "Xcode project name without the .xcodeproj suffix.",
+        "type": "string"
+      },
+      "projectDir": {
+        "name": "projectDir",
+        "description": "Project directory path.",
+        "type": "string"
+      },
+      "scheme": {
+        "name": "scheme",
+        "description": "Scheme name to build.",
+        "type": "string"
+      },
+      "configuration": {
+        "name": "configuration",
+        "description": "Build configuration such as Debug or Release.",
+        "type": "string"
+      },
+      "platform": {
+        "name": "platform",
+        "description": "SDK platform such as macosx or iphonesimulator.",
+        "type": "string"
+      },
+      "clean": {
+        "name": "clean",
+        "description": "Whether to clean derived data before building.",
+        "type": "boolean"
+      },
+      "showOperationLogs": {
+        "name": "showOperationLogs",
+        "description": "Whether to include verbose operation logging.",
+        "type": "boolean"
+      },
+      "alltargets": {
+        "name": "alltargets",
+        "description": "Whether to build all targets.",
+        "type": "boolean"
+      },
+      "codesign": {
+        "name": "codesign",
+        "description": "Code signing team identifier.",
+        "type": "string"
+      },
+      "codeSigningIdentity": {
+        "name": "codeSigningIdentity",
+        "description": "Explicit code signing identity.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectName",
+      "projectDir"
+    ]
+  },
+  "name": "check_with_xcode",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ]
+  },
+  "pluginName": "",
+  "scriptName": "tool_entry.js",
+  "toolType": "ScriptTool"
+}

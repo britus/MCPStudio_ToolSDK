@@ -1,0 +1,53 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
+  },
+  "description": "Open and read a file.",
+  "execHandler": "open_file",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "name": "path",
+        "description": "File path to open.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "path"
+    ]
+  },
+  "name": "open_file",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ]
+  },
+  "pluginName": "",
+  "scriptName": "tool_entry.js",
+  "toolType": "ScriptTool"
+}

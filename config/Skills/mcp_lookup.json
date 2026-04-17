@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-17T08:19:00.000Z",
+    "priority": 0.9
+  },
+  "name": "mcp_lookup",
+  "description": "Retrieve MCP prompt and resource definitions from local MCPStudio configuration.",
+  "type": "skill",
+  "contextTags": [
+    "mcp",
+    "prompt",
+    "resource",
+    "configuration"
+  ],
+  "scripts": [
+    "fetchPrompt.js",
+    "fetchResource.js"
+  ],
+  "relatedTools": [
+    "config/Tools/fetch_prompt.json",
+    "config/Tools/fetch_resource.json"
+  ],
+  "handlers": [],
+  "whenToUse": [
+    "When a task needs the contents of a named MCP prompt.",
+    "When a task needs metadata or links for a named MCP resource."
+  ],
+  "instructions": [
+    "Use prompt lookup for reusable templates and argument metadata.",
+    "Use resource lookup when the task needs a URI, mime type, or resource display name."
+  ]
+}

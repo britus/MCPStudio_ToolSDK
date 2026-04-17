@@ -1,0 +1,78 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
+  },
+  "description": "Configure and build a CMake project.",
+  "execHandler": "cmake_build",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "projectDir": {
+        "name": "projectDir",
+        "description": "Project directory path.",
+        "type": "string"
+      },
+      "projectTarget": {
+        "name": "projectTarget",
+        "description": "Build target name.",
+        "type": "string"
+      },
+      "buildType": {
+        "name": "buildType",
+        "description": "Build type such as Debug or Release.",
+        "type": "string"
+      },
+      "cmakeFlags": {
+        "name": "cmakeFlags",
+        "description": "Additional CMake flags.",
+        "type": "string"
+      },
+      "cmakeArgs": {
+        "name": "cmakeArgs",
+        "description": "Additional CMake arguments.",
+        "type": "string"
+      },
+      "verbose": {
+        "name": "verbose",
+        "description": "Whether to enable verbose logging.",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "projectDir"
+    ]
+  },
+  "name": "cmake_build",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ]
+  },
+  "pluginName": "",
+  "scriptName": "tool_entry.js",
+  "toolType": "ScriptTool"
+}

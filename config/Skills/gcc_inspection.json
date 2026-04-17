@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-04-17T08:19:00.000Z",
+    "priority": 0.9
+  },
+  "name": "gcc_inspection",
+  "description": "Inspect GCC availability, compiler settings, and basic compiler metadata.",
+  "type": "skill",
+  "contextTags": [
+    "gcc",
+    "compiler",
+    "diagnostics",
+    "toolchain"
+  ],
+  "scripts": [
+    "checkWithGcc.js",
+    "gccSettings.js",
+    "getGccInfo.js"
+  ],
+  "relatedTools": [
+    "config/Tools/check_with_gcc.json",
+    "config/Tools/gcc_settings.json",
+    "config/Tools/get_gcc_info.json"
+  ],
+  "handlers": [
+    "checkWithGcc",
+    "gccSettings",
+    "getGccInfo"
+  ],
+  "whenToUse": [
+    "When a task needs to confirm GCC availability or inspect its environment.",
+    "When supported flags, target information, or version metadata are required before building."
+  ],
+  "instructions": [
+    "Use the lightweight info path first when only version or location details are needed.",
+    "Use the fuller settings or detection flows when architecture, supported flags, or link behavior matter."
+  ]
+}
