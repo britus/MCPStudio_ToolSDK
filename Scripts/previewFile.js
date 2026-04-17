@@ -6,50 +6,58 @@
 const shared = require('sharedFunctions');
 
 function previewFile(params) {
-    var filePath = params.filePath || "";
-    
-    if (!filePath) {
-        return shared.createErrorResult("filePath parameter is required");
+    var pathValidation = shared.validateFilePath(params.filePath || "", "filePath");
+    var filePath;
+    var content;
+    var lines;
+    var wordCount;
+    var result;
+
+    if (!pathValidation.ok) {
+        return shared.setErrorResult(pathValidation.message, {
+            operation: "previewFile"
+        });
     }
+
+    filePath = pathValidation.value;
     
     console.log("Processing file: " + filePath);
     
     // Check if file exists
     if (!MCPStudio.fileExists(filePath)) {
-        return shared.createErrorResult("File not found: " + filePath);
+        return shared.setErrorResult("File not found: " + filePath, {
+            operation: "previewFile",
+            filePath: filePath
+        });
     }
     
     // Read file content
-    var content = MCPStudio.readFile(filePath);
-    if (!content) {
-        return shared.createErrorResult("Failed to read file: " + filePath);
+    content = MCPStudio.readFile(filePath);
+    if (content === null) {
+        return shared.setErrorResult("Failed to read file: " + filePath, {
+            operation: "previewFile",
+            filePath: filePath
+        });
     }
     
     // Process the content (example: count lines and words)
-    var lines = content.split('\n');
-    var wordCount = content.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+    lines = content.split('\n');
+    wordCount = content.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
     
-    var result = {
+    result = {
         filePath: filePath,
         lineCount: lines.length,
         wordCount: wordCount,
         charCount: content.length,
         preview: lines.slice(0, 10).join('\n')
     };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            filePath: filePath,
-            operation: "processFile",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+
+    return shared.setSuccessResult(result, {
+        filePath: filePath,
+        operation: "previewFile"
+    });
 }
 
 module.exports = {
-	processFile
+	previewFile
 };

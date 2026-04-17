@@ -18,27 +18,44 @@ const shared = require('sharedFunctions');
  * @returns {string} JSON result (success: boolean, message: string)
  */
 function qmakeBuild(params) {
+  var projectDirValidation;
+  var projectFileValidation;
+
   // Validate required parameters
   if (!params || !params.projectDir) {
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "[Script] QMake project directory parameter required.\n",
-        metadata: {
-            operation: "qmakeBuild",
-            success: false,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-    return;
+    return shared.setErrorResult("[Script] QMake project directory parameter required.\n", {
+      operation: "qmakeBuild",
+      stdout: stdOut,
+      stderr: stdErr
+    });
   }
 
   const qtVersion = "6.11.0";
   const homePath = MCPStudio.getHomePath();
   
   const qtPlatformDir = homePath + "/Qt/" + qtVersion + "/macos";
-  const projectDir = params.projectDir;
   const projectTarget = params.projectTarget || 'QMAKE project target name missing';
-  const projectFile = params.projectFile || projectTarget + '.pro';
+  projectDirValidation = shared.validateDirectoryPath(params.projectDir, "projectDir");
+  if (!projectDirValidation.ok) {
+    return shared.setErrorResult(projectDirValidation.message, {
+      operation: "qmakeBuild",
+      stdout: stdOut,
+      stderr: stdErr
+    });
+  }
+
+  const projectDir = projectDirValidation.value;
+  projectFileValidation = shared.validatePath(params.projectFile || projectTarget + '.pro', "projectFile", { relative: true });
+  if (!projectFileValidation.ok) {
+    return shared.setErrorResult(projectFileValidation.message, {
+      operation: "qmakeBuild",
+      path: projectDir,
+      stdout: stdOut,
+      stderr: stdErr
+    });
+  }
+
+  const projectFile = projectFileValidation.value;
   const buildType = params.buildType || 'Debug'; // 'Debug' or 'Release'
   const qmakeArgs = params.qmakeArgs || '';
   const makeArgs = params.makeArgs || '';
@@ -46,16 +63,12 @@ function qmakeBuild(params) {
 
   // Validate directory exists using MCPStudio API
   if (!MCPStudio.fileExists(projectDir)) {
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "QMake project directory '" + projectDir + "' not found.",
-        metadata: {
-            operation: "qmakeBuild",
-            success: false,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-    return;
+    return shared.setErrorResult("QMake project directory '" + projectDir + "' not found.", {
+      operation: "qmakeBuild",
+      path: projectDir,
+      stdout: stdOut,
+      stderr: stdErr
+    });
   }
 
   // Ensure build directory exists
@@ -78,15 +91,15 @@ function qmakeBuild(params) {
     `set -euo pipefail`,
     // Ensure qmake and make are in PATH. Common Qt6 path added.
     // User might need to adjust /opt/Qt/6.x.x/gcc_64/bin depending on their Qt installation path.
-    `export QTDIR=${qtPlatformDir}`,
+    `export QTDIR=${shared.quoteShellArgument(qtPlatformDir)}`,
     `export PATH=$QTDIR/bin:/usr/local/qt6/bin:/usr/local/bin:/bin:/usr/bin:$PATH`,
-    `cd "${projectDir}" || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
+    `cd ${shared.quoteShellArgument(projectDir)} || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
     (verbose ? `echo 'Ensuring build directory...'` : ''),
     `mkdir -p build || { echo 'Failed to create build directory.'; exit 1; }`,
     `cd build || { echo 'Failed to change to build directory.'; exit 1; }`,
     `echo 'Running QMake...'`,
     // Run qmake from the build directory, pointing to the .pro file in the parent project directory
-    `qmake ../"${projectFile}" ${configArgsForQMake} ${qmakeArgs} || { echo 'QMake failed.'; exit 1; }`,
+    `qmake ../${shared.quoteShellArgument(projectFile)} ${configArgsForQMake} ${qmakeArgs} || { echo 'QMake failed.'; exit 1; }`,
     `echo 'Building...'`,
     `make -j8 ${makeArgs} || { echo 'Build failed.'; exit 1; }`,
     `echo 'Build completed successfully.'`

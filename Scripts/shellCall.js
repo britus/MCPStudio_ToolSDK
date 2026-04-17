@@ -24,6 +24,7 @@ function shellCall(params) {
     var command = params.command || "";
     var parameters = params.parameters || [];
     var shell = params.shell || "/bin/bash";
+    var shellValidation;
     
     taskLog("=== Shell Call Task ===");
     taskLog("Command: " + command);
@@ -32,12 +33,23 @@ function shellCall(params) {
 
     // Validate input parameters
     if (!command) {
-        return shared.createErrorResult("Missing required parameter: command");
+        return shared.setErrorResult("Missing required parameter: command", {
+            operation: "shellCall"
+        });
     }
     
     if (shell.length === 0) {
         shell = "/bin/bash";
     }
+
+    shellValidation = shared.validateFilePath(shell, "shell", { absolute: true });
+    if (!shellValidation.ok) {
+        return shared.setErrorResult(shellValidation.message, {
+            operation: "shellCall"
+        });
+    }
+
+    shell = shellValidation.value;
 
     var isCustomShell = false;
     

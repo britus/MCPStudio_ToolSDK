@@ -12,37 +12,40 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with deletion status or error
  */
 function deleteFile(params) {
-    var path = params.path || "";
+    var pathValidation = shared.validateFilePath(params.path || "", "path");
+    var path;
+    var success;
+    var result;
     
-    if (path === "") {
-        return shared.createErrorResult("Missing path parameter");
+    if (!pathValidation.ok) {
+        return shared.setErrorResult(pathValidation.message, {
+            operation: "deleteFile"
+        });
     }
+
+    path = pathValidation.value;
     
     console.log("Delete file: " + path);
     
     // Delete file
-    var success = MCPStudio.deleteFile(path);
+    success = MCPStudio.deleteFile(path);
     
     if (!success) {
-        return shared.createErrorResult("Failed to delete file: " + path);
+        return shared.setErrorResult("Failed to delete file: " + path, {
+            operation: "deleteFile",
+            path: path
+        });
     }
     
-    var result = {
+    result = {
         success: "File successfully deleted.",
-        path: path,
+        path: path
     };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            path: path,
-            operation: "deleteFile",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+
+    return shared.setSuccessResult(result, {
+        path: path,
+        operation: "deleteFile"
+    });
 }
 
 module.exports = {

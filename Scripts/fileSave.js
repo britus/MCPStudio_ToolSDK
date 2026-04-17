@@ -13,38 +13,41 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with save status or error
  */
 function saveFile(params) {
-    var path = params.file_path || "";
+    var pathValidation = shared.validateFilePath(params.file_path || "", "file_path");
+    var path;
     var content = params.content || "";
+    var success;
+    var result;
     
-    if (path === "") {
-        return shared.createErrorResult("Missing parameter: file_path");
+    if (!pathValidation.ok) {
+        return shared.setErrorResult(pathValidation.message, {
+            operation: "saveFile"
+        });
     }
+
+    path = pathValidation.value;
     
     console.log("Save file: " + path);
     
     // Save file content
-    var success = MCPStudio.saveFile(path, content);
+    success = MCPStudio.saveFile(path, content);
     
     if (!success) {
-        return shared.createErrorResult("Failed to save file: " + path);
+        return shared.setErrorResult("Failed to save file: " + path, {
+            operation: "saveFile",
+            path: path
+        });
     }
     
-    var result = {
+    result = {
         success: "File successfully saved.",
-        path: path,
+        path: path
     };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            path: path,
-            operation: "saveFile",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+
+    return shared.setSuccessResult(result, {
+        path: path,
+        operation: "saveFile"
+    });
 }
 
 module.exports = {

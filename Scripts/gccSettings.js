@@ -31,7 +31,13 @@ function gccSettings(params) {
     var compilerPath = compiler;
     
     if (!MCPStudio.fileExists(compilerPath)) {
-        return shared.createErrorResult("GCC compiler not found at " + compilerPath + ". Please install GCC using: brew install gcc or sudo apt-get install gcc");
+        return shared.setErrorResult(
+            "GCC compiler not found at " + compilerPath + ". Please install GCC using: brew install gcc or sudo apt-get install gcc",
+            {
+                operation: "gccSettings",
+                path: compilerPath
+            }
+        );
     }
 
     taskLog("[Script] GCC compiler detected at " + compilerPath);

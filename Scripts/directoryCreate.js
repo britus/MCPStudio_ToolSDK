@@ -12,34 +12,44 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with directory creation status or error
  */
 function createDirectory(params) {
-    var dirPath = params.dirPath || MCPStudio.getDocumentsPath() + "/.eof.mcpstudio";
+    var dirValidation = shared.validateDirectoryPath(
+        params.dirPath || MCPStudio.getDocumentsPath() + "/.eof.mcpstudio",
+        "dirPath"
+    );
+    var dirPath;
+    var success;
+    var result;
+
+    if (!dirValidation.ok) {
+        return shared.setErrorResult(dirValidation.message, {
+            operation: "createDirectory"
+        });
+    }
+
+    dirPath = dirValidation.value;
 
     console.log("Create directory: " + dirPath);
     
-        // Create directory
+    // Create directory
     if (!MCPStudio.fileExists(dirPath)) {
-        var success = MCPStudio.createDirectory(dirPath);
+        success = MCPStudio.createDirectory(dirPath);
         if (!success) {
-            return shared.createErrorResult("Failed to create directory: " + dirPath);
+            return shared.setErrorResult("Failed to create directory: " + dirPath, {
+                operation: "createDirectory",
+                path: dirPath
+            });
         }
     }
     
-    var result = {
-        success: "Directory successfully created.",
-        path: dirPath,
+    result = {
+        status: "Directory successfully created.",
+        path: dirPath
     };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            path: dirPath,
-            operation: "createDirectory",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+
+    return shared.setSuccessResult(result, {
+        path: dirPath,
+        operation: "createDirectory"
+    });
 }
 
 module.exports = {

@@ -1,52 +1,51 @@
 {
-  "annotations" : {
-    "audience" : [
+  "annotations": {
+    "audience": [
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-04-07T04:25:53.897Z",
-    "priority" : 0.9
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
   },
-  "description" : "Lists all files in the specified directory",
-  "execHandler" : "listDirectory",
-  "execMethod" : "toolEntry",
-  "inputSchema" : {
-    "properties" : {
-      "path" : {
-        "description" : "Path to the directory to list",
-        "name" : "path",
-        "type" : "string"
+  "description": "List the contents of a directory.",
+  "execHandler": "list_directory",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "name": "path",
+        "description": "Directory path to list.",
+        "type": "string"
       }
     },
-    "required" : [
-      "path"
-    ],
-    "type" : "object"
+    "required": []
   },
-  "name" : "list_directory",
-  "outputSchema" : {
-    "properties" : {
-      "contents" : {
-        "description" : "Array of file and directory names",
-        "items" : {
-          "type" : "string"
-        },
-        "name" : "contents",
-        "type" : "array"
+  "name": "list_directory",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
       },
-      "path" : {
-        "description" : "The path that was listed",
-        "name" : "path",
-        "type" : "string"
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
       }
     },
-    "required" : [
-      "contents",
-      "path"
-    ],
-    "type" : "object"
+    "required": [
+      "success"
+    ]
   },
-  "pluginName" : "",
-  "scriptName" : "Scripts\/tool_entry.js",
-  "toolType" : "ScriptTool"
+  "pluginName": "",
+  "scriptName": "Scripts/tool_entry.js",
+  "toolType": "ScriptTool"
 }

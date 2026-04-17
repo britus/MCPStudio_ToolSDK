@@ -1,49 +1,55 @@
 {
-  "annotations" : {
-    "audience" : [
+  "annotations": {
+    "audience": [
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-04-07T04:25:53.892Z",
-    "priority" : 0.9
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
   },
-  "description" : "Check if a file exists at the specified path",
-  "execHandler" : "fileExists",
-  "execMethod" : "toolEntry",
-  "inputSchema" : {
-    "properties" : {
-      "path" : {
-        "description" : "Path to the file to check",
-        "name" : "path",
-        "type" : "string"
+  "description": "Check whether a file or directory exists.",
+  "execHandler": "file_exists",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "name": "path",
+        "description": "File or directory path to check.",
+        "type": "string"
       }
     },
-    "required" : [
+    "required": [
       "path"
-    ],
-    "type" : "object"
+    ]
   },
-  "name" : "file_exists",
-  "outputSchema" : {
-    "properties" : {
-      "exists" : {
-        "description" : "True if file exists, false otherwise",
-        "name" : "exists",
-        "type" : "boolean"
+  "name": "file_exists",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "exists": {
+        "name": "exists",
+        "description": "True when the path exists.",
+        "type": "boolean"
       },
-      "path" : {
-        "description" : "The path that was checked",
-        "name" : "path",
-        "type" : "string"
+      "path": {
+        "name": "path",
+        "description": "Validated path that was checked.",
+        "type": "string"
+      },
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation.",
+        "type": "boolean"
       }
     },
-    "required" : [
+    "required": [
       "exists",
-      "path"
-    ],
-    "type" : "object"
+      "path",
+      "success"
+    ]
   },
-  "pluginName" : "",
-  "scriptName" : "Scripts\/tool_entry.js",
-  "toolType" : "ScriptTool"
+  "pluginName": "",
+  "scriptName": "Scripts/tool_entry.js",
+  "toolType": "ScriptTool"
 }

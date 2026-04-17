@@ -21,21 +21,27 @@ const shellCall = require('shellCall').shellCall;
  */
 
 function cmakeBuild(params) {
+  var projectDirValidation;
+
   // Validate required parameters
   if (!params || !params.projectDir) {
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "[Script] cmake Project directory parameter required.\n",
-        metadata: {
-            operation: "cmakeBuild",
-            success: false,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-    return;
+    return shared.setErrorResult("[Script] cmake Project directory parameter required.\n", {
+      operation: "cmakeBuild",
+      stdout: stdOut,
+      stderr: stdErr
+    });
   }
 
-  const projectDir = params.projectDir;
+  projectDirValidation = shared.validateDirectoryPath(params.projectDir, "projectDir");
+  if (!projectDirValidation.ok) {
+    return shared.setErrorResult(projectDirValidation.message, {
+      operation: "cmakeBuild",
+      stdout: stdOut,
+      stderr: stdErr
+    });
+  }
+
+  const projectDir = projectDirValidation.value;
   const projectTarget = params.projectTarget || 'app';
   const buildType = params.buildType || 'Debug';
   const cmakeFlags = params.cmakeFlags || '';
@@ -44,16 +50,12 @@ function cmakeBuild(params) {
 
   // Validate directory exists using MCPStudio API
   if (!MCPStudio.fileExists(projectDir)) {
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "cmake Project directory '"+ projectDir+"' not found.",
-        metadata: {
-            operation: "cmakeBuild",
-            success: false,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-    return;
+    return shared.setErrorResult("cmake Project directory '" + projectDir + "' not found.", {
+      operation: "cmakeBuild",
+      path: projectDir,
+      stdout: stdOut,
+      stderr: stdErr
+    });
   }
 
   // Ensure build directory exists
@@ -73,7 +75,7 @@ function cmakeBuild(params) {
     `#!/bin/bash`,
     `set -euo pipefail`,
     `export PATH=/usr/local/bin:/bin:/usr/bin:$PATH`,
-    `cd ${projectDir} || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
+    `cd ${shared.quoteShellArgument(projectDir)} || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
     `echo 'Running CMake...';`,
     `cmake -S . -B build -DCMAKE_BUILD_TYPE=${buildType} ${finalCmakeFlags} ${cmakeArgs} || { echo 'CMake failed.'; exit 1; }`,
     `echo 'Building...';`,
@@ -95,7 +97,7 @@ function cmakeBuild(params) {
             operation: "cmakeBuild",
             shellScript: shellScript,
             success: true,
-            sstdout: stdOut,
+            stdout: stdOut,
             stderr: stdErr,
         }
     }));
@@ -126,6 +128,3 @@ function cmakeBuild(params) {
 // });
 
 module.exports = { cmakeBuild };
-
-// Note: This script is designed to be used in the MCP Studio environment with shell integration.
-// In production, it will execute the shell command via shellCall and return actual output.

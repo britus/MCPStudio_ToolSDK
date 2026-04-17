@@ -27,6 +27,7 @@ function taskLog(message) {
 function checkWithXcode(params) {
     var projectName = params.projectName || "";
     var projectDir = params.projectDir || "";
+    var dirValidation;
     
     taskLog("=== Xcode Build Task ===");
     taskLog("Project: " + projectName);
@@ -34,11 +35,25 @@ function checkWithXcode(params) {
 
     // Validate input parameters
     if (!projectDir) {
-        return shared.createErrorResult("Missing required parameter: projectDir");
+        return shared.setErrorResult("Missing required parameter: projectDir", {
+            operation: "checkWithXcode"
+        });
     }
+
+    dirValidation = shared.validateDirectoryPath(projectDir, "projectDir");
+    if (!dirValidation.ok) {
+        return shared.setErrorResult(dirValidation.message, {
+            operation: "checkWithXcode"
+        });
+    }
+
+    projectDir = dirValidation.value;
     
     if (!MCPStudio.fileExists(projectDir)) {
-        return shared.createErrorResult("Project directory not found: " + projectDir);
+        return shared.setErrorResult("Project directory not found: " + projectDir, {
+            operation: "checkWithXcode",
+            path: projectDir
+        });
     }
 
     // Normalize project name (remove .xcodeproj extension if present)
@@ -69,18 +84,27 @@ function checkWithXcode(params) {
     // Clean build artifacts if requested
     if (cleanBuild) {
         shellScript += '# Clean previous build artifacts\n';
+        shellScript += 'PROJECT_DIR=' + shared.quoteShellArgument(projectDir) + '\n';
+        shellScript += 'cd "${PROJECT_DIR}" || exit 1\n';
         shellScript += 'rm -rf DerivedData/ || true\n\n';
         shellScript += 'rm -rf build/DerivedData/ || true\n\n';
         shellScript += 'rm -rf Build/DerivedData/ || true\n\n';
         taskLog("[Script] Cleaning previous builds...");
         success = MCPStudio.shell(shellScript);
         if (!success) {
-            return shared.createErrorResult("Failed to clean build directory");
+            return shared.setErrorResult("Failed to clean build directory", {
+                operation: "checkWithXcode",
+                path: projectDir,
+                projectName: projectName
+            });
         }
+
+        shellScript = '#!/bin/bash\n';
+        shellScript += 'set -euo pipefail\n';
     }
     
-    shellScript += 'PROJECT_NAME="' + projectName + '"\n';
-    shellScript += 'PROJECT_DIR="' + projectDir + '"\n';
+    shellScript += 'PROJECT_NAME=' + shared.quoteShellArgument(projectName) + '\n';
+    shellScript += 'PROJECT_DIR=' + shared.quoteShellArgument(projectDir) + '\n';
     shellScript += 'ARCH=`uname -m`\n';
     shellScript += 'cd "${PROJECT_DIR}" || exit 1\n';
     shellScript += 'xcodebuild';
@@ -95,20 +119,20 @@ function checkWithXcode(params) {
     }
     
     if (codesign.length > 0) {
-        shellScript += ' --codeSigningIdentity="' + codesign + '"';
+        shellScript += ' --codeSigningIdentity ' + shared.quoteShellArgument(codesign);
     }
     if (scheme.length > 0) {
-        shellScript += ' -scheme ' + scheme;
+        shellScript += ' -scheme ' + shared.quoteShellArgument(scheme);
     }
     if (platform.length > 0) {
-        shellScript += ' -sdk ' + platform;
+        shellScript += ' -sdk ' + shared.quoteShellArgument(platform);
     }
     // Fixed: check if configuration is not empty string instead of numeric comparison
     if (configuration && configuration.length > 0) {
-        shellScript += ' -configuration ' + configuration;
+        shellScript += ' -configuration ' + shared.quoteShellArgument(configuration);
     }
     /* end */
-    if (codesign && codesign.length === 0) {
+    if (!codesign || codesign.length === 0) {
     	shellScript += ' CODE_SIGNING_ALLOWED=NO build || exit 1\n';
     } else {
     	shellScript += ' build || exit 1\n';

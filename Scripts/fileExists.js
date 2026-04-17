@@ -12,34 +12,34 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with existence status
  */
 function fileExists(params) {
-    var path = params.path || "";
+    var pathValidation = shared.validatePath(params.path || "", "path");
+    var path;
+    var exists;
+    var result;
     
-    if (path === "") {
-        return shared.createErrorResult("Missing path parameter");
+    if (!pathValidation.ok) {
+        return shared.setErrorResult(pathValidation.message, {
+            operation: "fileExists"
+        });
     }
+
+    path = pathValidation.value;
     
     console.log("Check file existence: " + path);
     
     // Check if file exists
-    var exists = MCPStudio.fileExists(path);
+    exists = MCPStudio.fileExists(path);
     
-    var result = {
+    result = {
+        exists: exists,
+        path: path
+    };
+
+    return shared.setSuccessResult(result, {
         exists: exists,
         path: path,
-    };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            exists: exists,
-            path: path,
-            operation: "fileExists",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+        operation: "fileExists"
+    });
 }
 
 module.exports = {

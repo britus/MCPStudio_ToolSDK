@@ -12,34 +12,44 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with directory contents or error
  */
 function listDirectory(params) {
-    var path = params.path || MCPStudio.getDocumentsPath() + "/.eof.mcpstudio";
+    var pathValidation = shared.validateDirectoryPath(
+        params.path || MCPStudio.getDocumentsPath() + "/.eof.mcpstudio",
+        "path"
+    );
+    var path;
+    var contents;
+    var result;
+
+    if (!pathValidation.ok) {
+        return shared.setErrorResult(pathValidation.message, {
+            operation: "listDirectory"
+        });
+    }
+
+    path = pathValidation.value;
     
     console.log("List directory: " + path);
     
     // List directory contents
-    var contents = MCPStudio.listDirectory(path);
+    contents = MCPStudio.listDirectory(path);
     
     if (contents === null) {
-        return shared.createErrorResult("Failed to list directory: " + path);
+        return shared.setErrorResult("Failed to list directory: " + path, {
+            operation: "listDirectory",
+            path: path
+        });
     }
     
-    var result = {
+    result = {
+        contents: contents,
+        path: path
+    };
+
+    return shared.setSuccessResult(result, {
         contents: contents,
         path: path,
-    };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            contents: contents,
-            path: path,
-            operation: "listDirectory",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+        operation: "listDirectory"
+    });
 }
 
 module.exports = {

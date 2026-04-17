@@ -12,38 +12,41 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with file content or error
  */
 function openFile(params) {
-    var path = params.path || "";
+    var pathValidation = shared.validateFilePath(params.path || "", "path");
+    var path;
+    var content;
+    var result;
     
-    if (path === "") {
-        return shared.createErrorResult("Missing path parameter");
+    if (!pathValidation.ok) {
+        return shared.setErrorResult(pathValidation.message, {
+            operation: "openFile"
+        });
     }
+
+    path = pathValidation.value;
     
     console.log("Open file: " + path);
     
     // Open file (alias for readFile)
-    var content = MCPStudio.openFile(path);
+    content = MCPStudio.openFile(path);
     
     if (content === null) {
-        return shared.createErrorResult("Failed to open file: " + path);
+        return shared.setErrorResult("Failed to open file: " + path, {
+            operation: "openFile",
+            path: path
+        });
     }
     
-    var result = {
+    result = {
         content: content,
-        path: path,
+        path: path
     };
-    
-    // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            path: path,
-            content: content,
-            operation: "openFile",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+
+    return shared.setSuccessResult(result, {
+        path: path,
+        content: content,
+        operation: "openFile"
+    });
 }
 
 module.exports = {

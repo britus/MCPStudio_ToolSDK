@@ -1,39 +1,45 @@
 {
-  "annotations" : {
-    "audience" : [
+  "annotations": {
+    "audience": [
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-04-07T04:25:53.905Z",
-    "priority" : 0.9
+    "lastModified": "2026-04-07T04:25:53.899Z",
+    "priority": 0.9
   },
-  "description" : "Gets the user documents directory path",
-  "execHandler" : "getDocumentsPath",
-  "execMethod" : "toolEntry",
-  "inputSchema" : {
-    "properties" : {
-
-    },
-    "type" : "object"
+  "description": "Return the MCPStudio documents directory path.",
+  "execHandler": "get_documents_path",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
   },
-  "name" : "get_documents_path",
-  "outputSchema" : {
-    "properties" : {
-      "path" : {
-        "description" : "The documents directory path",
-        "items" : {
-          "type" : "string"
-        },
-        "name" : "path",
-        "type" : "string"
+  "name": "get_documents_path",
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "name": "success",
+        "description": "Status flag about operation",
+        "type": "boolean"
+      },
+      "error": {
+        "name": "error",
+        "description": "Operation error status information",
+        "type": "string"
+      },
+      "operation": {
+        "name": "operation",
+        "description": "Name of operation",
+        "type": "string"
       }
     },
-    "required" : [
-      "path"
-    ],
-    "type" : "object"
+    "required": [
+      "success"
+    ]
   },
-  "pluginName" : "",
-  "scriptName" : "Scripts\/tool_entry.js",
-  "toolType" : "ScriptTool"
+  "pluginName": "",
+  "scriptName": "Scripts/tool_entry.js",
+  "toolType": "ScriptTool"
 }

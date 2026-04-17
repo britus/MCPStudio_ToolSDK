@@ -32,7 +32,7 @@ const getDocumentsPath = require('getPathDocuments');
 const getTempPath = require('getPathTemp');
 
 /**
- * Entry point for all script tool calls
+ * Entry point for all MCP script tool calls
  * @param {string} sid - Session identifier
  * @param {string} handlerName - Method/handler name to execute
  * @param {string} jsonParams - JSON string with parameters
@@ -56,7 +56,8 @@ function toolEntry(sid, handlerName, jsonParams) {
          //PATCH END
 
          switch(handlerName) {
-            // Toolchain
+         
+            // File based Toolchain
             case "analyzeDirectory":
                 return analyzedir.analyzeDirectory(params);
             case "mkdir":
@@ -81,33 +82,6 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return gccSettings.gccSettings(params);
             case "getGccInfo":
                 return getGccInfo.getGccInfo(params);
-
-            // MCP Prompt, Resource
-            case "fetchPrompt":
-                return fetchPrompt.fetchPrompt(params);
-
-            case "fetchResource":
-                return fetchResource.fetchResource(params);
-
-            // HTTP Toolchain
-            case "fetchData":
-                return httpTools.httpTools("fetchData", params);
-            case "postData":
-                return httpTools.httpTools("postData", params);
-            case "fetchJSON":
-                return httpTools.httpTools("fetchJSON", params);
-            case "downloadFile":
-                return httpTools.httpTools("downloadFile", params);
-            case "scrapeWebpage":
-                return httpTools.httpTools("scrapeWebpage", params);
-            case "apiRequest":
-                return httpTools.httpTools("apiRequest", params);
-            case "checkStatus":
-                return httpTools.httpTools("checkStatus", params);
-            case "webhookCall":
-                return httpTools.httpTools("webhookCall", params);
-
-            // File operations
             case "fileExists":
                 return fileExists.fileExists(params);
             case "readFile":
@@ -132,6 +106,31 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return logMessage.logMessage(params);
             case "setToolResult":
                 return setToolResult.setToolResult(params);
+
+            // Retrieve MCP Prompt, Resource for processing
+            case "fetchPrompt":
+                return fetchPrompt.fetchPrompt(params);
+
+            case "fetchResource":
+                return fetchResource.fetchResource(params);
+
+            // HTTP Toolchain
+            case "fetchData":
+                return httpTools.httpTools("fetchData", params);
+            case "postData":
+                return httpTools.httpTools("postData", params);
+            case "fetchJSON":
+                return httpTools.httpTools("fetchJSON", params);
+            case "downloadFile":
+                return httpTools.httpTools("downloadFile", params);
+            case "scrapeWebpage":
+                return httpTools.httpTools("scrapeWebpage", params);
+            case "apiRequest":
+                return httpTools.httpTools("apiRequest", params);
+            case "checkStatus":
+                return httpTools.httpTools("checkStatus", params);
+            case "webhookCall":
+                return httpTools.httpTools("webhookCall", params);
 
             default:
                 return shared.error("Unknown handler: " + handlerName);

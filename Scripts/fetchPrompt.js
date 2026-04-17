@@ -13,22 +13,33 @@ const shared = require('sharedFunctions');
  */
 function fetchPrompt(params) {
     var promptName = params.promptName;
+    var json;
+    var prompt;
+    var data;
     
     if (!promptName) {
-        return shared.createErrorResult("Prompt name required");
+        return shared.setErrorResult("Prompt name required", {
+            operation: "fetchPrompt"
+        });
     }
     
-    var json = MCPStudio.promptConfig(promptName);
+    json = MCPStudio.promptConfig(promptName);
     if (!json) {
-        return shared.createErrorResult("Failed to get prompt " + promptName);
+        return shared.setErrorResult("Failed to get prompt " + promptName, {
+            operation: "fetchPrompt",
+            promptName: promptName
+        });
     }
     
-    var prompt = JSON.parse(json);
+    prompt = JSON.parse(json);
     if (!prompt) {
-        return shared.createErrorResult("Failed to parse prompt " + promptName);
+        return shared.setErrorResult("Failed to parse prompt " + promptName, {
+            operation: "fetchPrompt",
+            promptName: promptName
+        });
     }
     
-    var data = {
+    data = {
         operation: "fetchPrompt",
         message: prompt.name + ": " + prompt.template,
         prompt: prompt.template,
@@ -36,7 +47,7 @@ function fetchPrompt(params) {
         arguments: prompt.arguments
     };
     
-    return shared.createSuccessResult(data, data);
+    return shared.setSuccessResult(data, data);
 }
 
 module.exports = {
