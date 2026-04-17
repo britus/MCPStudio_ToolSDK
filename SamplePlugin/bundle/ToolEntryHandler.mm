@@ -38,102 +38,101 @@
 {
     NSString *effectiveHandler = [self effectiveHandlerName:handlerName params:params];
 
-    if ([effectiveHandler isEqualToString:@"analyzeDirectory"] || [effectiveHandler isEqualToString:@"analyze_directory"]) {
+    if ([effectiveHandler isEqualToString:@"analyzeDirectory"]) {
         return [self analyzeDirectory:params];
     }
     if ([effectiveHandler isEqualToString:@"mkdir"]) {
         return [self mkdirHandler:params];
     }
-    if ([effectiveHandler isEqualToString:@"checkWithXcode"] || [effectiveHandler isEqualToString:@"check_with_xcode"]) {
+    if ([effectiveHandler isEqualToString:@"checkWithXcode"]) {
         return [self checkWithXcode:params];
     }
-    if ([effectiveHandler isEqualToString:@"clangCheckSyntax"] || [effectiveHandler isEqualToString:@"clang_check_syntax"]) {
+    if ([effectiveHandler isEqualToString:@"clangCheckSyntax"]) {
         return [self clangCheckSyntax:params];
     }
-    if ([effectiveHandler isEqualToString:@"clangCompile"] || [effectiveHandler isEqualToString:@"clang_compile"]) {
+    if ([effectiveHandler isEqualToString:@"clangCompile"]) {
         return [self clangCompile:params];
     }
-    if ([effectiveHandler isEqualToString:@"clangMake"] || [effectiveHandler isEqualToString:@"clang_make"]) {
+    if ([effectiveHandler isEqualToString:@"clangMake"]) {
         return [self clangMake:params];
     }
-    if ([effectiveHandler isEqualToString:@"shellCall"] || [effectiveHandler isEqualToString:@"shell_call"]) {
+    if ([effectiveHandler isEqualToString:@"shellCall"]) {
         return [self shellCall:params];
     }
-    if ([effectiveHandler isEqualToString:@"cmakeBuild"] || [effectiveHandler isEqualToString:@"cmake_build"]) {
+    if ([effectiveHandler isEqualToString:@"cmakeBuild"]) {
         return [self cmakeBuild:params];
     }
-    if ([effectiveHandler isEqualToString:@"qmakeBuild"] || [effectiveHandler isEqualToString:@"qmake_build"]) {
+    if ([effectiveHandler isEqualToString:@"qmakeBuild"]) {
         return [self qmakeBuild:params];
     }
-    if ([effectiveHandler isEqualToString:@"checkWithGcc"] || [effectiveHandler isEqualToString:@"check_with_gcc"]) {
+    if ([effectiveHandler isEqualToString:@"checkWithGcc"]) {
         return [self checkWithGcc:params];
     }
-    if ([effectiveHandler isEqualToString:@"gccSettings"] || [effectiveHandler isEqualToString:@"gcc_settings"]) {
+    if ([effectiveHandler isEqualToString:@"gccSettings"]) {
         return [self gccSettings:params];
     }
-    if ([effectiveHandler isEqualToString:@"getGccInfo"] || [effectiveHandler isEqualToString:@"get_gcc_info"]) {
+    if ([effectiveHandler isEqualToString:@"getGccInfo"]) {
         return [self getGccInfo:params];
     }
-    if ([effectiveHandler isEqualToString:@"fileExists"] || [effectiveHandler isEqualToString:@"file_exists"]) {
+    if ([effectiveHandler isEqualToString:@"fileExists"]) {
         return [self fileExists:params];
     }
-    if ([effectiveHandler isEqualToString:@"readFile"] || [effectiveHandler isEqualToString:@"read_file"]) {
+    if ([effectiveHandler isEqualToString:@"readFile"]) {
         return [self readFile:params];
     }
-    if ([effectiveHandler isEqualToString:@"saveFile"] || [effectiveHandler isEqualToString:@"save_file"] ||
-        [effectiveHandler isEqualToString:@"writeFile"] || [effectiveHandler isEqualToString:@"write_file"]) {
+    if ([effectiveHandler isEqualToString:@"saveFile"] ||
+        [effectiveHandler isEqualToString:@"writeFile"]) {
         return [self saveFile:params];
     }
-    if ([effectiveHandler isEqualToString:@"openFile"] || [effectiveHandler isEqualToString:@"open_file"]) {
+    if ([effectiveHandler isEqualToString:@"openFile"]) {
         return [self openFile:params];
     }
-    if ([effectiveHandler isEqualToString:@"deleteFile"] || [effectiveHandler isEqualToString:@"delete_file"]) {
+    if ([effectiveHandler isEqualToString:@"deleteFile"]) {
         return [self deleteFile:params];
     }
-    if ([effectiveHandler isEqualToString:@"listDirectory"] || [effectiveHandler isEqualToString:@"list_directory"]) {
+    if ([effectiveHandler isEqualToString:@"listDirectory"]) {
         return [self listDirectory:params];
     }
-    if ([effectiveHandler isEqualToString:@"createDirectory"] || [effectiveHandler isEqualToString:@"create_directory"]) {
+    if ([effectiveHandler isEqualToString:@"createDirectory"]) {
         return [self createDirectory:params];
     }
-    if ([effectiveHandler isEqualToString:@"getDocumentsPath"] || [effectiveHandler isEqualToString:@"get_documents_path"]) {
+    if ([effectiveHandler isEqualToString:@"getDocumentsPath"]) {
         return [self getDocumentsPath:params];
     }
-    if ([effectiveHandler isEqualToString:@"getTempPath"] || [effectiveHandler isEqualToString:@"get_temp_path"]) {
+    if ([effectiveHandler isEqualToString:@"getTempPath"]) {
         return [self getTempPath:params];
     }
-    if ([effectiveHandler isEqualToString:@"fetchPrompt"] || [effectiveHandler isEqualToString:@"fetch_prompt"]) {
+    if ([effectiveHandler isEqualToString:@"fetchPrompt"]) {
         return [self fetchPrompt:params];
     }
-    if ([effectiveHandler isEqualToString:@"fetchResource"] || [effectiveHandler isEqualToString:@"fetch_resource"]) {
+    if ([effectiveHandler isEqualToString:@"fetchResource"]) {
         return [self fetchResource:params];
     }
-    if ([effectiveHandler isEqualToString:@"previewFile"] || [effectiveHandler isEqualToString:@"preview_file"]) {
+    if ([effectiveHandler isEqualToString:@"previewFile"]) {
         return [self previewFile:params];
     }
-    if ([effectiveHandler isEqualToString:@"fetchData"] || [effectiveHandler isEqualToString:@"fetch_data"]) {
+    if ([effectiveHandler isEqualToString:@"fetchData"]) {
         return [self fetchData:params];
     }
-    if ([effectiveHandler isEqualToString:@"postData"] || [effectiveHandler isEqualToString:@"post_data"]) {
+    if ([effectiveHandler isEqualToString:@"postData"]) {
         return [self postData:params];
     }
-    if ([effectiveHandler isEqualToString:@"fetchJSON"] || [effectiveHandler isEqualToString:@"fetch_json"]) {
+    if ([effectiveHandler isEqualToString:@"fetchJSON"]) {
         return [self fetchJSON:params];
     }
-    if ([effectiveHandler isEqualToString:@"downloadFile"] || [effectiveHandler isEqualToString:@"download_file"]) {
+    if ([effectiveHandler isEqualToString:@"downloadFile"]) {
         return [self downloadFile:params];
     }
-    if ([effectiveHandler isEqualToString:@"apiRequest"] || [effectiveHandler isEqualToString:@"api_request"]) {
+    if ([effectiveHandler isEqualToString:@"apiRequest"]) {
         return [self apiRequest:params];
     }
-    if ([effectiveHandler isEqualToString:@"scrapeWebpage"] || [effectiveHandler isEqualToString:@"scrape_webpage"] ||
-        [effectiveHandler isEqualToString:@"scrape_web_page"]) {
+    if ([effectiveHandler isEqualToString:@"scrapeWebpage"]) {
         return [self scrapeWebpage:params];
     }
-    if ([effectiveHandler isEqualToString:@"checkStatus"] || [effectiveHandler isEqualToString:@"check_status"]) {
+    if ([effectiveHandler isEqualToString:@"checkStatus"]) {
         return [self checkStatus:params];
     }
-    if ([effectiveHandler isEqualToString:@"webhookCall"] || [effectiveHandler isEqualToString:@"webhook_call"]) {
+    if ([effectiveHandler isEqualToString:@"webhookCall"]) {
         return [self webhookCall:params];
     }
 
