@@ -11,14 +11,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ToolEntryHandler : NSObject
 
-// Original interface (for PluginMain.mm)
 - (NSDictionary *)handleToolEntryWithSID:(NSString *)sid
-                                 toolName:(NSString *)toolName
-                                  params:(NSString *)params
-                                 error:(NSError **)error;
-
-// Set internal state for batch operations
-- (void)setArgs:(id)args params:(NSDictionary *)params error:(NSError **)error;
+                                toolName:(NSString *)toolName
+                                  params:(NSDictionary *)params
+                                   error:(NSError **)error;
 
 @end
 
