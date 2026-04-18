@@ -44,18 +44,10 @@ function toolEntry(sid, handlerName, jsonParams) {
     console.log("[toolEntry]: ctx=" + JSON.stringify(this));
 
     try {   	
-        var params = JSON.parse(jsonParams);
+        var jp = jsonParams || "{}";
+        var params = JSON.parse(jp);
 
-        //PATCH-BEGIN: Handler injection
-        //  injected testHandler name
-        let testHandler = params.testHandler || "";
-        if (testHandler != "") {
-            console.log("[toolEntry]: Handler injection=" + testHandler);
-            handlerName = testHandler;
-         }
-         //PATCH END
-
-         switch(handlerName) {
+        switch(handlerName) {
          
             // File based Toolchain
             case "analyzeDirectory":
