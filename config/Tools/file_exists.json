@@ -1,55 +1,55 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-04-07T04:25:53.899Z",
-    "priority": 0.9
+    "lastModified" : "2026-04-19T05:46:03.324Z",
+    "priority" : 0.9
   },
-  "description": "Check whether a file or directory exists.",
-  "execHandler": "file_exists",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "path": {
-        "name": "path",
-        "description": "File or directory path to check.",
-        "type": "string"
+  "description" : "Check whether a file or directory exists.",
+  "execHandler" : "fileExists",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "path" : {
+        "description" : "File or directory path to check.",
+        "name" : "path",
+        "type" : "string"
       }
     },
-    "required": [
+    "required" : [
       "path"
-    ]
+    ],
+    "type" : "object"
   },
-  "name": "file_exists",
-  "outputSchema": {
-    "type": "object",
-    "properties": {
-      "exists": {
-        "name": "exists",
-        "description": "True when the path exists.",
-        "type": "boolean"
+  "name" : "file_exists",
+  "outputSchema" : {
+    "properties" : {
+      "exists" : {
+        "description" : "True when the path exists.",
+        "name" : "exists",
+        "type" : "boolean"
       },
-      "path": {
-        "name": "path",
-        "description": "Validated path that was checked.",
-        "type": "string"
+      "path" : {
+        "description" : "Validated path that was checked.",
+        "name" : "path",
+        "type" : "string"
       },
-      "success": {
-        "name": "success",
-        "description": "Status flag about operation.",
-        "type": "boolean"
+      "success" : {
+        "description" : "Status flag about operation.",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "exists",
       "path",
       "success"
-    ]
+    ],
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }

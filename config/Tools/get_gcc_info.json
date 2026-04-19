@@ -1,51 +1,50 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-04-07T04:25:53.899Z",
-    "priority": 0.9
+    "lastModified" : "2026-04-19T05:46:03.331Z",
+    "priority" : 0.9
   },
-  "description": "Report basic GCC compiler information.",
-  "execHandler": "get_gcc_info",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "compiler": {
-        "name": "compiler",
-        "description": "Compiler executable or path to inspect.",
-        "type": "string"
+  "description" : "Report basic GCC compiler information.",
+  "execHandler" : "getGccInfo",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "compiler" : {
+        "description" : "Compiler executable or path to inspect.",
+        "name" : "compiler",
+        "type" : "string"
       }
     },
-    "required": []
+    "type" : "object"
   },
-  "name": "get_gcc_info",
-  "outputSchema": {
-    "type": "object",
-    "properties": {
-      "success": {
-        "name": "success",
-        "description": "Status flag about operation",
-        "type": "boolean"
+  "name" : "get_gcc_info",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
       },
-      "error": {
-        "name": "error",
-        "description": "Operation error status information",
-        "type": "string"
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
       },
-      "operation": {
-        "name": "operation",
-        "description": "Name of operation",
-        "type": "string"
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "success"
-    ]
+    ],
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }

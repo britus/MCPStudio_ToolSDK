@@ -1,51 +1,50 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-04-07T04:25:53.899Z",
-    "priority": 0.9
+    "lastModified" : "2026-04-19T05:46:03.340Z",
+    "priority" : 0.9
   },
-  "description": "Create a directory.",
-  "execHandler": "create_directory",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "dirPath": {
-        "name": "dirPath",
-        "description": "Directory path to create.",
-        "type": "string"
+  "description" : "Create a directory.",
+  "execHandler" : "createDirectory",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "dirPath" : {
+        "description" : "Directory path to create.",
+        "name" : "dirPath",
+        "type" : "string"
       }
     },
-    "required": []
+    "type" : "object"
   },
-  "name": "create_directory",
-  "outputSchema": {
-    "type": "object",
-    "properties": {
-      "success": {
-        "name": "success",
-        "description": "Status flag about operation",
-        "type": "boolean"
+  "name" : "create_directory",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
       },
-      "error": {
-        "name": "error",
-        "description": "Operation error status information",
-        "type": "string"
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
       },
-      "operation": {
-        "name": "operation",
-        "description": "Name of operation",
-        "type": "string"
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "success"
-    ]
+    ],
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }

@@ -1,61 +1,60 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-04-07T04:25:53.899Z",
-    "priority": 0.9
+    "lastModified" : "2026-04-19T05:46:03.324Z",
+    "priority" : 0.9
   },
-  "description": "Inspect the available GCC toolchain and report its capabilities.",
-  "execHandler": "check_with_gcc",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "arch": {
-        "name": "arch",
-        "description": "Requested target architecture.",
-        "type": "string"
+  "description" : "Inspect the available GCC toolchain and report its capabilities.",
+  "execHandler" : "checkWithGcc",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "arch" : {
+        "description" : "Requested target architecture.",
+        "name" : "arch",
+        "type" : "string"
       },
-      "compilerPath": {
-        "name": "compilerPath",
-        "description": "Optional compiler path root.",
-        "type": "string"
+      "compilerPath" : {
+        "description" : "Optional compiler path root.",
+        "name" : "compilerPath",
+        "type" : "string"
       },
-      "verbose": {
-        "name": "verbose",
-        "description": "Whether to enable verbose logging.",
-        "type": "boolean"
+      "verbose" : {
+        "description" : "Whether to enable verbose logging.",
+        "name" : "verbose",
+        "type" : "boolean"
       }
     },
-    "required": []
+    "type" : "object"
   },
-  "name": "check_with_gcc",
-  "outputSchema": {
-    "type": "object",
-    "properties": {
-      "success": {
-        "name": "success",
-        "description": "Status flag about operation",
-        "type": "boolean"
+  "name" : "check_with_gcc",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
       },
-      "error": {
-        "name": "error",
-        "description": "Operation error status information",
-        "type": "string"
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
       },
-      "operation": {
-        "name": "operation",
-        "description": "Name of operation",
-        "type": "string"
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "success"
-    ]
+    ],
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }

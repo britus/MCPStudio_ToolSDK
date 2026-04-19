@@ -1,83 +1,83 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-04-07T04:25:53.899Z",
-    "priority": 0.9
+    "lastModified" : "2026-04-19T05:46:03.338Z",
+    "priority" : 0.9
   },
-  "description": "Configure and build a QMake project.",
-  "execHandler": "qmake_build",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "projectDir": {
-        "name": "projectDir",
-        "description": "Project directory path.",
-        "type": "string"
+  "description" : "Configure and build a QMake project.",
+  "execHandler" : "qmakeBuild",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "buildType" : {
+        "description" : "Build type such as Debug or Release.",
+        "name" : "buildType",
+        "type" : "string"
       },
-      "projectTarget": {
-        "name": "projectTarget",
-        "description": "Project target name.",
-        "type": "string"
+      "makeArgs" : {
+        "description" : "Additional make arguments.",
+        "name" : "makeArgs",
+        "type" : "string"
       },
-      "projectFile": {
-        "name": "projectFile",
-        "description": "Relative .pro file path.",
-        "type": "string"
+      "projectDir" : {
+        "description" : "Project directory path.",
+        "name" : "projectDir",
+        "type" : "string"
       },
-      "buildType": {
-        "name": "buildType",
-        "description": "Build type such as Debug or Release.",
-        "type": "string"
+      "projectFile" : {
+        "description" : "Relative .pro file path.",
+        "name" : "projectFile",
+        "type" : "string"
       },
-      "qmakeArgs": {
-        "name": "qmakeArgs",
-        "description": "Additional qmake arguments.",
-        "type": "string"
+      "projectTarget" : {
+        "description" : "Project target name.",
+        "name" : "projectTarget",
+        "type" : "string"
       },
-      "makeArgs": {
-        "name": "makeArgs",
-        "description": "Additional make arguments.",
-        "type": "string"
+      "qmakeArgs" : {
+        "description" : "Additional qmake arguments.",
+        "name" : "qmakeArgs",
+        "type" : "string"
       },
-      "verbose": {
-        "name": "verbose",
-        "description": "Whether to enable verbose logging.",
-        "type": "boolean"
+      "verbose" : {
+        "description" : "Whether to enable verbose logging.",
+        "name" : "verbose",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "projectDir"
-    ]
+    ],
+    "type" : "object"
   },
-  "name": "qmake_build",
-  "outputSchema": {
-    "type": "object",
-    "properties": {
-      "success": {
-        "name": "success",
-        "description": "Status flag about operation",
-        "type": "boolean"
+  "name" : "qmake_build",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
       },
-      "error": {
-        "name": "error",
-        "description": "Operation error status information",
-        "type": "string"
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
       },
-      "operation": {
-        "name": "operation",
-        "description": "Name of operation",
-        "type": "string"
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "success"
-    ]
+    ],
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }

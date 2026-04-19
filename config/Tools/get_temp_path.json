@@ -1,45 +1,46 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-04-07T04:25:53.899Z",
-    "priority": 0.9
+    "lastModified" : "2026-04-19T05:46:03.322Z",
+    "priority" : 0.9
   },
-  "description": "Return the MCPStudio temporary directory path.",
-  "execHandler": "get_temp_path",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "type": "object",
-    "properties": {},
-    "required": []
+  "description" : "Return the MCPStudio temporary directory path.",
+  "execHandler" : "getTempPath",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+
+    },
+    "type" : "object"
   },
-  "name": "get_temp_path",
-  "outputSchema": {
-    "type": "object",
-    "properties": {
-      "success": {
-        "name": "success",
-        "description": "Status flag about operation",
-        "type": "boolean"
+  "name" : "get_temp_path",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
       },
-      "error": {
-        "name": "error",
-        "description": "Operation error status information",
-        "type": "string"
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
       },
-      "operation": {
-        "name": "operation",
-        "description": "Name of operation",
-        "type": "string"
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "success"
-    ]
+    ],
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }
