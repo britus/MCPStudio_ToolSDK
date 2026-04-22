@@ -1,3 +1,11 @@
+// ===================================================================
+//  PluginMain.mm
+//  MCPStudio - Custom Tool SDK - SamplePlugin
+//
+//  Created by EoF Software Labs on 2026.
+//  Copyright © 2026 EoF Software Labs. All rights reserved.
+// ===================================================================
+
 #ifdef TOOL_BUNDLE
 
 #import <Foundation/Foundation.h>

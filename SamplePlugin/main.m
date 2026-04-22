@@ -1,9 +1,10 @@
-//
+// ===================================================================
 //  main.m
-//  SamplePlugin
+//  MCPStudio - Custom Tool SDK - SamplePlugin
 //
-//  Created by Björn Eschrich on 16.02.26.
-//
+//  Created by EoF Software Labs on 2026.
+//  Copyright © 2026 EoF Software Labs. All rights reserved.
+// ===================================================================
 
 #import <Foundation/Foundation.h>
 

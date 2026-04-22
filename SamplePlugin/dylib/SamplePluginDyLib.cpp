@@ -1,6 +1,10 @@
-//
+// ===================================================================
 //  SamplePluginDyLib.cpp
-//  SamplePluginDyLib
+//  MCPStudio - Custom Tool SDK - SamplePlugin
+//
+//  Created by EoF Software Labs on 2026.
+//  Copyright © 2026 EoF Software Labs. All rights reserved.
+// ===================================================================
 
 #include <iostream>
 #include "SamplePluginDyLib.hpp"
