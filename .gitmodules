@@ -1,0 +1,6 @@
+[submodule "skills/anthropic_skills"]
+	path = skills/anthropic_skills
+	url = https://github.com/anthropics/skills.git
+[submodule "skills/openai_skills"]
+	path = skills/openai_skills
+	url = https://github.com/openai/skills.git
