@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-04-19T05:46:03.323Z",
+    "lastModified" : "2026-05-04T06:03:18.804Z",
     "priority" : 0.9
   },
   "description" : "Configure and build a CMake project.",

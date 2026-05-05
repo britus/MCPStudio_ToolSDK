@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-04T06:03:18.820Z",
+    "lastModified" : "2026-05-04T06:03:18.823Z",
     "priority" : 0.9
   },
   "description" : "Read a file from local file system",
@@ -23,7 +23,7 @@
     ],
     "type" : "object"
   },
-  "name" : "read_file_content",
+  "name" : "read_file",
   "outputSchema" : {
     "properties" : {
       "content" : {

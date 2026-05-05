@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-04-19T05:46:03.325Z",
+    "lastModified" : "2026-05-04T06:03:18.805Z",
     "priority" : 0.9
   },
   "description" : "List available macOS calendars.",
@@ -24,15 +24,19 @@
         "items" : {
           "properties" : {
             "calendar_id" : {
+              "description" : "",
               "type" : "string"
             },
             "source" : {
+              "description" : "",
               "type" : "string"
             },
             "title" : {
+              "description" : "",
               "type" : "string"
             },
             "type" : {
+              "description" : "",
               "type" : "string"
             }
           },
