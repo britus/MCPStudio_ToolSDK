@@ -1,0 +1,14 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user"
+    ],
+    "lastModified" : "2026-05-05T04:45:43.097Z",
+    "priority" : 1
+  },
+  "description" : "Viewer template HTML for Anthropic Skill: algorithmic-art",
+  "mimeType" : "text\/html",
+  "name" : "algorithmic-art_templates_viewer_html",
+  "type" : "file",
+  "uri" : "\/Users\/eofmc\/EoF\/mcpstudio\/Skills\/anthropic_skills\/skills\/algorithmic-art\/templates\/viewer.html"
+}
