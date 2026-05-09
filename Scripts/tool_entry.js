@@ -127,7 +127,7 @@ function toolEntry(sid, handlerName, jsonParams) {
             default:
                 return shared.error("Unknown handler: " + handlerName);
         }
-
+  
     } catch(e) {
         console.log("[toolEntry] " + e);
         return shared.error(e.toString());
