@@ -13,6 +13,7 @@ const fetchResource = require('fetchResource');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
 const shellCall = require('shellCall');
+const skillExecute = require('skill_execute');
 const cmakeBuild = require('cmakeBuild');
 const qmakeBuild = require('qmakeBuild');
 const checkWithGcc = require('checkWithGcc');
@@ -64,6 +65,8 @@ function toolEntry(sid, handlerName, jsonParams) {
                 return clangTools.clangMake(params);
             case "shellCall":
             	return shellCall.shellCall(params);
+            case "skillExecute":
+                return skillExecute.skillExecute(params);
             case "cmakeBuild":
             	return cmakeBuild.cmakeBuild(params);
             case "qmakeBuild":
@@ -133,4 +136,3 @@ function toolEntry(sid, handlerName, jsonParams) {
         return shared.error(e.toString());
     }
 }
-

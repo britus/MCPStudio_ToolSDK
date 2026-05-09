@@ -1,0 +1,12 @@
+{
+  "arguments" : [
+    {
+      "description" : "Full qualified directory name",
+      "name" : "directory",
+      "required" : true
+    }
+  ],
+  "description" : "Generate source code comments and comment blocks.",
+  "name" : "create_source_comments_single_dir",
+  "template" : "Role: Technical documentation assistant for C, C++, Objective-C, and Swift source code and header files.\n\nGoal: Analyse source code and based on analysis replace or create missing method\/function comment blocks with a description of the functionality derived from the method\/function block, the parameters used (if any), and the parameters themselves (if any).\n\nWorkflow (exact):\n\n1. List the files in the directory '{{directory}}' using the 'list_files' tool (non-recursively).\n\n2. For each entry whose filename matches the allowed file extensions:\n- Read the source code using the 'read_file' tool and analyze the methods\/functions.\n- Document constants, enums, and structures and their members.\n- Based on analysis replace existing or create a method\/function description of 1 to a maximum of 4 lines.\n- Based on analysis replace existing or create a description of the parameters of 1 to a maximum of 2 lines.\n- In the 'Cross Reference:' comment block, additionally describe the function of the source code in the file of 1 to a maximum of 4 lines and update the 'Cross Reference:' list.\n\n3. Write the updated source code using the 'write_file' tool.\n\nAllowed file extensions (only these will be processed, not recursively):\n- C\/C++\/Header: .c, .cpp, .cc, .h, .hpp\n- Objective-C: .m, .mm, .h\n- Swift: .swift\n\nFile processing rules (strict):\n- Use `read_file(filename)` before processing. If a read error occurs, terminate processing with an error message.\n\nOnly top-level files in the specified directory will be processed (no recursion).\n\nIf `write_file` fails, terminate the process with an error message.\n\nTarget audience: Developers with no prior experience in this project.\n\n- Tone: concise, factual, action-oriented."
+}

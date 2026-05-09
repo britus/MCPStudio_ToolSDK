@@ -7,42 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F71170FE2F7AA79A00F39DFE /* testGet.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F52F7AA79A00F39DFE /* testGet.js */; };
-		F71170FF2F7AA79A00F39DFE /* tool_entry.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170FD2F7AA79A00F39DFE /* tool_entry.js */; };
-		F71171002F7AA79A00F39DFE /* testDownload.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F32F7AA79A00F39DFE /* testDownload.js */; };
-		F71171012F7AA79A00F39DFE /* plistBuddy.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EC2F7AA79A00F39DFE /* plistBuddy.js */; };
-		F71171022F7AA79A00F39DFE /* qmakeBuild.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */; };
-		F71171032F7AA79A00F39DFE /* testPaths.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F92F7AA79A00F39DFE /* testPaths.js */; };
-		F71171042F7AA79A00F39DFE /* previewFile.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170ED2F7AA79A00F39DFE /* previewFile.js */; };
-		F71171052F7AA79A00F39DFE /* testPost.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170FB2F7AA79A00F39DFE /* testPost.js */; };
-		F71171062F7AA79A00F39DFE /* testPipeline.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170FA2F7AA79A00F39DFE /* testPipeline.js */; };
-		F71171072F7AA79A00F39DFE /* mkdir.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EB2F7AA79A00F39DFE /* mkdir.js */; };
-		F71171082F7AA79A00F39DFE /* getPathTemp.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E92F7AA79A00F39DFE /* getPathTemp.js */; };
-		F71171092F7AA79A00F39DFE /* fetchPrompt.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E12F7AA79A00F39DFE /* fetchPrompt.js */; };
-		F711710A2F7AA79A00F39DFE /* testLogging.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F82F7AA79A00F39DFE /* testLogging.js */; };
-		F711710B2F7AA79A00F39DFE /* fileDelete.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E32F7AA79A00F39DFE /* fileDelete.js */; };
-		F711710C2F7AA79A00F39DFE /* testDifferentMethods.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F22F7AA79A00F39DFE /* testDifferentMethods.js */; };
-		F711710D2F7AA79A00F39DFE /* sharedFunctions.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */; };
-		F711710E2F7AA79A00F39DFE /* directoryCreate.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DF2F7AA79A00F39DFE /* directoryCreate.js */; };
-		F711710F2F7AA79A00F39DFE /* testFileOps.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F42F7AA79A00F39DFE /* testFileOps.js */; };
-		F71171102F7AA79A00F39DFE /* fileRead.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E62F7AA79A00F39DFE /* fileRead.js */; };
-		F71171112F7AA79A00F39DFE /* testHttpAll.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F62F7AA79A00F39DFE /* testHttpAll.js */; };
-		F71171122F7AA79A00F39DFE /* cmakeBuild.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DE2F7AA79A00F39DFE /* cmakeBuild.js */; };
-		F71171132F7AA79A00F39DFE /* fetchResource.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E22F7AA79A00F39DFE /* fetchResource.js */; };
-		F71171142F7AA79A00F39DFE /* fileExists.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E42F7AA79A00F39DFE /* fileExists.js */; };
-		F71171152F7AA79A00F39DFE /* analyzeDirectory.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */; };
-		F71171162F7AA79A00F39DFE /* fileOpen.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E52F7AA79A00F39DFE /* fileOpen.js */; };
-		F71171172F7AA79A00F39DFE /* clangTools.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DD2F7AA79A00F39DFE /* clangTools.js */; };
-		F71171182F7AA79A00F39DFE /* bootstrap.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DB2F7AA79A00F39DFE /* bootstrap.js */; };
-		F71171192F7AA79A00F39DFE /* checkWithXcode.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */; };
-		F711711A2F7AA79A00F39DFE /* httpTools.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170EA2F7AA79A00F39DFE /* httpTools.js */; };
-		F711711B2F7AA79A00F39DFE /* testJSON.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F72F7AA79A00F39DFE /* testJSON.js */; };
-		F711711C2F7AA79A00F39DFE /* shellCall.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F02F7AA79A00F39DFE /* shellCall.js */; };
-		F711711D2F7AA79A00F39DFE /* getPathDocuments.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E82F7AA79A00F39DFE /* getPathDocuments.js */; };
-		F711711E2F7AA79A00F39DFE /* fileSave.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E72F7AA79A00F39DFE /* fileSave.js */; };
-		F711711F2F7AA79A00F39DFE /* testCustomHeaders.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170F12F7AA79A00F39DFE /* testCustomHeaders.js */; };
-		F71171202F7AA79A00F39DFE /* directoryList.js in Resources */ = {isa = PBXBuildFile; fileRef = F71170E02F7AA79A00F39DFE /* directoryList.js */; };
-		F75EE2782F436EE7009908F1 /* ToolCapabilities.json in Resources */ = {isa = PBXBuildFile; fileRef = F75EE26A2F436EE7009908F1 /* ToolCapabilities.json */; };
 		F75EE2B82F436EE7009908F1 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
 		F75EE2C12F436EE7009908F1 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2622F436EE7009908F1 /* PluginMain.mm */; };
 		F75EE2C92F436EE7009908F1 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2632F436EE7009908F1 /* ToolDescriptor.c */; };
@@ -84,7 +48,6 @@
 		F71170E92F7AA79A00F39DFE /* getPathTemp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = getPathTemp.js; sourceTree = "<group>"; };
 		F71170EA2F7AA79A00F39DFE /* httpTools.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = httpTools.js; sourceTree = "<group>"; };
 		F71170EB2F7AA79A00F39DFE /* mkdir.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mkdir.js; sourceTree = "<group>"; };
-		F71170EC2F7AA79A00F39DFE /* plistBuddy.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = plistBuddy.js; sourceTree = "<group>"; };
 		F71170ED2F7AA79A00F39DFE /* previewFile.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = previewFile.js; sourceTree = "<group>"; };
 		F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = qmakeBuild.js; sourceTree = "<group>"; };
 		F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = sharedFunctions.js; sourceTree = "<group>"; };
@@ -101,6 +64,77 @@
 		F71170FA2F7AA79A00F39DFE /* testPipeline.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testPipeline.js; sourceTree = "<group>"; };
 		F71170FB2F7AA79A00F39DFE /* testPost.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = testPost.js; sourceTree = "<group>"; };
 		F71170FD2F7AA79A00F39DFE /* tool_entry.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = tool_entry.js; sourceTree = "<group>"; };
+		F75AC3FC2FAF73100008BE10 /* codereview.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = codereview.md; sourceTree = "<group>"; };
+		F75AC3FD2FAF73100008BE10 /* codereview_file_list_prompt.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = codereview_file_list_prompt.md; sourceTree = "<group>"; };
+		F75AC3FE2FAF73100008BE10 /* codereview_file_list_system.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = codereview_file_list_system.md; sourceTree = "<group>"; };
+		F75AC3FF2FAF73100008BE10 /* codereview_prompt.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = codereview_prompt.md; sourceTree = "<group>"; };
+		F75AC4002FAF73100008BE10 /* codereview_system.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = codereview_system.md; sourceTree = "<group>"; };
+		F75AC4032FAF73220008BE10 /* create_source_comments_list_of_files.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_source_comments_list_of_files.json; sourceTree = "<group>"; };
+		F75AC4042FAF73220008BE10 /* create_source_comments_single_dir.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_source_comments_single_dir.json; sourceTree = "<group>"; };
+		F75AC4052FAF73220008BE10 /* create_source_doc_singe_dir.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_source_doc_singe_dir.json; sourceTree = "<group>"; };
+		F75AC4072FAF73220008BE10 /* eof mcp studio home page.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "eof mcp studio home page.json"; sourceTree = "<group>"; };
+		F75AC4082FAF73220008BE10 /* message context protocol (mcp) specification.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "message context protocol (mcp) specification.json"; sourceTree = "<group>"; };
+		F75AC40A2FAF73220008BE10 /* clang-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clang-syntax-check.json"; sourceTree = "<group>"; };
+		F75AC40B2FAF73220008BE10 /* cmake-standard-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "cmake-standard-config.json"; sourceTree = "<group>"; };
+		F75AC40C2FAF73220008BE10 /* code-review-file-list.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "code-review-file-list.json"; sourceTree = "<group>"; };
+		F75AC40D2FAF73220008BE10 /* make-standard-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "make-standard-build.json"; sourceTree = "<group>"; };
+		F75AC40E2FAF73220008BE10 /* project-tree-code-review.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "project-tree-code-review.json"; sourceTree = "<group>"; };
+		F75AC40F2FAF73220008BE10 /* qt-make-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-make-build.json"; sourceTree = "<group>"; };
+		F75AC4102FAF73220008BE10 /* qt-qmake-create-gui-app-test-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-create-gui-app-test-build.json"; sourceTree = "<group>"; };
+		F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-generate-makefile.json"; sourceTree = "<group>"; };
+		F75AC4122FAF73220008BE10 /* swift-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swift-syntax-check.json"; sourceTree = "<group>"; };
+		F75AC4132FAF73220008BE10 /* xcodebuild-full-debug-project-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-full-debug-project-build.json"; sourceTree = "<group>"; };
+		F75AC4142FAF73220008BE10 /* xcodebuild-full-release-project-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-full-release-project-build.json"; sourceTree = "<group>"; };
+		F75AC4152FAF73220008BE10 /* xcodebuild-scheme-debug-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-scheme-debug-build.json"; sourceTree = "<group>"; };
+		F75AC4162FAF73220008BE10 /* xcodebuild-scheme-release-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-scheme-release-build.json"; sourceTree = "<group>"; };
+		F75AC4182FAF73220008BE10 /* analyze_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = analyze_directory.json; sourceTree = "<group>"; };
+		F75AC4192FAF73220008BE10 /* build_with_xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = build_with_xcode.json; sourceTree = "<group>"; };
+		F75AC41A2FAF73220008BE10 /* check_with_gcc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = check_with_gcc.json; sourceTree = "<group>"; };
+		F75AC41B2FAF73220008BE10 /* check_with_xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = check_with_xcode.json; sourceTree = "<group>"; };
+		F75AC41C2FAF73220008BE10 /* clang_check_syntax.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_check_syntax.json; sourceTree = "<group>"; };
+		F75AC41D2FAF73220008BE10 /* clang_compile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_compile.json; sourceTree = "<group>"; };
+		F75AC41E2FAF73220008BE10 /* clang_make.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_make.json; sourceTree = "<group>"; };
+		F75AC41F2FAF73220008BE10 /* cmake_build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cmake_build.json; sourceTree = "<group>"; };
+		F75AC4202FAF73220008BE10 /* create_contact.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_contact.json; sourceTree = "<group>"; };
+		F75AC4212FAF73220008BE10 /* create_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_directory.json; sourceTree = "<group>"; };
+		F75AC4222FAF73220008BE10 /* create_event.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_event.json; sourceTree = "<group>"; };
+		F75AC4232FAF73220008BE10 /* create_reminder.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_reminder.json; sourceTree = "<group>"; };
+		F75AC4242FAF73220008BE10 /* delete_contact.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_contact.json; sourceTree = "<group>"; };
+		F75AC4252FAF73220008BE10 /* delete_event.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_event.json; sourceTree = "<group>"; };
+		F75AC4262FAF73220008BE10 /* delete_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_file.json; sourceTree = "<group>"; };
+		F75AC4272FAF73220008BE10 /* delete_reminder.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_reminder.json; sourceTree = "<group>"; };
+		F75AC4282FAF73220008BE10 /* fetch_prompt.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fetch_prompt.json; sourceTree = "<group>"; };
+		F75AC4292FAF73220008BE10 /* fetch_resource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fetch_resource.json; sourceTree = "<group>"; };
+		F75AC42A2FAF73220008BE10 /* file_exists.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = file_exists.json; sourceTree = "<group>"; };
+		F75AC42B2FAF73220008BE10 /* gcc_settings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = gcc_settings.json; sourceTree = "<group>"; };
+		F75AC42C2FAF73220008BE10 /* get_documents_path.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = get_documents_path.json; sourceTree = "<group>"; };
+		F75AC42D2FAF73220008BE10 /* get_gcc_info.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = get_gcc_info.json; sourceTree = "<group>"; };
+		F75AC42E2FAF73220008BE10 /* get_temp_path.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = get_temp_path.json; sourceTree = "<group>"; };
+		F75AC42F2FAF73220008BE10 /* http_download.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_download.json; sourceTree = "<group>"; };
+		F75AC4302FAF73220008BE10 /* http_get_data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_get_data.json; sourceTree = "<group>"; };
+		F75AC4312FAF73220008BE10 /* http_post_data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_post_data.json; sourceTree = "<group>"; };
+		F75AC4322FAF73220008BE10 /* library_handler.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = library_handler.json; sourceTree = "<group>"; };
+		F75AC4332FAF73220008BE10 /* list_calendars.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_calendars.json; sourceTree = "<group>"; };
+		F75AC4342FAF73220008BE10 /* list_contacts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_contacts.json; sourceTree = "<group>"; };
+		F75AC4352FAF73220008BE10 /* list_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_directory.json; sourceTree = "<group>"; };
+		F75AC4362FAF73220008BE10 /* list_events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_events.json; sourceTree = "<group>"; };
+		F75AC4372FAF73220008BE10 /* list_files.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_files.json; sourceTree = "<group>"; };
+		F75AC4382FAF73220008BE10 /* list_reminder_lists.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_reminder_lists.json; sourceTree = "<group>"; };
+		F75AC4392FAF73220008BE10 /* list_reminders.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_reminders.json; sourceTree = "<group>"; };
+		F75AC43A2FAF73220008BE10 /* mcp_resource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mcp_resource.json; sourceTree = "<group>"; };
+		F75AC43B2FAF73220008BE10 /* mkdir.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mkdir.json; sourceTree = "<group>"; };
+		F75AC43C2FAF73220008BE10 /* open_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = open_file.json; sourceTree = "<group>"; };
+		F75AC43D2FAF73220008BE10 /* qmake_build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = qmake_build.json; sourceTree = "<group>"; };
+		F75AC43E2FAF73220008BE10 /* read_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = read_file.json; sourceTree = "<group>"; };
+		F75AC43F2FAF73220008BE10 /* read_file_content.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = read_file_content.json; sourceTree = "<group>"; };
+		F75AC4402FAF73220008BE10 /* save_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = save_file.json; sourceTree = "<group>"; };
+		F75AC4412FAF73220008BE10 /* scrape_web_page.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = scrape_web_page.json; sourceTree = "<group>"; };
+		F75AC4422FAF73220008BE10 /* shell_call.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = shell_call.json; sourceTree = "<group>"; };
+		F75AC4432FAF73220008BE10 /* skill_execute.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = skill_execute.json; sourceTree = "<group>"; };
+		F75AC4442FAF73220008BE10 /* update_contact.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = update_contact.json; sourceTree = "<group>"; };
+		F75AC4452FAF73220008BE10 /* update_event.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = update_event.json; sourceTree = "<group>"; };
+		F75AC4462FAF73220008BE10 /* update_reminder.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = update_reminder.json; sourceTree = "<group>"; };
+		F75AC4472FAF73220008BE10 /* write_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = write_file.json; sourceTree = "<group>"; };
 		F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SamplePluginBundle.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		F75EE1FE2F436EE7009908F1 /* CustomToolExports.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomToolExports.h; sourceTree = "<group>"; };
 		F75EE1FF2F436EE7009908F1 /* ToolABI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolABI.h; sourceTree = "<group>"; };
@@ -164,9 +198,136 @@
 			path = "test-scripts";
 			sourceTree = "<group>";
 		};
+		F75AC4012FAF73100008BE10 /* codereview */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC3FC2FAF73100008BE10 /* codereview.md */,
+				F75AC3FD2FAF73100008BE10 /* codereview_file_list_prompt.md */,
+				F75AC3FE2FAF73100008BE10 /* codereview_file_list_system.md */,
+				F75AC3FF2FAF73100008BE10 /* codereview_prompt.md */,
+				F75AC4002FAF73100008BE10 /* codereview_system.md */,
+			);
+			path = codereview;
+			sourceTree = "<group>";
+		};
+		F75AC4022FAF73100008BE10 /* Skills */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC4012FAF73100008BE10 /* codereview */,
+			);
+			path = Skills;
+			sourceTree = "<group>";
+		};
+		F75AC4062FAF73220008BE10 /* Prompts */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC4032FAF73220008BE10 /* create_source_comments_list_of_files.json */,
+				F75AC4042FAF73220008BE10 /* create_source_comments_single_dir.json */,
+				F75AC4052FAF73220008BE10 /* create_source_doc_singe_dir.json */,
+			);
+			path = Prompts;
+			sourceTree = "<group>";
+		};
+		F75AC4092FAF73220008BE10 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC4072FAF73220008BE10 /* eof mcp studio home page.json */,
+				F75AC4082FAF73220008BE10 /* message context protocol (mcp) specification.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F75AC4172FAF73220008BE10 /* Skills */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC40A2FAF73220008BE10 /* clang-syntax-check.json */,
+				F75AC40B2FAF73220008BE10 /* cmake-standard-config.json */,
+				F75AC40C2FAF73220008BE10 /* code-review-file-list.json */,
+				F75AC40D2FAF73220008BE10 /* make-standard-build.json */,
+				F75AC40E2FAF73220008BE10 /* project-tree-code-review.json */,
+				F75AC40F2FAF73220008BE10 /* qt-make-build.json */,
+				F75AC4102FAF73220008BE10 /* qt-qmake-create-gui-app-test-build.json */,
+				F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */,
+				F75AC4122FAF73220008BE10 /* swift-syntax-check.json */,
+				F75AC4132FAF73220008BE10 /* xcodebuild-full-debug-project-build.json */,
+				F75AC4142FAF73220008BE10 /* xcodebuild-full-release-project-build.json */,
+				F75AC4152FAF73220008BE10 /* xcodebuild-scheme-debug-build.json */,
+				F75AC4162FAF73220008BE10 /* xcodebuild-scheme-release-build.json */,
+			);
+			path = Skills;
+			sourceTree = "<group>";
+		};
+		F75AC4482FAF73220008BE10 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC4182FAF73220008BE10 /* analyze_directory.json */,
+				F75AC4192FAF73220008BE10 /* build_with_xcode.json */,
+				F75AC41A2FAF73220008BE10 /* check_with_gcc.json */,
+				F75AC41B2FAF73220008BE10 /* check_with_xcode.json */,
+				F75AC41C2FAF73220008BE10 /* clang_check_syntax.json */,
+				F75AC41D2FAF73220008BE10 /* clang_compile.json */,
+				F75AC41E2FAF73220008BE10 /* clang_make.json */,
+				F75AC41F2FAF73220008BE10 /* cmake_build.json */,
+				F75AC4202FAF73220008BE10 /* create_contact.json */,
+				F75AC4212FAF73220008BE10 /* create_directory.json */,
+				F75AC4222FAF73220008BE10 /* create_event.json */,
+				F75AC4232FAF73220008BE10 /* create_reminder.json */,
+				F75AC4242FAF73220008BE10 /* delete_contact.json */,
+				F75AC4252FAF73220008BE10 /* delete_event.json */,
+				F75AC4262FAF73220008BE10 /* delete_file.json */,
+				F75AC4272FAF73220008BE10 /* delete_reminder.json */,
+				F75AC4282FAF73220008BE10 /* fetch_prompt.json */,
+				F75AC4292FAF73220008BE10 /* fetch_resource.json */,
+				F75AC42A2FAF73220008BE10 /* file_exists.json */,
+				F75AC42B2FAF73220008BE10 /* gcc_settings.json */,
+				F75AC42C2FAF73220008BE10 /* get_documents_path.json */,
+				F75AC42D2FAF73220008BE10 /* get_gcc_info.json */,
+				F75AC42E2FAF73220008BE10 /* get_temp_path.json */,
+				F75AC42F2FAF73220008BE10 /* http_download.json */,
+				F75AC4302FAF73220008BE10 /* http_get_data.json */,
+				F75AC4312FAF73220008BE10 /* http_post_data.json */,
+				F75AC4322FAF73220008BE10 /* library_handler.json */,
+				F75AC4332FAF73220008BE10 /* list_calendars.json */,
+				F75AC4342FAF73220008BE10 /* list_contacts.json */,
+				F75AC4352FAF73220008BE10 /* list_directory.json */,
+				F75AC4362FAF73220008BE10 /* list_events.json */,
+				F75AC4372FAF73220008BE10 /* list_files.json */,
+				F75AC4382FAF73220008BE10 /* list_reminder_lists.json */,
+				F75AC4392FAF73220008BE10 /* list_reminders.json */,
+				F75AC43A2FAF73220008BE10 /* mcp_resource.json */,
+				F75AC43B2FAF73220008BE10 /* mkdir.json */,
+				F75AC43C2FAF73220008BE10 /* open_file.json */,
+				F75AC43D2FAF73220008BE10 /* qmake_build.json */,
+				F75AC43E2FAF73220008BE10 /* read_file.json */,
+				F75AC43F2FAF73220008BE10 /* read_file_content.json */,
+				F75AC4402FAF73220008BE10 /* save_file.json */,
+				F75AC4412FAF73220008BE10 /* scrape_web_page.json */,
+				F75AC4422FAF73220008BE10 /* shell_call.json */,
+				F75AC4432FAF73220008BE10 /* skill_execute.json */,
+				F75AC4442FAF73220008BE10 /* update_contact.json */,
+				F75AC4452FAF73220008BE10 /* update_event.json */,
+				F75AC4462FAF73220008BE10 /* update_reminder.json */,
+				F75AC4472FAF73220008BE10 /* write_file.json */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		F75AC4492FAF73220008BE10 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				F75AC4062FAF73220008BE10 /* Prompts */,
+				F75AC4092FAF73220008BE10 /* Resources */,
+				F75AC4172FAF73220008BE10 /* Skills */,
+				F75AC4482FAF73220008BE10 /* Tools */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
 		F75EE1EE2F436EAB009908F1 = {
 			isa = PBXGroup;
 			children = (
+				F75AC4492FAF73220008BE10 /* config */,
+				F75AC4022FAF73100008BE10 /* Skills */,
 				F75EE2712F436EE7009908F1 /* Scripts */,
 				F75EE2012F436EE7009908F1 /* include */,
 				F75EE2742F436EE7009908F1 /* ToolJSONBridge */,
@@ -238,6 +399,7 @@
 		F75EE2712F436EE7009908F1 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
+				F71170FD2F7AA79A00F39DFE /* tool_entry.js */,
 				F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */,
 				F71170DB2F7AA79A00F39DFE /* bootstrap.js */,
 				F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */,
@@ -256,13 +418,11 @@
 				F71170E92F7AA79A00F39DFE /* getPathTemp.js */,
 				F71170EA2F7AA79A00F39DFE /* httpTools.js */,
 				F71170EB2F7AA79A00F39DFE /* mkdir.js */,
-				F71170EC2F7AA79A00F39DFE /* plistBuddy.js */,
 				F71170ED2F7AA79A00F39DFE /* previewFile.js */,
 				F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */,
 				F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */,
 				F71170F02F7AA79A00F39DFE /* shellCall.js */,
 				F71170FC2F7AA79A00F39DFE /* test-scripts */,
-				F71170FD2F7AA79A00F39DFE /* tool_entry.js */,
 			);
 			path = Scripts;
 			sourceTree = "<group>";
@@ -337,7 +497,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					F75EE1F62F436EAB009908F1 = {
 						CreatedOnToolsVersion = 26.2;
@@ -372,42 +532,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F71170FE2F7AA79A00F39DFE /* testGet.js in Resources */,
-				F71170FF2F7AA79A00F39DFE /* tool_entry.js in Resources */,
-				F71171002F7AA79A00F39DFE /* testDownload.js in Resources */,
-				F71171012F7AA79A00F39DFE /* plistBuddy.js in Resources */,
-				F71171022F7AA79A00F39DFE /* qmakeBuild.js in Resources */,
-				F71171032F7AA79A00F39DFE /* testPaths.js in Resources */,
-				F71171042F7AA79A00F39DFE /* previewFile.js in Resources */,
-				F71171052F7AA79A00F39DFE /* testPost.js in Resources */,
-				F71171062F7AA79A00F39DFE /* testPipeline.js in Resources */,
-				F71171072F7AA79A00F39DFE /* mkdir.js in Resources */,
-				F71171082F7AA79A00F39DFE /* getPathTemp.js in Resources */,
-				F71171092F7AA79A00F39DFE /* fetchPrompt.js in Resources */,
-				F711710A2F7AA79A00F39DFE /* testLogging.js in Resources */,
-				F711710B2F7AA79A00F39DFE /* fileDelete.js in Resources */,
-				F711710C2F7AA79A00F39DFE /* testDifferentMethods.js in Resources */,
-				F711710D2F7AA79A00F39DFE /* sharedFunctions.js in Resources */,
-				F711710E2F7AA79A00F39DFE /* directoryCreate.js in Resources */,
-				F711710F2F7AA79A00F39DFE /* testFileOps.js in Resources */,
-				F71171102F7AA79A00F39DFE /* fileRead.js in Resources */,
-				F71171112F7AA79A00F39DFE /* testHttpAll.js in Resources */,
-				F71171122F7AA79A00F39DFE /* cmakeBuild.js in Resources */,
-				F71171132F7AA79A00F39DFE /* fetchResource.js in Resources */,
-				F71171142F7AA79A00F39DFE /* fileExists.js in Resources */,
-				F71171152F7AA79A00F39DFE /* analyzeDirectory.js in Resources */,
-				F71171162F7AA79A00F39DFE /* fileOpen.js in Resources */,
-				F71171172F7AA79A00F39DFE /* clangTools.js in Resources */,
-				F71171182F7AA79A00F39DFE /* bootstrap.js in Resources */,
-				F71171192F7AA79A00F39DFE /* checkWithXcode.js in Resources */,
-				F711711A2F7AA79A00F39DFE /* httpTools.js in Resources */,
-				F711711B2F7AA79A00F39DFE /* testJSON.js in Resources */,
-				F711711C2F7AA79A00F39DFE /* shellCall.js in Resources */,
-				F711711D2F7AA79A00F39DFE /* getPathDocuments.js in Resources */,
-				F711711E2F7AA79A00F39DFE /* fileSave.js in Resources */,
-				F711711F2F7AA79A00F39DFE /* testCustomHeaders.js in Resources */,
-				F71171202F7AA79A00F39DFE /* directoryList.js in Resources */,
-				F75EE2782F436EE7009908F1 /* ToolCapabilities.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,6 +605,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -506,6 +631,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 			};
 			name = Debug;
 		};
@@ -543,6 +669,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -561,6 +688,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 			};
 			name = Release;
 		};
@@ -571,6 +699,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - Sample Plugin";
@@ -596,6 +725,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - Sample Plugin";
@@ -618,6 +748,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -635,6 +766,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

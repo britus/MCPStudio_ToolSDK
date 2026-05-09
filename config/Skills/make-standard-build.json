@@ -1,0 +1,18 @@
+{
+  "description": "Runs standard make in a selected project directory.",
+  "enabledToolNames": [
+    "skill_execute"
+  ],
+  "modelPreferences": {},
+  "name": "make-standard-build",
+  "promptTemplate": "Create and execute the following shell script with `skill_execute`, passing it as `content`. Use `{{project_directory}}` as the directory containing the Makefile.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPROJECT_DIR=\"{{project_directory}}\"\n[ -n \"$PROJECT_DIR\" ] && [ \"$PROJECT_DIR\" != \"{{project_directory}}\" ] || { echo \"Missing project_directory\" >&2; exit 1; }\ncd \"$PROJECT_DIR\"\nmake -j\"$(sysctl -n hw.ncpu 2>/dev/null || echo 4)\"\n```\n\nReturn the make output.",
+  "resourceIDs": [],
+  "skillEnabled": true,
+  "systemInstruction": "Run standard make in the selected project directory.",
+  "triggerPhrases": [
+    "standard make",
+    "make in projekt directory",
+    "make build"
+  ],
+  "visibilityScope": "chat"
+}

@@ -1,0 +1,18 @@
+{
+  "description": "Creates a minimal Qt Widgets GUI application project with QMake, determines QTDIR, generates the Makefile, and runs a test build.",
+  "enabledToolNames": [
+    "skill_execute"
+  ],
+  "modelPreferences": {},
+  "name": "qt-qmake-create-gui-app-test-build",
+  "promptTemplate": "Create and execute the following shell script with the tool `skill_execute`, passing the complete script as the `content` parameter. The build system must be QMAKE and QTDIR must be detected before building. If the user does not provide `{{project_directory}}`, use the current working directory plus `QtGuiApp`.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPROJECT_DIR=\"${PROJECT_DIR:-{{project_directory}}}\"\nif [ -z \"$PROJECT_DIR\" ] || [ \"$PROJECT_DIR\" = \"{{project_directory}}\" ]; then PROJECT_DIR=\"$PWD/QtGuiApp\"; fi\nAPP_NAME=\"${APP_NAME:-QtGuiApp}\"\nfind_qmake() {\n  if [ -n \"${QTDIR:-}\" ] && [ -x \"$QTDIR/bin/qmake\" ]; then echo \"$QTDIR/bin/qmake\"; return 0; fi\n  if command -v qmake >/dev/null 2>&1; then command -v qmake; return 0; fi\n  if command -v qmake6 >/dev/null 2>&1; then command -v qmake6; return 0; fi\n  for q in \"$HOME\"/Qt/*/macos/bin/qmake \"$HOME\"/Qt/*/clang_64/bin/qmake /Applications/Qt/*/macos/bin/qmake /opt/homebrew/opt/qt/bin/qmake /usr/local/opt/qt/bin/qmake; do\n    [ -x \"$q\" ] && echo \"$q\" && return 0\n  done\n  return 1\n}\nQMAKE_BIN=\"$(find_qmake)\" || { echo \"qmake not found. Install Qt or set QTDIR.\" >&2; exit 1; }\nexport QTDIR=\"$(cd \"$(dirname \"$QMAKE_BIN\")/..\" && pwd)\"\nexport PATH=\"$QTDIR/bin:$PATH\"\nmkdir -p \"$PROJECT_DIR\"\ncd \"$PROJECT_DIR\"\ncat > \"$APP_NAME.pro\" <<'PRO'\nQT += widgets\nCONFIG += c++17\nTEMPLATE = app\nTARGET = QtGuiApp\nSOURCES += main.cpp\nPRO\ncat > main.cpp <<'CPP'\n#include <QApplication>\n#include <QLabel>\nint main(int argc, char *argv[]) {\n    QApplication app(argc, argv);\n    QLabel label(\"Hello from Qt/QMake\");\n    label.resize(320, 120);\n    label.show();\n    return app.exec();\n}\nCPP\nmkdir -p build\ncd build\n\"$QMAKE_BIN\" \"../$APP_NAME.pro\" CONFIG+=debug\nmake -j\"$(sysctl -n hw.ncpu 2>/dev/null || echo 4)\"\n```\n\nReturn the script output and clearly state the detected QTDIR.",
+  "resourceIDs": [],
+  "skillEnabled": true,
+  "systemInstruction": "You are a careful build automation assistant. Use the skill_execute tool to run the provided shell script snippet. Do not substitute QMAKE with CMake.",
+  "triggerPhrases": [
+    "qt gui app projekt anlegen",
+    "qt qmake gui test build",
+    "create qt gui qmake project"
+  ],
+  "visibilityScope": "chat"
+}

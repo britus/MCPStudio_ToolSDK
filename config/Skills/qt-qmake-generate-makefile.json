@@ -1,0 +1,18 @@
+{
+  "description": "Generates a Makefile for a selectable Qt .pro project using QMake after determining QTDIR.",
+  "enabledToolNames": [
+    "skill_execute"
+  ],
+  "modelPreferences": {},
+  "name": "qt-qmake-generate-makefile",
+  "promptTemplate": "Create and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{project_file_pro}}` with the selected .pro file path before execution. QTDIR must be detected before running qmake.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPROJECT_FILE_PRO=\"{{project_file_pro}}\"\n[ -n \"$PROJECT_FILE_PRO\" ] && [ \"$PROJECT_FILE_PRO\" != \"{{project_file_pro}}\" ] || { echo \"Missing project_file_pro\" >&2; exit 1; }\nfind_qmake() {\n  if [ -n \"${QTDIR:-}\" ] && [ -x \"$QTDIR/bin/qmake\" ]; then echo \"$QTDIR/bin/qmake\"; return 0; fi\n  if command -v qmake >/dev/null 2>&1; then command -v qmake; return 0; fi\n  if command -v qmake6 >/dev/null 2>&1; then command -v qmake6; return 0; fi\n  for q in \"$HOME\"/Qt/*/macos/bin/qmake \"$HOME\"/Qt/*/clang_64/bin/qmake /Applications/Qt/*/macos/bin/qmake /opt/homebrew/opt/qt/bin/qmake /usr/local/opt/qt/bin/qmake; do [ -x \"$q\" ] && echo \"$q\" && return 0; done\n  return 1\n}\nQMAKE_BIN=\"$(find_qmake)\" || { echo \"qmake not found. Install Qt or set QTDIR.\" >&2; exit 1; }\nexport QTDIR=\"$(cd \"$(dirname \"$QMAKE_BIN\")/..\" && pwd)\"\nexport PATH=\"$QTDIR/bin:$PATH\"\nPROJECT_DIR=\"$(cd \"$(dirname \"$PROJECT_FILE_PRO\")\" && pwd)\"\nPROJECT_FILE=\"$(basename \"$PROJECT_FILE_PRO\")\"\ncd \"$PROJECT_DIR\"\n\"$QMAKE_BIN\" \"$PROJECT_FILE\"\n```\n\nReturn the generated Makefile location and detected QTDIR.",
+  "resourceIDs": [],
+  "skillEnabled": true,
+  "systemInstruction": "Use QMake to generate the Makefile for the user-selected .pro file. Detect and export QTDIR first.",
+  "triggerPhrases": [
+    "qt app makefile mit qmake erzeugen",
+    "qmake makefile erzeugen",
+    "generate qt makefile"
+  ],
+  "visibilityScope": "chat"
+}
