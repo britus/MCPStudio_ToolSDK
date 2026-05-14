@@ -1,18 +1,22 @@
 {
-  "description": "Runs a full Debug xcodebuild for an Xcode project.",
-  "enabledToolNames": [
+  "description" : "Runs a full Debug xcodebuild for an Xcode project.",
+  "enabledToolNames" : [
     "skill_execute"
   ],
-  "modelPreferences": {},
-  "name": "xcodebuild-full-debug-project-build",
-  "promptTemplate": "Create and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{project_xcodeproj}}` with the selected .xcodeproj path.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPROJECT_XCODEPROJ=\"{{project_xcodeproj}}\"\n[ -n \"$PROJECT_XCODEPROJ\" ] && [ \"$PROJECT_XCODEPROJ\" != \"{{project_xcodeproj}}\" ] || { echo \"Missing project_xcodeproj\" >&2; exit 1; }\nxcodebuild -project \"$PROJECT_XCODEPROJ\" -configuration Debug clean build\n```\n\nReturn the xcodebuild output.",
-  "resourceIDs": [],
-  "skillEnabled": true,
-  "systemInstruction": "Run xcodebuild for the selected project as a full Debug clean build.",
-  "triggerPhrases": [
+  "modelPreferences" : {
+
+  },
+  "name" : "xcodebuild-full-debug-project-build",
+  "promptTemplate" : "Create and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{project_xcodeproj}}` with the selected .xcodeproj path.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nPROJECT_XCODEPROJ=\"{{project_xcodeproj}}\"\n[ -n \"$PROJECT_XCODEPROJ\" ] && [ \"$PROJECT_XCODEPROJ\" != \"{{project_xcodeproj}}\" ] || { echo \"Missing project_xcodeproj\" >&2; exit 1; }\nxcodebuild -project \"$PROJECT_XCODEPROJ\" -configuration Debug clean build\n```\n\nReturn the xcodebuild output.",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Run xcodebuild for the selected project as a full Debug clean build.",
+  "triggerPhrases" : [
     "xcodebuild full debug project build",
     "full debug xcode build",
     "xcode projekt debug build"
   ],
-  "visibilityScope": "chat"
+  "visibilityScope" : "chat"
 }

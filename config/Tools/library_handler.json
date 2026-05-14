@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-04T06:03:18.818Z",
+    "lastModified" : "2026-05-10T11:59:23.206Z",
     "priority" : 0.9
   },
   "description" : "Calls a macOS Plugin Bundle for resource access",

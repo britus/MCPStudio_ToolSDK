@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-04T06:03:18.805Z",
+    "lastModified" : "2026-05-10T11:59:23.189Z",
     "priority" : 0.9
   },
   "description" : "Check whether a file or directory exists.",

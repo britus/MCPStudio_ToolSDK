@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-04T06:03:18.819Z",
+    "lastModified" : "2026-05-10T11:59:23.207Z",
     "priority" : 0.9
   },
   "description" : "Use this tool every time you finish modifying source code files in a project folder or if the user request to build a Xcode project with xcodebuild. This tool provides information about the validity of the build. If errors occur, try to fix them.",
@@ -30,7 +30,7 @@
         "type" : "string"
       },
       "codesign" : {
-        "defaultValue" : "83NQU389JN",
+        "defaultValue" : "",
         "description" : "Apple Developer Team Identifier for code signing and notarization.",
         "name" : "codesign",
         "type" : "string"

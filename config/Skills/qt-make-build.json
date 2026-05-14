@@ -1,18 +1,22 @@
 {
-  "description": "Builds a Qt application with make after detecting QTDIR.",
-  "enabledToolNames": [
+  "description" : "Builds a Qt application with make after detecting QTDIR.",
+  "enabledToolNames" : [
     "skill_execute"
   ],
-  "modelPreferences": {},
-  "name": "qt-make-build",
-  "promptTemplate": "Create and execute the following shell script with `skill_execute`, passing it as `content`. Use `{{project_directory}}` as the directory containing the Makefile. QTDIR must be detected before make runs.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPROJECT_DIR=\"{{project_directory}}\"\n[ -n \"$PROJECT_DIR\" ] && [ \"$PROJECT_DIR\" != \"{{project_directory}}\" ] || { echo \"Missing project_directory\" >&2; exit 1; }\nfind_qmake() {\n  if [ -n \"${QTDIR:-}\" ] && [ -x \"$QTDIR/bin/qmake\" ]; then echo \"$QTDIR/bin/qmake\"; return 0; fi\n  if command -v qmake >/dev/null 2>&1; then command -v qmake; return 0; fi\n  if command -v qmake6 >/dev/null 2>&1; then command -v qmake6; return 0; fi\n  for q in \"$HOME\"/Qt/*/macos/bin/qmake \"$HOME\"/Qt/*/clang_64/bin/qmake /Applications/Qt/*/macos/bin/qmake /opt/homebrew/opt/qt/bin/qmake /usr/local/opt/qt/bin/qmake; do [ -x \"$q\" ] && echo \"$q\" && return 0; done\n  return 1\n}\nQMAKE_BIN=\"$(find_qmake)\" || { echo \"qmake not found. Install Qt or set QTDIR.\" >&2; exit 1; }\nexport QTDIR=\"$(cd \"$(dirname \"$QMAKE_BIN\")/..\" && pwd)\"\nexport PATH=\"$QTDIR/bin:$PATH\"\ncd \"$PROJECT_DIR\"\n[ -f Makefile ] || { echo \"Makefile not found in $PROJECT_DIR\" >&2; exit 1; }\nmake -j\"$(sysctl -n hw.ncpu 2>/dev/null || echo 4)\"\n```\n\nReturn the make output and detected QTDIR.",
-  "resourceIDs": [],
-  "skillEnabled": true,
-  "systemInstruction": "Use make for the Qt app build and detect QTDIR before the build.",
-  "triggerPhrases": [
+  "modelPreferences" : {
+
+  },
+  "name" : "qt-make-build",
+  "promptTemplate" : "Create and execute the following shell script with `skill_execute`, passing it as `content`. Use `{{project_directory}}` as the directory containing the Makefile. QTDIR must be detected before make runs.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nPROJECT_DIR=\"{{project_directory}}\"\n[ -n \"$PROJECT_DIR\" ] && [ \"$PROJECT_DIR\" != \"{{project_directory}}\" ] || { echo \"Missing project_directory\" >&2; exit 1; }\nfind_qmake() {\n  if [ -n \"${QTDIR:-}\" ] && [ -x \"$QTDIR\/bin\/qmake\" ]; then echo \"$QTDIR\/bin\/qmake\"; return 0; fi\n  if command -v qmake >\/dev\/null 2>&1; then command -v qmake; return 0; fi\n  if command -v qmake6 >\/dev\/null 2>&1; then command -v qmake6; return 0; fi\n  for q in \"$HOME\"\/Qt\/*\/macos\/bin\/qmake \"$HOME\"\/Qt\/*\/clang_64\/bin\/qmake \/Applications\/Qt\/*\/macos\/bin\/qmake \/opt\/homebrew\/opt\/qt\/bin\/qmake \/usr\/local\/opt\/qt\/bin\/qmake; do [ -x \"$q\" ] && echo \"$q\" && return 0; done\n  return 1\n}\nQMAKE_BIN=\"$(find_qmake)\" || { echo \"qmake not found. Install Qt or set QTDIR.\" >&2; exit 1; }\nexport QTDIR=\"$(cd \"$(dirname \"$QMAKE_BIN\")\/..\" && pwd)\"\nexport PATH=\"$QTDIR\/bin:$PATH\"\ncd \"$PROJECT_DIR\"\n[ -f Makefile ] || { echo \"Makefile not found in $PROJECT_DIR\" >&2; exit 1; }\nmake -j\"$(sysctl -n hw.ncpu 2>\/dev\/null || echo 4)\"\n```\n\nReturn the make output and detected QTDIR.",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Use make for the Qt app build and detect QTDIR before the build.",
+  "triggerPhrases" : [
     "qt app build mit make",
     "qt make build",
     "build qt makefile"
   ],
-  "visibilityScope": "chat"
+  "visibilityScope" : "chat"
 }

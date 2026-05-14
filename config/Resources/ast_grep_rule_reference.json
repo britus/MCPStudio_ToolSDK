@@ -1,0 +1,16 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user"
+    ],
+    "lastModified" : "2026-05-10T11:59:23.218Z",
+    "priority" : 1
+  },
+  "contextTags" : "[\"ast\",\"grep\",\"rule\",\"reference\"]",
+  "description" : "ast-grep Rule Reference `rule_reference.md`\nThis document provides comprehensive documentation for ast-grep rule syntax, covering all rule types and metavariables.",
+  "mimeType" : "text\/markdown",
+  "name" : "ast_grep_rule_reference",
+  "relatedResources" : "[]",
+  "type" : "resourceLink",
+  "uri" : "https:\/\/github.com\/ast-grep\/agent-skill\/blob\/main\/ast-grep\/skills\/ast-grep\/references\/rule_reference.md"
+}

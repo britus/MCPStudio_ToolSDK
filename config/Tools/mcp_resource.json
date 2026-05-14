@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-04T06:03:18.804Z",
+    "lastModified" : "2026-05-10T11:59:23.188Z",
     "priority" : 0.9
   },
   "description" : "Retrieve an MCP web resource, a local document resource, etc. This tool loads a resource entry from the local resource database.",

@@ -1,58 +1,58 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-05-09T00:00:00.000Z",
-    "priority": 0.9
+    "lastModified" : "2026-05-10T11:59:23.213Z",
+    "priority" : 0.9
   },
-  "description": "Execute a shell script snippet supplied by an MCP Studio Skill.",
-  "execHandler": "skillExecute",
-  "execMethod": "toolEntry",
-  "inputSchema": {
-    "properties": {
-      "content": {
-        "description": "Shell script content generated from the Skill instructions.",
-        "name": "content",
-        "type": "string"
+  "description" : "Execute a shell script snippet supplied by an MCP Studio Skill.",
+  "execHandler" : "skillExecute",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "content" : {
+        "description" : "Shell script content generated from the Skill instructions.",
+        "name" : "content",
+        "type" : "string"
       },
-      "operation": {
-        "description": "Optional operation name for logging and result metadata.",
-        "name": "operation",
-        "type": "string"
+      "operation" : {
+        "description" : "Optional operation name for logging and result metadata.",
+        "name" : "operation",
+        "type" : "string"
       }
     },
-    "required": [
+    "required" : [
       "content"
     ],
-    "type": "object"
+    "type" : "object"
   },
-  "name": "skill_execute",
-  "outputSchema": {
-    "properties": {
-      "error": {
-        "description": "Operation error status information",
-        "name": "error",
-        "type": "string"
+  "name" : "skill_execute",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Operation error status information",
+        "name" : "error",
+        "type" : "string"
       },
-      "operation": {
-        "description": "Name of operation",
-        "name": "operation",
-        "type": "string"
+      "operation" : {
+        "description" : "Name of operation",
+        "name" : "operation",
+        "type" : "string"
       },
-      "success": {
-        "description": "Status flag about operation",
-        "name": "success",
-        "type": "boolean"
+      "success" : {
+        "description" : "Status flag about operation",
+        "name" : "success",
+        "type" : "boolean"
       }
     },
-    "required": [
+    "required" : [
       "success"
     ],
-    "type": "object"
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "tool_entry.js",
-  "toolType": "ScriptTool"
+  "pluginName" : "",
+  "scriptName" : "tool_entry.js",
+  "toolType" : "ScriptTool"
 }

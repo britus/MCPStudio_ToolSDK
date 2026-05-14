@@ -1,17 +1,17 @@
 {
-  "description" : "Reviews a source-code root directory file by file and writes one Markdown review per source file into a mirrored Reviews directory. Use this skill when the user wants a structured code review of a source tree with actionable AI correction instructions.",
+  "description" : "Reviews a specified source-code directory file by file and writes one Markdown review per source file into a mirrored Reviews directory. Use this skill when the user wants a structured code review of a source tree with actionable AI correction instructions.",
   "enabledToolNames" : [
 
   ],
-  "name" : "project-tree-code-review",
+  "name" : "review_code_in_specified_directory",
   "promptTemplate" : "Do not modify source files while reviewing unless the user explicitly asks for fixes. Every actionable finding must include AI Correction Instructions: direct, concrete implementation steps for another coding agent. If a file has no actionable findings, write that clearly in its review file.\n\nGoal:\nReview the source-code root directory `{{directory}}` non-recursively file by file, unless the user explicitly requests recursive review.\n\nInputs:\n- `{{directory}}`: source-code root directory to review\n- `{{review_root_dir}}`: separate target directory where review Markdown files will be written\n\nOutput layout:\nFor every reviewed source file, create a Markdown review file using this path pattern:\n\n`{{review_root_dir}}\/<relative\/source\/path>.review.md`\n\nThe `<relative\/source\/path>` must be computed relative to `{{directory}}`.\n\nExamples:\n- Source: `{{directory}}\/App\/ViewController.swift`\n- Review: `{{review_root_dir}}\/App\/ViewController.swift.review.md`\n\n- Source: `{{directory}}\/Models\/User.ts`\n- Review: `{{review_root_dir}}\/Models\/User.ts.review.md`\n\nCreate any needed target subdirectories inside `{{review_root_dir}}`.\n\nProcess files in deterministic path order and complete one source file review before moving to the next.\n\nEach Markdown review must contain:\n- Source file path\n- Short summary\n- Findings grouped by priority P0-P3\n- Concrete evidence with line references where possible\n- AI Correction Instructions that another coding agent can apply directly\n- Verification steps\n- Residual risk\n\nFinding priorities:\n- P0: Critical issue causing severe security compromise, data loss, or widespread breakage\n- P1: High-impact correctness, security, crash, or data integrity issue\n- P2: Meaningful bug, lifecycle issue, performance problem, maintainability risk, or missing test coverage\n- P3: Minor issue worth fixing, but low risk\n\nExclude generated, build, dependency, and review output directories unless the user explicitly asks otherwise. Exclusions include:\n- `.git`\n- `Reviews`\n- `{{review_root_dir}}`\n- `Build`\n- `DerivedData`\n- `.build`\n- `node_modules`\n- `Pods`\n- `Carthage\/Build`\n\nFocus on:\n- correctness\n- security\n- data loss\n- crashes\n- concurrency\n- lifecycle\n- performance\n- maintainability\n- tests\n- user-facing behavior\n\nAvoid broad style commentary unless it blocks safe maintenance.\n\nAfter all per-file reviews are written, create an aggregate summary at:\n\n`{{review_root_dir}}\/README.md`\n\nThe summary README must include:\n- Total files reviewed\n- Counts by priority P0-P3\n- Top correction themes\n- Recommended fix order\n- Verification commands\n- Any skipped files or directories, with reasons\n",
-  "resourceIDs" : [
+  "resourceNames" : [
 
   ],
   "skillEnabled" : true,
   "systemInstruction" : "You are a careful senior code reviewer. When this skill is used, review a user-selected source-code root directory one file at a time. Do not produce a single monolithic report. Write one Markdown review per reviewed source file under the selected review output root directory `{{review_root_dir}}`, preserving the original relative source directory structure from `{{directory}}`.\n",
   "triggerPhrases" : [
-    "source tree code review",
+    "review source code directory",
     "review source directory",
     "file by file code review",
     "per-file source review"

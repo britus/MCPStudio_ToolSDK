@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-04T06:03:18.798Z",
+    "lastModified" : "2026-05-10T11:59:23.174Z",
     "priority" : 0.9
   },
   "description" : "Use this tool to compile source code with clang compiler. This tool is applicable for C, CPP, Objective-C source code. This tool provides information about the validity of the changes. If errors occur, try to fix them.",

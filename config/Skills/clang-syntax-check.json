@@ -1,18 +1,22 @@
 {
-  "description": "Runs a syntax check with clang for a selected C, C++, Objective-C, or Objective-C++ source file.",
-  "enabledToolNames": [
+  "description" : "Runs a syntax check with clang for a selected C, C++, Objective-C, or Objective-C++ source file.",
+  "enabledToolNames" : [
     "skill_execute"
   ],
-  "modelPreferences": {},
-  "name": "clang-syntax-check",
-  "promptTemplate": "Create and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{source_file}}` with the selected source file and optionally provide `{{clang_args}}` for include paths, language standard, SDK, or framework flags.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nSOURCE_FILE=\"{{source_file}}\"\nCLANG_ARGS=\"{{clang_args}}\"\n[ -n \"$SOURCE_FILE\" ] && [ \"$SOURCE_FILE\" != \"{{source_file}}\" ] || { echo \"Missing source_file\" >&2; exit 1; }\nif [ \"$CLANG_ARGS\" = \"{{clang_args}}\" ]; then CLANG_ARGS=\"\"; fi\nclang -fsyntax-only $CLANG_ARGS \"$SOURCE_FILE\"\n```\n\nReturn clang diagnostics.",
-  "resourceIDs": [],
-  "skillEnabled": true,
-  "systemInstruction": "Run clang syntax checking only. Do not produce an object file or executable.",
-  "triggerPhrases": [
+  "modelPreferences" : {
+
+  },
+  "name" : "clang-syntax-check",
+  "promptTemplate" : "Create and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{source_file}}` with the selected source file and optionally provide `{{clang_args}}` for include paths, language standard, SDK, or framework flags.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nSOURCE_FILE=\"{{source_file}}\"\nCLANG_ARGS=\"{{clang_args}}\"\n[ -n \"$SOURCE_FILE\" ] && [ \"$SOURCE_FILE\" != \"{{source_file}}\" ] || { echo \"Missing source_file\" >&2; exit 1; }\nif [ \"$CLANG_ARGS\" = \"{{clang_args}}\" ]; then CLANG_ARGS=\"\"; fi\nclang -fsyntax-only $CLANG_ARGS \"$SOURCE_FILE\"\n```\n\nReturn clang diagnostics.",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Run clang syntax checking only. Do not produce an object file or executable.",
+  "triggerPhrases" : [
     "syntax check mit clang",
     "clang syntax check",
     "clang fsyntax-only"
   ],
-  "visibilityScope": "chat"
+  "visibilityScope" : "chat"
 }
