@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-10T11:59:23.204Z",
+    "lastModified" : "2026-06-10T02:24:23.701Z",
     "priority" : 0.9
   },
   "description" : "Report detailed GCC compiler settings and supported flags.",
@@ -50,6 +50,6 @@
     "type" : "object"
   },
   "pluginName" : "",
-  "scriptName" : "tool_entry.js",
+  "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
   "toolType" : "ScriptTool"
 }

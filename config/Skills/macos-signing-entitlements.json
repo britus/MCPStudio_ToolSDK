@@ -1,0 +1,18 @@
+{
+  "description" : "Inspect signing, entitlements, hardened runtime, and Gatekeeper issues for macOS apps. Use when asked to diagnose code signing failures, missing entitlements, sandbox problems, notarization prerequisites, or trust-policy launch errors.",
+  "enabledToolNames" : [
+
+  ],
+  "name" : "macos-signing-entitlements",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Signing & Entitlements\nQuick Start\nUse this skill when the failure smells like codesigning rather than compilation:\nlaunch refusal, missing entitlement, invalid signature, sandbox mismatch,\nhardened runtime confusion, or trust-policy rejection.\n\nWorkflow\nInspect the bundle or binary.\n\nLocate the .app or executable.\nIdentify the main binary inside Contents\/MacOS\/.\nRead signing details.\n\nUse codesign -dvvv --entitlements :- <path>.\nUse spctl -a -vv <path> when Gatekeeper behavior matters.\nUse plutil -p for entitlements or Info.plist inspection.\nClassify the failure.\n\nUnsigned or ad hoc signed\nWrong identity\nEntitlement mismatch\nHardened runtime issue\nApp Sandbox issue\nNested code signing issue\nDistribution\/notarization prerequisite issue\nExplain the minimum fix path.\n\nSay exactly what is wrong.\nShow the shortest set of validation or repair commands.\nDistinguish local development problems from distribution problems.\nUseful Commands\ncodesign -dvvv --entitlements :- <app-or-binary>\nspctl -a -vv <app-or-binary>\nsecurity find-identity -p codesigning -v\nplutil -p <path-to-entitlements-or-plist>\nGuardrails\nNever invent missing entitlements.\nDo not conflate notarization with local debug signing.\nIf the real issue is a build setting or provisioning profile, say so directly.\nOutput Expectations\nProvide:\n\nwhat artifact was inspected\nwhat signing state it is in\nthe exact failure class\nthe minimum fix or validation sequence",
+  "triggerPhrases" : [
+    "codesign",
+    "hardened runtime"
+  ],
+  "visibilityScope" : "global"
+}

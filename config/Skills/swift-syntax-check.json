@@ -1,22 +1,29 @@
 {
   "description" : "Runs a syntax check with the Swift compiler for a selected Swift source file.",
   "enabledToolNames" : [
-    "skill_execute"
+    "file_exists",
+    "get_documents_path",
+    "get_temp_path",
+    "list_files",
+    "mkdir",
+    "read_file",
+    "skill_execute",
+    "write_file"
   ],
   "modelPreferences" : {
 
   },
   "name" : "swift-syntax-check",
-  "promptTemplate" : "Create and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{source_file}}` with the selected Swift file and optionally provide `{{swift_args}}` for SDK, target, package, or framework flags.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nSOURCE_FILE=\"{{source_file}}\"\nSWIFT_ARGS=\"{{swift_args}}\"\n[ -n \"$SOURCE_FILE\" ] && [ \"$SOURCE_FILE\" != \"{{source_file}}\" ] || { echo \"Missing source_file\" >&2; exit 1; }\nif [ \"$SWIFT_ARGS\" = \"{{swift_args}}\" ]; then SWIFT_ARGS=\"\"; fi\nswiftc -parse $SWIFT_ARGS \"$SOURCE_FILE\"\n```\n\nReturn Swift compiler diagnostics.",
+  "promptTemplate" : "",
   "resourceNames" : [
 
   ],
   "skillEnabled" : true,
-  "systemInstruction" : "Run Swift syntax parsing only. Do not emit an executable.",
+  "systemInstruction" : "Run Swift syntax parsing only. Do not emit an executable.\n\nCreate and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{source_file}}` with the selected Swift file and optionally provide `{{swift_args}}` for SDK, target, package, or framework flags.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nSOURCE_FILE=\"{{source_file}}\"\nSWIFT_ARGS=\"{{swift_args}}\"\n[ -n \"$SOURCE_FILE\" ] && [ \"$SOURCE_FILE\" != \"{{source_file}}\" ] || { echo \"Missing source_file\" >&2; exit 1; }\nif [ \"$SWIFT_ARGS\" = \"{{swift_args}}\" ]; then SWIFT_ARGS=\"\"; fi\n\nswiftc -parse $SWIFT_ARGS \"$SOURCE_FILE\"\n```\n\nReturn Swift compiler diagnostics.\n",
   "triggerPhrases" : [
     "syntax check mit swift compiler",
     "swift syntax check",
     "swiftc parse"
   ],
-  "visibilityScope" : "chat"
+  "visibilityScope" : "global"
 }

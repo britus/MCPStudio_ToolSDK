@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-10T11:59:23.174Z",
+    "lastModified" : "2026-06-10T02:24:23.692Z",
     "priority" : 0.9
   },
   "description" : "Use this tool to compile source code with clang compiler. This tool is applicable for C, CPP, Objective-C source code. This tool provides information about the validity of the changes. If errors occur, try to fix them.",
@@ -51,6 +51,6 @@
     "type" : "object"
   },
   "pluginName" : "",
-  "scriptName" : "tool_entry.js",
+  "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
   "toolType" : "ScriptTool"
 }

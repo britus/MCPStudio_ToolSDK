@@ -1,0 +1,17 @@
+{
+  "description" : "Prepare and troubleshoot packaging, signing, and notarization workflows for macOS distribution. Use when asked to archive a Mac app, validate bundle structure, reason about notarization readiness, or explain distribution-only failures.",
+  "enabledToolNames" : [
+
+  ],
+  "name" : "macos-packaging-notarization",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Packaging & Notarization for macOS distribution\n\nQuick Start\nUse this skill when the work is about shipping the app rather than merely\nrunning it locally: archives, exported app bundles, notarization readiness,\nhardened runtime, or distribution validation.\n\nWorkflow\nConfirm the distribution goal.\n\nLocal archive validation\nSigned distributable app\nNotarization troubleshooting\nInspect the artifact.\n\nValidate app bundle structure.\nCheck nested frameworks, helper tools, and entitlements.\nInspect signing and runtime prerequisites.\n\nHardened runtime\nSigning identity\nNested code signatures\nRequired entitlements\nExplain notarization readiness or failure.\n\nSeparate packaging issues from trust-policy symptoms.\nPoint to the minimum follow-up validation commands.\nGuardrails\nDo not present notarization as required for ordinary local debug runs.\nCall out when you lack the actual exported artifact and are inferring from project settings.\nKeep advice concrete and verifiable.\nOutput Expectations\nProvide:\n\nwhat artifact or settings were inspected\nwhether the app looks distribution-ready\nthe top missing prerequisite or failure mode\nthe next validation or repair step",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "global"
+}

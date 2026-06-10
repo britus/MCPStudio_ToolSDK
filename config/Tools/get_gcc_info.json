@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-10T11:59:23.198Z",
+    "lastModified" : "2026-06-10T02:24:23.699Z",
     "priority" : 0.9
   },
   "description" : "Report basic GCC compiler information.",
@@ -45,6 +45,6 @@
     "type" : "object"
   },
   "pluginName" : "",
-  "scriptName" : "tool_entry.js",
+  "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
   "toolType" : "ScriptTool"
 }

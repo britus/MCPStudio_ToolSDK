@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-10T11:59:23.188Z",
+    "lastModified" : "2026-06-10T02:24:23.694Z",
     "priority" : 0.9
   },
   "description" : "Configure and build a CMake project.",
@@ -73,6 +73,6 @@
     "type" : "object"
   },
   "pluginName" : "",
-  "scriptName" : "tool_entry.js",
+  "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
   "toolType" : "ScriptTool"
 }

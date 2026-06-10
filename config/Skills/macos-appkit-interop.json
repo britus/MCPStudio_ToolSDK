@@ -1,0 +1,17 @@
+{
+  "description" : "Decide when and how to bridge a macOS app from SwiftUI into AppKit. Use when implementing NSViewRepresentable or NSViewControllerRepresentable, accessing NSWindow or the responder chain, presenting panels, customizing menus, or handling desktop behaviors that SwiftUI does not model cleanly.",
+  "enabledToolNames" : [
+
+  ],
+  "name" : "macos-appkit-interop",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "AppKit Interop\nQuick Start\nUse this skill when SwiftUI is close but not quite enough for native macOS behavior.\nKeep the bridge as small and explicit as possible. SwiftUI should usually remain\nthe source of truth, while AppKit handles the imperative edge.\n\nChoose The Smallest Bridge\nUse pure SwiftUI when the required behavior already exists in scenes, toolbars, commands, inspectors, or standard controls.\nUse NSViewRepresentable when you need a specific AppKit view with lightweight lifecycle needs.\nUse NSViewControllerRepresentable when you need controller lifecycle, delegation, or presentation coordination.\nUse direct AppKit window or app hooks when you need NSWindow, responder-chain, menu validation, panels, or app-level behavior.\nWorkflow\nName the capability gap precisely.\n\nWindow behavior\nText system behavior\nMenu validation\nDrag and drop\nFile open\/save panels\nFirst responder control\nPick the smallest boundary that solves it.\n\nAvoid porting a whole screen to AppKit when one wrapped control or coordinator would do.\nKeep ownership explicit.\n\nSwiftUI owns value state, selection, and observable models.\nAppKit objects stay inside the representable, coordinator, or bridge object.\nExpose a narrow interface back to SwiftUI.\n\nBindings for editable state\nSmall callbacks for events\nFocused bridge services only when necessary\nValidate lifecycle assumptions.\n\nSwiftUI may recreate representables.\nCoordinators exist to hold delegate and target-action glue, not as a second app architecture.\nReferences\nreferences\/representables.md: choosing between view and view-controller wrappers, plus coordinator patterns.\nreferences\/window-panels.md: window access, utility windows, and open\/save panels.\nreferences\/responder-menus.md: first responder, command routing, and menu validation.\nreferences\/drag-drop-pasteboard.md: pasteboard, file URLs, and desktop drag\/drop edges.\nGuardrails\nDo not duplicate the source of truth between SwiftUI and AppKit.\nDo not let Coordinator become an unstructured dumping ground.\nDo not store long-lived NSView or NSWindow instances globally without a strong ownership reason.\nPrefer a tiny tested bridge over rewriting the feature in raw AppKit.\nIf a pattern can remain entirely in swiftui-patterns, keep it there.\nOutput Expectations\nProvide:\n\nthe exact SwiftUI limitation being crossed\nthe smallest recommended bridge type\nthe data-flow boundary between SwiftUI and AppKit\nthe lifecycle or validation risks to watch",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "chat"
+}

@@ -1,0 +1,24 @@
+{
+  "description" : "Add lightweight runtime telemetry and debug instrumentation to macOS apps, then verify those events after building and running. Use when wiring `Logger` \/ `os.Logger`, adding log points for window\/sidebar\/menu-bar actions, reading runtime logs from Console or `log stream`, or confirming that expected events fire after a local run.",
+  "enabledToolNames" : [
+    "file_exists",
+    "get_documents_path",
+    "get_temp_path",
+    "list_files",
+    "mkdir",
+    "read_file",
+    "skill_execute",
+    "write_file"
+  ],
+  "name" : "macos-app-telemetry",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Telemetry\nQuick Start\nUse this skill to add lightweight app instrumentation that helps debug behavior\nwithout turning the codebase into a logging landfill. Prefer Apple's unified\nlogging APIs and verify the events after a build\/run loop.\n\nCore Guidelines\nPrefer Logger from the OSLog framework for structured app logs.\nGive each feature a clear subsystem\/category pair so runtime filtering stays easy.\nLog meaningful user and app lifecycle events: window opening, sidebar selection changes, menu commands, menu bar extra actions, sync\/load milestones, and unexpected fallback paths.\nKeep info logs concise and stable. Use debug logs for noisy state details.\nDo not log secrets, auth tokens, personal data, or raw document contents.\nAdd signposts only when measuring timing or performance spans; do not overinstrument by default.\nMinimal Logger Pattern\nimport OSLog\n\nprivate let logger = Logger(\n  subsystem: Bundle.main.bundleIdentifier ?? \"SampleApp\",\n  category: \"Sidebar\"\n)\n\n@MainActor\nfunc selectItem(_ item: SidebarItem) {\n  logger.info(\"Selected sidebar item: \\(item.id, privacy: .public)\")\n  selection = item.id\n}\nUse feature-specific categories like Windowing, Commands, MenuBar, Sidebar,\nSync, or Import so logs can be filtered quickly.\n\nWorkflow\nIdentify the behavior that needs observability.\n\nWindow open\/close\nSidebar or inspector selection changes\nMenu or keyboard command actions\nMenu bar extra actions\nBackground load\/sync\/import events\nError and recovery paths\nAdd the smallest useful instrumentation.\n\nCreate one Logger per feature area or type.\nLog action boundaries and key state transitions.\nPrefer one high-signal line per user action over noisy value dumps.\nBuild and run the app.\n\nUse build-run-debug for the build\/run loop.\nIf script\/build_and_run.sh exists, prefer .\/script\/build_and_run.sh --telemetry for live telemetry checks or .\/script\/build_and_run.sh --logs for broader process logs.\nExercise the UI or command path that should emit telemetry.\nRead runtime logs and verify the event fired.\n\nUse Console.app with a process\/subsystem filter when that is the fastest manual check.\nUse log stream --style compact --predicate 'process == \"AppName\"' for live terminal verification.\nPrefer tighter predicates when you know the subsystem\/category:\nlog stream --style compact --predicate 'subsystem == \"com.example.app\" && category == \"Sidebar\"'\nTighten or remove instrumentation.\n\nIf the event fires, keep only the logs that remain useful for future debugging.\nIf it does not fire, move the log closer to the suspected control path and rerun.\nVerification Checklist\nThe app builds after telemetry changes.\nThe relevant action emits exactly one clear log line or a small bounded sequence.\nThe log can be filtered by process, subsystem, or category.\nNo sensitive payloads are written to unified logs.\nNoisy temporary debug logs are removed or demoted before finishing.\nGuardrails\nDo not use print as the primary app telemetry mechanism for macOS app code.\nDo not leave a dense trail of permanent debug logs around every state mutation.\nDo not claim an event is wired correctly until you have a concrete verification path through Console, log stream, or captured process output.\nIf the debugging task is mostly about crash\/backtrace analysis rather than action telemetry, switch to build-run-debug.",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "chat"
+}

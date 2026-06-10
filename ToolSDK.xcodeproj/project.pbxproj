@@ -34,8 +34,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		F790001A2FB000000000001A /* nodejs-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nodejs-runtime-resource-access.json"; sourceTree = "<group>"; };
-		F79000192FB0000000000019 /* node_stdlib_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = node_stdlib_tool.js; sourceTree = "<group>"; };
 		F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analyzeDirectory.js; sourceTree = "<group>"; };
 		F71170DB2F7AA79A00F39DFE /* bootstrap.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = bootstrap.js; sourceTree = "<group>"; };
 		F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = checkWithXcode.js; sourceTree = "<group>"; };
@@ -175,6 +173,8 @@
 		F79000162FB0000000000016 /* PluginMain.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PluginMain.mm; sourceTree = "<group>"; };
 		F79000172FB0000000000017 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
 		F79000182FB0000000000018 /* echo_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = echo_tool.js; sourceTree = "<group>"; };
+		F79000192FB0000000000019 /* node_stdlib_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = node_stdlib_tool.js; sourceTree = "<group>"; };
+		F790001A2FB000000000001A /* nodejs-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nodejs-runtime-resource-access.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

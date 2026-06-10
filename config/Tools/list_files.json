@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-05-10T11:59:23.205Z",
+    "lastModified" : "2026-06-10T02:24:23.702Z",
     "priority" : 0.9
   },
   "description" : "Lists all files in the specified directory using a string list of file extensions (i.e. „.cpp“ or „.js“)",
