@@ -5,6 +5,11 @@
 
 const shared = require('sharedFunctions');
 
+function taskLog(message) {
+    console.log(message);
+    stdOut.push(message);
+}
+
 function skillExecute(params) {
     params = params || {};
 
@@ -20,10 +25,26 @@ function skillExecute(params) {
     }
 
     var shellScript = String(content);
+    
+    console.log("[Script] execute: " + shellScript);
+    
     var success = MCPStudio.shell(shellScript);
+    
+    if (stdOut && stdOut.length > 0) {
+        console.log("[Script] stdout:\n" + stdOut.join("\n"));
+    }
+    if (stdErr && stdErr.length > 0) {
+        console.log("[Script] stderr:\n" + stdErr.join("\n"));
+    }
 
+    if (success) {
+        taskLog("[Script] Command successful!");
+    }
+    
     MCPStudio.setToolResult(JSON.stringify({
-        text: (success ? "[Script] Skill script executed successfully.\n\n" : "[Script] Skill script failed.\n\n") +
+        text: (success 
+                ? "[Script] Skill script executed successfully.\n\n" 
+                : "[Script] Skill script failed.\n\n") +
             (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +
             (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
         metadata: {

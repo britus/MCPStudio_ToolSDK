@@ -1,0 +1,133 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-06-09T00:00:00.000Z",
+    "priority": 0.9
+  },
+  "description": "Execute JavaScript using Node.js. Provide inline JavaScript or a script path; the tool runs it with the configured Node.js executable and returns stdout, stderr, exit code, and execution status.",
+  "execHandler": "NodeJSRuntimeTool",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "properties": {
+      "inlineScript": {
+        "description": "JavaScript source code to execute with Node.js. Use this or scriptPath.",
+        "name": "inlineScript",
+        "type": "string"
+      },
+      "scriptPath": {
+        "description": "Absolute path to a JavaScript file to execute. Use this or inlineScript.",
+        "name": "scriptPath",
+        "type": "string"
+      },
+      "nodeExecutable": {
+        "description": "Optional absolute path to the Node.js executable, or 'node' to resolve via /usr/bin/env.",
+        "name": "nodeExecutable",
+        "type": "string"
+      },
+      "scriptArguments": {
+        "description": "Arguments passed to the JavaScript script.",
+        "items": {
+          "type": "string"
+        },
+        "name": "scriptArguments",
+        "type": "array"
+      },
+      "workingDirectory": {
+        "description": "Optional working directory for the Node.js process.",
+        "name": "workingDirectory",
+        "type": "string"
+      },
+      "stdin": {
+        "description": "Optional text passed to the Node.js process via stdin.",
+        "name": "stdin",
+        "type": "string"
+      },
+      "stdinJSON": {
+        "description": "Optional JSON object passed to the Node.js process via stdin.",
+        "items": {
+          "properties": {},
+          "type": "object"
+        },
+        "name": "stdinJSON",
+        "type": "object"
+      },
+      "timeoutSeconds": {
+        "description": "Maximum execution time in seconds. Defaults to 60 and is capped by the plugin.",
+        "name": "timeoutSeconds",
+        "type": "number"
+      },
+      "resultMode": {
+        "description": "Result handling mode. Use 'capture' to return stdout/stderr automatically, or 'toolResultJSON' to parse stdout as a complete MCP tool result JSON object.",
+        "name": "resultMode",
+        "type": "string"
+      }
+    },
+    "required": [],
+    "type": "object"
+  },
+  "name": "nodejs_runtime",
+  "outputSchema": {
+    "properties": {
+      "success": {
+        "description": "Whether the Node.js process exited successfully.",
+        "name": "success",
+        "type": "boolean"
+      },
+      "exitCode": {
+        "description": "Node.js process exit code.",
+        "name": "exitCode",
+        "type": "integer"
+      },
+      "stdout": {
+        "description": "Captured stdout from the Node.js process.",
+        "name": "stdout",
+        "type": "string"
+      },
+      "stderr": {
+        "description": "Captured stderr from the Node.js process.",
+        "name": "stderr",
+        "type": "string"
+      },
+      "timedOut": {
+        "description": "Whether execution timed out.",
+        "name": "timedOut",
+        "type": "boolean"
+      },
+      "nodeExecutable": {
+        "description": "Resolved Node.js executable used for execution.",
+        "name": "nodeExecutable",
+        "type": "string"
+      },
+      "scriptPath": {
+        "description": "JavaScript file path used for execution, if any.",
+        "name": "scriptPath",
+        "type": "string"
+      },
+      "workingDirectory": {
+        "description": "Working directory used by the Node.js process.",
+        "name": "workingDirectory",
+        "type": "string"
+      },
+      "resultMode": {
+        "description": "Result handling mode used by the tool.",
+        "name": "resultMode",
+        "type": "string"
+      },
+      "launchError": {
+        "description": "Launch error details if the Node.js process could not be started.",
+        "name": "launchError",
+        "type": "string"
+      }
+    },
+    "required": [
+      "success"
+    ],
+    "type": "object"
+  },
+  "pluginName": "NodeJSRuntimeTool",
+  "scriptName": "",
+  "toolType": "CustomTool"
+}

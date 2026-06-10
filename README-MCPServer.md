@@ -18,8 +18,8 @@ techniques copied from qmcp project. Thank's ;)
 
 ```
 ┌─────────────────────────────────────┐
-│      MCPStudio Application Layer        │
-│    (MCPServer.MCPStudio wrapper)        │
+│      MCPStudio Application Layer    │
+│    (MCPServer.MCPStudio wrapper)    │
 └──────────────┬──────────────────────┘
                │
 ┌──────────────▼──────────────────────┐

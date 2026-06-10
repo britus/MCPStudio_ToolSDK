@@ -67,7 +67,8 @@ function shellCall(params) {
     // Build command with parameters based on function parameters
     shellScript += 'set -euo pipefail\n';
     shellScript += "cd \"$(dirname \"$0\")\" || exit 1\n";
-
+    shellScript += "echo \"Current path: `pwd`\"\n";
+    
     if (parameters && parameters.length > 0) {
         taskLog("[Script] Building command with parameters...");
         
@@ -77,13 +78,14 @@ function shellCall(params) {
             if (arg != null) {
                 var argStr = String(arg);
                 // cleanup JSON escapings
-                var escapedArg = argStr
-                    .replace(/"/g, '\\"')
-                    .replace(/\$/g, '\\$')
-                    .replace(/`/g, '\\`');
-                paramString += " \"" + escapedArg + "\"";
+                var escapedArg = argStr;
+                   //.replace(/"/g, '\\"')
+                   // .replace(/\$/g, '\\$')
+                   // .replace(/`/g, '\\`');
+               console.log("[Script] Argument:" + escapedArg);
+               paramString += " " + escapedArg + " ";
             } else {
-                paramString += " \"\"";
+               paramString = "";
             }
         }
         shellScript += command + paramString + '\n';
@@ -95,6 +97,13 @@ function shellCall(params) {
     taskLog("[Script] Run: " + shellScript);
     
     var success = MCPStudio.shell(shellScript);
+    
+    if (stdOut && stdOut.length > 0) {
+        console.log("[Script] stdout:\n" + stdOut.join("\n"));
+    }
+    if (stdErr && stdErr.length > 0) {
+        console.log("[Script] stderr:\n" + stdErr.join("\n"));
+    }
 
     if (success) {
         MCPStudio.setToolResult(JSON.stringify({

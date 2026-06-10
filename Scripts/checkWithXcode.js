@@ -143,6 +143,9 @@ function checkWithXcode(params) {
     
     success = MCPStudio.shell(shellScript);
     
+    taskLog("stdout: " + stdOut.join("\n"));
+    taskLog("stderr: " + stdErr.join("\n"));
+    
     if (!success) {
         MCPStudio.setToolResult(JSON.stringify({
             text: "[Script] Build FAILED for " + projectName + "\n" + 
