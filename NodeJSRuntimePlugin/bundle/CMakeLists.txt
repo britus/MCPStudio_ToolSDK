@@ -15,7 +15,6 @@ add_library(NodeJSRuntimeBundle MODULE
     ToolDescriptor.c
     PluginMain.mm
     NodeJSRuntimeHandler.mm
-    ../../ToolJSONBridge/ToolJSONBridge.mm
 )
 
 target_include_directories(NodeJSRuntimeBundle PRIVATE
@@ -31,11 +30,23 @@ set_target_properties(NodeJSRuntimeBundle PROPERTIES
 )
 
 target_link_libraries(NodeJSRuntimeBundle
+    PRIVATE ToolJSONBridge
     PRIVATE "-framework Cocoa"
     PRIVATE "-framework Foundation"
     PRIVATE "-framework AppKit"
 )
 
+set_target_properties(NodeJSRuntimeBundle PROPERTIES
+    INSTALL_RPATH "@executable_path/../Resources/Bundles;@loader_path/../../.."
+    BUILD_WITH_INSTALL_RPATH TRUE
+)
+
 set_target_properties(NodeJSRuntimeBundle PROPERTIES COMPILE_DEFINITIONS
     "TOOL_BUNDLE=1"
+)
+
+add_custom_command(TARGET NodeJSRuntimeBundle POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:ToolJSONBridge>
+        $<TARGET_FILE_DIR:NodeJSRuntimeBundle>/../../..
 )

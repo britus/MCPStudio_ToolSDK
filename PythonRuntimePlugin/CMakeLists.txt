@@ -7,4 +7,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(PythonRuntimePlugin VERSION 1.0.0)
 
+if(NOT TARGET ToolJSONBridge)
+    add_subdirectory(../ToolJSONBridge ${CMAKE_BINARY_DIR}/ToolJSONBridge)
+endif()
 add_subdirectory(bundle)

@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F75EE1F62F436EAB009908F1"
-               BuildableName = "SamplePluginBundle.plugin"
-               BlueprintName = "SamplePluginBundle"
+               BlueprintIdentifier = "F79200402FD0000000000040"
+               BuildableName = "libToolJSONBridge.dylib"
+               BlueprintName = "ToolJSONBridge"
                ReferencedContainer = "container:ToolSDK.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,6 +32,48 @@
                BlueprintIdentifier = "F75EE2D02F436FA2009908F1"
                BuildableName = "libSamplePluginDyLib.dylib"
                BlueprintName = "SamplePluginDyLib"
+               ReferencedContainer = "container:ToolSDK.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F79000402FB0000000000040"
+               BuildableName = "NodeJSRuntimeTool.bundle"
+               BlueprintName = "NodeJSRuntimeTool"
+               ReferencedContainer = "container:ToolSDK.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F79100402FC0000000000040"
+               BuildableName = "PythonRuntimeTool.bundle"
+               BlueprintName = "PythonRuntimeTool"
+               ReferencedContainer = "container:ToolSDK.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F75EE1F62F436EAB009908F1"
+               BuildableName = "SamplePluginBundle.plugin"
+               BlueprintName = "SamplePluginBundle"
                ReferencedContainer = "container:ToolSDK.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

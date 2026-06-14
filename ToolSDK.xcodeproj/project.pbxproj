@@ -17,14 +17,17 @@
 		F75EE36F2F43718D009908F1 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2672F436EE7009908F1 /* ToolDescriptor.c */; };
 		F75EE3702F4371A2009908F1 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
 		F75EE3732F4377C5009908F1 /* ToolEntryHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE3722F4377C5009908F1 /* ToolEntryHandler.mm */; };
-		F79000012FB0000000000001 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
 		F79000022FB0000000000002 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79000162FB0000000000016 /* PluginMain.mm */; };
 		F79000032FB0000000000003 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F79000172FB0000000000017 /* ToolDescriptor.c */; };
 		F79000042FB0000000000004 /* NodeJSRuntimeHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79000152FB0000000000015 /* NodeJSRuntimeHandler.mm */; };
-		F79100012FC0000000000001 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
 		F79100022FC0000000000002 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79100162FC0000000000016 /* PluginMain.mm */; };
 		F79100032FC0000000000003 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F79100172FC0000000000017 /* ToolDescriptor.c */; };
 		F79100042FC0000000000004 /* PythonRuntimeHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79100152FC0000000000015 /* PythonRuntimeHandler.mm */; };
+		F79200012FD0000000000001 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
+		F79200022FD0000000000002 /* libToolJSONBridge.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F79200102FD0000000000010 /* libToolJSONBridge.dylib */; };
+		F79200032FD0000000000003 /* libToolJSONBridge.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F79200102FD0000000000010 /* libToolJSONBridge.dylib */; };
+		F79DA29C2FDE610F003E58B8 /* libToolJSONBridge.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F79200102FD0000000000010 /* libToolJSONBridge.dylib */; };
+		F79DA29D2FDE610F003E58B8 /* libToolJSONBridge.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = F79200102FD0000000000010 /* libToolJSONBridge.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +38,49 @@
 			remoteGlobalIDString = F75EE2D02F436FA2009908F1;
 			remoteInfo = SamplePluginDyLib;
 		};
+		F79200602FD0000000000060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F75EE1EF2F436EAB009908F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F79200402FD0000000000040;
+			remoteInfo = ToolJSONBridge;
+		};
+		F79200612FD0000000000061 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F75EE1EF2F436EAB009908F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F79200402FD0000000000040;
+			remoteInfo = ToolJSONBridge;
+		};
+		F79DA2992FDE60F7003E58B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F75EE1EF2F436EAB009908F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F79200402FD0000000000040;
+			remoteInfo = ToolJSONBridge;
+		};
+		F79DA29E2FDE610F003E58B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F75EE1EF2F436EAB009908F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F79200402FD0000000000040;
+			remoteInfo = ToolJSONBridge;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F79DA2A02FDE610F003E58B8 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F79DA29D2FDE610F003E58B8 /* libToolJSONBridge.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analyzeDirectory.js; sourceTree = "<group>"; };
@@ -169,6 +214,7 @@
 		F79100182FC0000000000018 /* echo_tool.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = echo_tool.py; sourceTree = "<group>"; };
 		F79100192FC0000000000019 /* python_stdlib_tool.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = python_stdlib_tool.py; sourceTree = "<group>"; };
 		F791001B2FC000000000001B /* python_runtime.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = python_runtime.json; sourceTree = "<group>"; };
+		F79200102FD0000000000010 /* libToolJSONBridge.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libToolJSONBridge.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		F79D9FD62FDE5A56003E58B8 /* ast-grep-rule-generator.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ast-grep-rule-generator.json"; sourceTree = "<group>"; };
 		F79D9FD72FDE5A56003E58B8 /* build-run-debug-xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "build-run-debug-xcode.json"; sourceTree = "<group>"; };
 		F79D9FD82FDE5A56003E58B8 /* clang-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clang-syntax-check.json"; sourceTree = "<group>"; };
@@ -205,6 +251,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F79DA29C2FDE610F003E58B8 /* libToolJSONBridge.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,10 +266,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F79200022FD0000000000002 /* libToolJSONBridge.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F79100312FC0000000000031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F79200032FD0000000000003 /* libToolJSONBridge.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F79200312FD0000000000031 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -401,6 +457,7 @@
 				F75EE2042F436EE7009908F1 /* README-MCPServer.md */,
 				F75EE2062F436EE7009908F1 /* README-SamplePlugin.md */,
 				F75EE2072F436EE7009908F1 /* README-Scripting.md */,
+				F79DA29B2FDE610F003E58B8 /* Frameworks */,
 				F75EE1F82F436EAB009908F1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -408,6 +465,7 @@
 		F75EE1F82F436EAB009908F1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				F79200102FD0000000000010 /* libToolJSONBridge.dylib */,
 				F79000102FB0000000000010 /* NodeJSRuntimeTool.bundle */,
 				F79100102FC0000000000010 /* PythonRuntimeTool.bundle */,
 				F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */,
@@ -566,6 +624,13 @@
 			path = examples;
 			sourceTree = "<group>";
 		};
+		F79DA29B2FDE610F003E58B8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -588,11 +653,14 @@
 				F75EE1F32F436EAB009908F1 /* Sources */,
 				F75EE1F42F436EAB009908F1 /* Frameworks */,
 				F75EE1F52F436EAB009908F1 /* Resources */,
+				F79DA2A02FDE610F003E58B8 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F79DA29A2FDE60F7003E58B8 /* PBXTargetDependency */,
 				F75EE36D2F43716F009908F1 /* PBXTargetDependency */,
+				F79DA29F2FDE610F003E58B8 /* PBXTargetDependency */,
 			);
 			name = SamplePluginBundle;
 			packageProductDependencies = (
@@ -631,6 +699,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F79200622FD0000000000062 /* PBXTargetDependency */,
 			);
 			name = NodeJSRuntimeTool;
 			packageProductDependencies = (
@@ -650,6 +719,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F79200632FD0000000000063 /* PBXTargetDependency */,
 			);
 			name = PythonRuntimeTool;
 			packageProductDependencies = (
@@ -657,6 +727,24 @@
 			productName = PythonRuntimeTool;
 			productReference = F79100102FC0000000000010 /* PythonRuntimeTool.bundle */;
 			productType = "com.apple.product-type.bundle";
+		};
+		F79200402FD0000000000040 /* ToolJSONBridge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F79200522FD0000000000052 /* Build configuration list for PBXNativeTarget "ToolJSONBridge" */;
+			buildPhases = (
+				F79200302FD0000000000030 /* Sources */,
+				F79200312FD0000000000031 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ToolJSONBridge;
+			packageProductDependencies = (
+			);
+			productName = ToolJSONBridge;
+			productReference = F79200102FD0000000000010 /* libToolJSONBridge.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -679,6 +767,9 @@
 					F79100402FC0000000000040 = {
 						CreatedOnToolsVersion = 26.2;
 					};
+					F79200402FD0000000000040 = {
+						CreatedOnToolsVersion = 26.2;
+					};
 				};
 			};
 			buildConfigurationList = F75EE1F22F436EAB009908F1 /* Build configuration list for PBXProject "ToolSDK" */;
@@ -698,6 +789,7 @@
 				F79000402FB0000000000040 /* NodeJSRuntimeTool */,
 				F79100402FC0000000000040 /* PythonRuntimeTool */,
 				F75EE1F62F436EAB009908F1 /* SamplePluginBundle */,
+				F79200402FD0000000000040 /* ToolJSONBridge */,
 				F75EE2D02F436FA2009908F1 /* SamplePluginDyLib */,
 			);
 		};
@@ -754,7 +846,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F79000012FB0000000000001 /* ToolJSONBridge.mm in Sources */,
 				F79000042FB0000000000004 /* NodeJSRuntimeHandler.mm in Sources */,
 				F79000022FB0000000000002 /* PluginMain.mm in Sources */,
 				F79000032FB0000000000003 /* ToolDescriptor.c in Sources */,
@@ -765,10 +856,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F79100012FC0000000000001 /* ToolJSONBridge.mm in Sources */,
 				F79100042FC0000000000004 /* PythonRuntimeHandler.mm in Sources */,
 				F79100022FC0000000000002 /* PluginMain.mm in Sources */,
 				F79100032FC0000000000003 /* ToolDescriptor.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F79200302FD0000000000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F79200012FD0000000000001 /* ToolJSONBridge.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -779,6 +877,26 @@
 			isa = PBXTargetDependency;
 			target = F75EE2D02F436FA2009908F1 /* SamplePluginDyLib */;
 			targetProxy = F75EE36C2F43716F009908F1 /* PBXContainerItemProxy */;
+		};
+		F79200622FD0000000000062 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F79200402FD0000000000040 /* ToolJSONBridge */;
+			targetProxy = F79200602FD0000000000060 /* PBXContainerItemProxy */;
+		};
+		F79200632FD0000000000063 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F79200402FD0000000000040 /* ToolJSONBridge */;
+			targetProxy = F79200612FD0000000000061 /* PBXContainerItemProxy */;
+		};
+		F79DA29A2FDE60F7003E58B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F79200402FD0000000000040 /* ToolJSONBridge */;
+			targetProxy = F79DA2992FDE60F7003E58B8 /* PBXContainerItemProxy */;
+		};
+		F79DA29F2FDE610F003E58B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F79200402FD0000000000040 /* ToolJSONBridge */;
+			targetProxy = F79DA29E2FDE610F003E58B8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1011,6 +1129,10 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Resources/Bundles",
+					"@loader_path/../../..",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = "-DTOOL_BUNDLE";
 				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.NodeJSRuntimeTool;
@@ -1042,6 +1164,10 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Resources/Bundles",
+					"@loader_path/../../..",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = "-DTOOL_BUNDLE";
 				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.NodeJSRuntimeTool;
@@ -1073,6 +1199,10 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Resources/Bundles",
+					"@loader_path/../../..",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = "-DTOOL_BUNDLE";
 				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.PythonRuntimeTool;
@@ -1104,6 +1234,10 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Resources/Bundles",
+					"@loader_path/../../..",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = "-DTOOL_BUNDLE";
 				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.PythonRuntimeTool;
@@ -1113,6 +1247,52 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		F79200502FD0000000000050 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				LD_DYLIB_INSTALL_NAME = "@rpath/libToolJSONBridge.dylib";
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.ToolJSONBridge;
+				PRODUCT_NAME = ToolJSONBridge;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		F79200512FD0000000000051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				LD_DYLIB_INSTALL_NAME = "@rpath/libToolJSONBridge.dylib";
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.ToolJSONBridge;
+				PRODUCT_NAME = ToolJSONBridge;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -1160,6 +1340,15 @@
 			buildConfigurations = (
 				F79100502FC0000000000050 /* Debug */,
 				F79100512FC0000000000051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F79200522FD0000000000052 /* Build configuration list for PBXNativeTarget "ToolJSONBridge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F79200502FD0000000000050 /* Debug */,
+				F79200512FD0000000000051 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
