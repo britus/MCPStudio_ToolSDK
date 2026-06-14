@@ -2,8 +2,8 @@
 #  CMakeList.txt
 #  MCPStudio - Custom Tool SDK - SamplePlugin macOS Plugin Bundle
 #
-#  Created by EoF Software Labs on 2026.
-#  Copyright © 2026 EoF Software Labs. All rights reserved.
+#  Created by EoF Software Lab on 2026.
+#  Copyright © 2026 EoF Software Lab. All rights reserved.
 # ===================================================================
 
 # Define the project name and version

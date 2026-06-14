@@ -1,9 +1,6 @@
 // ===================================================================
 //  PluginMain.mm
-//  MCPStudio - Custom Tool SDK - SamplePlugin
-//
-//  Created by EoF Software Lab on 2026.
-//  Copyright © 2026 EoF Software Lab. All rights reserved.
+//  MCPStudio ToolSDK - Python Runtime Plugin
 // ===================================================================
 
 #ifdef TOOL_BUNDLE
@@ -15,7 +12,7 @@
 #include "CustomToolExports.h"
 #include "ToolABI.h"
 #include "ToolJSONBridge.h"
-#import "ToolEntryHandler.h"
+#import "PythonRuntimeHandler.h"
 
 TOOL_API void toolEntry(const char *sid,
                         const char *toolName,
@@ -25,7 +22,7 @@ TOOL_API void toolEntry(const char *sid,
 {
     @autoreleasepool {
         if (!sid || !toolName || !params || !resultJson || !resultSize) {
-            fprintf(stderr, "[SamplePlugin.bundle] Invalid parameters.\n");
+            fprintf(stderr, "[PythonRuntime.bundle] Invalid parameters.\n");
             return;
         }
 
@@ -35,35 +32,21 @@ TOOL_API void toolEntry(const char *sid,
             parsedParams = @{};
         }
 
-        ToolEntryHandler *handler = [[ToolEntryHandler alloc] init];
+        PythonRuntimeHandler *handler = [[PythonRuntimeHandler alloc] init];
         NSDictionary *result = [handler handleToolEntryWithSID:[NSString stringWithUTF8String:sid]
                                                       toolName:[NSString stringWithUTF8String:toolName]
                                                         params:parsedParams ?: @{}
                                                          error:&error];
 
         if (!result) {
-            NSString *message = error.localizedDescription ?: @"Plugin execution failed";
-            result = @{
-                @"structuredContent": @{
-                    @"text": message,
-                    @"success": @NO,
-                    @"metadata": @{
-                        @"error": message
-                    }
-                },
-                @"content": @[
-                    @{
-                        @"type": @"text",
-                        @"text": message
-                    }
-                ],
-                @"isError": @YES
-            };
+            NSString *message = error.localizedDescription ?: @"Python runtime plugin execution failed";
+            result = [PythonRuntimeHandler errorEnvelope:message
+                                                metadata:@{ @"error": message ?: @"" }];
         }
 
         NSString *json = [ToolJSONBridge jsonStringFromDictionary:result error:&error];
         if (!json || error) {
-            json = @"{\"structuredContent\":{\"text\":\"JSON serialization failed\",\"success\":false,\"metadata\":{\"error\":\"JSON serialization failed\"}},\"content\":[{\"type\":\"text\",\"text\":\"JSON serialization failed\"}],\"isError\":true}";
+            json = @"{\"structuredContent\":{\"success\":false,\"text\":\"JSON serialization failed\",\"metadata\":{\"error\":\"JSON serialization failed\"}},\"content\":[{\"type\":\"text\",\"text\":\"JSON serialization failed\"}],\"isError\":true}";
         }
 
         NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
@@ -72,7 +55,7 @@ TOOL_API void toolEntry(const char *sid,
 
         if (!*resultJson) {
             *resultSize = 0;
-            fprintf(stderr, "[SamplePlugin.bundle] Failed to allocate result buffer.\n");
+            fprintf(stderr, "[PythonRuntime.bundle] Failed to allocate result buffer.\n");
             return;
         }
 

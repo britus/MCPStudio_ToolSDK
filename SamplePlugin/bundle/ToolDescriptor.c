@@ -2,8 +2,8 @@
 //  ToolDescriptor.c
 //  MCPStudio - Custom Tool SDK - SamplePlugin
 //
-//  Created by EoF Software Labs on 2026.
-//  Copyright © 2026 EoF Software Labs. All rights reserved.
+//  Created by EoF Software Lab on 2026.
+//  Copyright © 2026 EoF Software Lab. All rights reserved.
 // ===================================================================
 
 #ifdef TOOL_BUNDLE
@@ -16,7 +16,7 @@ static ToolPluginDescriptor desc = {
     .toolVersion      = 1,
     .name             = "SampleTool_Bundle_Handler",
     .version          = "1.0.1",
-    .author           = "EoF Software Labs",
+    .author           = "EoF Software Lab",
     .description      = "Sample Plugin Tool Handler written in ObjectiveC as macOS Bundle",
     .toolEntryPoint   = "toolEntry",
     .toolIdentifier   = "org.eof.tools.MCStudio.SamplePlugin.Bundle",

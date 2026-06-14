@@ -2,8 +2,8 @@
 //  CustomToolExports.h
 //  MCPStudio - Custom Tool SDK
 //
-//  Created by EoF Software Labs on 2026.
-//  Copyright © 2026 EoF Software Labs. All rights reserved.
+//  Created by EoF Software Lab on 2026.
+//  Copyright © 2026 EoF Software Lab. All rights reserved.
 // ===================================================================
 #pragma once
 #if defined(__APPLE__)

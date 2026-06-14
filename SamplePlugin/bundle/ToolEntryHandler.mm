@@ -2,8 +2,8 @@
 //  ToolEntryHandler.mm
 //  MCPStudio - Custom Tool SDK - SamplePlugin
 //
-//  Created by EoF Software Labs on 2026.
-//  Copyright © 2026 EoF Software Labs. All rights reserved.
+//  Created by EoF Software Lab on 2026.
+//  Copyright © 2026 EoF Software Lab. All rights reserved.
 // ===================================================================
 
 #import <AppKit/AppKit.h>

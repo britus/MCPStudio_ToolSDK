@@ -21,6 +21,10 @@
 		F79000022FB0000000000002 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79000162FB0000000000016 /* PluginMain.mm */; };
 		F79000032FB0000000000003 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F79000172FB0000000000017 /* ToolDescriptor.c */; };
 		F79000042FB0000000000004 /* NodeJSRuntimeHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79000152FB0000000000015 /* NodeJSRuntimeHandler.mm */; };
+		F79100012FC0000000000001 /* ToolJSONBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F75EE2732F436EE7009908F1 /* ToolJSONBridge.mm */; };
+		F79100022FC0000000000002 /* PluginMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79100162FC0000000000016 /* PluginMain.mm */; };
+		F79100032FC0000000000003 /* ToolDescriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = F79100172FC0000000000017 /* ToolDescriptor.c */; };
+		F79100042FC0000000000004 /* PythonRuntimeHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = F79100152FC0000000000015 /* PythonRuntimeHandler.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -175,6 +179,18 @@
 		F79000182FB0000000000018 /* echo_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = echo_tool.js; sourceTree = "<group>"; };
 		F79000192FB0000000000019 /* node_stdlib_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = node_stdlib_tool.js; sourceTree = "<group>"; };
 		F790001A2FB000000000001A /* nodejs-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nodejs-runtime-resource-access.json"; sourceTree = "<group>"; };
+		F79100102FC0000000000010 /* PythonRuntimeTool.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PythonRuntimeTool.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		F79100112FC0000000000011 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		F79100122FC0000000000012 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F79100132FC0000000000013 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		F79100142FC0000000000014 /* PythonRuntimeHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PythonRuntimeHandler.h; sourceTree = "<group>"; };
+		F79100152FC0000000000015 /* PythonRuntimeHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PythonRuntimeHandler.mm; sourceTree = "<group>"; };
+		F79100162FC0000000000016 /* PluginMain.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PluginMain.mm; sourceTree = "<group>"; };
+		F79100172FC0000000000017 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
+		F79100182FC0000000000018 /* echo_tool.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = echo_tool.py; sourceTree = "<group>"; };
+		F79100192FC0000000000019 /* python_stdlib_tool.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = python_stdlib_tool.py; sourceTree = "<group>"; };
+		F791001A2FC000000000001A /* python-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "python-runtime-resource-access.json"; sourceTree = "<group>"; };
+		F791001B2FC000000000001B /* python_runtime.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = python_runtime.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +209,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F79000312FB0000000000031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F79100312FC0000000000031 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -272,6 +295,7 @@
 				F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */,
 				F75AC4122FAF73220008BE10 /* swift-syntax-check.json */,
 				F790001A2FB000000000001A /* nodejs-runtime-resource-access.json */,
+				F791001A2FC000000000001A /* python-runtime-resource-access.json */,
 				F75AC4132FAF73220008BE10 /* xcodebuild-full-debug-project-build.json */,
 				F75AC4142FAF73220008BE10 /* xcodebuild-full-release-project-build.json */,
 				F75AC4152FAF73220008BE10 /* xcodebuild-scheme-debug-build.json */,
@@ -319,6 +343,7 @@
 				F75AC4392FAF73220008BE10 /* list_reminders.json */,
 				F75AC43A2FAF73220008BE10 /* mcp_resource.json */,
 				F75AC43B2FAF73220008BE10 /* mkdir.json */,
+				F791001B2FC000000000001B /* python_runtime.json */,
 				F75AC43C2FAF73220008BE10 /* open_file.json */,
 				F75AC43D2FAF73220008BE10 /* qmake_build.json */,
 				F75AC43E2FAF73220008BE10 /* read_file.json */,
@@ -354,6 +379,7 @@
 				F75EE2712F436EE7009908F1 /* Scripts */,
 				F75EE2012F436EE7009908F1 /* include */,
 				F79000202FB0000000000020 /* NodeJSRuntimePlugin */,
+				F79100202FC0000000000020 /* PythonRuntimePlugin */,
 				F75EE2742F436EE7009908F1 /* ToolJSONBridge */,
 				F75EE26B2F436EE7009908F1 /* SamplePlugin */,
 				F75EE2022F436EE7009908F1 /* LICENSE */,
@@ -369,6 +395,7 @@
 			isa = PBXGroup;
 			children = (
 				F79000102FB0000000000010 /* NodeJSRuntimeTool.bundle */,
+				F79100102FC0000000000010 /* PythonRuntimeTool.bundle */,
 				F75EE1F72F436EAB009908F1 /* SamplePluginBundle.plugin */,
 				F75EE2D12F436FA2009908F1 /* libSamplePluginDyLib.dylib */,
 			);
@@ -493,6 +520,38 @@
 			path = examples;
 			sourceTree = "<group>";
 		};
+		F79100202FC0000000000020 /* PythonRuntimePlugin */ = {
+			isa = PBXGroup;
+			children = (
+				F79100212FC0000000000021 /* bundle */,
+				F79100222FC0000000000022 /* examples */,
+				F79100112FC0000000000011 /* CMakeLists.txt */,
+				F79100122FC0000000000012 /* README.md */,
+			);
+			path = PythonRuntimePlugin;
+			sourceTree = "<group>";
+		};
+		F79100212FC0000000000021 /* bundle */ = {
+			isa = PBXGroup;
+			children = (
+				F79100132FC0000000000013 /* CMakeLists.txt */,
+				F79100142FC0000000000014 /* PythonRuntimeHandler.h */,
+				F79100152FC0000000000015 /* PythonRuntimeHandler.mm */,
+				F79100162FC0000000000016 /* PluginMain.mm */,
+				F79100172FC0000000000017 /* ToolDescriptor.c */,
+			);
+			path = bundle;
+			sourceTree = "<group>";
+		};
+		F79100222FC0000000000022 /* examples */ = {
+			isa = PBXGroup;
+			children = (
+				F79100182FC0000000000018 /* echo_tool.py */,
+				F79100192FC0000000000019 /* python_stdlib_tool.py */,
+			);
+			path = examples;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -566,6 +625,25 @@
 			productReference = F79000102FB0000000000010 /* NodeJSRuntimeTool.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
+		F79100402FC0000000000040 /* PythonRuntimeTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F79100522FC0000000000052 /* Build configuration list for PBXNativeTarget "PythonRuntimeTool" */;
+			buildPhases = (
+				F79100302FC0000000000030 /* Sources */,
+				F79100312FC0000000000031 /* Frameworks */,
+				F79100322FC0000000000032 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PythonRuntimeTool;
+			packageProductDependencies = (
+			);
+			productName = PythonRuntimeTool;
+			productReference = F79100102FC0000000000010 /* PythonRuntimeTool.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -582,6 +660,9 @@
 						CreatedOnToolsVersion = 26.2;
 					};
 					F79000402FB0000000000040 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					F79100402FC0000000000040 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -601,6 +682,7 @@
 			projectRoot = "";
 			targets = (
 				F79000402FB0000000000040 /* NodeJSRuntimeTool */,
+				F79100402FC0000000000040 /* PythonRuntimeTool */,
 				F75EE1F62F436EAB009908F1 /* SamplePluginBundle */,
 				F75EE2D02F436FA2009908F1 /* SamplePluginDyLib */,
 			);
@@ -616,6 +698,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F79000322FB0000000000032 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F79100322FC0000000000032 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -655,6 +744,17 @@
 				F79000042FB0000000000004 /* NodeJSRuntimeHandler.mm in Sources */,
 				F79000022FB0000000000002 /* PluginMain.mm in Sources */,
 				F79000032FB0000000000003 /* ToolDescriptor.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F79100302FC0000000000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F79100012FC0000000000001 /* ToolJSONBridge.mm in Sources */,
+				F79100042FC0000000000004 /* PythonRuntimeHandler.mm in Sources */,
+				F79100022FC0000000000002 /* PluginMain.mm in Sources */,
+				F79100032FC0000000000003 /* ToolDescriptor.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -800,7 +900,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - Sample Plugin";
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio - Sample Plugin";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
@@ -826,7 +926,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 83NQU389JN;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - Sample Plugin";
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio - Sample Plugin";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
@@ -893,7 +993,7 @@
 					"$(SRCROOT)/ToolJSONBridge",
 					"$(SRCROOT)/NodeJSRuntimePlugin/bundle",
 				);
-				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - NodeJS Runtime Tool";
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio - NodeJS Runtime Tool";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
@@ -924,7 +1024,7 @@
 					"$(SRCROOT)/ToolJSONBridge",
 					"$(SRCROOT)/NodeJSRuntimePlugin/bundle",
 				);
-				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio ToolSDK - NodeJS Runtime Tool";
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio - NodeJS Runtime Tool";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
@@ -932,6 +1032,68 @@
 				OTHER_CFLAGS = "-DTOOL_BUNDLE";
 				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.NodeJSRuntimeTool;
 				PRODUCT_NAME = NodeJSRuntimeTool;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		F79100502FC0000000000050 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/ToolJSONBridge",
+					"$(SRCROOT)/PythonRuntimePlugin/bundle",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio - Python Runtime Tool";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = "-DTOOL_BUNDLE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.PythonRuntimeTool;
+				PRODUCT_NAME = PythonRuntimeTool;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		F79100512FC0000000000051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 83NQU389JN;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/ToolJSONBridge",
+					"$(SRCROOT)/PythonRuntimePlugin/bundle",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "EoF MCP Studio - Python Runtime Tool";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = "-DTOOL_BUNDLE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.eof.tools.mcpstudio.ToolSDK.PythonRuntimeTool;
+				PRODUCT_NAME = PythonRuntimeTool;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = YES;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -975,6 +1137,15 @@
 			buildConfigurations = (
 				F79000502FB0000000000050 /* Debug */,
 				F79000512FB0000000000051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F79100522FC0000000000052 /* Build configuration list for PBXNativeTarget "PythonRuntimeTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F79100502FC0000000000050 /* Debug */,
+				F79100512FC0000000000051 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

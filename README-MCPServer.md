@@ -91,7 +91,7 @@ Content-Type: application/json
 
 ## License
 
-Copyright © 2026 EoF Software Labs. All rights reserved.
+Copyright © 2026 EoF Software Lab. All rights reserved.
 
 ## Troubleshooting
 
