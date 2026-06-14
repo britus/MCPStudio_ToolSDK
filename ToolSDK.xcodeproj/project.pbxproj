@@ -84,9 +84,7 @@
 		F75AC4082FAF73220008BE10 /* message context protocol (mcp) specification.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "message context protocol (mcp) specification.json"; sourceTree = "<group>"; };
 		F75AC40A2FAF73220008BE10 /* clang-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clang-syntax-check.json"; sourceTree = "<group>"; };
 		F75AC40B2FAF73220008BE10 /* cmake-standard-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "cmake-standard-config.json"; sourceTree = "<group>"; };
-		F75AC40C2FAF73220008BE10 /* code-review-file-list.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "code-review-file-list.json"; sourceTree = "<group>"; };
 		F75AC40D2FAF73220008BE10 /* make-standard-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "make-standard-build.json"; sourceTree = "<group>"; };
-		F75AC40E2FAF73220008BE10 /* project-tree-code-review.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "project-tree-code-review.json"; sourceTree = "<group>"; };
 		F75AC40F2FAF73220008BE10 /* qt-make-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-make-build.json"; sourceTree = "<group>"; };
 		F75AC4102FAF73220008BE10 /* qt-qmake-create-gui-app-test-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-create-gui-app-test-build.json"; sourceTree = "<group>"; };
 		F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-generate-makefile.json"; sourceTree = "<group>"; };
@@ -98,7 +96,6 @@
 		F75AC4182FAF73220008BE10 /* analyze_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = analyze_directory.json; sourceTree = "<group>"; };
 		F75AC4192FAF73220008BE10 /* build_with_xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = build_with_xcode.json; sourceTree = "<group>"; };
 		F75AC41A2FAF73220008BE10 /* check_with_gcc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = check_with_gcc.json; sourceTree = "<group>"; };
-		F75AC41B2FAF73220008BE10 /* check_with_xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = check_with_xcode.json; sourceTree = "<group>"; };
 		F75AC41C2FAF73220008BE10 /* clang_check_syntax.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_check_syntax.json; sourceTree = "<group>"; };
 		F75AC41D2FAF73220008BE10 /* clang_compile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_compile.json; sourceTree = "<group>"; };
 		F75AC41E2FAF73220008BE10 /* clang_make.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_make.json; sourceTree = "<group>"; };
@@ -124,18 +121,13 @@
 		F75AC4322FAF73220008BE10 /* library_handler.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = library_handler.json; sourceTree = "<group>"; };
 		F75AC4332FAF73220008BE10 /* list_calendars.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_calendars.json; sourceTree = "<group>"; };
 		F75AC4342FAF73220008BE10 /* list_contacts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_contacts.json; sourceTree = "<group>"; };
-		F75AC4352FAF73220008BE10 /* list_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_directory.json; sourceTree = "<group>"; };
 		F75AC4362FAF73220008BE10 /* list_events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_events.json; sourceTree = "<group>"; };
 		F75AC4372FAF73220008BE10 /* list_files.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_files.json; sourceTree = "<group>"; };
 		F75AC4382FAF73220008BE10 /* list_reminder_lists.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_reminder_lists.json; sourceTree = "<group>"; };
 		F75AC4392FAF73220008BE10 /* list_reminders.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_reminders.json; sourceTree = "<group>"; };
-		F75AC43A2FAF73220008BE10 /* mcp_resource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mcp_resource.json; sourceTree = "<group>"; };
 		F75AC43B2FAF73220008BE10 /* mkdir.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mkdir.json; sourceTree = "<group>"; };
-		F75AC43C2FAF73220008BE10 /* open_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = open_file.json; sourceTree = "<group>"; };
 		F75AC43D2FAF73220008BE10 /* qmake_build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = qmake_build.json; sourceTree = "<group>"; };
 		F75AC43E2FAF73220008BE10 /* read_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = read_file.json; sourceTree = "<group>"; };
-		F75AC43F2FAF73220008BE10 /* read_file_content.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = read_file_content.json; sourceTree = "<group>"; };
-		F75AC4402FAF73220008BE10 /* save_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = save_file.json; sourceTree = "<group>"; };
 		F75AC4412FAF73220008BE10 /* scrape_web_page.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = scrape_web_page.json; sourceTree = "<group>"; };
 		F75AC4422FAF73220008BE10 /* shell_call.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = shell_call.json; sourceTree = "<group>"; };
 		F75AC4432FAF73220008BE10 /* skill_execute.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = skill_execute.json; sourceTree = "<group>"; };
@@ -287,9 +279,7 @@
 			children = (
 				F75AC40A2FAF73220008BE10 /* clang-syntax-check.json */,
 				F75AC40B2FAF73220008BE10 /* cmake-standard-config.json */,
-				F75AC40C2FAF73220008BE10 /* code-review-file-list.json */,
 				F75AC40D2FAF73220008BE10 /* make-standard-build.json */,
-				F75AC40E2FAF73220008BE10 /* project-tree-code-review.json */,
 				F75AC40F2FAF73220008BE10 /* qt-make-build.json */,
 				F75AC4102FAF73220008BE10 /* qt-qmake-create-gui-app-test-build.json */,
 				F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */,
@@ -310,7 +300,6 @@
 				F75AC4182FAF73220008BE10 /* analyze_directory.json */,
 				F75AC4192FAF73220008BE10 /* build_with_xcode.json */,
 				F75AC41A2FAF73220008BE10 /* check_with_gcc.json */,
-				F75AC41B2FAF73220008BE10 /* check_with_xcode.json */,
 				F75AC41C2FAF73220008BE10 /* clang_check_syntax.json */,
 				F75AC41D2FAF73220008BE10 /* clang_compile.json */,
 				F75AC41E2FAF73220008BE10 /* clang_make.json */,
@@ -336,19 +325,14 @@
 				F75AC4322FAF73220008BE10 /* library_handler.json */,
 				F75AC4332FAF73220008BE10 /* list_calendars.json */,
 				F75AC4342FAF73220008BE10 /* list_contacts.json */,
-				F75AC4352FAF73220008BE10 /* list_directory.json */,
 				F75AC4362FAF73220008BE10 /* list_events.json */,
 				F75AC4372FAF73220008BE10 /* list_files.json */,
 				F75AC4382FAF73220008BE10 /* list_reminder_lists.json */,
 				F75AC4392FAF73220008BE10 /* list_reminders.json */,
-				F75AC43A2FAF73220008BE10 /* mcp_resource.json */,
 				F75AC43B2FAF73220008BE10 /* mkdir.json */,
 				F791001B2FC000000000001B /* python_runtime.json */,
-				F75AC43C2FAF73220008BE10 /* open_file.json */,
 				F75AC43D2FAF73220008BE10 /* qmake_build.json */,
 				F75AC43E2FAF73220008BE10 /* read_file.json */,
-				F75AC43F2FAF73220008BE10 /* read_file_content.json */,
-				F75AC4402FAF73220008BE10 /* save_file.json */,
 				F75AC4412FAF73220008BE10 /* scrape_web_page.json */,
 				F75AC4422FAF73220008BE10 /* shell_call.json */,
 				F75AC4432FAF73220008BE10 /* skill_execute.json */,
