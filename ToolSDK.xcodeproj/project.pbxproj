@@ -82,17 +82,6 @@
 		F75AC4052FAF73220008BE10 /* create_source_doc_singe_dir.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_source_doc_singe_dir.json; sourceTree = "<group>"; };
 		F75AC4072FAF73220008BE10 /* eof mcp studio home page.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "eof mcp studio home page.json"; sourceTree = "<group>"; };
 		F75AC4082FAF73220008BE10 /* message context protocol (mcp) specification.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "message context protocol (mcp) specification.json"; sourceTree = "<group>"; };
-		F75AC40A2FAF73220008BE10 /* clang-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clang-syntax-check.json"; sourceTree = "<group>"; };
-		F75AC40B2FAF73220008BE10 /* cmake-standard-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "cmake-standard-config.json"; sourceTree = "<group>"; };
-		F75AC40D2FAF73220008BE10 /* make-standard-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "make-standard-build.json"; sourceTree = "<group>"; };
-		F75AC40F2FAF73220008BE10 /* qt-make-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-make-build.json"; sourceTree = "<group>"; };
-		F75AC4102FAF73220008BE10 /* qt-qmake-create-gui-app-test-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-create-gui-app-test-build.json"; sourceTree = "<group>"; };
-		F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-generate-makefile.json"; sourceTree = "<group>"; };
-		F75AC4122FAF73220008BE10 /* swift-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swift-syntax-check.json"; sourceTree = "<group>"; };
-		F75AC4132FAF73220008BE10 /* xcodebuild-full-debug-project-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-full-debug-project-build.json"; sourceTree = "<group>"; };
-		F75AC4142FAF73220008BE10 /* xcodebuild-full-release-project-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-full-release-project-build.json"; sourceTree = "<group>"; };
-		F75AC4152FAF73220008BE10 /* xcodebuild-scheme-debug-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-scheme-debug-build.json"; sourceTree = "<group>"; };
-		F75AC4162FAF73220008BE10 /* xcodebuild-scheme-release-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-scheme-release-build.json"; sourceTree = "<group>"; };
 		F75AC4182FAF73220008BE10 /* analyze_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = analyze_directory.json; sourceTree = "<group>"; };
 		F75AC4192FAF73220008BE10 /* build_with_xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = build_with_xcode.json; sourceTree = "<group>"; };
 		F75AC41A2FAF73220008BE10 /* check_with_gcc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = check_with_gcc.json; sourceTree = "<group>"; };
@@ -101,7 +90,6 @@
 		F75AC41E2FAF73220008BE10 /* clang_make.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = clang_make.json; sourceTree = "<group>"; };
 		F75AC41F2FAF73220008BE10 /* cmake_build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cmake_build.json; sourceTree = "<group>"; };
 		F75AC4202FAF73220008BE10 /* create_contact.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_contact.json; sourceTree = "<group>"; };
-		F75AC4212FAF73220008BE10 /* create_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_directory.json; sourceTree = "<group>"; };
 		F75AC4222FAF73220008BE10 /* create_event.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_event.json; sourceTree = "<group>"; };
 		F75AC4232FAF73220008BE10 /* create_reminder.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = create_reminder.json; sourceTree = "<group>"; };
 		F75AC4242FAF73220008BE10 /* delete_contact.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_contact.json; sourceTree = "<group>"; };
@@ -170,7 +158,6 @@
 		F79000172FB0000000000017 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
 		F79000182FB0000000000018 /* echo_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = echo_tool.js; sourceTree = "<group>"; };
 		F79000192FB0000000000019 /* node_stdlib_tool.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = node_stdlib_tool.js; sourceTree = "<group>"; };
-		F790001A2FB000000000001A /* nodejs-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nodejs-runtime-resource-access.json"; sourceTree = "<group>"; };
 		F79100102FC0000000000010 /* PythonRuntimeTool.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PythonRuntimeTool.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		F79100112FC0000000000011 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		F79100122FC0000000000012 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -181,8 +168,36 @@
 		F79100172FC0000000000017 /* ToolDescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ToolDescriptor.c; sourceTree = "<group>"; };
 		F79100182FC0000000000018 /* echo_tool.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = echo_tool.py; sourceTree = "<group>"; };
 		F79100192FC0000000000019 /* python_stdlib_tool.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = python_stdlib_tool.py; sourceTree = "<group>"; };
-		F791001A2FC000000000001A /* python-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "python-runtime-resource-access.json"; sourceTree = "<group>"; };
 		F791001B2FC000000000001B /* python_runtime.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = python_runtime.json; sourceTree = "<group>"; };
+		F79D9FD62FDE5A56003E58B8 /* ast-grep-rule-generator.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ast-grep-rule-generator.json"; sourceTree = "<group>"; };
+		F79D9FD72FDE5A56003E58B8 /* build-run-debug-xcode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "build-run-debug-xcode.json"; sourceTree = "<group>"; };
+		F79D9FD82FDE5A56003E58B8 /* clang-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clang-syntax-check.json"; sourceTree = "<group>"; };
+		F79D9FD92FDE5A56003E58B8 /* cmake-standard-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "cmake-standard-config.json"; sourceTree = "<group>"; };
+		F79D9FDA2FDE5A56003E58B8 /* driving-duration-estimator.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "driving-duration-estimator.json"; sourceTree = "<group>"; };
+		F79D9FDB2FDE5A56003E58B8 /* frontend-design.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "frontend-design.json"; sourceTree = "<group>"; };
+		F79D9FDC2FDE5A56003E58B8 /* macos-app-telemetry.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "macos-app-telemetry.json"; sourceTree = "<group>"; };
+		F79D9FDD2FDE5A56003E58B8 /* macos-appkit-interop.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "macos-appkit-interop.json"; sourceTree = "<group>"; };
+		F79D9FDE2FDE5A56003E58B8 /* macos-packaging-notarization.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "macos-packaging-notarization.json"; sourceTree = "<group>"; };
+		F79D9FDF2FDE5A56003E58B8 /* macos-signing-entitlements.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "macos-signing-entitlements.json"; sourceTree = "<group>"; };
+		F79D9FE02FDE5A56003E58B8 /* macos-window-management.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "macos-window-management.json"; sourceTree = "<group>"; };
+		F79D9FE12FDE5A56003E58B8 /* make-standard-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "make-standard-build.json"; sourceTree = "<group>"; };
+		F79D9FE22FDE5A56003E58B8 /* mcp_studio_user_doc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mcp_studio_user_doc.json; sourceTree = "<group>"; };
+		F79D9FE32FDE5A56003E58B8 /* nodejs-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nodejs-runtime-resource-access.json"; sourceTree = "<group>"; };
+		F79D9FE42FDE5A56003E58B8 /* python-runtime-resource-access.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "python-runtime-resource-access.json"; sourceTree = "<group>"; };
+		F79D9FE52FDE5A56003E58B8 /* qt-make-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-make-build.json"; sourceTree = "<group>"; };
+		F79D9FE62FDE5A56003E58B8 /* qt-qmake-create-gui-app-test-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-create-gui-app-test-build.json"; sourceTree = "<group>"; };
+		F79D9FE72FDE5A56003E58B8 /* qt-qmake-generate-makefile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "qt-qmake-generate-makefile.json"; sourceTree = "<group>"; };
+		F79D9FE82FDE5A56003E58B8 /* review_code_in_specified_directory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = review_code_in_specified_directory.json; sourceTree = "<group>"; };
+		F79D9FE92FDE5A56003E58B8 /* review_code_in_specified_file_list.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = review_code_in_specified_file_list.json; sourceTree = "<group>"; };
+		F79D9FEA2FDE5A56003E58B8 /* swift-syntax-check.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swift-syntax-check.json"; sourceTree = "<group>"; };
+		F79D9FEB2FDE5A56003E58B8 /* swiftpm-macos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swiftpm-macos.json"; sourceTree = "<group>"; };
+		F79D9FEC2FDE5A56003E58B8 /* swiftui-patterns-ios.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swiftui-patterns-ios.json"; sourceTree = "<group>"; };
+		F79D9FED2FDE5A56003E58B8 /* swiftui-patterns-macos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swiftui-patterns-macos.json"; sourceTree = "<group>"; };
+		F79D9FEE2FDE5A56003E58B8 /* swiftui-view-refactor-macos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swiftui-view-refactor-macos.json"; sourceTree = "<group>"; };
+		F79D9FEF2FDE5A56003E58B8 /* xcodebuild-full-debug-project-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-full-debug-project-build.json"; sourceTree = "<group>"; };
+		F79D9FF02FDE5A56003E58B8 /* xcodebuild-full-release-project-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-full-release-project-build.json"; sourceTree = "<group>"; };
+		F79D9FF12FDE5A56003E58B8 /* xcodebuild-scheme-debug-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-scheme-debug-build.json"; sourceTree = "<group>"; };
+		F79D9FF22FDE5A56003E58B8 /* xcodebuild-scheme-release-build.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "xcodebuild-scheme-release-build.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,19 +292,35 @@
 		F75AC4172FAF73220008BE10 /* Skills */ = {
 			isa = PBXGroup;
 			children = (
-				F75AC40A2FAF73220008BE10 /* clang-syntax-check.json */,
-				F75AC40B2FAF73220008BE10 /* cmake-standard-config.json */,
-				F75AC40D2FAF73220008BE10 /* make-standard-build.json */,
-				F75AC40F2FAF73220008BE10 /* qt-make-build.json */,
-				F75AC4102FAF73220008BE10 /* qt-qmake-create-gui-app-test-build.json */,
-				F75AC4112FAF73220008BE10 /* qt-qmake-generate-makefile.json */,
-				F75AC4122FAF73220008BE10 /* swift-syntax-check.json */,
-				F790001A2FB000000000001A /* nodejs-runtime-resource-access.json */,
-				F791001A2FC000000000001A /* python-runtime-resource-access.json */,
-				F75AC4132FAF73220008BE10 /* xcodebuild-full-debug-project-build.json */,
-				F75AC4142FAF73220008BE10 /* xcodebuild-full-release-project-build.json */,
-				F75AC4152FAF73220008BE10 /* xcodebuild-scheme-debug-build.json */,
-				F75AC4162FAF73220008BE10 /* xcodebuild-scheme-release-build.json */,
+				F79D9FD62FDE5A56003E58B8 /* ast-grep-rule-generator.json */,
+				F79D9FD72FDE5A56003E58B8 /* build-run-debug-xcode.json */,
+				F79D9FD82FDE5A56003E58B8 /* clang-syntax-check.json */,
+				F79D9FD92FDE5A56003E58B8 /* cmake-standard-config.json */,
+				F79D9FDA2FDE5A56003E58B8 /* driving-duration-estimator.json */,
+				F79D9FDB2FDE5A56003E58B8 /* frontend-design.json */,
+				F79D9FDC2FDE5A56003E58B8 /* macos-app-telemetry.json */,
+				F79D9FDD2FDE5A56003E58B8 /* macos-appkit-interop.json */,
+				F79D9FDE2FDE5A56003E58B8 /* macos-packaging-notarization.json */,
+				F79D9FDF2FDE5A56003E58B8 /* macos-signing-entitlements.json */,
+				F79D9FE02FDE5A56003E58B8 /* macos-window-management.json */,
+				F79D9FE12FDE5A56003E58B8 /* make-standard-build.json */,
+				F79D9FE22FDE5A56003E58B8 /* mcp_studio_user_doc.json */,
+				F79D9FE32FDE5A56003E58B8 /* nodejs-runtime-resource-access.json */,
+				F79D9FE42FDE5A56003E58B8 /* python-runtime-resource-access.json */,
+				F79D9FE52FDE5A56003E58B8 /* qt-make-build.json */,
+				F79D9FE62FDE5A56003E58B8 /* qt-qmake-create-gui-app-test-build.json */,
+				F79D9FE72FDE5A56003E58B8 /* qt-qmake-generate-makefile.json */,
+				F79D9FE82FDE5A56003E58B8 /* review_code_in_specified_directory.json */,
+				F79D9FE92FDE5A56003E58B8 /* review_code_in_specified_file_list.json */,
+				F79D9FEA2FDE5A56003E58B8 /* swift-syntax-check.json */,
+				F79D9FEB2FDE5A56003E58B8 /* swiftpm-macos.json */,
+				F79D9FEC2FDE5A56003E58B8 /* swiftui-patterns-ios.json */,
+				F79D9FED2FDE5A56003E58B8 /* swiftui-patterns-macos.json */,
+				F79D9FEE2FDE5A56003E58B8 /* swiftui-view-refactor-macos.json */,
+				F79D9FEF2FDE5A56003E58B8 /* xcodebuild-full-debug-project-build.json */,
+				F79D9FF02FDE5A56003E58B8 /* xcodebuild-full-release-project-build.json */,
+				F79D9FF12FDE5A56003E58B8 /* xcodebuild-scheme-debug-build.json */,
+				F79D9FF22FDE5A56003E58B8 /* xcodebuild-scheme-release-build.json */,
 			);
 			path = Skills;
 			sourceTree = "<group>";
@@ -305,7 +336,6 @@
 				F75AC41E2FAF73220008BE10 /* clang_make.json */,
 				F75AC41F2FAF73220008BE10 /* cmake_build.json */,
 				F75AC4202FAF73220008BE10 /* create_contact.json */,
-				F75AC4212FAF73220008BE10 /* create_directory.json */,
 				F75AC4222FAF73220008BE10 /* create_event.json */,
 				F75AC4232FAF73220008BE10 /* create_reminder.json */,
 				F75AC4242FAF73220008BE10 /* delete_contact.json */,
