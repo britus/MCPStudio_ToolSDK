@@ -1,0 +1,83 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-07-01T03:11:47.201Z",
+    "priority" : 0.9
+  },
+  "description" : "Create and normalize a draft multi-agent workflow without saving it. Use this before validating or committing a generated workflow.",
+  "execHandler" : "MultiAgentWorkflowDraftHandler",
+  "execMethod" : "createMultiAgentWorkflowDraft",
+  "inputSchema" : {
+    "properties" : {
+      "draft" : {
+        "description" : "Workflow draft object with name, summary, goal, pattern, systemInstruction, agents, and connections. If agents are omitted, a coordinator\/specialist draft is generated from the goal.",
+        "name" : "draft",
+        "type" : "object"
+      },
+      "draft_json" : {
+        "description" : "Alternative JSON string representation of the workflow draft.",
+        "name" : "draft_json",
+        "type" : "string"
+      },
+      "goal" : {
+        "description" : "High-level workflow goal used when no draft object is supplied.",
+        "name" : "goal",
+        "type" : "string"
+      },
+      "name" : {
+        "description" : "Workflow name used when no draft object is supplied.",
+        "name" : "name",
+        "type" : "string"
+      }
+    },
+    "type" : "object"
+  },
+  "name" : "create_multi_agent_workflow_draft",
+  "outputSchema" : {
+    "properties" : {
+      "draft" : {
+        "description" : "Normalized workflow draft preview.",
+        "name" : "draft",
+        "type" : "object"
+      },
+      "draft_id" : {
+        "description" : "Temporary draft identifier that can be passed to validate or commit.",
+        "name" : "draft_id",
+        "type" : "string"
+      },
+      "errors" : {
+        "description" : "Validation errors.",
+        "name" : "errors",
+        "type" : "array"
+      },
+      "success" : {
+        "description" : "Operation status.",
+        "name" : "success",
+        "type" : "boolean"
+      },
+      "valid" : {
+        "description" : "Whether the draft can be committed.",
+        "name" : "valid",
+        "type" : "boolean"
+      },
+      "warnings" : {
+        "description" : "Validation warnings.",
+        "name" : "warnings",
+        "type" : "array"
+      }
+    },
+    "required" : [
+      "success",
+      "draft",
+      "draft_id",
+      "valid"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
+}

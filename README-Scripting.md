@@ -5,19 +5,18 @@
 ## MCP Studio Tool SDK - Scripting Reference Guide
 
 ### Overview
-
-This document provides a comprehensive summary of all available tools, their functions, parameters, and usage patterns for the MCP Studio Tool SDK environment.
+This document provides a comprehensive summary of all available tools, their functions, parameters, and usage patterns for the MCP Studio Tool SDK environment. All tool scripts follow consistent patterns for reliability and maintainability.
 
 ---
 
 ## Table of Contents
-
 1. [Import Instructions](#import-instructions)
 2. [Tool Entry Function Requirements](#tool-entry-function-requirements)
-3. [Built-in Tools Reference](#built-in-tools-reference)
-4. [Code Patterns and Best Practices](#code-patterns-and-best-practices)
-5. [Error Handling](#error-handling)
-6. [Result Format Specification](#result-format-specification)
+3. [Shared Functions Reference](#shared-functions-reference)
+4. [Built-in Tools Reference](#built-in-tools-reference)
+5. [Code Patterns and Best Practices](#code-patterns-and-best-practices)
+6. [Error Handling](#error-handling)
+7. [Result Format Specification](#result-format-specification)
 
 ---
 
@@ -28,18 +27,16 @@ All tool scripts are located in the Scripts directory and can be imported using 
 ```javascript
 // Import shared functions (required for all tools)
 const shared = require('sharedFunctions');
-
 // Import specific tools
 const checkWithXcode = require('checkWithXcode').checkWithXcode;
 const shellCall = require('shellCall').shellCall;
 const analyzeDirectory = require('analyzeDirectory').analyzeDirectory;
-
 // Access all exports at once
 const tools = {
-    checkWithXcode: require('checkWithXcode'),
-    shellCall: require('shellCall'),
-    fileRead: require('fileRead'),
-    // ... etc
+  checkWithXcode: require('checkWithXcode'),
+  shellCall: require('shellCall'),
+  fileRead: require('fileRead'),
+  // ... etc
 };
 ```
 
@@ -51,64 +48,136 @@ Every tool script MUST implement the toolEntry function with the following signa
 
 ```javascript
 function toolEntry(sid, handlerName, jsonParams) {
-    // Required signature
-    // sid: session ID string
-    // handlerName: handler name requested by caller
-    // jsonParams: raw JSON parameters as string from MCPStudio controller
-    // Return JSON string or use MCPStudio.setToolResult() to set result object then return null
+// Required signature
+// sid: session ID string
+// handlerName: handler name requested by caller
+// jsonParams: raw JSON parameters as string from MCPStudio controller
+// Return JSON string or use MCPStudio.setToolResult() to set result object then return null
 }
 ```
 
-### Implementation Example
+### Implementation Example (tool_entry.js)
 
 ```javascript
+// ===================================================================
+// Tool entry main script - FIXED VERSION
+// ===================================================================
+// Import shared functions
+const shared = require('sharedFunctions');
+// Toolchain
+const analyzedir = require('analyzeDirectory');
+const httpTools = require('httpTools');
+const fetchPrompt = require('fetchPrompt');
+const fetchResource = require('fetchResource');
+const checkWithXcode = require('checkWithXcode');
+const clangTools = require('clangTools');
+const shellCall = require('shellCall');
+const skillExecute = require('skill_execute');
+const cmakeBuild = require('cmakeBuild');
+const qmakeBuild = require('qmakeBuild');
+// ... register all other tools
+const HANDLERS = {
+  // File based Toolchain
+  analyzeDirectory: (params) => analyzedir.analyzeDirectory(params),
+  mkdir: (params) => mkdir.mkdir(params),
+  checkWithXcode: (params) => checkWithXcode.checkWithXcode(params),
+  shellCall: (params) => shellCall.shellCall(params),
+  // ... etc
+};
+const VALID_HANDLERS = Object.keys(HANDLERS);
+
+function getHandler(handlerName) {
+  if (!VALID_HANDLERS.includes(handlerName)) {
+    return null;
+  }
+  return HANDLERS[handlerName];
+}
+
+function parseParams(jsonParams) {
+  if (!jsonParams) {
+    throw new Error("Missing jsonParams parameter");
+  }
+  try {
+    return JSON.parse(jsonParams);
+  } catch (e) {
+    throw new Error(`Invalid JSON: ${e.message || e}`);
+  }
+}
+
+/**
+* Entry point for all MCP script tool calls
+* @param {string} sid - Session identifier
+* @param {string} handlerName - Method/handler name to execute
+* @param {string} jsonParams - JSON string with parameters
+* @returns {string} JSON result or plain text
+*/
 function toolEntry(sid, handlerName, jsonParams) {
-    var params = JSON.parse(jsonParams); // Parse raw JSON string
-    
-    // Validate handler name exists in tool exports
-    if (!toolExports[handlerName]) {
-        MCPStudio.setToolResult({
-            text: "Error: Handler not found: " + handlerName,
-            metadata: {
-                success: false,
-                code: "HANDLER_NOT_FOUND"
-            }
-        });
-        return null;
+  console.log(`[toolEntry]: sid=${sid || 'sid.unknown'} handler=${handlerName || 'Unknown'}`);
+  try {
+    const handler = getHandler(handlerName);
+    if (!handler) {
+      return shared.error(`Unknown handler: ${handlerName}.`);
     }
-    
-    // Execute the requested handler with parsed parameters
-    try {
-        var result = toolExports[handlerName](params);
-        
-        if (result === null) {
-            // Handler already set result via MCPStudio.setToolResult()
-            return null;
-        }
-        
-        // Return result as JSON string or let handler call MCPStudio.setToolResult()
-        if (typeof result === 'object') {
-            var jsonResult = JSON.stringify(result);
-            MCPStudio.setToolResult(jsonResult);
-            return null;
-        }
-        
-        return result;
-    } catch (error) {
-        MCPStudio.setToolResult({
-            text: "Error executing handler: " + error.message,
-            metadata: {
-                success: false,
-                code: "EXECUTION_ERROR",
-                error: error.message
-            }
-        });
-        return null;
-    }
+    const params = parseParams(jsonParams);
+    return handler(params);
+  } catch(e) {
+    console.error(`[toolEntry] ${e.message || e}`);
+    return shared.error(e.message || e.toString());
+  }
 }
 
 module.exports = { toolEntry };
 ```
+
+---
+
+## Shared Functions Reference
+
+### Core Utility Functions (sharedFunctions.js)
+
+All tools should import and use the shared functions for consistent behavior:
+
+```javascript
+const shared = require('sharedFunctions');
+```
+
+#### Result Creation Functions
+
+| Function | Description | Returns |
+|----------|-------------|---------|
+| `success(data, metadata)` | Creates a success result with data | JSON string |
+| `error(message)` | Creates an error result with message | JSON string |
+| `createSuccessResult(data, metadata)` | Creates success result (verbose) | JSON string |
+| `createErrorResult(errorMessage)` | Creates error result (verbose) | JSON string |
+| `setToolResultPayload(text, metadata)` | Sets tool result via MCPStudio bridge | null |
+| `setSuccessResult(data, metadata)` | Sets success result via MCPStudio | null |
+| `setErrorResult(errorMessage, metadata)` | Sets error result via MCPStudio | null |
+
+#### Validation Functions
+
+| Function | Description | Returns |
+|----------|-------------|---------|
+| `validatePath(rawPath, parameterName, options)` | Validates path string | `{ok: bool, message: string, value: string}` |
+| `validateFilePath(rawPath, parameterName, options)` | Validates file path (required) | Validation result object |
+| `validateDirectoryPath(rawPath, parameterName, options)` | Validates directory path (required) | Validation result object |
+
+#### Helper Functions
+
+| Function | Description | Returns |
+|----------|-------------|---------|
+| `ensureDirectory(path)` | Ensures directory exists, creates if needed | void |
+| `normalizePath(path)` | Normalizes path string | normalized path or null |
+| `joinPath(basePath, childName)` | Joins two path segments | joined path string |
+| `quoteShellArgument(value)` | Quotes shell argument safely | quoted string |
+| `countWords(text)` | Counts words in text | number |
+
+#### Output Access Functions
+
+| Function | Description | Returns |
+|----------|-------------|---------|
+| `getOutput()` | Returns stdout array | Array<string> |
+| `getStandardOutput()` | Returns standard output | Array<string> |
+| `getErrorOutput()` | Returns stderr array | Array<string> |
 
 ---
 
@@ -120,17 +189,16 @@ module.exports = { toolEntry };
 
 ```javascript
 function checkWithXcode(params) {
-    // Required parameters:
-    var projectName = params.projectName || "";
-    var projectDir = params.projectDir || "";
-    
-    // Optional parameters:
-    var scheme = params.scheme || "";
-    var configuration = params.configuration || "Debug";
-    var platform = params.platform || "macosx";
-    var codesign = params.codesign || "";
-    var cleanBuild = params.clean === true;
-    var showOperationLogs = params.showOperationLogs === true;
+// Required parameters:
+var projectName = params.projectName || "";
+var projectDir = params.projectDir || "";
+// Optional parameters:
+var scheme = params.scheme || "";
+var configuration = params.configuration || "Debug";
+var platform = params.platform || "macosx";
+var codesign = params.codesign || "";
+var cleanBuild = params.clean === true;
+var showOperationLogs = params.showOperationLogs === true;
 }
 ```
 
@@ -150,13 +218,13 @@ function checkWithXcode(params) {
 **Usage Example**:
 ```javascript
 const result = checkWithXcode({
-    projectName: "MyProject",
-    projectDir: "/path/to/project",
-    scheme: "Debug",
-    configuration: "Release",
-    platform: "macosx",
-    clean: true,
-    showOperationLogs: false
+  projectName: "MyProject",
+  projectDir: "/path/to/project",
+  scheme: "Debug",
+  configuration: "Release",
+  platform: "macosx",
+  clean: true,
+  showOperationLogs: false
 });
 ```
 
@@ -168,12 +236,11 @@ const result = checkWithXcode({
 
 ```javascript
 function shellCall(params) {
-    // Required parameters:
-    var command = params.command || "";
-    
-    // Optional parameters:
-    var parameters = params.parameters || [];
-    var shell = params.shell || "/bin/bash";
+// Required parameters:
+var command = params.command || "";
+// Optional parameters:
+var parameters = params.parameters || [];
+var shell = params.shell || "/bin/bash";
 }
 ```
 
@@ -189,20 +256,18 @@ function shellCall(params) {
 ```javascript
 // Single command
 const result = shellCall({
-    command: "pwd"
+  command: "pwd"
 });
-
 // Command with parameters
 const result = shellCall({
-    command: "ls",
-    parameters: ["-la"]
+  command: "ls",
+  parameters: ["-la"]
 });
-
 // Custom shell
 const result = shellCall({
-    command: "echo",
-    parameters: ["Hello World"],
-    shell: "/bin/sh"
+  command: "echo",
+  parameters: ["Hello World"],
+  shell: "/bin/sh"
 });
 ```
 
@@ -214,8 +279,8 @@ const result = shellCall({
 
 ```javascript
 function fileRead(params) {
-    var filePath = params.filePath || "";
-    var encoding = params.encoding || "utf-8";
+var filePath = params.filePath || "";
+var encoding = params.encoding || "utf-8";
 }
 ```
 
@@ -229,8 +294,8 @@ function fileRead(params) {
 **Usage Example**:
 ```javascript
 const result = fileRead({
-    filePath: "/path/to/file.txt",
-    encoding: "utf-8"
+  filePath: "/path/to/file.txt",
+  encoding: "utf-8"
 });
 ```
 
@@ -241,10 +306,10 @@ const result = fileRead({
 **Purpose**: Save content to files
 
 ```javascript
-function fileSave(params) {
-    var filePath = params.filePath || "";
-    var content = params.content || "";
-    var encoding = params.encoding || "utf-8";
+function saveFile(params) {
+var filePath = params.file_path || "";
+var content = params.content || "";
+var encoding = params.encoding || "utf-8";
 }
 ```
 
@@ -252,16 +317,16 @@ function fileSave(params) {
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| filePath | string | Yes | - | Absolute or relative path to file |
+| file_path | string | Yes | - | Absolute or relative path to file |
 | content | string | Yes | - | Content to save in file |
 | encoding | string | No | utf-8 | File encoding (utf-8, ascii, etc.) |
 
 **Usage Example**:
 ```javascript
 const result = fileSave({
-    filePath: "/path/to/file.txt",
-    content: "Hello World",
-    encoding: "utf-8"
+  file_path: "/path/to/file.txt",
+  content: "Hello World",
+  encoding: "utf-8"
 });
 ```
 
@@ -273,7 +338,7 @@ const result = fileSave({
 
 ```javascript
 function analyzeDirectory(params) {
-    var dirPath = params.dirPath || "";
+var dirPath = params.dirPath || "";
 }
 ```
 
@@ -286,7 +351,7 @@ function analyzeDirectory(params) {
 **Usage Example**:
 ```javascript
 const result = analyzeDirectory({
-    dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts"
+  dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts"
 });
 ```
 
@@ -298,7 +363,7 @@ const result = analyzeDirectory({
 
 ```javascript
 function fetchResource(params) {
-    var resourceName = params.resourceName || "";
+var resourceName = params.resourceName || "";
 }
 ```
 
@@ -311,19 +376,19 @@ function fetchResource(params) {
 **Usage Example**:
 ```javascript
 const result = fetchResource({
-    resourceName: "sample-document.json"
+  resourceName: "sample-document.json"
 });
 ```
 
 ---
 
-### 7. directoryCreate.js (mkdir)
+### 7. mkdir.js / directoryCreate.js
 
 **Purpose**: Create directories at specified paths
 
 ```javascript
-function directoryCreate(params) {
-    var dirPath = params.dirPath || "";
+function mkdir(params) {
+var dirPath = params.dirPath || "";
 }
 ```
 
@@ -335,8 +400,8 @@ function directoryCreate(params) {
 
 **Usage Example**:
 ```javascript
-const result = directoryCreate({
-    dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/NewFolder"
+const result = mkdir({
+  dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/NewFolder"
 });
 ```
 
@@ -347,8 +412,8 @@ const result = directoryCreate({
 **Purpose**: Delete files or directories
 
 ```javascript
-function fileDelete(params) {
-    var path = params.path || "";
+function deleteFile(params) {
+var path = params.path || "";
 }
 ```
 
@@ -361,19 +426,19 @@ function fileDelete(params) {
 **Usage Example**:
 ```javascript
 const result = fileDelete({
-    path: "/path/to/file.txt"
+  path: "/path/to/file.txt"
 });
 ```
 
 ---
 
-### 9. httpGet.js
+### 9. httpGet.js (via httpTools)
 
 **Purpose**: Fetch/get data from web sites or web services
 
 ```javascript
-function httpGet(params) {
-    var url = params.url || "";
+function fetchData(params) {
+var url = params.url || "";
 }
 ```
 
@@ -382,24 +447,26 @@ function httpGet(params) {
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | url | string | Yes | - | Full qualified URL to fetch data from |
+| headers | Object | No | {} | Optional HTTP headers |
+| saveToFile | string | No | - | Optional file path to save response |
 
 **Usage Example**:
 ```javascript
-const result = httpGet({
-    url: "https://api.example.com/data"
+const result = httpTools("fetchData", {
+  url: "https://api.example.com/data"
 });
 ```
 
 ---
 
-### 10. httpPost.js
+### 10. httpPost.js (via httpTools)
 
 **Purpose**: POST JSON data to web sites or web services
 
 ```javascript
-function httpPost(params) {
-    var url = params.url || "";
-    var data = params.data || {};
+function postData(params) {
+var url = params.url || "";
+var data = params.data || {};
 }
 ```
 
@@ -412,64 +479,24 @@ function httpPost(params) {
 
 **Usage Example**:
 ```javascript
-const result = httpPost({
-    url: "https://api.example.com/submit",
-    data: {
-        "name": "Test",
-        "value": 123
-    }
+const result = httpTools("postData", {
+  url: "https://api.example.com/submit",
+  data: {
+    "name": "Test",
+    "value": 123
+  }
 });
 ```
 
 ---
 
-### 11. plistBuddy.js
-
-**Purpose**: macOS PlistBuddy operations for preference files
-
-```javascript
-function plistBuddy(params) {
-    var filePath = params.filePath || "";
-    var operation = params.operation || "";
-    var key = params.key || "";
-}
-```
-
-**Parameters Table**:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| filePath | string | Yes | - | Path to plist file |
-| operation | string | Yes | - | Operation: get/set/delete/list |
-| key | string | No | - | Plist key to operate on |
-
-**Usage Examples**:
-```javascript
-// Get value
-const result = plistBuddy({
-    filePath: "/path/to/Preferences.plist",
-    operation: "get",
-    key: "KeyToRead"
-});
-
-// Set value
-const result = plistBuddy({
-    filePath: "/path/to/Preferences.plist",
-    operation: "set",
-    key: "KeyToWrite",
-    value: "newValue"
-});
-```
-
----
-
-### 12. fileExists.js
+### 11. fileExists.js
 
 **Purpose**: Check if file exists at specified path
 
 ```javascript
 function fileExists(params) {
-    var path = params.path || "";
+var path = params.path || "";
 }
 ```
 
@@ -482,22 +509,47 @@ function fileExists(params) {
 **Usage Example**:
 ```javascript
 const result = fileExists({
-    path: "/path/to/file.txt"
+  path: "/path/to/file.txt"
 });
 ```
+
+---
+
+### 12. Additional Tools
+
+#### clangTools.js
+- `clangCheckSyntax(params)` - Check C/C++ syntax with clang
+- `clangCompile(params)` - Compile C/C++ code with clang
+- `clangMake(params)` - Run make with clang toolchain
+
+#### cmakeBuild.js
+- `cmakeBuild(params)` - Build project using CMake
+
+#### qmakeBuild.js
+- `qmakeBuild(params)` - Build Qt project using QMake
+
+#### checkWithGcc.js
+- `checkWithGcc(params)` - Build and validate GCC projects
+
+#### gccSettings.js
+- `gccSettings(params)` - Configure GCC compiler settings
+
+#### getGccInfo.js
+- `getGccInfo(params)` - Get GCC compiler information
+
+#### fetchPrompt.js
+- `fetchPrompt(params)` - Fetch MCP prompt resources
 
 ---
 
 ## Code Patterns and Best Practices
 
 ### Pattern 1: Shared Functions Import
-
 All tools must import shared functions for consistent behavior:
 
 ```javascript
 // Required import for all tool scripts
 const shared = require('sharedFunctions');
-
 // Optional: other shared dependencies
 const MCPStudio = require('MCPStudioRuntime');
 ```
@@ -505,71 +557,69 @@ const MCPStudio = require('MCPStudioRuntime');
 ---
 
 ### Pattern 2: Logging Helper Function
-
-Use buildLog() helper in all tools for consistent output:
+Use console.log() in all tools for consistent output (logs to stdOut):
 
 ```javascript
-function buildLog(message) {
-    console.log(message);
-    stdOut.push(message);
+function taskLog(message) {
+  console.log(message);
+  stdOut.push(message);
 }
-```
 
-**Usage**:
-```javascript
-buildLog("=== Tool Name Task ===");
-buildLog("Processing item: " + item);
-buildLog("Operation completed at: " + new Date());
+taskLog("=== Tool Name Task ===");
+taskLog("Processing item: " + item);
+taskLog("Operation completed at: " + new Date());
 ```
 
 ---
 
 ### Pattern 3: Input Validation
-
 Always validate required parameters before execution:
 
 ```javascript
 function myTool(params) {
-    var requiredParam = params.requiredParam || "";
-    
-    // Validate input
-    if (!requiredParam) {
-        return shared.createErrorResult("Missing required parameter: requiredParam");
-    }
-    
-    // Proceed with execution
-    // ...
+  var requiredParam = params.requiredParam || "";
+  // Validate input using shared validation functions
+  var validation = shared.validateFilePath(requiredParam, "requiredParam");
+  if (!validation.ok) {
+    return shared.setErrorResult(validation.message, { operation: "myTool" });
+  }
+  // Proceed with execution
+  // ...
 }
 ```
 
 ---
 
 ### Pattern 4: Result Handling
-
-Use MCPStudio.setToolResult() to communicate results:
+Use MCPStudio.setToolResult() or shared.* functions to communicate results:
 
 ```javascript
-// Success case
+// Success case - using shared helper
+return shared.setSuccessResult(result, {
+  operation: "myTool",
+  path: operationPath
+});
+
+// Or using MCPStudio directly
 MCPStudio.setToolResult(JSON.stringify({
-    text: "Operation completed successfully",
-    metadata: {
-        success: true,
-        path: operationPath,
-        code: operationCode,
-        // ...
-    }
+  text: "Operation completed successfully",
+  metadata: {
+    success: true,
+    code: "OPERATION_SUCCESS",
+    path: operationPath
+  }
 }));
 return null; // Result already set
 
 // Failure case
 MCPStudio.setToolResult(JSON.stringify({
-    text: "Error: Operation failed",
-    metadata: {
-        success: false,
-        code: "OPERATION_FAILED",
-        error: errorMessage,
-        // ...
-    }
+  text: "Error: Operation failed",
+  metadata: {
+    success: false,
+    code: "OPERATION_FAILED",
+    error: errorMessage,
+    path: operationPath
+  }
 }));
 return null;
 ```
@@ -577,35 +627,54 @@ return null;
 ---
 
 ### Pattern 5: Error Creation Helper
-
-Use shared.createErrorResult() for consistent error messages:
+Use shared.error() or shared.setErrorResult() for consistent error messages:
 
 ```javascript
-var errorCode = "MISSING_PARAMETER";
-var errorMessage = "Missing required parameter: " + paramName;
+// Simple error
+return shared.error("Missing required parameter: " + paramName);
 
-MCPStudio.setToolResult(JSON.stringify({
-    text: errorMessage,
-    metadata: {
-        success: false,
-        code: errorCode,
-        // ...
-    }
-}));
-return null;
+// Detailed error with metadata
+return shared.setErrorResult(errorMessage, {
+  operation: "myTool",
+  path: operationPath,
+  code: "MISSING_PARAMETER"
+});
 ```
 
 ---
 
 ### Pattern 6: Command Execution
-
 When executing shell commands, properly escape special characters:
 
 ```javascript
 var command = params.command || "";
 var escapedCommand = command.replace(/"/g, '\\"')
-                            .replace('$', '\\$')
-                            .replace('`', '\\`');
+  .replace('$', '\\$')
+  .replace('`', '\\`');
+```
+
+---
+
+### Pattern 7: Module Exports
+All tool scripts must export their main function:
+
+```javascript
+module.exports = {
+  checkWithXcode,      // Or specific exported function name
+  toolEntry            // Required entry point for tool_entry.js
+};
+```
+
+**Example - Tool Handler Export**:
+```javascript
+module.exports = {
+  checkWithXcode
+};
+
+// Example - Tool Entry Script Export (must always include toolEntry)
+module.exports = {
+  toolEntry
+};
 ```
 
 ---
@@ -623,6 +692,7 @@ var escapedCommand = command.replace(/"/g, '\\"')
 | PERMISSION_DENIED | Insufficient permissions for operation |
 | OPERATION_FAILED | Generic operation failure |
 | EXECUTION_ERROR | Script execution error |
+| INVALID_JSON | JSON parsing failed |
 
 ---
 
@@ -632,14 +702,29 @@ All errors should follow this format:
 
 ```javascript
 MCPStudio.setToolResult(JSON.stringify({
-    text: "Error: [Human readable message]",
-    metadata: {
-        success: false,
-        code: "ERROR_CODE",
-        path: operationPath,
-        error: "[Stack trace or detailed error]"
-    }
+  text: "Error: [Human readable message]",
+  metadata: {
+    success: false,
+    code: "ERROR_CODE",
+    path: operationPath,
+    error: "[Stack trace or detailed error]"
+  }
 }));
+```
+
+---
+
+### Validation Error Format
+
+Use validation result objects for parameter validation errors:
+
+```javascript
+var validation = shared.validateFilePath(rawPath, "filePath");
+if (!validation.ok) {
+  return shared.setErrorResult(validation.message, {
+    operation: "myTool"
+  });
+}
 ```
 
 ---
@@ -650,15 +735,13 @@ MCPStudio.setToolResult(JSON.stringify({
 
 ```json
 {
-    "text": "Operation completed successfully",
-    "metadata": {
-        "path": "/path/to/operation",
-        "success": true,
-        "code": "OPERATION_SUCCESS",
-        "exitCode": 0,
-        "stdout": [],
-        "stderr": []
-    }
+  "text": "{\"content\": \"...\", \"path\": \"/path/to/file\"}",
+  "success": true,
+  "metadata": {
+    "path": "/path/to/operation",
+    "operation": "readFile",
+    "code": "OPERATION_SUCCESS"
+  }
 }
 ```
 
@@ -666,15 +749,14 @@ MCPStudio.setToolResult(JSON.stringify({
 
 ```json
 {
-    "text": "Error: Operation failed with exit code 1",
-    "metadata": {
-        "path": "/path/to/operation",
-        "success": false,
-        "code": "OPERATION_FAILED",
-        "exitCode": 1,
-        "stdout": [],
-        "stderr": ["Error details..."]
-    }
+  "text": "Error: Operation failed with exit code 1",
+  "success": false,
+  "metadata": {
+    "path": "/path/to/operation",
+    "error": "Operation failed",
+    "code": "OPERATION_FAILED",
+    "exitCode": 1
+  }
 }
 ```
 
@@ -685,29 +767,33 @@ MCPStudio.setToolResult(JSON.stringify({
 All tool scripts must export their main function:
 
 ```javascript
-module.exports = {
-    checkWithXcode,      // Or specific exported function name
-    toolEntry            // Required entry point
-};
-```
-
-**Example**:
-```javascript
 // checkWithXcode.js exports
 module.exports = {
-    checkWithXcode
+  checkWithXcode
 };
 
 // shellCall.js exports
 module.exports = {
-    shellCall
+  shellCall
 };
 
 // Tool entry script exports (must always include toolEntry)
 module.exports = {
-    toolEntry
+  toolEntry
 };
 ```
+
+---
+
+## Quick Start Guide
+
+1. **Create tool script** with proper function signature
+2. **Import shared functions**: `const shared = require('sharedFunctions');`
+3. **Implement input validation** using shared validation functions
+4. **Use console.log()** for logging (logs to stdOut)
+5. **Call MCPStudio.* methods** for file operations, shell execution, etc.
+6. **Set result via** `MCPStudio.setToolResult()` or `shared.setSuccessResult()/setErrorResult()`
+7. **Export main function** from module: `module.exports = { functionName }`
 
 ---
 
@@ -718,136 +804,116 @@ module.exports = {
 // MCP Studio Tool SDK - Tool Entry Handler
 // Required for all tool scripts to function properly
 // ===================================================================
-
 // Import shared functions
 const shared = require('sharedFunctions');
-
 // Tool exports map (register all available tools)
 var toolExports = {};
 
 /**
- * Initialize and register available tools
- * @param {Object} tools - Object containing all available tool functions
- */
+* Initialize and register available tools
+* @param {Object} tools - Object containing all available tool functions
+*/
 function initToolRegistry(tools) {
-    // Register all available tools in the registry
-    for (var key in tools) {
-        if (tools.hasOwnProperty(key)) {
-            toolExports[key] = tools[key];
-        }
+  // Register all available tools in the registry
+  for (var key in tools) {
+    if (tools.hasOwnProperty(key)) {
+      toolExports[key] = tools[key];
     }
+  }
 }
 
 /**
- * Initialize with checkWithXcode as default tool
- */
+* Initialize with checkWithXcode as default tool
+*/
 function init() {
-    var checkWithXcode = require('checkWithXcode').checkWithXcode;
-    var shellCall = require('shellCall').shellCall;
-    var fileRead = require('fileRead').fileRead;
-    var fileSave = require('fileSave').fileSave;
-    // ... register all other tools
-    
-    initToolRegistry({
-        checkWithXcode: checkWithXcode,
-        shellCall: shellCall,
-        fileRead: fileRead,
-        fileSave: fileSave
-    });
+  var checkWithXcode = require('checkWithXcode').checkWithXcode;
+  var shellCall = require('shellCall').shellCall;
+  var fileRead = require('fileRead').fileRead;
+  var fileSave = require('fileSave').fileSave;
+  // ... register all other tools
+  initToolRegistry({
+    checkWithXcode: checkWithXcode,
+    shellCall: shellCall,
+    fileRead: fileRead,
+    fileSave: fileSave
+  });
 }
 
 /**
- * Required tool entry function - MUST implement this signature
- * @param {string} sid - Session ID string
- * @param {string} handlerName - Handler name requested by caller
- * @param {string} jsonParams - Raw JSON parameters as string from MCPStudio controller
- * @returns {string|null} Return JSON string or null if using MCPStudio.setToolResult()
- */
+* Required tool entry function - MUST implement this signature
+* @param {string} sid - Session ID string
+* @param {string} handlerName - Handler name requested by caller
+* @param {string} jsonParams - Raw JSON parameters as string from MCPStudio controller
+* @returns {string|null} Return JSON string or null if using MCPStudio.setToolResult()
+*/
 function toolEntry(sid, handlerName, jsonParams) {
-    // Parse raw JSON string parameters
-    var params;
-    try {
-        params = JSON.parse(jsonParams);
-    } catch (e) {
-        MCPStudio.setToolResult({
-            text: "Error: Failed to parse parameters JSON",
-            metadata: {
-                success: false,
-                code: "INVALID_JSON",
-                error: e.message,
-                path: sid,
-                handlerName: handlerName
-            }
-        });
-        return null;
+  // Parse raw JSON string parameters
+  var params;
+  try {
+    params = JSON.parse(jsonParams);
+  } catch (e) {
+    MCPStudio.setToolResult({
+      text: "Error: Failed to parse parameters JSON",
+      metadata: {
+        success: false,
+        code: "INVALID_JSON",
+        error: e.message,
+        path: sid,
+        handlerName: handlerName
+      }
+    });
+    return null;
+  }
+  // Validate handler name exists in tool exports
+  if (!toolExports[handlerName]) {
+    MCPStudio.setToolResult({
+      text: "Error: Handler not found: " + handlerName,
+      metadata: {
+        success: false,
+        code: "HANDLER_NOT_FOUND",
+        path: sid,
+        handlerName: handlerName
+      }
+    });
+    return null;
+  }
+  // Execute the requested handler with parsed parameters
+  try {
+    var result = toolExports[handlerName](params);
+    if (result === null) {
+      // Handler already set result via MCPStudio.setToolResult()
+      return null;
     }
-
-    // Validate handler name exists in tool exports
-    if (!toolExports[handlerName]) {
-        MCPStudio.setToolResult({
-            text: "Error: Handler not found: " + handlerName,
-            metadata: {
-                success: false,
-                code: "HANDLER_NOT_FOUND",
-                path: sid,
-                handlerName: handlerName
-            }
-        });
-        return null;
+    // Return result as JSON string or let handler call MCPStudio.setToolResult()
+    if (typeof result === 'object') {
+      var jsonResult = JSON.stringify(result);
+      MCPStudio.setToolResult(jsonResult);
+      return null;
     }
-
-    // Execute the requested handler with parsed parameters
-    try {
-        var result = toolExports[handlerName](params);
-
-        if (result === null) {
-            // Handler already set result via MCPStudio.setToolResult()
-            return null;
-        }
-
-        // Return result as JSON string or let handler call MCPStudio.setToolResult()
-        if (typeof result === 'object') {
-            var jsonResult = JSON.stringify(result);
-            MCPStudio.setToolResult(jsonResult);
-            return null;
-        }
-
-        return result;
-
-    } catch (error) {
-        MCPStudio.setToolResult({
-            text: "Error executing handler: " + error.message,
-            metadata: {
-                success: false,
-                code: "EXECUTION_ERROR",
-                error: error.message,
-                stack: error.stack,
-                path: sid,
-                handlerName: handlerName
-            }
-        });
-        return null;
-    }
+    return result;
+  } catch (error) {
+    MCPStudio.setToolResult({
+      text: "Error executing handler: " + error.message,
+      metadata: {
+        success: false,
+        code: "EXECUTION_ERROR",
+        error: error.message,
+        stack: error.stack,
+        path: sid,
+        handlerName: handlerName
+      }
+    });
+    return null;
+  }
 }
 
 // Initialize tool registry
 init();
 
 module.exports = {
-    toolEntry
+  toolEntry
 };
 ```
-
----
-
-## Quick Start Guide
-
-1. **Create tool script** with proper function signature
-2. **Implement buildLog()** helper for consistent logging
-3. **Validate all inputs** before execution
-4. **Use MCPStudio.setToolResult()** to return results
-5. **Export main function** from module
-6. **Register in toolEntry** via shared registry
 
 ---
 
@@ -859,8 +925,9 @@ module.exports = {
 - fileSave.js - File writing utility
 - analyzeDirectory.js - Directory analysis utility
 - fetchResource.js - MCP resource fetching utility
-- httpGet.js - HTTP GET requests
-- httpPost.js - HTTP POST requests
+- httpTools.js - HTTP GET/POST requests
+- sharedFunctions.js - Shared utility functions
+- tool_entry.js - Main entry point handler
 
 ---
 

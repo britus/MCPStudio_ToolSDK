@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-06-10T02:24:23.703Z",
+    "lastModified" : "2026-07-01T03:11:47.194Z",
     "priority" : 0.9
   },
   "description" : "Use this tool every time you finish modifying source code files in a project folder or if the user request to build a Xcode project with xcodebuild. This tool provides information about the validity of the build. If errors occur, try to fix them.",

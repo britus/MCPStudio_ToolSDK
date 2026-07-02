@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-06-10T02:24:23.697Z",
+    "lastModified" : "2026-07-01T03:11:47.187Z",
     "priority" : 0.9
   },
   "description" : "Use this tool to build a project using Unix make named ‚Makefile‘. The Parameter ‚makeFile‘ must contain a full qualfied file name. This tool is applicable for Unix make file projects. This tool provides information about the validity of the changes. If errors occur, try to fix them. Always show the content of parameter ‚stdout’ and ‚stderr‘. ",

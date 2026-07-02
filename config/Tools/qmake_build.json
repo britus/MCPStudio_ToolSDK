@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-06-10T02:24:23.703Z",
+    "lastModified" : "2026-07-01T03:11:47.195Z",
     "priority" : 0.9
   },
   "description" : "Configure and build a QMake project.",

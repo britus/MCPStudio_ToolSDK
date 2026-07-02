@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-06-14T00:00:00.000Z",
+    "lastModified" : "2026-07-01T03:11:47.199Z",
     "priority" : 0.9
   },
   "description" : "Execute Python using Python 3. Provide inline Python or a script path; the tool runs it with the configured Python executable and returns stdout, stderr, exit code, and execution status.",
@@ -18,12 +18,12 @@
         "type" : "string"
       },
       "pythonExecutable" : {
-        "description" : "Optional absolute path to the Python executable, or 'python3' to resolve via /usr/bin/env.",
+        "description" : "Optional absolute path to the Python executable, or 'python3' to resolve via \/usr\/bin\/env.",
         "name" : "pythonExecutable",
         "type" : "string"
       },
       "resultMode" : {
-        "description" : "Result handling mode. Use 'capture' to return stdout/stderr automatically, or 'toolResultJSON' to parse stdout as a complete MCP tool result JSON object.",
+        "description" : "Result handling mode. Use 'capture' to return stdout\/stderr automatically, or 'toolResultJSON' to parse stdout as a complete MCP tool result JSON object.",
         "name" : "resultMode",
         "type" : "string"
       },

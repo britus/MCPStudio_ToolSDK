@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-06-10T02:24:23.704Z",
+    "lastModified" : "2026-07-01T03:11:47.196Z",
     "priority" : 0.9
   },
   "description" : "Execute a shell command with optional parameters.",

@@ -1,0 +1,605 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate a Python-runtime based government-source research workflow. Delegate bounded 1-2 link-deep Python crawl planning to country planners, run only the explicitly configured python_runtime runner agents, then send the captured Python crawler output to specialists for LLM relevance review and analysis. Keep script planning separate from execution. Require source URLs, link titles, fetch metadata, translation into the user's prompt language when needed, and clear uncertainty notes.",
+      "maxTurns" : 10,
+      "name" : "ResearchCoordinator",
+      "positionX" : 548,
+      "positionY" : 80,
+      "properties" : [
+        {
+          "description" : "Output language policy for all downstream agents.",
+          "key" : "outputLanguage",
+          "required" : true,
+          "value" : "Use the same language as the user's prompt. Translate foreign-language source material into that language.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Primary research scope for the workflow.",
+          "key" : "researchScope",
+          "required" : true,
+          "value" : "Current border situations, land border crossings, territorial disputes, security dynamics, regional stability, government-source evidence",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Shared result keys produced by planners, runners, specialists, reviewer, and synthesizer.",
+          "key" : "sharedProperties",
+          "required" : false,
+          "value" : "azScriptPlan, geScriptPlan, ruScriptPlan, azGovSources, geGovSources, ruGovSources, azResult, geResult, ruResult, reviewFindings, finalSummary",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan the Python crawling approach for Russian official government sources. Do not execute tools. Produce ruScriptPlan: audit the configured seed urls property, plan a bounded 1-2 link-deep crawl, define title-based relevance criteria for the LLM to apply to discovered link titles, list expected Python runtime arguments, extraction intent, safety constraints, and expected stdout fields. The runner is already configured and may not be modified at runtime.",
+      "maxTurns" : 4,
+      "name" : "RussiaScriptPlannerAgent",
+      "positionX" : 996.40234375,
+      "positionY" : 99.66796875,
+      "properties" : [
+        {
+          "description" : "How the planner should judge candidate links by title before deeper review.",
+          "key" : "linkTitleRelevancePolicy",
+          "required" : false,
+          "value" : "Prefer official pages whose link title or anchor text mentions borders, crossings, checkpoints, customs, security, territorial disputes, official statements, travel rules, or the target countries\/regions. Reject generic navigation, media galleries, social links, language switchers, and unrelated institutional pages.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Planned crawl depth for official source exploration.",
+          "key" : "maxCrawlDepth",
+          "required" : false,
+          "value" : "2",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Planner output describing intended Python runtime call.",
+          "key" : "ruScriptPlan",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Comma-separated official Russian source URLs planned for Python runtime bounded crawling.",
+          "key" : "urls",
+          "required" : true,
+          "value" : "https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/russischefoederation-node, https:\/\/mid.ru\/en\/search\/?q=Georgia+international+land+border+crossing&sort=date&lang=en&order=desc&count=20, https:\/\/mid.ru\/en\/foreign_policy\/news\/, https:\/\/mid.ru\/en\/foreign_policy\/international_safety\/",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan the Python crawling approach for Azerbaijan official government sources. Do not execute tools. Produce azScriptPlan: audit the configured seed urls property, plan a bounded 1-2 link-deep crawl, define title-based relevance criteria for the LLM to apply to discovered link titles, list expected Python runtime arguments, extraction intent, safety constraints, and expected stdout fields. The runner is already configured and may not be modified at runtime.",
+      "maxTurns" : 4,
+      "name" : "AzerbaijanScriptPlannerAgent",
+      "positionX" : 99.203125,
+      "positionY" : 113.7578125,
+      "properties" : [
+        {
+          "description" : "Planner output describing intended Python runtime call.",
+          "key" : "azScriptPlan",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "How the planner should judge candidate links by title before deeper review.",
+          "key" : "linkTitleRelevancePolicy",
+          "required" : false,
+          "value" : "Prefer official pages whose link title or anchor text mentions borders, crossings, checkpoints, customs, security, territorial disputes, official statements, travel rules, or the target countries\/regions. Reject generic navigation, media galleries, social links, language switchers, and unrelated institutional pages.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Planned crawl depth for official source exploration.",
+          "key" : "maxCrawlDepth",
+          "required" : false,
+          "value" : "2",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Comma-separated official Azerbaijan source URLs planned for Python runtime bounded crawling.",
+          "key" : "urls",
+          "required" : true,
+          "value" : "https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/aserbaidschan-node, https:\/\/www.migration.gov.az\/en\/press\/26, https:\/\/mfa.gov.az\/en\/news, https:\/\/mfa.gov.az\/en\/category\/announcements",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute the bound `python_runtime` tool with the configured bounded crawler arguments. Do not generate or alter code. The inline script fetches seed URLs, extracts page titles and link titles, crawls selected same-site links up to maxCrawlDepth 1-2, and emits structured JSON with pagesFetched, discoveredLinks, selectedLinks, stdout, stderr, exitCode, success, and timeout metadata from the tool.",
+      "llmProviderID" : "lmStudio",
+      "maxTurns" : 3,
+      "modelName" : "",
+      "name" : "GeorgiaScriptRunnerAgent",
+      "positionX" : 768.86328125,
+      "positionY" : 241.6484375,
+      "properties" : [
+        {
+          "description" : "Inline Python crawler that fetches official source URLs, extracts text and link titles, and emits structured JSON to stdout.",
+          "key" : "inlineScript",
+          "required" : true,
+          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nclass PageExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.parts = []\n        self.links = []\n        self.skip = 0\n        self.in_title = False\n        self.title_parts = []\n        self.current_link = None\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs_dict = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs_dict.get('href'):\n            self.current_link = {\n                'href': attrs_dict.get('href', ''),\n                'title': attrs_dict.get('title') or attrs_dict.get('aria-label') or '',\n                'textParts': []\n            }\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current_link:\n            text = clean_text(' '.join(self.current_link.pop('textParts', [])))\n            title = clean_text(self.current_link.get('title') or text)\n            self.links.append({'href': self.current_link.get('href', ''), 'title': title, 'text': text})\n            self.current_link = None\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current_link is not None:\n            self.current_link['textParts'].append(text)\n        self.parts.append(text)\n\ndef clean_text(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef extract_page(html_text, base_url):\n    parser = PageExtractor()\n    parser.feed(html_text)\n    text = clean_text(' '.join(parser.parts))\n    title = clean_text(' '.join(parser.title_parts))\n    links = []\n    seen = set()\n    for raw in parser.links:\n        href = raw.get('href', '')\n        absolute = urllib.parse.urljoin(base_url, href)\n        parsed = urllib.parse.urlparse(absolute)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'title': clean_text(raw.get('title') or raw.get('text') or normalized), 'text': clean_text(raw.get('text'))})\n    return title, text, links\n\ndef normalize_urls(value):\n    items = value if isinstance(value, list) else str(value or '').split(',')\n    return [item.strip() for item in items if item and item.strip()]\n\ndef normalize_terms(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[,;]', str(value or ''))\n    return [clean_text(item).lower() for item in items if clean_text(item)]\n\ndef same_site(url, seeds):\n    host = urllib.parse.urlparse(url).netloc.lower().removeprefix('www.')\n    return any(host == urllib.parse.urlparse(seed).netloc.lower().removeprefix('www.') for seed in seeds)\n\ndef blocked(url, patterns):\n    lowered = url.lower()\n    return any(pattern and pattern in lowered for pattern in patterns)\n\ndef relevance_score(link, terms):\n    haystack = f\"{link.get('title', '')} {link.get('text', '')} {link.get('url', '')}\".lower()\n    return sum(1 for term in terms if term in haystack)\n\ndef fetch_url(url, params, depth, source_url=None, link_title=''):\n    fetched_at = datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z'\n    req = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntimeTool\/1.0'})\n    try:\n        with urllib.request.urlopen(req, timeout=int(params.get('requestTimeoutSeconds', 20))) as resp:\n            raw = resp.read(int(params.get('maxBytesPerUrl', 500000)))\n            encoding = resp.headers.get_content_charset() or 'utf-8'\n            html_text = raw.decode(encoding, errors='replace')\n            page_title, text, links = extract_page(html_text, resp.geturl())\n            return {\n                'url': url,\n                'finalUrl': resp.geturl(),\n                'sourceUrl': source_url,\n                'linkTitle': link_title,\n                'depth': depth,\n                'pageTitle': page_title,\n                'statusCode': resp.status,\n                'contentType': resp.headers.get('content-type', ''),\n                'fetchedAtUTC': fetched_at,\n                'success': True,\n                'text': text[:int(params.get('maxTextCharsPerUrl', 20000))],\n                'links': links\n            }\n    except Exception as exc:\n        return {\n            'url': url,\n            'sourceUrl': source_url,\n            'linkTitle': link_title,\n            'depth': depth,\n            'fetchedAtUTC': fetched_at,\n            'success': False,\n            'error': f'{type(exc).__name__}: {exc}'\n        }\n\ndef crawl(params):\n    seeds = normalize_urls(params.get('urls', params.get('url', '')))\n    terms = normalize_terms(params.get('relevantTitleTerms', 'border, crossing, customs, checkpoint, security, statement, announcement, travel, region, conflict, peace, Abkhazia, South Ossetia, Armenia, Azerbaijan, Georgia, Russia, Caucasus'))\n    blocked_patterns = normalize_terms(params.get('blockedUrlPatterns', 'facebook.com, instagram.com, youtube.com, t.me, telegram.me, whatsapp, mailto:'))\n    max_depth = max(0, min(int(params.get('maxCrawlDepth', 1)), 2))\n    max_links_per_page = max(1, int(params.get('maxLinksPerPage', 8)))\n    max_pages = max(len(seeds), int(params.get('maxPages', 24)))\n    pages = []\n    discovered = []\n    selected = []\n    queue = [{'url': url, 'depth': 0, 'sourceUrl': None, 'linkTitle': ''} for url in seeds]\n    visited = set()\n\n    while queue and len(pages) < max_pages:\n        item = queue.pop(0)\n        url = item['url']\n        if url in visited or blocked(url, blocked_patterns):\n            continue\n        visited.add(url)\n        page = fetch_url(url, params, item['depth'], item.get('sourceUrl'), item.get('linkTitle', ''))\n        links = page.pop('links', []) if page.get('success') else []\n        pages.append(page)\n        if not page.get('success') or item['depth'] >= max_depth:\n            continue\n\n        candidates = []\n        for link in links:\n            if not same_site(link['url'], seeds) or blocked(link['url'], blocked_patterns) or link['url'] in visited:\n                continue\n            score = relevance_score(link, terms)\n            record = {\n                'sourceUrl': page.get('finalUrl', url),\n                'url': link['url'],\n                'title': link.get('title', ''),\n                'anchorText': link.get('text', ''),\n                'depth': item['depth'] + 1,\n                'titleRelevanceScore': score\n            }\n            discovered.append(record)\n            if score > 0:\n                candidates.append(record)\n        candidates.sort(key=lambda rec: (-rec['titleRelevanceScore'], rec['title'], rec['url']))\n        for record in candidates[:max_links_per_page]:\n            selected.append(record)\n            queue.append({'url': record['url'], 'depth': record['depth'], 'sourceUrl': record['sourceUrl'], 'linkTitle': record['title']})\n\n    return {\n        'country': params.get('country', ''),\n        'seedUrls': seeds,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'maxCrawlDepth': max_depth,\n        'titleRelevanceTerms': terms,\n        'pagesFetched': pages,\n        'discoveredLinks': discovered[:200],\n        'selectedLinks': selected[:100],\n        'selectionNote': 'Python applies a bounded title\/anchor-text prefilter. Downstream LLM agents must audit selectedLinks and decide final relevance from link titles, page titles, source text, and the user request.'\n    }\n\nparams = json.load(sys.stdin)\nprint(json.dumps(crawl(params), ensure_ascii=False, indent=2))",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python executable resolution.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout and stderr from Python runtime.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Structured input for the bounded Python title-link crawler.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "{\"country\":\"Georgia\",\"urls\":\"https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/georgien-node, https:\/\/mfa.gov.ge\/en\/news, https:\/\/mfa.gov.ge\/en\/statements-by-mfa\",\"requestTimeoutSeconds\":20,\"maxBytesPerUrl\":500000,\"maxTextCharsPerUrl\":16000,\"maxCrawlDepth\":2,\"maxLinksPerPage\":6,\"maxPages\":24,\"relevantTitleTerms\":\"border, crossing, checkpoint, customs, occupation, occupied territories, Abkhazia, South Ossetia, Russia, security, statement, travel, consular, Geneva International Discussions, conflict, region\",\"blockedUrlPatterns\":\"facebook.com, instagram.com, youtube.com, t.me, telegram.me, x.com, twitter.com, mailto:\"}",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Maximum Python runtime duration.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "120",
+          "valueType" : "number"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.1,
+      "toolName" : "python_runtime"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan the Python crawling approach for Georgia official government sources. Do not execute tools. Produce geScriptPlan: audit the configured seed urls property, plan a bounded 1-2 link-deep crawl, define title-based relevance criteria for the LLM to apply to discovered link titles, list expected Python runtime arguments, extraction intent, safety constraints, and expected stdout fields. The runner is already configured and may not be modified at runtime.",
+      "maxTurns" : 4,
+      "name" : "GeorgiaScriptPlannerAgent",
+      "positionX" : 335.890625,
+      "positionY" : 317.234375,
+      "properties" : [
+        {
+          "description" : "Planner output describing intended Python runtime call.",
+          "key" : "geScriptPlan",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "How the planner should judge candidate links by title before deeper review.",
+          "key" : "linkTitleRelevancePolicy",
+          "required" : false,
+          "value" : "Prefer official pages whose link title or anchor text mentions borders, crossings, checkpoints, customs, security, territorial disputes, official statements, travel rules, or the target countries\/regions. Reject generic navigation, media galleries, social links, language switchers, and unrelated institutional pages.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Planned crawl depth for official source exploration.",
+          "key" : "maxCrawlDepth",
+          "required" : false,
+          "value" : "2",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Comma-separated official Georgia source URLs planned for Python runtime bounded crawling.",
+          "key" : "urls",
+          "required" : true,
+          "value" : "https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/georgien-node, https:\/\/mfa.gov.ge\/en\/news, https:\/\/mfa.gov.ge\/en\/statements-by-mfa",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute the bound `python_runtime` tool with the configured bounded crawler arguments. Do not generate or alter code. The inline script fetches seed URLs, extracts page titles and link titles, crawls selected same-site links up to maxCrawlDepth 1-2, and emits structured JSON with pagesFetched, discoveredLinks, selectedLinks, stdout, stderr, exitCode, success, and timeout metadata from the tool.",
+      "llmProviderID" : "lmStudio",
+      "maxTurns" : 3,
+      "modelName" : "",
+      "name" : "RussiaScriptRunnerAgent",
+      "positionX" : 995.35546875,
+      "positionY" : 343.01171875,
+      "properties" : [
+        {
+          "description" : "Inline Python crawler that fetches official source URLs, extracts text and link titles, and emits structured JSON to stdout.",
+          "key" : "inlineScript",
+          "required" : true,
+          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nclass PageExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.parts = []\n        self.links = []\n        self.skip = 0\n        self.in_title = False\n        self.title_parts = []\n        self.current_link = None\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs_dict = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs_dict.get('href'):\n            self.current_link = {\n                'href': attrs_dict.get('href', ''),\n                'title': attrs_dict.get('title') or attrs_dict.get('aria-label') or '',\n                'textParts': []\n            }\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current_link:\n            text = clean_text(' '.join(self.current_link.pop('textParts', [])))\n            title = clean_text(self.current_link.get('title') or text)\n            self.links.append({'href': self.current_link.get('href', ''), 'title': title, 'text': text})\n            self.current_link = None\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current_link is not None:\n            self.current_link['textParts'].append(text)\n        self.parts.append(text)\n\ndef clean_text(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef extract_page(html_text, base_url):\n    parser = PageExtractor()\n    parser.feed(html_text)\n    text = clean_text(' '.join(parser.parts))\n    title = clean_text(' '.join(parser.title_parts))\n    links = []\n    seen = set()\n    for raw in parser.links:\n        href = raw.get('href', '')\n        absolute = urllib.parse.urljoin(base_url, href)\n        parsed = urllib.parse.urlparse(absolute)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'title': clean_text(raw.get('title') or raw.get('text') or normalized), 'text': clean_text(raw.get('text'))})\n    return title, text, links\n\ndef normalize_urls(value):\n    items = value if isinstance(value, list) else str(value or '').split(',')\n    return [item.strip() for item in items if item and item.strip()]\n\ndef normalize_terms(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[,;]', str(value or ''))\n    return [clean_text(item).lower() for item in items if clean_text(item)]\n\ndef same_site(url, seeds):\n    host = urllib.parse.urlparse(url).netloc.lower().removeprefix('www.')\n    return any(host == urllib.parse.urlparse(seed).netloc.lower().removeprefix('www.') for seed in seeds)\n\ndef blocked(url, patterns):\n    lowered = url.lower()\n    return any(pattern and pattern in lowered for pattern in patterns)\n\ndef relevance_score(link, terms):\n    haystack = f\"{link.get('title', '')} {link.get('text', '')} {link.get('url', '')}\".lower()\n    return sum(1 for term in terms if term in haystack)\n\ndef fetch_url(url, params, depth, source_url=None, link_title=''):\n    fetched_at = datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z'\n    req = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntimeTool\/1.0'})\n    try:\n        with urllib.request.urlopen(req, timeout=int(params.get('requestTimeoutSeconds', 20))) as resp:\n            raw = resp.read(int(params.get('maxBytesPerUrl', 500000)))\n            encoding = resp.headers.get_content_charset() or 'utf-8'\n            html_text = raw.decode(encoding, errors='replace')\n            page_title, text, links = extract_page(html_text, resp.geturl())\n            return {\n                'url': url,\n                'finalUrl': resp.geturl(),\n                'sourceUrl': source_url,\n                'linkTitle': link_title,\n                'depth': depth,\n                'pageTitle': page_title,\n                'statusCode': resp.status,\n                'contentType': resp.headers.get('content-type', ''),\n                'fetchedAtUTC': fetched_at,\n                'success': True,\n                'text': text[:int(params.get('maxTextCharsPerUrl', 20000))],\n                'links': links\n            }\n    except Exception as exc:\n        return {\n            'url': url,\n            'sourceUrl': source_url,\n            'linkTitle': link_title,\n            'depth': depth,\n            'fetchedAtUTC': fetched_at,\n            'success': False,\n            'error': f'{type(exc).__name__}: {exc}'\n        }\n\ndef crawl(params):\n    seeds = normalize_urls(params.get('urls', params.get('url', '')))\n    terms = normalize_terms(params.get('relevantTitleTerms', 'border, crossing, customs, checkpoint, security, statement, announcement, travel, region, conflict, peace, Abkhazia, South Ossetia, Armenia, Azerbaijan, Georgia, Russia, Caucasus'))\n    blocked_patterns = normalize_terms(params.get('blockedUrlPatterns', 'facebook.com, instagram.com, youtube.com, t.me, telegram.me, whatsapp, mailto:'))\n    max_depth = max(0, min(int(params.get('maxCrawlDepth', 1)), 2))\n    max_links_per_page = max(1, int(params.get('maxLinksPerPage', 8)))\n    max_pages = max(len(seeds), int(params.get('maxPages', 24)))\n    pages = []\n    discovered = []\n    selected = []\n    queue = [{'url': url, 'depth': 0, 'sourceUrl': None, 'linkTitle': ''} for url in seeds]\n    visited = set()\n\n    while queue and len(pages) < max_pages:\n        item = queue.pop(0)\n        url = item['url']\n        if url in visited or blocked(url, blocked_patterns):\n            continue\n        visited.add(url)\n        page = fetch_url(url, params, item['depth'], item.get('sourceUrl'), item.get('linkTitle', ''))\n        links = page.pop('links', []) if page.get('success') else []\n        pages.append(page)\n        if not page.get('success') or item['depth'] >= max_depth:\n            continue\n\n        candidates = []\n        for link in links:\n            if not same_site(link['url'], seeds) or blocked(link['url'], blocked_patterns) or link['url'] in visited:\n                continue\n            score = relevance_score(link, terms)\n            record = {\n                'sourceUrl': page.get('finalUrl', url),\n                'url': link['url'],\n                'title': link.get('title', ''),\n                'anchorText': link.get('text', ''),\n                'depth': item['depth'] + 1,\n                'titleRelevanceScore': score\n            }\n            discovered.append(record)\n            if score > 0:\n                candidates.append(record)\n        candidates.sort(key=lambda rec: (-rec['titleRelevanceScore'], rec['title'], rec['url']))\n        for record in candidates[:max_links_per_page]:\n            selected.append(record)\n            queue.append({'url': record['url'], 'depth': record['depth'], 'sourceUrl': record['sourceUrl'], 'linkTitle': record['title']})\n\n    return {\n        'country': params.get('country', ''),\n        'seedUrls': seeds,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'maxCrawlDepth': max_depth,\n        'titleRelevanceTerms': terms,\n        'pagesFetched': pages,\n        'discoveredLinks': discovered[:200],\n        'selectedLinks': selected[:100],\n        'selectionNote': 'Python applies a bounded title\/anchor-text prefilter. Downstream LLM agents must audit selectedLinks and decide final relevance from link titles, page titles, source text, and the user request.'\n    }\n\nparams = json.load(sys.stdin)\nprint(json.dumps(crawl(params), ensure_ascii=False, indent=2))",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python executable resolution.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout and stderr from Python runtime.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Structured input for the bounded Python title-link crawler.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "{\"country\":\"Russia\/North Caucasus\",\"urls\":\"https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/russischefoederation-node, https:\/\/mid.ru\/en\/search\/?q=Georgia+international+land+border+crossing&sort=date&lang=en&order=desc&count=20, https:\/\/mid.ru\/en\/foreign_policy\/news\/, https:\/\/mid.ru\/en\/foreign_policy\/international_safety\/\",\"requestTimeoutSeconds\":20,\"maxBytesPerUrl\":500000,\"maxTextCharsPerUrl\":16000,\"maxCrawlDepth\":2,\"maxLinksPerPage\":6,\"maxPages\":24,\"relevantTitleTerms\":\"border, crossing, checkpoint, customs, Georgia, Azerbaijan, Armenia, Abkhazia, South Ossetia, Caucasus, security, foreign policy, statement, comment, region, conflict, peacekeeping\",\"blockedUrlPatterns\":\"facebook.com, instagram.com, youtube.com, t.me, telegram.me, vk.com, mailto:\"}",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Maximum Python runtime duration.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "120",
+          "valueType" : "number"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.1,
+      "toolName" : "python_runtime"
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute the bound `python_runtime` tool with the configured bounded crawler arguments. Do not generate or alter code. The inline script fetches seed URLs, extracts page titles and link titles, crawls selected same-site links up to maxCrawlDepth 1-2, and emits structured JSON with pagesFetched, discoveredLinks, selectedLinks, stdout, stderr, exitCode, success, and timeout metadata from the tool.",
+      "llmProviderID" : "lmStudio",
+      "maxTurns" : 3,
+      "modelName" : "",
+      "name" : "AzerbaijanScriptRunnerAgent",
+      "positionX" : 100,
+      "positionY" : 347.390625,
+      "properties" : [
+        {
+          "description" : "Inline Python crawler that fetches official source URLs, extracts text and link titles, and emits structured JSON to stdout.",
+          "key" : "inlineScript",
+          "required" : true,
+          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nclass PageExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.parts = []\n        self.links = []\n        self.skip = 0\n        self.in_title = False\n        self.title_parts = []\n        self.current_link = None\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs_dict = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs_dict.get('href'):\n            self.current_link = {\n                'href': attrs_dict.get('href', ''),\n                'title': attrs_dict.get('title') or attrs_dict.get('aria-label') or '',\n                'textParts': []\n            }\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current_link:\n            text = clean_text(' '.join(self.current_link.pop('textParts', [])))\n            title = clean_text(self.current_link.get('title') or text)\n            self.links.append({'href': self.current_link.get('href', ''), 'title': title, 'text': text})\n            self.current_link = None\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current_link is not None:\n            self.current_link['textParts'].append(text)\n        self.parts.append(text)\n\ndef clean_text(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef extract_page(html_text, base_url):\n    parser = PageExtractor()\n    parser.feed(html_text)\n    text = clean_text(' '.join(parser.parts))\n    title = clean_text(' '.join(parser.title_parts))\n    links = []\n    seen = set()\n    for raw in parser.links:\n        href = raw.get('href', '')\n        absolute = urllib.parse.urljoin(base_url, href)\n        parsed = urllib.parse.urlparse(absolute)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'title': clean_text(raw.get('title') or raw.get('text') or normalized), 'text': clean_text(raw.get('text'))})\n    return title, text, links\n\ndef normalize_urls(value):\n    items = value if isinstance(value, list) else str(value or '').split(',')\n    return [item.strip() for item in items if item and item.strip()]\n\ndef normalize_terms(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[,;]', str(value or ''))\n    return [clean_text(item).lower() for item in items if clean_text(item)]\n\ndef same_site(url, seeds):\n    host = urllib.parse.urlparse(url).netloc.lower().removeprefix('www.')\n    return any(host == urllib.parse.urlparse(seed).netloc.lower().removeprefix('www.') for seed in seeds)\n\ndef blocked(url, patterns):\n    lowered = url.lower()\n    return any(pattern and pattern in lowered for pattern in patterns)\n\ndef relevance_score(link, terms):\n    haystack = f\"{link.get('title', '')} {link.get('text', '')} {link.get('url', '')}\".lower()\n    return sum(1 for term in terms if term in haystack)\n\ndef fetch_url(url, params, depth, source_url=None, link_title=''):\n    fetched_at = datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z'\n    req = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntimeTool\/1.0'})\n    try:\n        with urllib.request.urlopen(req, timeout=int(params.get('requestTimeoutSeconds', 20))) as resp:\n            raw = resp.read(int(params.get('maxBytesPerUrl', 500000)))\n            encoding = resp.headers.get_content_charset() or 'utf-8'\n            html_text = raw.decode(encoding, errors='replace')\n            page_title, text, links = extract_page(html_text, resp.geturl())\n            return {\n                'url': url,\n                'finalUrl': resp.geturl(),\n                'sourceUrl': source_url,\n                'linkTitle': link_title,\n                'depth': depth,\n                'pageTitle': page_title,\n                'statusCode': resp.status,\n                'contentType': resp.headers.get('content-type', ''),\n                'fetchedAtUTC': fetched_at,\n                'success': True,\n                'text': text[:int(params.get('maxTextCharsPerUrl', 20000))],\n                'links': links\n            }\n    except Exception as exc:\n        return {\n            'url': url,\n            'sourceUrl': source_url,\n            'linkTitle': link_title,\n            'depth': depth,\n            'fetchedAtUTC': fetched_at,\n            'success': False,\n            'error': f'{type(exc).__name__}: {exc}'\n        }\n\ndef crawl(params):\n    seeds = normalize_urls(params.get('urls', params.get('url', '')))\n    terms = normalize_terms(params.get('relevantTitleTerms', 'border, crossing, customs, checkpoint, security, statement, announcement, travel, region, conflict, peace, Abkhazia, South Ossetia, Armenia, Azerbaijan, Georgia, Russia, Caucasus'))\n    blocked_patterns = normalize_terms(params.get('blockedUrlPatterns', 'facebook.com, instagram.com, youtube.com, t.me, telegram.me, whatsapp, mailto:'))\n    max_depth = max(0, min(int(params.get('maxCrawlDepth', 1)), 2))\n    max_links_per_page = max(1, int(params.get('maxLinksPerPage', 8)))\n    max_pages = max(len(seeds), int(params.get('maxPages', 24)))\n    pages = []\n    discovered = []\n    selected = []\n    queue = [{'url': url, 'depth': 0, 'sourceUrl': None, 'linkTitle': ''} for url in seeds]\n    visited = set()\n\n    while queue and len(pages) < max_pages:\n        item = queue.pop(0)\n        url = item['url']\n        if url in visited or blocked(url, blocked_patterns):\n            continue\n        visited.add(url)\n        page = fetch_url(url, params, item['depth'], item.get('sourceUrl'), item.get('linkTitle', ''))\n        links = page.pop('links', []) if page.get('success') else []\n        pages.append(page)\n        if not page.get('success') or item['depth'] >= max_depth:\n            continue\n\n        candidates = []\n        for link in links:\n            if not same_site(link['url'], seeds) or blocked(link['url'], blocked_patterns) or link['url'] in visited:\n                continue\n            score = relevance_score(link, terms)\n            record = {\n                'sourceUrl': page.get('finalUrl', url),\n                'url': link['url'],\n                'title': link.get('title', ''),\n                'anchorText': link.get('text', ''),\n                'depth': item['depth'] + 1,\n                'titleRelevanceScore': score\n            }\n            discovered.append(record)\n            if score > 0:\n                candidates.append(record)\n        candidates.sort(key=lambda rec: (-rec['titleRelevanceScore'], rec['title'], rec['url']))\n        for record in candidates[:max_links_per_page]:\n            selected.append(record)\n            queue.append({'url': record['url'], 'depth': record['depth'], 'sourceUrl': record['sourceUrl'], 'linkTitle': record['title']})\n\n    return {\n        'country': params.get('country', ''),\n        'seedUrls': seeds,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'maxCrawlDepth': max_depth,\n        'titleRelevanceTerms': terms,\n        'pagesFetched': pages,\n        'discoveredLinks': discovered[:200],\n        'selectedLinks': selected[:100],\n        'selectionNote': 'Python applies a bounded title\/anchor-text prefilter. Downstream LLM agents must audit selectedLinks and decide final relevance from link titles, page titles, source text, and the user request.'\n    }\n\nparams = json.load(sys.stdin)\nprint(json.dumps(crawl(params), ensure_ascii=False, indent=2))",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python executable resolution.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout and stderr from Python runtime.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Structured input for the bounded Python title-link crawler.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "{\"country\":\"Azerbaijan\",\"urls\":\"https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/aserbaidschan-node, https:\/\/www.migration.gov.az\/en\/press\/26, https:\/\/mfa.gov.az\/en\/news, https:\/\/mfa.gov.az\/en\/category\/announcements\",\"requestTimeoutSeconds\":20,\"maxBytesPerUrl\":500000,\"maxTextCharsPerUrl\":16000,\"maxCrawlDepth\":2,\"maxLinksPerPage\":6,\"maxPages\":24,\"relevantTitleTerms\":\"border, crossing, checkpoint, customs, Armenia, Azerbaijan, Karabakh, Zangezur, Lachin, peace, security, statement, announcement, region, conflict, travel, migration\",\"blockedUrlPatterns\":\"facebook.com, instagram.com, youtube.com, t.me, telegram.me, x.com, twitter.com, mailto:\"}",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Maximum Python runtime duration.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "120",
+          "valueType" : "number"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.1,
+      "toolName" : "python_runtime"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Analyze Georgia using the incoming Python runtime crawler output as primary current evidence. Parse stdout JSON when present, audit selectedLinks and discoveredLinks, and let the LLM decide final relevance from linkTitle\/pageTitle\/source text instead of blindly trusting the Python title prefilter. Note stderr\/exitCode\/timedOut if present, translate source material into the user's prompt language where needed, and return geResult with: sources checked, fetch metadata, title-based link relevance decisions, translated current evidence, border crossing status findings, current risks, source limitations, and uncertainties.",
+      "maxTurns" : 6,
+      "name" : "GeorgiaBorderSpecialist",
+      "positionX" : 677.265625,
+      "positionY" : 457.08203125,
+      "properties" : [
+        {
+          "description" : "Python runtime output for Georgia government-source collection.",
+          "key" : "geGovSources",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final structured Georgia research result.",
+          "key" : "geResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Analyze Azerbaijan using the incoming Python runtime crawler output as primary current evidence. Parse stdout JSON when present, audit selectedLinks and discoveredLinks, and let the LLM decide final relevance from linkTitle\/pageTitle\/source text instead of blindly trusting the Python title prefilter. Note stderr\/exitCode\/timedOut if present, translate source material into the user's prompt language where needed, and return azResult with: sources checked, fetch metadata, title-based link relevance decisions, translated current evidence, border crossing status findings, current risks, source limitations, and uncertainties.",
+      "maxTurns" : 6,
+      "name" : "AzerbaijanBorderSpecialist",
+      "positionX" : 103.0390625,
+      "positionY" : 587.65625,
+      "properties" : [
+        {
+          "description" : "Python runtime output for Azerbaijan government-source collection.",
+          "key" : "azGovSources",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final structured Azerbaijan research result.",
+          "key" : "azResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Analyze Russia\/North Caucasus using the incoming Python runtime crawler output as primary current evidence. Parse stdout JSON when present, audit selectedLinks and discoveredLinks, and let the LLM decide final relevance from linkTitle\/pageTitle\/source text instead of blindly trusting the Python title prefilter. Note stderr\/exitCode\/timedOut if present, translate source material into the user's prompt language where needed, and return ruResult with: sources checked, fetch metadata, title-based link relevance decisions, translated current evidence, border crossing status findings, current risks, source limitations, and uncertainties.",
+      "maxTurns" : 6,
+      "name" : "RussiaNorthCaucasusSpecialist",
+      "positionX" : 993.2890625,
+      "positionY" : 601.9140625,
+      "properties" : [
+        {
+          "description" : "Python runtime output for Russia\/North Caucasus government-source collection.",
+          "key" : "ruGovSources",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final structured Russia\/North Caucasus research result.",
+          "key" : "ruResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Review the incoming country and regional research findings for accuracy, completeness, source attribution, Python execution evidence, translation fidelity, and clear separation between fetched government text, established facts, and analysis. Produce reviewFindings with approval status, required corrections, confidence notes, source gaps, and Python execution concerns. Preserve azResult, geResult, and ruResult substance for synthesis.",
+      "maxTurns" : 4,
+      "name" : "BorderAnalysisReviewer",
+      "positionX" : 469.73046875,
+      "positionY" : 703.0234375,
+      "properties" : [
+        {
+          "description" : "Research result from Azerbaijan specialist.",
+          "key" : "azResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Research result from Georgia specialist.",
+          "key" : "geResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Review findings, approval status, corrections, confidence notes, source gaps, and Python execution concerns.",
+          "key" : "reviewFindings",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Research result from Russia\/North Caucasus specialist.",
+          "key" : "ruResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "reviewer",
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Synthesize the reviewed Python-runtime based research findings into a comprehensive final report in the user's prompt language. Cover border situations, land border crossing status where evidence is available, territorial disputes, security dynamics, uncertainties, and regional implications for Azerbaijan, Georgia, and Russia\/North Caucasus. Cite official URLs checked, include translated source evidence where useful, and clearly mark unresolved source gaps. Produce finalSummary.",
+      "maxTurns" : 5,
+      "name" : "FinalReportSynthesizer",
+      "positionX" : 851.8671875,
+      "positionY" : 790.046875,
+      "properties" : [
+        {
+          "description" : "Research result from Azerbaijan specialist.",
+          "key" : "azResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final synthesized border situation report.",
+          "key" : "finalSummary",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Research result from Georgia specialist.",
+          "key" : "geResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Reviewer findings.",
+          "key" : "reviewFindings",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Research result from Russia\/North Caucasus specialist.",
+          "key" : "ruResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "synthesizer",
+      "temperature" : 0.2,
+      "toolName" : ""
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Azerbaijan Python runtime output is available or failed with diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Analyze Azerbaijan",
+      "sharedStateKeys" : "azGovSources, azResult",
+      "source" : "AzerbaijanScriptRunnerAgent",
+      "target" : "AzerbaijanBorderSpecialist"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Georgia Python runtime output is available or failed with diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Analyze Georgia",
+      "sharedStateKeys" : "geGovSources, geResult",
+      "source" : "GeorgiaScriptRunnerAgent",
+      "target" : "GeorgiaBorderSpecialist"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Russia Python runtime output is available or failed with diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Analyze Russia\/North Caucasus",
+      "sharedStateKeys" : "ruGovSources, ruResult",
+      "source" : "RussiaScriptRunnerAgent",
+      "target" : "RussiaNorthCaucasusSpecialist"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Start of research task.",
+      "kind" : "delegation",
+      "label" : "Plan Azerbaijan Python crawl",
+      "sharedStateKeys" : "azScriptPlan",
+      "source" : "ResearchCoordinator",
+      "target" : "AzerbaijanScriptPlannerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Start of research task.",
+      "kind" : "delegation",
+      "label" : "Plan Georgia Python crawl",
+      "sharedStateKeys" : "geScriptPlan",
+      "source" : "ResearchCoordinator",
+      "target" : "GeorgiaScriptPlannerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Start of research task.",
+      "kind" : "delegation",
+      "label" : "Plan Russia Python crawl",
+      "sharedStateKeys" : "ruScriptPlan",
+      "source" : "ResearchCoordinator",
+      "target" : "RussiaScriptPlannerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Azerbaijan script plan is available for audit.",
+      "kind" : "handoff",
+      "label" : "Run Azerbaijan Python",
+      "sharedStateKeys" : "azScriptPlan, azGovSources",
+      "source" : "AzerbaijanScriptPlannerAgent",
+      "target" : "AzerbaijanScriptRunnerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Georgia script plan is available for audit.",
+      "kind" : "handoff",
+      "label" : "Run Georgia Python",
+      "sharedStateKeys" : "geScriptPlan, geGovSources",
+      "source" : "GeorgiaScriptPlannerAgent",
+      "target" : "GeorgiaScriptRunnerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Russia script plan is available for audit.",
+      "kind" : "handoff",
+      "label" : "Run Russia Python",
+      "sharedStateKeys" : "ruScriptPlan, ruGovSources",
+      "source" : "RussiaScriptPlannerAgent",
+      "target" : "RussiaScriptRunnerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Azerbaijan research result is available.",
+      "kind" : "artifactFlow",
+      "label" : "Send Azerbaijan result",
+      "sharedStateKeys" : "azResult",
+      "source" : "AzerbaijanBorderSpecialist",
+      "target" : "BorderAnalysisReviewer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Georgia research result is available.",
+      "kind" : "artifactFlow",
+      "label" : "Send Georgia result",
+      "sharedStateKeys" : "geResult",
+      "source" : "GeorgiaBorderSpecialist",
+      "target" : "BorderAnalysisReviewer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Russia\/North Caucasus research result is available.",
+      "kind" : "artifactFlow",
+      "label" : "Send Russia result",
+      "sharedStateKeys" : "ruResult",
+      "source" : "RussiaNorthCaucasusSpecialist",
+      "target" : "BorderAnalysisReviewer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Reviewer has findings or approval.",
+      "kind" : "handoff",
+      "label" : "Synthesize final report",
+      "sharedStateKeys" : "azResult, geResult, ruResult, reviewFindings, finalSummary",
+      "source" : "BorderAnalysisReviewer",
+      "target" : "FinalReportSynthesizer"
+    }
+  ],
+  "goal" : "Use Python runtime tool runners to collect current official government-source information with bounded 1-2 link-deep crawling, preserve Python execution evidence, let LLM agents judge title-based link relevance, translate foreign-language material into the user's prompt language where needed, and analyze the current border situation and geopolitical dynamics for Azerbaijan, Georgia, and Russia\/North Caucasus.",
+  "name" : "Border Crossing Research",
+  "pattern" : "coordinator",
+  "summary" : "Python-runtime border situation research workflow with ScriptPlannerAgent planning, bounded title-link crawling by ScriptRunnerAgent stages, LLM relevance audit, specialist analysis, review, and final synthesis.",
+  "systemInstruction" : "Coordinate current government-source border research using a separated Python script planning and execution pattern. Planner agents produce auditable plans only, including title-based relevance criteria for 1-2 link-deep crawling. Runner agents execute the bound python_runtime tool with configured schema arguments only. Preserve source attribution, Python stdout\/stderr\/exit metadata, selected\/discovered link titles, uncertainty notes, and translations into the user's prompt language."
+}

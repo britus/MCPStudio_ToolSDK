@@ -1,9 +1,19 @@
 {
   "description" : "Estimate realistic driving duration for a given distance and country. Use this skill when the user asks how many days a trip will take, provides or implies a distance in kilometers and a country, or asks to calculate travel duration at an average speed of 55 km\/h with 6.5 driving hours per day while considering road and geological conditions.",
   "enabledToolNames" : [
+    "file_exists",
+    "get_documents_path",
+    "get_temp_path",
+    "http_get_data",
+    "list_files",
+    "mkdir",
     "nodejs_runtime",
+    "python_runtime",
+    "read_file",
     "scrape_web_page",
-    "skill_execute"
+    "shell_call",
+    "skill_execute",
+    "write_file"
   ],
   "name" : "driving-duration-estimator",
   "promptTemplate" : "",

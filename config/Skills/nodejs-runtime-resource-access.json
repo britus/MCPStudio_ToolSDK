@@ -1,7 +1,17 @@
 {
   "description" : "Guides the assistant in using the Node.js runtime tool for JavaScript automation and careful local or remote resource access.",
   "enabledToolNames" : [
-    "nodejs_runtime"
+    "file_exists",
+    "get_documents_path",
+    "get_temp_path",
+    "list_files",
+    "mkdir",
+    "nodejs_runtime",
+    "read_file",
+    "scrape_web_page",
+    "shell_call",
+    "skill_execute",
+    "write_file"
   ],
   "modelPreferences" : {
 
