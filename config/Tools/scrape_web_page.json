@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-01T03:11:47.193Z",
+    "lastModified" : "2026-07-03T07:28:20.950Z",
     "priority" : 0.9
   },
   "description" : "Scrape web page (This tool strip some HTML tags)  from original HTML code.",

@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-01T03:11:47.186Z",
+    "lastModified" : "2026-07-03T07:28:20.945Z",
     "priority" : 0.9
   },
   "description" : "Write\/Saves content to a file on local file system",

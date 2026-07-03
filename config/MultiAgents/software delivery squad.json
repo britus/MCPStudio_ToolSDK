@@ -33,7 +33,7 @@
       "maxTurns" : 6,
       "name" : "Planner",
       "positionX" : 591.8515625,
-      "positionY" : 86.625,
+      "positionY" : 86.5,
       "properties" : [
         {
           "description" : "Optional constraints such as platform, architecture, or code style. Suitable for narrowing the plan and avoiding broad refactors.",
@@ -55,7 +55,7 @@
       "modelName" : "gpt-4.1",
       "name" : "List directory tool",
       "positionX" : 421.25390625,
-      "positionY" : 322.62109375,
+      "positionY" : 322.50390625,
       "properties" : [
         {
           "description" : "If empty, use user given directory name from prompt.",
@@ -118,8 +118,8 @@
       "maxTurns" : 4,
       "modelName" : "",
       "name" : "Verifier",
-      "positionX" : 729.0017755681819,
-      "positionY" : 555.8117897727273,
+      "positionX" : 729.1228693181819,
+      "positionY" : 555.6867897727273,
       "properties" : [
         {
           "description" : "The verification command or tool input. Useful for making test evidence repeatable.",

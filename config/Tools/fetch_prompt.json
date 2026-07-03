@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-01T03:11:47.187Z",
+    "lastModified" : "2026-07-03T07:28:20.946Z",
     "priority" : 0.9
   },
   "description" : "Fetch an MCP prompt definition by name.",
