@@ -1,77 +1,77 @@
 {
-  "annotations" : {
-    "audience" : [
+  "annotations": {
+    "audience": [
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-04T04:46:18.494Z",
-    "priority" : 0.9
+    "lastModified": "2026-07-04T04:46:18.494Z",
+    "priority": 0.9
   },
-  "description" : "Commit a validated multi-agent workflow draft into MCP Studio. Requires a professional license.",
-  "execHandler" : "MultiAgentWorkflowDraftHandler",
-  "execMethod" : "commitMultiAgentWorkflowDraft",
-  "inputSchema" : {
-    "properties" : {
-      "draft" : {
-        "description" : "Workflow draft object to commit.",
-        "name" : "draft",
-        "type" : "object"
+  "description": "Commit a validated multi-agent workflow draft into MCP Studio. Requires a professional license. Commit only after validation passes and the user intent to save/create is clear.",
+  "execHandler": "MultiAgentWorkflowDraftHandler",
+  "execMethod": "commitMultiAgentWorkflowDraft",
+  "inputSchema": {
+    "properties": {
+      "draft": {
+        "description": "Workflow draft object to commit. Only pass drafts that have been validated and reviewed for semantic completeness: agent responsibilities, relationship links, sharedStateKeys, artifactPolicy, configurable properties, and tool binding assumptions.",
+        "name": "draft",
+        "type": "object"
       },
-      "draft_id" : {
-        "description" : "Temporary draft identifier returned by create_multi_agent_workflow_draft.",
-        "name" : "draft_id",
-        "type" : "string"
+      "draft_id": {
+        "description": "Temporary draft identifier returned by create_multi_agent_workflow_draft.",
+        "name": "draft_id",
+        "type": "string"
       },
-      "draft_json" : {
-        "description" : "Alternative JSON string representation of the workflow draft.",
-        "name" : "draft_json",
-        "type" : "string"
+      "draft_json": {
+        "description": "Alternative JSON string representation of the workflow draft.",
+        "name": "draft_json",
+        "type": "string"
       }
     },
-    "type" : "object"
+    "type": "object"
   },
-  "name" : "agent_workflow_draft_commit",
-  "outputSchema" : {
-    "properties" : {
-      "committed" : {
-        "description" : "Whether the workflow was persisted.",
-        "name" : "committed",
-        "type" : "boolean"
+  "name": "agent_workflow_draft_commit",
+  "outputSchema": {
+    "properties": {
+      "committed": {
+        "description": "Whether the workflow was persisted.",
+        "name": "committed",
+        "type": "boolean"
       },
-      "errors" : {
-        "description" : "Validation or commit errors.",
-        "name" : "errors",
-        "type" : "array"
+      "errors": {
+        "description": "Validation or commit errors.",
+        "name": "errors",
+        "type": "array"
       },
-      "success" : {
-        "description" : "Operation status.",
-        "name" : "success",
-        "type" : "boolean"
+      "success": {
+        "description": "Operation status.",
+        "name": "success",
+        "type": "boolean"
       },
-      "valid" : {
-        "description" : "Whether the draft passed validation.",
-        "name" : "valid",
-        "type" : "boolean"
+      "valid": {
+        "description": "Whether the draft passed validation.",
+        "name": "valid",
+        "type": "boolean"
       },
-      "workflow_id" : {
-        "description" : "Created workflow UUID.",
-        "name" : "workflow_id",
-        "type" : "string"
+      "workflow_id": {
+        "description": "Created workflow UUID.",
+        "name": "workflow_id",
+        "type": "string"
       },
-      "workflow_name" : {
-        "description" : "Created workflow name.",
-        "name" : "workflow_name",
-        "type" : "string"
+      "workflow_name": {
+        "description": "Created workflow name.",
+        "name": "workflow_name",
+        "type": "string"
       }
     },
-    "required" : [
+    "required": [
       "success",
       "committed",
       "valid"
     ],
-    "type" : "object"
+    "type": "object"
   },
-  "pluginName" : "",
-  "scriptName" : "",
-  "toolType" : "BuiltinTool"
+  "pluginName": "",
+  "scriptName": "",
+  "toolType": "BuiltinTool"
 }
