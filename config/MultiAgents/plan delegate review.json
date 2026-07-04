@@ -1,0 +1,146 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Bereite die DuckDuckGo-Recherche für den Suchbegriff `EoF MCP Studio` vor. Delegiere die Ausführung an den konfigurierten Python Runtime Runner. Nicht selbst browsen; verlasse dich auf die Runner-Ausgabe und benenne erwartete Felder: resultLinks, checkedPages, hits, hitCount.",
+      "maxTurns" : 4,
+      "name" : "Specialist",
+      "positionX" : 537.73046875,
+      "positionY" : 109.44921875,
+      "properties" : [
+        {
+          "description" : "DuckDuckGo Linkermittlung und Trefferprüfung für EoF MCP Studio",
+          "key" : "capability",
+          "required" : true,
+          "value" : "duckduckgo-python-link-analysis",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Koordiniere den Ablauf: Specialist plant die DuckDuckGo-Suche, Python DuckDuckGo Runner führt das Mini-Script aus, Agent #3 prüft die Runner-Ausgabe und synthetisiert die Treffer für den Suchbegriff `EoF MCP Studio`.",
+      "maxTurns" : 6,
+      "name" : "Coordinator",
+      "positionX" : 124.734375,
+      "positionY" : 110.9765625,
+      "properties" : [
+        {
+          "description" : "",
+          "key" : "handoffPolicy",
+          "required" : true,
+          "value" : "delegate-run-review-synthesize",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Review the Python DuckDuckGo Runner output. Validate which checkedPages have containsPhrase=true, summarize hits with URLs, titles, snippets, status codes, and errors. If hitCount is 0, report that no fetched DuckDuckGo result page contained the exact phrase `EoF MCP Studio` and list the checked links.",
+      "maxTurns" : 6,
+      "name" : "Agent #3",
+      "positionX" : 141.43359375,
+      "positionY" : 358.62109375,
+      "properties" : [
+        {
+          "description" : "Verified DuckDuckGo\/Python runtime data for EoF MCP Studio",
+          "key" : "solvedData",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "synthesizer",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute the bound `python_runtime` tool exactly with the configured inlineScript and stdinJSON. The script queries DuckDuckGo HTML for `EoF MCP Studio`, extracts result links, fetches each result link, checks whether the phrase appears in the URL, anchor text, page title, or page text, and emits structured JSON with resultLinks, checkedPages, hits, hitCount, checkedCount, and fetch metadata. Do not generate or alter code at runtime.",
+      "maxTurns" : 3,
+      "name" : "DuckDuckGo",
+      "positionX" : 537.0234375,
+      "positionY" : 359.375,
+      "properties" : [
+        {
+          "description" : "Mini Python script: DuckDuckGo HTML suchen, Links extrahieren, Ergebnislinks abrufen und Phrase prüfen.",
+          "key" : "inlineScript",
+          "required" : true,
+          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nclass LinkExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.links = []\n        self.title_parts = []\n        self.text_parts = []\n        self.current = None\n        self.in_title = False\n        self.skip = 0\n\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs.get('href'):\n            self.current = {'href': attrs['href'], 'text': []}\n\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current:\n            text = clean(' '.join(self.current['text']))\n            self.links.append({'href': self.current['href'], 'text': text})\n            self.current = None\n\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current is not None:\n            self.current['text'].append(text)\n        self.text_parts.append(text)\n\ndef clean(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef unwrap_duckduckgo(url):\n    parsed = urllib.parse.urlparse(url)\n    qs = urllib.parse.parse_qs(parsed.query)\n    candidate = qs.get('uddg', [''])[0] or qs.get('u', [''])[0]\n    if candidate.startswith(('http:\/\/', 'https:\/\/')):\n        return urllib.parse.unquote(candidate)\n    return url\n\ndef fetch(url, timeout, max_bytes):\n    request = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntime\/1.0 DuckDuckGo link checker'})\n    with urllib.request.urlopen(request, timeout=timeout) as response:\n        raw = response.read(max_bytes)\n        encoding = response.headers.get_content_charset() or 'utf-8'\n        return response.geturl(), response.status, response.headers.get('content-type', ''), raw.decode(encoding, errors='replace')\n\ndef parse_page(html_text, base_url):\n    parser = LinkExtractor()\n    parser.feed(html_text)\n    title = clean(' '.join(parser.title_parts))\n    text = clean(' '.join(parser.text_parts))\n    links = []\n    seen = set()\n    for link in parser.links:\n        absolute = urllib.parse.urljoin(base_url, link['href'])\n        unwrapped = unwrap_duckduckgo(absolute)\n        parsed = urllib.parse.urlparse(unwrapped)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'anchorText': link['text']})\n    return title, text, links\n\ndef is_duckduckgo_result(url):\n    host = urllib.parse.urlparse(url).netloc.lower()\n    return 'duckduckgo.com' in host\n\ndef contains_phrase(*values, phrase):\n    needle = phrase.lower()\n    return needle in ' '.join(clean(v).lower() for v in values)\n\ndef main(params):\n    query = params.get('query', 'EoF MCP Studio')\n    phrase = params.get('matchPhrase', query)\n    timeout = int(params.get('requestTimeoutSeconds', 15))\n    max_bytes = int(params.get('maxBytesPerUrl', 350000))\n    max_results = int(params.get('maxResults', 10))\n    max_text = int(params.get('maxTextCharsPerUrl', 2500))\n    search_url = 'https:\/\/duckduckgo.com\/html\/?q=' + urllib.parse.quote_plus(query)\n\n    output = {\n        'query': query,\n        'matchPhrase': phrase,\n        'searchEngine': 'DuckDuckGo HTML',\n        'searchUrl': search_url,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'resultLinks': [],\n        'checkedPages': [],\n        'hits': []\n    }\n\n    final_url, status, content_type, html_text = fetch(search_url, timeout, max_bytes)\n    title, text, links = parse_page(html_text, final_url)\n    output['searchPage'] = {'finalUrl': final_url, 'statusCode': status, 'contentType': content_type, 'title': title}\n\n    candidates = []\n    for link in links:\n        url = link['url']\n        if is_duckduckgo_result(url) or 'duckduckgo.com\/y.js' in url:\n            continue\n        if url not in [item['url'] for item in candidates]:\n            candidates.append(link)\n        if len(candidates) >= max_results:\n            break\n    output['resultLinks'] = candidates\n\n    for link in candidates:\n        record = {'url': link['url'], 'anchorText': link.get('anchorText', '')}\n        try:\n            final, code, ctype, page_html = fetch(link['url'], timeout, max_bytes)\n            page_title, page_text, _ = parse_page(page_html, final)\n            hit = contains_phrase(link.get('anchorText', ''), link['url'], page_title, page_text, phrase=phrase)\n            record.update({\n                'finalUrl': final,\n                'statusCode': code,\n                'contentType': ctype,\n                'pageTitle': page_title,\n                'containsPhrase': hit,\n                'textSample': page_text[:max_text]\n            })\n            if hit:\n                output['hits'].append(record)\n        except Exception as exc:\n            record.update({'error': f'{type(exc).__name__}: {exc}', 'containsPhrase': False})\n        output['checkedPages'].append(record)\n\n    output['hitCount'] = len(output['hits'])\n    output['checkedCount'] = len(output['checkedPages'])\n    return output\n\nparams = json.load(sys.stdin) if not sys.stdin.isatty() else {}\nprint(json.dumps(main(params), ensure_ascii=False, indent=2))\n",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python executable resolution.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout and stderr from Python runtime.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Structured input for DuckDuckGo link analysis.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "{\"query\": \"EoF MCP Studio\", \"matchPhrase\": \"EoF MCP Studio\", \"requestTimeoutSeconds\": 15, \"maxBytesPerUrl\": 350000, \"maxTextCharsPerUrl\": 2500, \"maxResults\": 10}",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Maximum Python runtime duration.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "90",
+          "valueType" : "number"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.1,
+      "toolName" : "python_runtime"
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "",
+      "kind" : "delegation",
+      "label" : "Plan DuckDuckGo search",
+      "sharedStateKeys" : "",
+      "source" : "Coordinator",
+      "target" : "Specialist"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "",
+      "kind" : "review",
+      "label" : "Review checked links and hits",
+      "sharedStateKeys" : "solvedData",
+      "source" : "DuckDuckGo",
+      "target" : "Agent #3"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "",
+      "kind" : "artifactFlow",
+      "label" : "Run Python DuckDuckGo script",
+      "sharedStateKeys" : "",
+      "source" : "Specialist",
+      "target" : "DuckDuckGo"
+    }
+  ],
+  "goal" : "Query DuckDuckGo for `EoF MCP Studio`, inspect result links with Python runtime, review hits, and synthesize the findings.",
+  "name" : "Plan Delegate Review",
+  "pattern" : "coordinator",
+  "summary" : "Coordinator workflow with Python runtime DuckDuckGo link analysis",
+  "systemInstruction" : "Coordinate the DuckDuckGo Python-runtime workflow. Keep planning, tool execution, review, and synthesis separate. Preserve source URLs, checked links, hitCount, errors, and fetch metadata from the Python runtime output."
+}

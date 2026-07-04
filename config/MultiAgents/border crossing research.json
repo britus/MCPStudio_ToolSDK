@@ -157,8 +157,8 @@
       "maxTurns" : 4,
       "modelName" : "mistral-medium-latest",
       "name" : "RussiaScriptPlannerAgent2_MidSafety",
-      "positionX" : 1082.8642578125,
-      "positionY" : 200.7431640625,
+      "positionX" : 1111.5882161458333,
+      "positionY" : 186.58517795138889,
       "properties" : [
         {
           "description" : "Link relevance rule.",
@@ -271,8 +271,8 @@
       "maxTurns" : 4,
       "modelName" : "mistral-medium-latest",
       "name" : "GeorgiaScriptPlannerAgent1_MfaNews",
-      "positionX" : 619.7717013888889,
-      "positionY" : 321.8212890625,
+      "positionX" : 594.7239583333333,
+      "positionY" : 334.7119140625,
       "properties" : [
         {
           "description" : "Planner output.",
@@ -328,8 +328,8 @@
       "maxTurns" : 4,
       "modelName" : "mistral-medium-latest",
       "name" : "RussiaScriptPlannerAgent1_MidNews",
-      "positionX" : 1012.244140625,
-      "positionY" : 361.6904296875,
+      "positionX" : 1026.5323350694446,
+      "positionY" : 337.38487413194446,
       "properties" : [
         {
           "description" : "Link relevance rule.",
@@ -385,8 +385,8 @@
       "maxTurns" : 4,
       "modelName" : "mistral-medium-latest",
       "name" : "GeorgiaScriptPlannerAgent2_MfaStatements",
-      "positionX" : 746.4504123263889,
-      "positionY" : 436.7763671875,
+      "positionX" : 745.2655164930557,
+      "positionY" : 445.1357421875,
       "properties" : [
         {
           "description" : "Planner output.",
@@ -499,8 +499,8 @@
       "maxTurns" : 4,
       "modelName" : "mistral-medium-latest",
       "name" : "GeorgiaScriptPlannerAgent3_SarpiBorderCrossingHub",
-      "positionX" : 1046.817599826389,
-      "positionY" : 567.32421875,
+      "positionX" : 1039.899197048611,
+      "positionY" : 567.3025173611111,
       "properties" : [
         {
           "description" : "Planner output.",
@@ -838,8 +838,9 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Review country findings for accuracy, attribution, search provenance, execution evidence, translation, gaps, and uncertainty. Produce reviewFindings.",
-      "llmProviderID" : "none",
+      "llmProviderID" : "mistralai",
       "maxTurns" : 4,
+      "modelName" : "mistral-large-2512",
       "name" : "BorderAnalysisReviewer",
       "positionX" : 842.46875,
       "positionY" : 1177.3837890625,

@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-03T07:28:20.958Z",
+    "lastModified" : "2026-07-04T04:46:18.493Z",
     "priority" : 0.9
   },
   "description" : "Execute an EoF MCP Studio multi-agent workflow through the Agent Workflow Runtime. Use this when the user asks to run, execute, start, or use a workflow for a task. Do not simulate workflow execution with any other tools or by reasoning through agents manually.",

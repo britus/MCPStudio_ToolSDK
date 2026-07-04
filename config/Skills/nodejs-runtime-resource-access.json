@@ -32,6 +32,7 @@
     "use node http",
     "use node https",
     "node script tool",
+    "nodejs script",
     "run javascript"
   ],
   "visibilityScope" : "global"

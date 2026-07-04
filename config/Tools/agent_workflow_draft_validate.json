@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-03T07:28:20.957Z",
+    "lastModified" : "2026-07-04T04:46:18.492Z",
     "priority" : 0.9
   },
   "description" : "Validate a multi-agent workflow draft or a temporary draft_id before saving it.",

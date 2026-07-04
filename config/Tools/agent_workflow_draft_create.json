@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-03T07:28:20.957Z",
+    "lastModified" : "2026-07-04T04:46:18.493Z",
     "priority" : 0.9
   },
   "description" : "Create and normalize a draft multi-agent workflow without saving it. Use this before validating or committing a generated workflow.",
