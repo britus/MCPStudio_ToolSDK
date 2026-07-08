@@ -5,7 +5,7 @@
 ## Build
 
 ```bash
-cd /Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/PythonRuntimePlugin
+cd ~/toolsdk/PythonRuntimePlugin
 mkdir -p build
 cd build
 cmake ..
@@ -46,7 +46,7 @@ build/bundle/PythonRuntimeTool.bundle
 ```json
 {
   "pythonExecutable": "python3",
-  "scriptPath": "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/PythonRuntimePlugin/examples/echo_tool.py",
+  "scriptPath": "~/toolsdk/PythonRuntimePlugin/examples/echo_tool.py",
   "stdinJSON": { "message": "hello" },
   "timeoutSeconds": 10,
   "resultMode": "capture"

@@ -5,7 +5,7 @@
 ## Build
 
 ```bash
-cd /Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/NodeJSRuntimePlugin
+cd ~/toolsdk/NodeJSRuntimePlugin
 mkdir -p build
 cd build
 cmake ..
@@ -46,7 +46,7 @@ build/bundle/NodeJSRuntimeTool.bundle
 ```json
 {
   "nodeExecutable": "node",
-  "scriptPath": "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/NodeJSRuntimePlugin/examples/echo_tool.js",
+  "scriptPath": "~/toolsdk/NodeJSRuntimePlugin/examples/echo_tool.js",
   "stdinJSON": { "message": "hello" },
   "timeoutSeconds": 10,
   "resultMode": "capture"

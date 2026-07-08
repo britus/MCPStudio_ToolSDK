@@ -103,8 +103,7 @@ function parseParams(jsonParams) {
  * @returns {string} JSON result or plain text
  */
 function toolEntry(sid, handlerName, jsonParams) {
-    console.log(`[toolEntry]: sid=${sid || 'sid.unknown'} handler=${handlerName || 'Unknown'}`);
-
+    console.log(`[toolEntry]: handler=${handlerName || 'Unknown'}`);
     try {   
         const handler = getHandler(handlerName);
 

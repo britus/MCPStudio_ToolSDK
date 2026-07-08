@@ -351,7 +351,7 @@ var dirPath = params.dirPath || "";
 **Usage Example**:
 ```javascript
 const result = analyzeDirectory({
-  dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/Scripts"
+  dirPath: "~/toolsdk/Scripts"
 });
 ```
 
@@ -401,7 +401,7 @@ var dirPath = params.dirPath || "";
 **Usage Example**:
 ```javascript
 const result = mkdir({
-  dirPath: "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/NewFolder"
+  dirPath: "~/toolsdk/NewFolder"
 });
 ```
 

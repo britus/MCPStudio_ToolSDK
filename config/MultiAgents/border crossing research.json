@@ -4,11 +4,12 @@
       "executionMode" : "llmInstruction",
       "instruction" : "Coordinate search-first border research. Delegate one-URL crawl plans, run configured Python runners, then route outputs to specialists, review, and synthesis. Require URLs, titles, fetch metadata, search provenance, translations, and uncertainty notes.",
       "llmProviderID" : "mistralai",
+      "logLevel" : "warning",
       "maxTurns" : 10,
       "modelName" : "mistral-medium-latest",
       "name" : "ResearchCoordinator",
-      "positionX" : 535.87109375,
-      "positionY" : 86.0234375,
+      "positionX" : 507.92578125,
+      "positionY" : 83.1953125,
       "properties" : [
         {
           "description" : "Output language.",
@@ -28,7 +29,7 @@
           "description" : "Shared state keys.",
           "key" : "sharedProperties",
           "required" : false,
-          "value" : "azScriptPlan1, azScriptPlan2, azScriptPlan3, ruScriptPlan1, ruScriptPlan2, ruScriptPlan3, geScriptPlan1, geScriptPlan2, geScriptPlan3, azGovSources, geGovSources, ruGovSources, azResult, geResult, ruResult, reviewFindings, finalSummary",
+          "value" : "azScriptPlan, ruScriptPlan, geScriptPlan, azResult, geResult, ruResult, reviewFindings, finalSummary",
           "valueType" : "string"
         }
       ],
@@ -38,54 +39,62 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Plan Azerbaijan crawl for this single url. Do not run tools. Write azScriptPlan1: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
+      "instruction" : "Plan Azerbaijan crawl with given Python script file name \/Users\/eofmc\/EoF\/python_crawler\/crawler_az_border_status.py \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nURLs:\nhttps:\/\/www.migration.gov.az\/en\/press\/26,\nhttps:\/\/mfa.gov.az\/en\/news,\nhttps:\/\/mfa.gov.az\/en\/category\/announcements,\nhttps:\/\/www.gov.uk\/foreign-travel-advice\/azerbaijan,\nhttps:\/\/en.apa.az\/\n\nUse the agent properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": \"<complete script file name>\",\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
       "llmProviderID" : "mistralai",
+      "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "AzerbaijanScriptPlannerAgent1_MfaNews",
-      "positionX" : 120.10470920138889,
-      "positionY" : 91.455078125,
+      "modelName" : "devstral-latest",
+      "name" : "AzerbaijanScriptPlanner",
+      "positionX" : 174.01486545138889,
+      "positionY" : 197.36328125,
       "properties" : [
         {
-          "description" : "Planner output.",
-          "key" : "azScriptPlan1",
-          "required" : false,
+          "description" : "Input parameter from research coordinator agent.",
+          "key" : "azScriptPlan",
+          "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
+          "description" : "",
+          "key" : "stdinJSON.maxBytesPerUrl",
           "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
+          "value" : "50000",
           "valueType" : "string"
         },
         {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
+          "description" : "Number of subpages to crawl",
+          "key" : "stdinJSON.maxCrawlDepth",
           "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
+          "value" : "5",
           "valueType" : "string"
         },
         {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Azerbaijan land border crossing status Georgia Russia Armenia official travel security; Azerbaijan border checkpoint customs land borders official announcement; site:mfa.gov.az Azerbaijan border crossing security announcement; site:migration.gov.az Azerbaijan land border crossing rules",
+          "description" : "",
+          "key" : "stdinJSON.maxLinksPerPage",
+          "required" : false,
+          "value" : "16",
           "valueType" : "string"
         },
         {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/mfa.gov.az\/en\/news",
+          "description" : "Maximum number of reported web pages.",
+          "key" : "stdinJSON.maxPages",
+          "required" : false,
+          "value" : "24",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxSearchResultsPerPage",
+          "required" : false,
+          "value" : "8",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxTextCharsPerUrl",
+          "required" : false,
+          "value" : "4000",
           "valueType" : "string"
         }
       ],
@@ -95,54 +104,62 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Plan Russia\/North Caucasus crawl for this single url. Do not run tools. Write ruScriptPlan3: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
+      "instruction" : "Plan Russia\/North Caucasus crawl with given Python script file name \/Users\/eofmc\/EoF\/python_crawler\/crawler_ru_border_status.py \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nURLs:\nhttps:\/\/mid.ru\/en\/foreign_policy\/news\/,\nhttps:\/\/mid.ru\/en\/foreign_policy\/international_safety\/,\nhttps:\/\/russiable.com\/russia-borders\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": \"<complete script file name>\",\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
       "llmProviderID" : "mistralai",
+      "logLevel" : "warning",
       "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "RussiaScriptPlannerAgent3_BorderCrossingHubAsia",
-      "positionX" : 1360.5302734375,
-      "positionY" : 93.794921875,
+      "modelName" : "devstral-latest",
+      "name" : "RussiaScriptPlanner",
+      "positionX" : 912.8583984375,
+      "positionY" : 199.595703125,
       "properties" : [
         {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
-          "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
-          "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Planner output.",
-          "key" : "ruScriptPlan3",
-          "required" : false,
+          "description" : "Input parameter from research coordinator agent.",
+          "key" : "ruScriptPlan",
+          "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
+          "description" : "",
+          "key" : "stdinJSON.maxBytesPerUrl",
+          "required" : false,
+          "value" : "50000",
           "valueType" : "string"
         },
         {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Russia North Caucasus Georgia Azerbaijan land border crossing security official statement; Russia Georgia border crossing Verkhny Lars customs checkpoint travel advisory; site:mid.ru Georgia Azerbaijan border crossing Caucasus statement; site:customs.gov.ru border crossing Georgia Azerbaijan North Caucasus",
+          "description" : "Number of subpages to crawl",
+          "key" : "stdinJSON.maxCrawlDepth",
+          "required" : false,
+          "value" : "5",
           "valueType" : "string"
         },
         {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/bordercrossinghub.com\/asia\/",
+          "description" : "",
+          "key" : "stdinJSON.maxLinksPerPage",
+          "required" : false,
+          "value" : "16",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Maximum number of reported web pages.",
+          "key" : "stdinJSON.maxPages",
+          "required" : false,
+          "value" : "24",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxSearchResultsPerPage",
+          "required" : false,
+          "value" : "8",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxTextCharsPerUrl",
+          "required" : false,
+          "value" : "4000",
           "valueType" : "string"
         }
       ],
@@ -152,396 +169,62 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Plan Russia\/North Caucasus crawl for this single url. Do not run tools. Write ruScriptPlan2: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
+      "instruction" : "Plan Georgia crawl with given Python script file name \/Users\/eofmc\/EoF\/python_crawler\/crawler_ge_border_status.py\n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nURLs:\nhttps:\/\/mfa.gov.ge\/en\/news,\nhttps:\/\/mfa.gov.ge\/en\/statements-by-mfa\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": \"<complete script file name>\",\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
       "llmProviderID" : "mistralai",
+      "logLevel" : "warning",
       "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "RussiaScriptPlannerAgent2_MidSafety",
-      "positionX" : 1111.5882161458333,
-      "positionY" : 186.58517795138889,
+      "modelName" : "devstral-latest",
+      "name" : "GeorgiaScriptPlanner",
+      "positionX" : 506.43489583333326,
+      "positionY" : 303.9267578125,
       "properties" : [
         {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
-          "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
-          "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Planner output.",
-          "key" : "ruScriptPlan2",
-          "required" : false,
+          "description" : "Input parameter from research coordinator agent.",
+          "key" : "geScriptPlan",
+          "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Russia North Caucasus Georgia Azerbaijan land border crossing security official statement; Russia Georgia border crossing Verkhny Lars customs checkpoint travel advisory; site:mid.ru Georgia Azerbaijan border crossing Caucasus statement; site:customs.gov.ru border crossing Georgia Azerbaijan North Caucasus",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/mid.ru\/en\/foreign_policy\/international_safety\/",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "planner",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Plan Azerbaijan crawl for this single url. Do not run tools. Write azScriptPlan2: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
-      "llmProviderID" : "mistralai",
-      "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "AzerbaijanScriptPlannerAgent2_MfaAnnouncements",
-      "positionX" : 236.11252170138889,
-      "positionY" : 267.703125,
-      "properties" : [
-        {
-          "description" : "Planner output.",
-          "key" : "azScriptPlan2",
+          "description" : "",
+          "key" : "stdinJSON.maxBytesPerUrl",
           "required" : false,
-          "value" : "",
+          "value" : "50000",
           "valueType" : "string"
         },
         {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
+          "description" : "Number of subpages to crawl",
+          "key" : "stdinJSON.maxCrawlDepth",
           "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
+          "value" : "5",
           "valueType" : "string"
         },
         {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
+          "description" : "",
+          "key" : "stdinJSON.maxLinksPerPage",
           "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
+          "value" : "16",
           "valueType" : "string"
         },
         {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Azerbaijan land border crossing status Georgia Russia Armenia official travel security; Azerbaijan border checkpoint customs land borders official announcement; site:mfa.gov.az Azerbaijan border crossing security announcement; site:migration.gov.az Azerbaijan land border crossing rules",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/mfa.gov.az\/en\/category\/announcements",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "planner",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Plan Georgia crawl for this single url. Do not run tools. Write geScriptPlan1: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
-      "llmProviderID" : "mistralai",
-      "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "GeorgiaScriptPlannerAgent1_MfaNews",
-      "positionX" : 594.7239583333333,
-      "positionY" : 334.7119140625,
-      "properties" : [
-        {
-          "description" : "Planner output.",
-          "key" : "geScriptPlan1",
+          "description" : "Maximum number of reported web pages.",
+          "key" : "stdinJSON.maxPages",
           "required" : false,
-          "value" : "",
+          "value" : "24",
           "valueType" : "string"
         },
         {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
+          "description" : "",
+          "key" : "stdinJSON.maxSearchResultsPerPage",
           "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
+          "value" : "8",
           "valueType" : "string"
         },
         {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
+          "description" : "",
+          "key" : "stdinJSON.maxTextCharsPerUrl",
           "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Georgia land border crossing status Abkhazia South Ossetia Russia official travel security; Georgia border checkpoints customs travel advisory Azerbaijan Armenia Russia; site:mfa.gov.ge Georgia border crossing security statement; site:rs.ge Georgia customs border checkpoint",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/mfa.gov.ge\/en\/news",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "planner",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Plan Russia\/North Caucasus crawl for this single url. Do not run tools. Write ruScriptPlan1: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
-      "llmProviderID" : "mistralai",
-      "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "RussiaScriptPlannerAgent1_MidNews",
-      "positionX" : 1026.5323350694446,
-      "positionY" : 337.38487413194446,
-      "properties" : [
-        {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
-          "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
-          "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Planner output.",
-          "key" : "ruScriptPlan1",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Russia North Caucasus Georgia Azerbaijan land border crossing security official statement; Russia Georgia border crossing Verkhny Lars customs checkpoint travel advisory; site:mid.ru Georgia Azerbaijan border crossing Caucasus statement; site:customs.gov.ru border crossing Georgia Azerbaijan North Caucasus",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/mid.ru\/en\/foreign_policy\/news\/",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "planner",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Plan Georgia crawl for this single url. Do not run tools. Write geScriptPlan2: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
-      "llmProviderID" : "mistralai",
-      "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "GeorgiaScriptPlannerAgent2_MfaStatements",
-      "positionX" : 745.2655164930557,
-      "positionY" : 445.1357421875,
-      "properties" : [
-        {
-          "description" : "Planner output.",
-          "key" : "geScriptPlan2",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
-          "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
-          "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Georgia land border crossing status Abkhazia South Ossetia Russia official travel security; Georgia border checkpoints customs travel advisory Azerbaijan Armenia Russia; site:mfa.gov.ge Georgia border crossing security statement; site:rs.ge Georgia customs border checkpoint",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/mfa.gov.ge\/en\/statements-by-mfa",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "planner",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Plan Azerbaijan crawl for this single url. Do not run tools. Write azScriptPlan3: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
-      "llmProviderID" : "mistralai",
-      "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "AzerbaijanScriptPlannerAgent3_BorderCrossingHubAsia",
-      "positionX" : 377.2883029513889,
-      "positionY" : 460.869140625,
-      "properties" : [
-        {
-          "description" : "Planner output.",
-          "key" : "azScriptPlan3",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
-          "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
-          "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Azerbaijan land border crossing status Georgia Russia Armenia official travel security; Azerbaijan border checkpoint customs land borders official announcement; site:mfa.gov.az Azerbaijan border crossing security announcement; site:migration.gov.az Azerbaijan land border crossing rules",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/bordercrossinghub.com\/asia\/",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "planner",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Plan Georgia crawl for this single url. Do not run tools. Write geScriptPlan3: search-first steps, relevance rule, runtime args, stdout fields, limits, and risks.",
-      "llmProviderID" : "mistralai",
-      "maxTurns" : 4,
-      "modelName" : "mistral-medium-latest",
-      "name" : "GeorgiaScriptPlannerAgent3_SarpiBorderCrossingHub",
-      "positionX" : 1039.899197048611,
-      "positionY" : 567.3025173611111,
-      "properties" : [
-        {
-          "description" : "Planner output.",
-          "key" : "geScriptPlan3",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Link relevance rule.",
-          "key" : "linkTitleRelevancePolicy",
-          "required" : false,
-          "value" : "Keep links about borders, crossings, checkpoints, customs, security, disputes, travel rules, or target regions. Drop nav, ads, social, media, language, and unrelated institutional pages.",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Max crawl depth.",
-          "key" : "maxCrawlDepth",
-          "required" : false,
-          "value" : "2",
-          "valueType" : "number"
-        },
-        {
-          "description" : "Search engines.",
-          "key" : "searchEngines",
-          "required" : true,
-          "value" : "google, duckduckgo, bing",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Search queries.",
-          "key" : "searchQueries",
-          "required" : true,
-          "value" : "Georgia land border crossing status Abkhazia South Ossetia Russia official travel security; Georgia border checkpoints customs travel advisory Azerbaijan Armenia Russia; site:mfa.gov.ge Georgia border crossing security statement; site:rs.ge Georgia customs border checkpoint",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Single seed URL.",
-          "key" : "url",
-          "required" : true,
-          "value" : "https:\/\/bordercrossinghub.com\/sarp-sarpi-border-crossing\/",
+          "value" : "4000",
           "valueType" : "string"
         }
       ],
@@ -553,23 +236,24 @@
       "executionMode" : "mcpTool",
       "instruction" : "Run the bound python_runtime crawler with configured stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
       "llmProviderID" : "lmStudio",
+      "logLevel" : "warning",
       "maxTurns" : 3,
       "modelName" : "",
       "name" : "RussiaScriptRunnerAgent",
-      "positionX" : 1357.8984375,
-      "positionY" : 595.8369140625,
+      "positionX" : 881.07421875,
+      "positionY" : 437.3681640625,
       "properties" : [
         {
-          "description" : "Bound crawler script.",
+          "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
           "key" : "inlineScript",
-          "required" : true,
-          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nSEARCH_ENGINE_HOSTS = {\n    'google.com', 'www.google.com',\n    'duckduckgo.com', 'www.duckduckgo.com', 'html.duckduckgo.com',\n    'bing.com', 'www.bing.com'\n}\n\nclass PageExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.parts = []\n        self.links = []\n        self.skip = 0\n        self.in_title = False\n        self.title_parts = []\n        self.current_link = None\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs_dict = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs_dict.get('href'):\n            self.current_link = {\n                'href': attrs_dict.get('href', ''),\n                'title': attrs_dict.get('title') or attrs_dict.get('aria-label') or '',\n                'textParts': []\n            }\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current_link:\n            text = clean_text(' '.join(self.current_link.pop('textParts', [])))\n            title = clean_text(self.current_link.get('title') or text)\n            self.links.append({'href': self.current_link.get('href', ''), 'title': title, 'text': text})\n            self.current_link = None\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current_link is not None:\n            self.current_link['textParts'].append(text)\n        self.parts.append(text)\n\ndef clean_text(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef extract_page(html_text, base_url):\n    parser = PageExtractor()\n    parser.feed(html_text)\n    text = clean_text(' '.join(parser.parts))\n    title = clean_text(' '.join(parser.title_parts))\n    links = []\n    seen = set()\n    for raw in parser.links:\n        href = raw.get('href', '')\n        absolute = urllib.parse.urljoin(base_url, href)\n        unwrapped = unwrap_search_result_url(absolute)\n        parsed = urllib.parse.urlparse(unwrapped)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'title': clean_text(raw.get('title') or raw.get('text') or normalized), 'text': clean_text(raw.get('text'))})\n    return title, text, links\n\ndef normalize_urls(value):\n    items = value if isinstance(value, list) else str(value or '').split(',')\n    return [item.strip() for item in items if item and item.strip()]\n\ndef normalize_terms(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[,;]', str(value or ''))\n    return [clean_text(item).lower() for item in items if clean_text(item)]\n\ndef normalize_queries(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[\\n;]', str(value or ''))\n    return [clean_text(item) for item in items if clean_text(item)]\n\ndef host(url):\n    return urllib.parse.urlparse(url).netloc.lower().removeprefix('www.')\n\ndef is_search_engine_url(url):\n    parsed_host = urllib.parse.urlparse(url).netloc.lower()\n    return parsed_host in SEARCH_ENGINE_HOSTS or parsed_host.removeprefix('www.') in {h.removeprefix('www.') for h in SEARCH_ENGINE_HOSTS}\n\ndef search_engine_name(url):\n    parsed_host = urllib.parse.urlparse(url).netloc.lower()\n    if 'duckduckgo' in parsed_host:\n        return 'DuckDuckGo'\n    if 'bing' in parsed_host:\n        return 'Bing'\n    if 'google' in parsed_host:\n        return 'Google'\n    return 'SearchEngine'\n\ndef same_site(url, seeds):\n    link_host = host(url)\n    return any(link_host == host(seed) for seed in seeds)\n\ndef blocked(url, patterns):\n    lowered = url.lower()\n    return any(pattern and pattern in lowered for pattern in patterns)\n\ndef unwrap_search_result_url(url):\n    parsed = urllib.parse.urlparse(url)\n    qs = urllib.parse.parse_qs(parsed.query)\n    for key in ('q', 'url', 'uddg', 'u'):\n        candidate = qs.get(key, [''])[0]\n        if candidate.startswith(('http:\/\/', 'https:\/\/')):\n            return urllib.parse.unquote(candidate)\n    return url\n\ndef make_search_urls(params, queries):\n    engines = normalize_terms(params.get('searchEngines', 'google, duckduckgo, bing'))\n    templates = {\n        'google': 'https:\/\/www.google.com\/search?q={query}',\n        'duckduckgo': 'https:\/\/duckduckgo.com\/html\/?q={query}',\n        'bing': 'https:\/\/www.bing.com\/search?q={query}'\n    }\n    urls = []\n    for query in queries:\n        encoded = urllib.parse.quote_plus(query)\n        for engine in engines:\n            template = templates.get(engine)\n            if template:\n                urls.append({'url': template.format(query=encoded), 'query': query, 'engine': engine.title() if engine != 'duckduckgo' else 'DuckDuckGo'})\n    return urls\n\ndef relevance_score(link, terms):\n    haystack = f\"{link.get('title', '')} {link.get('text', '')} {link.get('url', '')}\".lower()\n    return sum(1 for term in terms if term in haystack)\n\ndef fetch_url(url, params, depth, source_url=None, link_title='', source_type='seed'):\n    fetched_at = datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z'\n    req = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntimeTool\/1.0 (+bounded research crawler)'})\n    try:\n        with urllib.request.urlopen(req, timeout=int(params.get('requestTimeoutSeconds', 20))) as resp:\n            raw = resp.read(int(params.get('maxBytesPerUrl', 500000)))\n            encoding = resp.headers.get_content_charset() or 'utf-8'\n            html_text = raw.decode(encoding, errors='replace')\n            page_title, text, links = extract_page(html_text, resp.geturl())\n            return {\n                'url': url,\n                'finalUrl': resp.geturl(),\n                'sourceUrl': source_url,\n                'linkTitle': link_title,\n                'sourceType': source_type,\n                'depth': depth,\n                'pageTitle': page_title,\n                'statusCode': resp.status,\n                'contentType': resp.headers.get('content-type', ''),\n                'fetchedAtUTC': fetched_at,\n                'success': True,\n                'text': text[:int(params.get('maxTextCharsPerUrl', 20000))],\n                'links': links\n            }\n    except Exception as exc:\n        return {\n            'url': url,\n            'sourceUrl': source_url,\n            'linkTitle': link_title,\n            'sourceType': source_type,\n            'depth': depth,\n            'fetchedAtUTC': fetched_at,\n            'success': False,\n            'error': f'{type(exc).__name__}: {exc}'\n        }\n\ndef crawl(params):\n    seeds = normalize_urls(params.get('urls', params.get('url', '')))\n    queries = normalize_queries(params.get('searchQueries', ''))\n    terms = normalize_terms(params.get('relevantTitleTerms', 'border, crossing, customs, checkpoint, security, statement, announcement, travel, region, conflict, peace, Abkhazia, South Ossetia, Armenia, Azerbaijan, Georgia, Russia, Caucasus'))\n    blocked_patterns = normalize_terms(params.get('blockedUrlPatterns', 'facebook.com, instagram.com, youtube.com, t.me, telegram.me, whatsapp, mailto:'))\n    max_depth = max(0, min(int(params.get('maxCrawlDepth', 1)), 2))\n    max_links_per_page = max(1, int(params.get('maxLinksPerPage', 8)))\n    max_search_results_per_page = max(1, int(params.get('maxSearchResultsPerPage', 8)))\n    max_pages = max(len(seeds), int(params.get('maxPages', 36)))\n    search_pages = make_search_urls(params, queries)\n    pages = []\n    discovered = []\n    selected = []\n    search_results = []\n    queue = [dict(item, depth=0, sourceUrl=None, linkTitle=item.get('query', ''), sourceType='searchEngine') for item in search_pages]\n    queue.extend({'url': url, 'depth': 0, 'sourceUrl': None, 'linkTitle': '', 'sourceType': 'governmentSeed'} for url in seeds)\n    visited = set()\n\n    while queue and len(pages) < max_pages:\n        item = queue.pop(0)\n        url = item['url']\n        if url in visited or blocked(url, blocked_patterns):\n            continue\n        visited.add(url)\n        page = fetch_url(url, params, item['depth'], item.get('sourceUrl'), item.get('linkTitle', ''), item.get('sourceType', 'seed'))\n        links = page.pop('links', []) if page.get('success') else []\n        pages.append(page)\n        if not page.get('success') or item['depth'] >= max_depth:\n            continue\n\n        candidates = []\n        page_url = page.get('finalUrl', url)\n        search_page = is_search_engine_url(page_url) or item.get('sourceType') == 'searchEngine'\n        follow_roots = seeds + [page_url]\n        for link in links:\n            link_url = link['url']\n            if blocked(link_url, blocked_patterns) or link_url in visited:\n                continue\n            if search_page:\n                if is_search_engine_url(link_url):\n                    continue\n            elif not same_site(link_url, follow_roots):\n                continue\n            score = relevance_score(link, terms)\n            record = {\n                'sourceUrl': page_url,\n                'url': link_url,\n                'title': link.get('title', ''),\n                'anchorText': link.get('text', ''),\n                'depth': item['depth'] + 1,\n                'sourceType': 'searchResult' if search_page else 'siteCrawl',\n                'searchEngine': search_engine_name(page_url) if search_page else '',\n                'titleRelevanceScore': score\n            }\n            discovered.append(record)\n            if search_page:\n                search_results.append(record)\n            if score > 0:\n                candidates.append(record)\n        candidates.sort(key=lambda rec: (-rec['titleRelevanceScore'], rec['title'], rec['url']))\n        limit = max_search_results_per_page if search_page else max_links_per_page\n        for record in candidates[:limit]:\n            selected.append(record)\n            queue.append({'url': record['url'], 'depth': record['depth'], 'sourceUrl': record['sourceUrl'], 'linkTitle': record['title'], 'sourceType': record['sourceType']})\n\n    return {\n        'country': params.get('country', ''),\n        'searchEngines': normalize_terms(params.get('searchEngines', 'google, duckduckgo, bing')),\n        'searchQueries': queries,\n        'governmentSeedUrls': seeds,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'maxCrawlDepth': max_depth,\n        'titleRelevanceTerms': terms,\n        'pagesFetched': pages,\n        'searchResultLinks': search_results[:200],\n        'discoveredLinks': discovered[:300],\n        'selectedLinks': selected[:150],\n        'selectionNote': 'Python first fetches Google, DuckDuckGo, and Bing result pages for configured queries, selects relevant result links by title\/anchor\/url terms, fetches those pages, then crawls same-site links up to the configured depth. Government seed URLs are fetched as a required fallback and corroboration set. Downstream LLM agents must audit selectedLinks\/searchResultLinks and decide final relevance from link titles, page titles, source text, URLs, fetch metadata, and the user request.'\n    }\n\nparams = json.load(sys.stdin)\nprint(json.dumps(crawl(params), ensure_ascii=False, indent=2))",
+          "required" : false,
+          "value" : "",
           "valueType" : "string"
         },
         {
           "description" : "Python executable.",
           "key" : "pythonExecutable",
-          "required" : false,
+          "required" : true,
           "value" : "python",
           "valueType" : "string"
         },
@@ -581,10 +265,31 @@
           "valueType" : "string"
         },
         {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Bound crawler script.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "\/Users\/eofmc\/EoF\/python_crawler\/crawler_ru_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
           "description" : "Crawler input JSON.",
           "key" : "stdinJSON",
           "required" : true,
-          "value" : "{\"country\":\"Russia\/North Caucasus\",\"urls\":\"https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/russischefoederation-node, https:\/\/mid.ru\/en\/search\/?q=Georgia+international+land+border+crossing&sort=date&lang=en&order=desc&count=20, https:\/\/mid.ru\/en\/foreign_policy\/news\/, https:\/\/mid.ru\/en\/foreign_policy\/international_safety\/\",\"requestTimeoutSeconds\":20,\"maxBytesPerUrl\":500000,\"maxTextCharsPerUrl\":16000,\"maxCrawlDepth\":2,\"maxLinksPerPage\":6,\"maxPages\":48,\"relevantTitleTerms\":\"border, crossing, checkpoint, customs, Georgia, Azerbaijan, Armenia, Abkhazia, South Ossetia, Caucasus, security, foreign policy, statement, comment, region, conflict, peacekeeping\",\"blockedUrlPatterns\":\"facebook.com, instagram.com, youtube.com, t.me, telegram.me, vk.com, mailto:, accounts.google.com, consent.google.com, policies.google.com, support.google.com, microsoft.com\/rewards, duckduckgo.com\/settings\",\"searchEngines\":\"google, duckduckgo, bing\",\"searchQueries\":[\"Russia North Caucasus Georgia Azerbaijan land border crossing security official statement\",\"Russia Georgia border crossing Verkhny Lars customs checkpoint travel advisory\",\"site:mid.ru Georgia Azerbaijan border crossing Caucasus statement\",\"site:customs.gov.ru border crossing Georgia Azerbaijan North Caucasus\"],\"maxSearchResultsPerPage\":8}",
+          "value" : "",
           "valueType" : "json"
         },
         {
@@ -593,6 +298,13 @@
           "required" : false,
           "value" : "120",
           "valueType" : "number"
+        },
+        {
+          "description" : "Optional working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
         }
       ],
       "role" : "toolRunner",
@@ -603,23 +315,24 @@
       "executionMode" : "mcpTool",
       "instruction" : "Run the bound python_runtime crawler with configured stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
       "llmProviderID" : "lmStudio",
+      "logLevel" : "debug",
       "maxTurns" : 3,
       "modelName" : "",
       "name" : "AzerbaijanScriptRunnerAgent",
-      "positionX" : 150.3544921875,
-      "positionY" : 805.640625,
+      "positionX" : 172.2919921875,
+      "positionY" : 460.109375,
       "properties" : [
         {
-          "description" : "Bound crawler script.",
+          "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
           "key" : "inlineScript",
-          "required" : true,
-          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nSEARCH_ENGINE_HOSTS = {\n    'google.com', 'www.google.com',\n    'duckduckgo.com', 'www.duckduckgo.com', 'html.duckduckgo.com',\n    'bing.com', 'www.bing.com'\n}\n\nclass PageExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.parts = []\n        self.links = []\n        self.skip = 0\n        self.in_title = False\n        self.title_parts = []\n        self.current_link = None\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs_dict = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs_dict.get('href'):\n            self.current_link = {\n                'href': attrs_dict.get('href', ''),\n                'title': attrs_dict.get('title') or attrs_dict.get('aria-label') or '',\n                'textParts': []\n            }\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current_link:\n            text = clean_text(' '.join(self.current_link.pop('textParts', [])))\n            title = clean_text(self.current_link.get('title') or text)\n            self.links.append({'href': self.current_link.get('href', ''), 'title': title, 'text': text})\n            self.current_link = None\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current_link is not None:\n            self.current_link['textParts'].append(text)\n        self.parts.append(text)\n\ndef clean_text(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef extract_page(html_text, base_url):\n    parser = PageExtractor()\n    parser.feed(html_text)\n    text = clean_text(' '.join(parser.parts))\n    title = clean_text(' '.join(parser.title_parts))\n    links = []\n    seen = set()\n    for raw in parser.links:\n        href = raw.get('href', '')\n        absolute = urllib.parse.urljoin(base_url, href)\n        unwrapped = unwrap_search_result_url(absolute)\n        parsed = urllib.parse.urlparse(unwrapped)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'title': clean_text(raw.get('title') or raw.get('text') or normalized), 'text': clean_text(raw.get('text'))})\n    return title, text, links\n\ndef normalize_urls(value):\n    items = value if isinstance(value, list) else str(value or '').split(',')\n    return [item.strip() for item in items if item and item.strip()]\n\ndef normalize_terms(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[,;]', str(value or ''))\n    return [clean_text(item).lower() for item in items if clean_text(item)]\n\ndef normalize_queries(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[\\n;]', str(value or ''))\n    return [clean_text(item) for item in items if clean_text(item)]\n\ndef host(url):\n    return urllib.parse.urlparse(url).netloc.lower().removeprefix('www.')\n\ndef is_search_engine_url(url):\n    parsed_host = urllib.parse.urlparse(url).netloc.lower()\n    return parsed_host in SEARCH_ENGINE_HOSTS or parsed_host.removeprefix('www.') in {h.removeprefix('www.') for h in SEARCH_ENGINE_HOSTS}\n\ndef search_engine_name(url):\n    parsed_host = urllib.parse.urlparse(url).netloc.lower()\n    if 'duckduckgo' in parsed_host:\n        return 'DuckDuckGo'\n    if 'bing' in parsed_host:\n        return 'Bing'\n    if 'google' in parsed_host:\n        return 'Google'\n    return 'SearchEngine'\n\ndef same_site(url, seeds):\n    link_host = host(url)\n    return any(link_host == host(seed) for seed in seeds)\n\ndef blocked(url, patterns):\n    lowered = url.lower()\n    return any(pattern and pattern in lowered for pattern in patterns)\n\ndef unwrap_search_result_url(url):\n    parsed = urllib.parse.urlparse(url)\n    qs = urllib.parse.parse_qs(parsed.query)\n    for key in ('q', 'url', 'uddg', 'u'):\n        candidate = qs.get(key, [''])[0]\n        if candidate.startswith(('http:\/\/', 'https:\/\/')):\n            return urllib.parse.unquote(candidate)\n    return url\n\ndef make_search_urls(params, queries):\n    engines = normalize_terms(params.get('searchEngines', 'google, duckduckgo, bing'))\n    templates = {\n        'google': 'https:\/\/www.google.com\/search?q={query}',\n        'duckduckgo': 'https:\/\/duckduckgo.com\/html\/?q={query}',\n        'bing': 'https:\/\/www.bing.com\/search?q={query}'\n    }\n    urls = []\n    for query in queries:\n        encoded = urllib.parse.quote_plus(query)\n        for engine in engines:\n            template = templates.get(engine)\n            if template:\n                urls.append({'url': template.format(query=encoded), 'query': query, 'engine': engine.title() if engine != 'duckduckgo' else 'DuckDuckGo'})\n    return urls\n\ndef relevance_score(link, terms):\n    haystack = f\"{link.get('title', '')} {link.get('text', '')} {link.get('url', '')}\".lower()\n    return sum(1 for term in terms if term in haystack)\n\ndef fetch_url(url, params, depth, source_url=None, link_title='', source_type='seed'):\n    fetched_at = datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z'\n    req = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntimeTool\/1.0 (+bounded research crawler)'})\n    try:\n        with urllib.request.urlopen(req, timeout=int(params.get('requestTimeoutSeconds', 20))) as resp:\n            raw = resp.read(int(params.get('maxBytesPerUrl', 500000)))\n            encoding = resp.headers.get_content_charset() or 'utf-8'\n            html_text = raw.decode(encoding, errors='replace')\n            page_title, text, links = extract_page(html_text, resp.geturl())\n            return {\n                'url': url,\n                'finalUrl': resp.geturl(),\n                'sourceUrl': source_url,\n                'linkTitle': link_title,\n                'sourceType': source_type,\n                'depth': depth,\n                'pageTitle': page_title,\n                'statusCode': resp.status,\n                'contentType': resp.headers.get('content-type', ''),\n                'fetchedAtUTC': fetched_at,\n                'success': True,\n                'text': text[:int(params.get('maxTextCharsPerUrl', 20000))],\n                'links': links\n            }\n    except Exception as exc:\n        return {\n            'url': url,\n            'sourceUrl': source_url,\n            'linkTitle': link_title,\n            'sourceType': source_type,\n            'depth': depth,\n            'fetchedAtUTC': fetched_at,\n            'success': False,\n            'error': f'{type(exc).__name__}: {exc}'\n        }\n\ndef crawl(params):\n    seeds = normalize_urls(params.get('urls', params.get('url', '')))\n    queries = normalize_queries(params.get('searchQueries', ''))\n    terms = normalize_terms(params.get('relevantTitleTerms', 'border, crossing, customs, checkpoint, security, statement, announcement, travel, region, conflict, peace, Abkhazia, South Ossetia, Armenia, Azerbaijan, Georgia, Russia, Caucasus'))\n    blocked_patterns = normalize_terms(params.get('blockedUrlPatterns', 'facebook.com, instagram.com, youtube.com, t.me, telegram.me, whatsapp, mailto:'))\n    max_depth = max(0, min(int(params.get('maxCrawlDepth', 1)), 2))\n    max_links_per_page = max(1, int(params.get('maxLinksPerPage', 8)))\n    max_search_results_per_page = max(1, int(params.get('maxSearchResultsPerPage', 8)))\n    max_pages = max(len(seeds), int(params.get('maxPages', 36)))\n    search_pages = make_search_urls(params, queries)\n    pages = []\n    discovered = []\n    selected = []\n    search_results = []\n    queue = [dict(item, depth=0, sourceUrl=None, linkTitle=item.get('query', ''), sourceType='searchEngine') for item in search_pages]\n    queue.extend({'url': url, 'depth': 0, 'sourceUrl': None, 'linkTitle': '', 'sourceType': 'governmentSeed'} for url in seeds)\n    visited = set()\n\n    while queue and len(pages) < max_pages:\n        item = queue.pop(0)\n        url = item['url']\n        if url in visited or blocked(url, blocked_patterns):\n            continue\n        visited.add(url)\n        page = fetch_url(url, params, item['depth'], item.get('sourceUrl'), item.get('linkTitle', ''), item.get('sourceType', 'seed'))\n        links = page.pop('links', []) if page.get('success') else []\n        pages.append(page)\n        if not page.get('success') or item['depth'] >= max_depth:\n            continue\n\n        candidates = []\n        page_url = page.get('finalUrl', url)\n        search_page = is_search_engine_url(page_url) or item.get('sourceType') == 'searchEngine'\n        follow_roots = seeds + [page_url]\n        for link in links:\n            link_url = link['url']\n            if blocked(link_url, blocked_patterns) or link_url in visited:\n                continue\n            if search_page:\n                if is_search_engine_url(link_url):\n                    continue\n            elif not same_site(link_url, follow_roots):\n                continue\n            score = relevance_score(link, terms)\n            record = {\n                'sourceUrl': page_url,\n                'url': link_url,\n                'title': link.get('title', ''),\n                'anchorText': link.get('text', ''),\n                'depth': item['depth'] + 1,\n                'sourceType': 'searchResult' if search_page else 'siteCrawl',\n                'searchEngine': search_engine_name(page_url) if search_page else '',\n                'titleRelevanceScore': score\n            }\n            discovered.append(record)\n            if search_page:\n                search_results.append(record)\n            if score > 0:\n                candidates.append(record)\n        candidates.sort(key=lambda rec: (-rec['titleRelevanceScore'], rec['title'], rec['url']))\n        limit = max_search_results_per_page if search_page else max_links_per_page\n        for record in candidates[:limit]:\n            selected.append(record)\n            queue.append({'url': record['url'], 'depth': record['depth'], 'sourceUrl': record['sourceUrl'], 'linkTitle': record['title'], 'sourceType': record['sourceType']})\n\n    return {\n        'country': params.get('country', ''),\n        'searchEngines': normalize_terms(params.get('searchEngines', 'google, duckduckgo, bing')),\n        'searchQueries': queries,\n        'governmentSeedUrls': seeds,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'maxCrawlDepth': max_depth,\n        'titleRelevanceTerms': terms,\n        'pagesFetched': pages,\n        'searchResultLinks': search_results[:200],\n        'discoveredLinks': discovered[:300],\n        'selectedLinks': selected[:150],\n        'selectionNote': 'Python first fetches Google, DuckDuckGo, and Bing result pages for configured queries, selects relevant result links by title\/anchor\/url terms, fetches those pages, then crawls same-site links up to the configured depth. Government seed URLs are fetched as a required fallback and corroboration set. Downstream LLM agents must audit selectedLinks\/searchResultLinks and decide final relevance from link titles, page titles, source text, URLs, fetch metadata, and the user request.'\n    }\n\nparams = json.load(sys.stdin)\nprint(json.dumps(crawl(params), ensure_ascii=False, indent=2))",
+          "required" : false,
+          "value" : "",
           "valueType" : "string"
         },
         {
           "description" : "Python executable.",
           "key" : "pythonExecutable",
-          "required" : false,
+          "required" : true,
           "value" : "python",
           "valueType" : "string"
         },
@@ -631,10 +344,31 @@
           "valueType" : "string"
         },
         {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Bound crawler script.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "\/Users\/eofmc\/EoF\/python_crawler\/crawler_az_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
           "description" : "Crawler input JSON.",
           "key" : "stdinJSON",
           "required" : true,
-          "value" : "{\"country\":\"Azerbaijan\",\"urls\":\"https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/aserbaidschan-node, https:\/\/www.migration.gov.az\/en\/press\/26, https:\/\/mfa.gov.az\/en\/news, https:\/\/mfa.gov.az\/en\/category\/announcements\",\"requestTimeoutSeconds\":20,\"maxBytesPerUrl\":500000,\"maxTextCharsPerUrl\":16000,\"maxCrawlDepth\":2,\"maxLinksPerPage\":6,\"maxPages\":48,\"relevantTitleTerms\":\"border, crossing, checkpoint, customs, Armenia, Azerbaijan, Karabakh, Zangezur, Lachin, peace, security, statement, announcement, region, conflict, travel, migration\",\"blockedUrlPatterns\":\"facebook.com, instagram.com, youtube.com, t.me, telegram.me, x.com, twitter.com, mailto:, accounts.google.com, consent.google.com, policies.google.com, support.google.com, microsoft.com\/rewards, duckduckgo.com\/settings\",\"searchEngines\":\"google, duckduckgo, bing\",\"searchQueries\":[\"Azerbaijan land border crossing status Georgia Russia Armenia official travel security\",\"Azerbaijan border checkpoint customs land borders official announcement\",\"site:mfa.gov.az Azerbaijan border crossing security announcement\",\"site:migration.gov.az Azerbaijan land border crossing rules\"],\"maxSearchResultsPerPage\":8}",
+          "value" : "",
           "valueType" : "json"
         },
         {
@@ -643,6 +377,13 @@
           "required" : false,
           "value" : "120",
           "valueType" : "number"
+        },
+        {
+          "description" : "Optional working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
         }
       ],
       "role" : "toolRunner",
@@ -653,23 +394,24 @@
       "executionMode" : "mcpTool",
       "instruction" : "Run the bound python_runtime crawler with configured stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
       "llmProviderID" : "lmStudio",
+      "logLevel" : "warning",
       "maxTurns" : 3,
       "modelName" : "",
       "name" : "GeorgiaScriptRunnerAgent",
-      "positionX" : 454.478515625,
-      "positionY" : 814.1591796875,
+      "positionX" : 558.185546875,
+      "positionY" : 540.8505859375,
       "properties" : [
         {
-          "description" : "Bound crawler script.",
+          "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
           "key" : "inlineScript",
-          "required" : true,
-          "value" : "import datetime, html.parser, json, re, sys, urllib.parse, urllib.request\n\nSEARCH_ENGINE_HOSTS = {\n    'google.com', 'www.google.com',\n    'duckduckgo.com', 'www.duckduckgo.com', 'html.duckduckgo.com',\n    'bing.com', 'www.bing.com'\n}\n\nclass PageExtractor(html.parser.HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.parts = []\n        self.links = []\n        self.skip = 0\n        self.in_title = False\n        self.title_parts = []\n        self.current_link = None\n    def handle_starttag(self, tag, attrs):\n        tag = tag.lower()\n        attrs_dict = {k.lower(): v for k, v in attrs if k and v}\n        if tag in {'script', 'style', 'noscript'}:\n            self.skip += 1\n            return\n        if tag == 'title':\n            self.in_title = True\n        if tag == 'a' and attrs_dict.get('href'):\n            self.current_link = {\n                'href': attrs_dict.get('href', ''),\n                'title': attrs_dict.get('title') or attrs_dict.get('aria-label') or '',\n                'textParts': []\n            }\n    def handle_endtag(self, tag):\n        tag = tag.lower()\n        if tag in {'script', 'style', 'noscript'} and self.skip:\n            self.skip -= 1\n            return\n        if tag == 'title':\n            self.in_title = False\n        if tag == 'a' and self.current_link:\n            text = clean_text(' '.join(self.current_link.pop('textParts', [])))\n            title = clean_text(self.current_link.get('title') or text)\n            self.links.append({'href': self.current_link.get('href', ''), 'title': title, 'text': text})\n            self.current_link = None\n    def handle_data(self, data):\n        if self.skip:\n            return\n        text = data.strip()\n        if not text:\n            return\n        if self.in_title:\n            self.title_parts.append(text)\n        if self.current_link is not None:\n            self.current_link['textParts'].append(text)\n        self.parts.append(text)\n\ndef clean_text(value):\n    return re.sub(r'\\s+', ' ', str(value or '')).strip()\n\ndef extract_page(html_text, base_url):\n    parser = PageExtractor()\n    parser.feed(html_text)\n    text = clean_text(' '.join(parser.parts))\n    title = clean_text(' '.join(parser.title_parts))\n    links = []\n    seen = set()\n    for raw in parser.links:\n        href = raw.get('href', '')\n        absolute = urllib.parse.urljoin(base_url, href)\n        unwrapped = unwrap_search_result_url(absolute)\n        parsed = urllib.parse.urlparse(unwrapped)\n        if parsed.scheme not in {'http', 'https'}:\n            continue\n        normalized = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', parsed.query, ''))\n        if normalized in seen:\n            continue\n        seen.add(normalized)\n        links.append({'url': normalized, 'title': clean_text(raw.get('title') or raw.get('text') or normalized), 'text': clean_text(raw.get('text'))})\n    return title, text, links\n\ndef normalize_urls(value):\n    items = value if isinstance(value, list) else str(value or '').split(',')\n    return [item.strip() for item in items if item and item.strip()]\n\ndef normalize_terms(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[,;]', str(value or ''))\n    return [clean_text(item).lower() for item in items if clean_text(item)]\n\ndef normalize_queries(value):\n    if isinstance(value, list):\n        items = value\n    else:\n        items = re.split(r'[\\n;]', str(value or ''))\n    return [clean_text(item) for item in items if clean_text(item)]\n\ndef host(url):\n    return urllib.parse.urlparse(url).netloc.lower().removeprefix('www.')\n\ndef is_search_engine_url(url):\n    parsed_host = urllib.parse.urlparse(url).netloc.lower()\n    return parsed_host in SEARCH_ENGINE_HOSTS or parsed_host.removeprefix('www.') in {h.removeprefix('www.') for h in SEARCH_ENGINE_HOSTS}\n\ndef search_engine_name(url):\n    parsed_host = urllib.parse.urlparse(url).netloc.lower()\n    if 'duckduckgo' in parsed_host:\n        return 'DuckDuckGo'\n    if 'bing' in parsed_host:\n        return 'Bing'\n    if 'google' in parsed_host:\n        return 'Google'\n    return 'SearchEngine'\n\ndef same_site(url, seeds):\n    link_host = host(url)\n    return any(link_host == host(seed) for seed in seeds)\n\ndef blocked(url, patterns):\n    lowered = url.lower()\n    return any(pattern and pattern in lowered for pattern in patterns)\n\ndef unwrap_search_result_url(url):\n    parsed = urllib.parse.urlparse(url)\n    qs = urllib.parse.parse_qs(parsed.query)\n    for key in ('q', 'url', 'uddg', 'u'):\n        candidate = qs.get(key, [''])[0]\n        if candidate.startswith(('http:\/\/', 'https:\/\/')):\n            return urllib.parse.unquote(candidate)\n    return url\n\ndef make_search_urls(params, queries):\n    engines = normalize_terms(params.get('searchEngines', 'google, duckduckgo, bing'))\n    templates = {\n        'google': 'https:\/\/www.google.com\/search?q={query}',\n        'duckduckgo': 'https:\/\/duckduckgo.com\/html\/?q={query}',\n        'bing': 'https:\/\/www.bing.com\/search?q={query}'\n    }\n    urls = []\n    for query in queries:\n        encoded = urllib.parse.quote_plus(query)\n        for engine in engines:\n            template = templates.get(engine)\n            if template:\n                urls.append({'url': template.format(query=encoded), 'query': query, 'engine': engine.title() if engine != 'duckduckgo' else 'DuckDuckGo'})\n    return urls\n\ndef relevance_score(link, terms):\n    haystack = f\"{link.get('title', '')} {link.get('text', '')} {link.get('url', '')}\".lower()\n    return sum(1 for term in terms if term in haystack)\n\ndef fetch_url(url, params, depth, source_url=None, link_title='', source_type='seed'):\n    fetched_at = datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z'\n    req = urllib.request.Request(url, headers={'User-Agent': 'MCPStudio-PythonRuntimeTool\/1.0 (+bounded research crawler)'})\n    try:\n        with urllib.request.urlopen(req, timeout=int(params.get('requestTimeoutSeconds', 20))) as resp:\n            raw = resp.read(int(params.get('maxBytesPerUrl', 500000)))\n            encoding = resp.headers.get_content_charset() or 'utf-8'\n            html_text = raw.decode(encoding, errors='replace')\n            page_title, text, links = extract_page(html_text, resp.geturl())\n            return {\n                'url': url,\n                'finalUrl': resp.geturl(),\n                'sourceUrl': source_url,\n                'linkTitle': link_title,\n                'sourceType': source_type,\n                'depth': depth,\n                'pageTitle': page_title,\n                'statusCode': resp.status,\n                'contentType': resp.headers.get('content-type', ''),\n                'fetchedAtUTC': fetched_at,\n                'success': True,\n                'text': text[:int(params.get('maxTextCharsPerUrl', 20000))],\n                'links': links\n            }\n    except Exception as exc:\n        return {\n            'url': url,\n            'sourceUrl': source_url,\n            'linkTitle': link_title,\n            'sourceType': source_type,\n            'depth': depth,\n            'fetchedAtUTC': fetched_at,\n            'success': False,\n            'error': f'{type(exc).__name__}: {exc}'\n        }\n\ndef crawl(params):\n    seeds = normalize_urls(params.get('urls', params.get('url', '')))\n    queries = normalize_queries(params.get('searchQueries', ''))\n    terms = normalize_terms(params.get('relevantTitleTerms', 'border, crossing, customs, checkpoint, security, statement, announcement, travel, region, conflict, peace, Abkhazia, South Ossetia, Armenia, Azerbaijan, Georgia, Russia, Caucasus'))\n    blocked_patterns = normalize_terms(params.get('blockedUrlPatterns', 'facebook.com, instagram.com, youtube.com, t.me, telegram.me, whatsapp, mailto:'))\n    max_depth = max(0, min(int(params.get('maxCrawlDepth', 1)), 2))\n    max_links_per_page = max(1, int(params.get('maxLinksPerPage', 8)))\n    max_search_results_per_page = max(1, int(params.get('maxSearchResultsPerPage', 8)))\n    max_pages = max(len(seeds), int(params.get('maxPages', 36)))\n    search_pages = make_search_urls(params, queries)\n    pages = []\n    discovered = []\n    selected = []\n    search_results = []\n    queue = [dict(item, depth=0, sourceUrl=None, linkTitle=item.get('query', ''), sourceType='searchEngine') for item in search_pages]\n    queue.extend({'url': url, 'depth': 0, 'sourceUrl': None, 'linkTitle': '', 'sourceType': 'governmentSeed'} for url in seeds)\n    visited = set()\n\n    while queue and len(pages) < max_pages:\n        item = queue.pop(0)\n        url = item['url']\n        if url in visited or blocked(url, blocked_patterns):\n            continue\n        visited.add(url)\n        page = fetch_url(url, params, item['depth'], item.get('sourceUrl'), item.get('linkTitle', ''), item.get('sourceType', 'seed'))\n        links = page.pop('links', []) if page.get('success') else []\n        pages.append(page)\n        if not page.get('success') or item['depth'] >= max_depth:\n            continue\n\n        candidates = []\n        page_url = page.get('finalUrl', url)\n        search_page = is_search_engine_url(page_url) or item.get('sourceType') == 'searchEngine'\n        follow_roots = seeds + [page_url]\n        for link in links:\n            link_url = link['url']\n            if blocked(link_url, blocked_patterns) or link_url in visited:\n                continue\n            if search_page:\n                if is_search_engine_url(link_url):\n                    continue\n            elif not same_site(link_url, follow_roots):\n                continue\n            score = relevance_score(link, terms)\n            record = {\n                'sourceUrl': page_url,\n                'url': link_url,\n                'title': link.get('title', ''),\n                'anchorText': link.get('text', ''),\n                'depth': item['depth'] + 1,\n                'sourceType': 'searchResult' if search_page else 'siteCrawl',\n                'searchEngine': search_engine_name(page_url) if search_page else '',\n                'titleRelevanceScore': score\n            }\n            discovered.append(record)\n            if search_page:\n                search_results.append(record)\n            if score > 0:\n                candidates.append(record)\n        candidates.sort(key=lambda rec: (-rec['titleRelevanceScore'], rec['title'], rec['url']))\n        limit = max_search_results_per_page if search_page else max_links_per_page\n        for record in candidates[:limit]:\n            selected.append(record)\n            queue.append({'url': record['url'], 'depth': record['depth'], 'sourceUrl': record['sourceUrl'], 'linkTitle': record['title'], 'sourceType': record['sourceType']})\n\n    return {\n        'country': params.get('country', ''),\n        'searchEngines': normalize_terms(params.get('searchEngines', 'google, duckduckgo, bing')),\n        'searchQueries': queries,\n        'governmentSeedUrls': seeds,\n        'fetchedAtUTC': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z',\n        'maxCrawlDepth': max_depth,\n        'titleRelevanceTerms': terms,\n        'pagesFetched': pages,\n        'searchResultLinks': search_results[:200],\n        'discoveredLinks': discovered[:300],\n        'selectedLinks': selected[:150],\n        'selectionNote': 'Python first fetches Google, DuckDuckGo, and Bing result pages for configured queries, selects relevant result links by title\/anchor\/url terms, fetches those pages, then crawls same-site links up to the configured depth. Government seed URLs are fetched as a required fallback and corroboration set. Downstream LLM agents must audit selectedLinks\/searchResultLinks and decide final relevance from link titles, page titles, source text, URLs, fetch metadata, and the user request.'\n    }\n\nparams = json.load(sys.stdin)\nprint(json.dumps(crawl(params), ensure_ascii=False, indent=2))",
+          "required" : false,
+          "value" : "",
           "valueType" : "string"
         },
         {
           "description" : "Python executable.",
           "key" : "pythonExecutable",
-          "required" : false,
+          "required" : true,
           "value" : "python",
           "valueType" : "string"
         },
@@ -681,10 +423,31 @@
           "valueType" : "string"
         },
         {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Bound crawler script.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "\/Users\/eofmc\/EoF\/python_crawler\/crawler_ge_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
           "description" : "Crawler input JSON.",
           "key" : "stdinJSON",
           "required" : true,
-          "value" : "{\"country\":\"Georgia\",\"urls\":\"https:\/\/www.auswaertiges-amt.de\/de\/service\/laender\/georgien-node, https:\/\/mfa.gov.ge\/en\/news, https:\/\/mfa.gov.ge\/en\/statements-by-mfa\",\"requestTimeoutSeconds\":20,\"maxBytesPerUrl\":500000,\"maxTextCharsPerUrl\":16000,\"maxCrawlDepth\":2,\"maxLinksPerPage\":6,\"maxPages\":48,\"relevantTitleTerms\":\"border, crossing, checkpoint, customs, occupation, occupied territories, Abkhazia, South Ossetia, Russia, security, statement, travel, consular, Geneva International Discussions, conflict, region\",\"blockedUrlPatterns\":\"facebook.com, instagram.com, youtube.com, t.me, telegram.me, x.com, twitter.com, mailto:, accounts.google.com, consent.google.com, policies.google.com, support.google.com, microsoft.com\/rewards, duckduckgo.com\/settings\",\"searchEngines\":\"google, duckduckgo, bing\",\"searchQueries\":[\"Georgia land border crossing status Abkhazia South Ossetia Russia official travel security\",\"Georgia border checkpoints customs travel advisory Azerbaijan Armenia Russia\",\"site:mfa.gov.ge Georgia border crossing security statement\",\"site:rs.ge Georgia customs border checkpoint\"],\"maxSearchResultsPerPage\":8}",
+          "value" : "",
           "valueType" : "json"
         },
         {
@@ -693,6 +456,13 @@
           "required" : false,
           "value" : "120",
           "valueType" : "number"
+        },
+        {
+          "description" : "Optional working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
         }
       ],
       "role" : "toolRunner",
@@ -701,24 +471,18 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Analyze Georgia from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return geResult with findings, risks, limits, and uncertainties.",
+      "instruction" : "Analyze Azerbaijan from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return azResult with findings, risks, limits, and uncertainties.",
       "llmProviderID" : "mistralai",
+      "logLevel" : "debug",
       "maxTurns" : 6,
       "modelName" : "mistral-large-2512",
-      "name" : "GeorgiaBorderSpecialist",
-      "positionX" : 858.53125,
-      "positionY" : 880.2724609375,
+      "name" : "AzerbaijanBorderSpecialist",
+      "positionX" : 170.1123046875,
+      "positionY" : 712.5751953125,
       "properties" : [
         {
-          "description" : "Georgia crawl output.",
-          "key" : "geGovSources",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Georgia result.",
-          "key" : "geResult",
+          "description" : "Azerbaijan result.",
+          "key" : "azResult",
           "required" : false,
           "value" : "",
           "valueType" : "string"
@@ -730,21 +494,15 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Analyze Russia\/North Caucasus from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return ruResult with findings, risks, limits, and uncertainties.",
+      "instruction" : "Analyze Russia\/North Caucasus from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return ruResult with findings, risks, limits, and uncertainties.",
       "llmProviderID" : "mistralai",
+      "logLevel" : "warning",
       "maxTurns" : 6,
       "modelName" : "mistral-large-2512",
       "name" : "RussiaNorthCaucasusSpecialist",
-      "positionX" : 1164.236328125,
-      "positionY" : 886.494140625,
+      "positionX" : 884.783203125,
+      "positionY" : 712.955078125,
       "properties" : [
-        {
-          "description" : "Russia crawl output.",
-          "key" : "ruGovSources",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
         {
           "description" : "Russia result.",
           "key" : "ruResult",
@@ -759,24 +517,18 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Analyze Azerbaijan from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return azResult with findings, risks, limits, and uncertainties.",
+      "instruction" : "Analyze Georgia from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return geResult with findings, risks, limits, and uncertainties.",
       "llmProviderID" : "mistralai",
+      "logLevel" : "warning",
       "maxTurns" : 6,
       "modelName" : "mistral-large-2512",
-      "name" : "AzerbaijanBorderSpecialist",
-      "positionX" : 438.4248046875,
-      "positionY" : 1120.5244140625,
+      "name" : "GeorgiaBorderSpecialist",
+      "positionX" : 579.80859375,
+      "positionY" : 763.9443359375,
       "properties" : [
         {
-          "description" : "Azerbaijan crawl output.",
-          "key" : "azGovSources",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Azerbaijan result.",
-          "key" : "azResult",
+          "description" : "Georgia result.",
+          "key" : "geResult",
           "required" : false,
           "value" : "",
           "valueType" : "string"
@@ -790,18 +542,12 @@
       "executionMode" : "llmInstruction",
       "instruction" : "Synthesize reviewed findings in the user language. Cover border status, disputes, security dynamics, evidence, URLs\/queries used, source gaps, and uncertainties. Produce finalSummary.",
       "llmProviderID" : "none",
+      "logLevel" : "warning",
       "maxTurns" : 5,
       "name" : "FinalReportSynthesizer",
-      "positionX" : 1255.3603515625,
-      "positionY" : 1165.837890625,
+      "positionX" : 175.1494140625,
+      "positionY" : 993.025390625,
       "properties" : [
-        {
-          "description" : "Azerbaijan result.",
-          "key" : "azResult",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
         {
           "description" : "Final report.",
           "key" : "finalSummary",
@@ -810,22 +556,8 @@
           "valueType" : "string"
         },
         {
-          "description" : "Georgia result.",
-          "key" : "geResult",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
           "description" : "Review result.",
           "key" : "reviewFindings",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Russia result.",
-          "key" : "ruResult",
           "required" : false,
           "value" : "",
           "valueType" : "string"
@@ -839,11 +571,12 @@
       "executionMode" : "llmInstruction",
       "instruction" : "Review country findings for accuracy, attribution, search provenance, execution evidence, translation, gaps, and uncertainty. Produce reviewFindings.",
       "llmProviderID" : "mistralai",
+      "logLevel" : "warning",
       "maxTurns" : 4,
       "modelName" : "mistral-large-2512",
       "name" : "BorderAnalysisReviewer",
-      "positionX" : 842.46875,
-      "positionY" : 1177.3837890625,
+      "positionX" : 580.51171875,
+      "positionY" : 1059.5595703125,
       "properties" : [
         {
           "description" : "Azerbaijan result.",
@@ -881,192 +614,84 @@
   ],
   "connections" : [
     {
-      "artifactPolicy" : "pass-latest",
+      "artifactPolicy" : "pass",
       "condition" : "Python runtime output is available or failed with diagnostics.",
       "kind" : "artifactFlow",
       "label" : "Analyze Azerbaijan",
-      "sharedStateKeys" : "azGovSources, azResult",
+      "sharedStateKeys" : "azResult",
       "source" : "AzerbaijanScriptRunnerAgent",
       "target" : "AzerbaijanBorderSpecialist"
     },
     {
-      "artifactPolicy" : "pass-latest",
+      "artifactPolicy" : "pass",
       "condition" : "Python runtime output is available or failed with diagnostics.",
       "kind" : "artifactFlow",
       "label" : "Analyze Georgia",
-      "sharedStateKeys" : "geGovSources, geResult",
+      "sharedStateKeys" : "geResult",
       "source" : "GeorgiaScriptRunnerAgent",
       "target" : "GeorgiaBorderSpecialist"
     },
     {
-      "artifactPolicy" : "pass-latest",
+      "artifactPolicy" : "pass",
       "condition" : "Python runtime output is available or failed with diagnostics.",
       "kind" : "artifactFlow",
       "label" : "Analyze Russia\/North Caucasus",
-      "sharedStateKeys" : "ruGovSources, ruResult",
+      "sharedStateKeys" : "ruResult",
       "source" : "RussiaScriptRunnerAgent",
       "target" : "RussiaNorthCaucasusSpecialist"
     },
     {
-      "artifactPolicy" : "pass-latest",
+      "artifactPolicy" : "pass",
       "condition" : "Start of research task.",
       "kind" : "delegation",
-      "label" : "Plan Azerbaijan URL 1",
-      "sharedStateKeys" : "azScriptPlan1",
+      "label" : "Plan Azerbaijan",
+      "sharedStateKeys" : "azScriptPlan",
       "source" : "ResearchCoordinator",
-      "target" : "AzerbaijanScriptPlannerAgent1_MfaNews"
+      "target" : "AzerbaijanScriptPlanner"
     },
     {
-      "artifactPolicy" : "pass-latest",
+      "artifactPolicy" : "pass",
       "condition" : "Start of research task.",
       "kind" : "delegation",
-      "label" : "Plan Azerbaijan URL 2",
-      "sharedStateKeys" : "azScriptPlan2",
+      "label" : "Plan Georgia",
+      "sharedStateKeys" : "geScriptPlan",
       "source" : "ResearchCoordinator",
-      "target" : "AzerbaijanScriptPlannerAgent2_MfaAnnouncements"
+      "target" : "GeorgiaScriptPlanner"
     },
     {
-      "artifactPolicy" : "pass-latest",
+      "artifactPolicy" : "pass",
       "condition" : "Start of research task.",
       "kind" : "delegation",
-      "label" : "Plan Azerbaijan URL 3",
-      "sharedStateKeys" : "azScriptPlan3",
+      "label" : "Plan Russia\/North Caucasus",
+      "sharedStateKeys" : "ruScriptPlan",
       "source" : "ResearchCoordinator",
-      "target" : "AzerbaijanScriptPlannerAgent3_BorderCrossingHubAsia"
+      "target" : "RussiaScriptPlanner"
     },
     {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Start of research task.",
-      "kind" : "delegation",
-      "label" : "Plan Georgia URL 1",
-      "sharedStateKeys" : "geScriptPlan1",
-      "source" : "ResearchCoordinator",
-      "target" : "GeorgiaScriptPlannerAgent1_MfaNews"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Start of research task.",
-      "kind" : "delegation",
-      "label" : "Plan Georgia URL 2",
-      "sharedStateKeys" : "geScriptPlan2",
-      "source" : "ResearchCoordinator",
-      "target" : "GeorgiaScriptPlannerAgent2_MfaStatements"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Start of research task.",
-      "kind" : "delegation",
-      "label" : "Plan Georgia URL 3",
-      "sharedStateKeys" : "geScriptPlan3",
-      "source" : "ResearchCoordinator",
-      "target" : "GeorgiaScriptPlannerAgent3_SarpiBorderCrossingHub"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Start of research task.",
-      "kind" : "delegation",
-      "label" : "Plan Russia\/North Caucasus URL 1",
-      "sharedStateKeys" : "ruScriptPlan1",
-      "source" : "ResearchCoordinator",
-      "target" : "RussiaScriptPlannerAgent1_MidNews"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Start of research task.",
-      "kind" : "delegation",
-      "label" : "Plan Russia\/North Caucasus URL 2",
-      "sharedStateKeys" : "ruScriptPlan2",
-      "source" : "ResearchCoordinator",
-      "target" : "RussiaScriptPlannerAgent2_MidSafety"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Start of research task.",
-      "kind" : "delegation",
-      "label" : "Plan Russia\/North Caucasus URL 3",
-      "sharedStateKeys" : "ruScriptPlan3",
-      "source" : "ResearchCoordinator",
-      "target" : "RussiaScriptPlannerAgent3_BorderCrossingHubAsia"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Azerbaijan URL 1 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Azerbaijan Python after URL 1 plan",
-      "sharedStateKeys" : "azScriptPlan1, azGovSources",
-      "source" : "AzerbaijanScriptPlannerAgent1_MfaNews",
+      "artifactPolicy" : "pass-override",
+      "condition" : "",
+      "kind" : "artifactFlow",
+      "label" : "Run Azerbaijan Python script",
+      "sharedStateKeys" : "inlineScript, scriptPath, stdinJSON",
+      "source" : "AzerbaijanScriptPlanner",
       "target" : "AzerbaijanScriptRunnerAgent"
     },
     {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Azerbaijan URL 2 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Azerbaijan Python after URL 2 plan",
-      "sharedStateKeys" : "azScriptPlan2, azGovSources",
-      "source" : "AzerbaijanScriptPlannerAgent2_MfaAnnouncements",
-      "target" : "AzerbaijanScriptRunnerAgent"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Azerbaijan URL 3 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Azerbaijan Python after URL 3 plan",
-      "sharedStateKeys" : "azScriptPlan3, azGovSources",
-      "source" : "AzerbaijanScriptPlannerAgent3_BorderCrossingHubAsia",
-      "target" : "AzerbaijanScriptRunnerAgent"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Georgia URL 1 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Georgia Python after URL 1 plan",
-      "sharedStateKeys" : "geScriptPlan1, geGovSources",
-      "source" : "GeorgiaScriptPlannerAgent1_MfaNews",
+      "artifactPolicy" : "pass-override",
+      "condition" : "",
+      "kind" : "artifactFlow",
+      "label" : "Run Georgia Python Script",
+      "sharedStateKeys" : "scriptPath, stdinJSON",
+      "source" : "GeorgiaScriptPlanner",
       "target" : "GeorgiaScriptRunnerAgent"
     },
     {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Georgia URL 2 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Georgia Python after URL 2 plan",
-      "sharedStateKeys" : "geScriptPlan2, geGovSources",
-      "source" : "GeorgiaScriptPlannerAgent2_MfaStatements",
-      "target" : "GeorgiaScriptRunnerAgent"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Georgia URL 3 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Georgia Python after URL 3 plan",
-      "sharedStateKeys" : "geScriptPlan3, geGovSources",
-      "source" : "GeorgiaScriptPlannerAgent3_SarpiBorderCrossingHub",
-      "target" : "GeorgiaScriptRunnerAgent"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Russia\/North Caucasus URL 1 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Russia\/North Caucasus Python after URL 1 plan",
-      "sharedStateKeys" : "ruScriptPlan1, ruGovSources",
-      "source" : "RussiaScriptPlannerAgent1_MidNews",
-      "target" : "RussiaScriptRunnerAgent"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Russia\/North Caucasus URL 2 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Russia\/North Caucasus Python after URL 2 plan",
-      "sharedStateKeys" : "ruScriptPlan2, ruGovSources",
-      "source" : "RussiaScriptPlannerAgent2_MidSafety",
-      "target" : "RussiaScriptRunnerAgent"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "Russia\/North Caucasus URL 3 plan is available.",
-      "kind" : "handoff",
-      "label" : "Run Russia\/North Caucasus Python after URL 3 plan",
-      "sharedStateKeys" : "ruScriptPlan3, ruGovSources",
-      "source" : "RussiaScriptPlannerAgent3_BorderCrossingHubAsia",
+      "artifactPolicy" : "pass-override",
+      "condition" : "",
+      "kind" : "artifactFlow",
+      "label" : "Run Russia Python Script",
+      "sharedStateKeys" : "scriptPath, stdinJSON",
+      "source" : "RussiaScriptPlanner",
       "target" : "RussiaScriptRunnerAgent"
     },
     {
@@ -1101,7 +726,7 @@
       "condition" : "Reviewer output is available.",
       "kind" : "handoff",
       "label" : "Synthesize final report",
-      "sharedStateKeys" : "azResult, geResult, ruResult, reviewFindings, finalSummary",
+      "sharedStateKeys" : "reviewFindings, finalSummary",
       "source" : "BorderAnalysisReviewer",
       "target" : "FinalReportSynthesizer"
     }
@@ -1110,5 +735,5 @@
   "name" : "Border Crossing Research",
   "pattern" : "coordinator",
   "summary" : "Search-first border research workflow with one-URL planners, Python crawlers, specialist analysis, review, and synthesis.",
-  "systemInstruction" : "Use one-URL planner agents for auditable crawl plans. Runner agents execute only configured python_runtime inputs. Preserve source URLs, titles, search provenance, stdout\/stderr\/exit metadata, translations, and uncertainties."
+  "systemInstruction" : "Use one-URL planner agents for auditable crawl plans. Runner agents execute only configured python_runtime inputs. Preserve source URLs, titles, search provenance, stdout\/stderr\/exit metadata, translations, and uncertainties. Do not use Markdown tables as a design element in the final report."
 }
