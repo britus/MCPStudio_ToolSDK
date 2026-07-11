@@ -1,7 +1,20 @@
 {
   "description" : "Creates a minimal Qt Widgets GUI application project with QMake, determines QTDIR, generates the Makefile, and runs a test build.",
   "enabledToolNames" : [
-    "skill_execute"
+    "check_with_gcc",
+    "clang_check_syntax",
+    "file_exists",
+    "get_documents_path",
+    "get_temp_path",
+    "list_files",
+    "mkdir",
+    "nodejs_runtime",
+    "python_runtime",
+    "qmake_build",
+    "read_file",
+    "scrape_web_page",
+    "skill_execute",
+    "write_file"
   ],
   "modelPreferences" : {
 

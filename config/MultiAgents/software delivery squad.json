@@ -3,10 +3,13 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Act as the root coordinator. Decompose the user's software task, assign work to specialist agents, preserve shared context, and synthesize a final implementation plan or answer. Ask the Reviewer for risk checks before finalizing.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "none",
       "maxTurns" : 8,
+      "modelName" : "qwen\/qwen3.5-9b",
       "name" : "Coordinator",
-      "positionX" : 135.32421875,
-      "positionY" : 84.51953125,
+      "positionX" : 134.81995738636365,
+      "positionY" : 85.56889204545453,
       "properties" : [
         {
           "description" : "Enter the concrete delivery objective. Suitable for keeping all agents aligned; changes the acceptance criteria the coordinator enforces.",
@@ -19,7 +22,7 @@
           "description" : "Comma-separated shared state keys passed between agents. Useful when work products must be traceable across handoffs.",
           "key" : "sharedStateKeys",
           "required" : false,
-          "value" : "requirements, directoryList, plan, changedFiles, testEvidence, reviewFindings",
+          "value" : "requirements, directoryList, plan, changedFiles, testEvidence, reviewFindings, project_path",
           "valueType" : "string"
         }
       ],
@@ -29,17 +32,27 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Transform the user's request into a concise engineering plan. Identify files or subsystems to inspect, implementation steps, risks, and verification commands. Return a plan the Implementer can execute.",
+      "instruction" : "Transform the user's request into a concise engineering plan. Identify files or subsystems to inspect, implementation steps, risks, and verification commands. Return a plan the Implementer can execute. If the user prompt contains a project or work directory then hand over to property `project_path `.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "none",
       "maxTurns" : 6,
+      "modelName" : "qwen\/qwen3.5-9b",
       "name" : "Planner",
-      "positionX" : 591.8515625,
-      "positionY" : 86.5,
+      "positionX" : 582.688565340909,
+      "positionY" : 85.94176136363636,
       "properties" : [
         {
           "description" : "Optional constraints such as platform, architecture, or code style. Suitable for narrowing the plan and avoiding broad refactors.",
           "key" : "constraints",
           "required" : false,
           "value" : "Follow existing repository patterns; keep changes small and verifiable.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Use this project path to work with resources",
+          "key" : "project_path",
+          "required" : false,
+          "value" : "${CHAT_PROJECT_DIR}",
           "valueType" : "string"
         }
       ],
@@ -48,35 +61,23 @@
       "toolName" : ""
     },
     {
-      "executionMode" : "mcpTool",
-      "instruction" : "Read user given directory structure.",
-      "llmProviderID" : "lmStudio",
-      "maxTurns" : 6,
-      "modelName" : "gpt-4.1",
-      "name" : "List directory tool",
-      "positionX" : 421.25390625,
-      "positionY" : 322.50390625,
-      "properties" : [
-        {
-          "description" : "If empty, use user given directory name from prompt.",
-          "key" : "dirPath",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "toolRunner",
-      "temperature" : 0.3,
-      "toolName" : "analyze_directory"
-    },
-    {
       "executionMode" : "llmInstruction",
       "instruction" : "Implement the plan. Propose exact code edits, preserve local conventions, and produce a concise change summary. If tool access is available, request only the tools required for file inspection or edits.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "none",
       "maxTurns" : 8,
+      "modelName" : "qwen\/qwen3.5-9b",
       "name" : "Implementer",
-      "positionX" : 799.26953125,
-      "positionY" : 323.421875,
+      "positionX" : 804.0639204545454,
+      "positionY" : 317.7041903409091,
       "properties" : [
+        {
+          "description" : "",
+          "key" : "directoryList",
+          "required" : false,
+          "value" : "The directory list of the given project directory",
+          "valueType" : "string"
+        },
         {
           "description" : "Named tools that are useful for implementation. Suitable for scoping MCP tool calls and reducing accidental tool use.",
           "key" : "preferredTools",
@@ -90,14 +91,59 @@
       "toolName" : ""
     },
     {
+      "executionMode" : "mcpTool",
+      "instruction" : "Read user given directory structure.",
+      "llmProviderID" : "lmStudio",
+      "logLevel" : "none",
+      "maxTurns" : 6,
+      "modelName" : "gpt-4.1",
+      "name" : "List directory tool",
+      "positionX" : 415.68181818181824,
+      "positionY" : 318.2769886363637,
+      "properties" : [
+        {
+          "description" : "List of file extensions to be filtered, in the form e.g. \".js\" or \".cpp\"",
+          "key" : "extensions",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Path to the project directory",
+          "key" : "project_path",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Boolean parameter to enable recursive traversal of the directory tree. Set the value 'false' to list the contents of the directory or the value 'true' to include subdirectories.",
+          "key" : "recursive",
+          "required" : false,
+          "value" : "true",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Sort by name, date, size",
+          "key" : "sort",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.3,
+      "toolName" : "list_files"
+    },
+    {
       "executionMode" : "llmInstruction",
       "instruction" : "Review the proposed implementation and verification evidence. Look for correctness issues, regressions, missing tests, license\/tool restrictions, and unclear handoffs. Return prioritized findings and a final go\/no-go signal.",
       "llmProviderID" : "mistralai",
+      "logLevel" : "none",
       "maxTurns" : 5,
       "modelName" : "mistral-code-agent-latest",
       "name" : "Reviewer",
-      "positionX" : 133.73958333333334,
-      "positionY" : 489.54296875,
+      "positionX" : 132.6600378787879,
+      "positionY" : 423.87500000000006,
       "properties" : [
         {
           "description" : "Risk areas to audit. Suitable for steering the reviewer toward product-specific concerns.",
@@ -115,12 +161,27 @@
       "executionMode" : "mcpTool",
       "instruction" : "Run or request verification. Prefer syntax checks and focused build\/test commands. Return command, result, failure reason, and next debugging hint.",
       "llmProviderID" : "lmStudio",
+      "logLevel" : "none",
       "maxTurns" : 4,
       "modelName" : "",
       "name" : "Verifier",
-      "positionX" : 729.1228693181819,
-      "positionY" : 555.6867897727273,
+      "positionX" : 728.5191761363637,
+      "positionY" : 560.8334517045455,
       "properties" : [
+        {
+          "description" : "Shell script content generated from the Skill instructions.",
+          "key" : "content",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional operation name for logging and result metadata.",
+          "key" : "operation",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
         {
           "description" : "The verification command or tool input. Useful for making test evidence repeatable.",
           "key" : "verificationCommand",
@@ -158,7 +219,7 @@
       "condition" : "if user provide a directory name then run as first step.",
       "kind" : "delegation",
       "label" : "List directory",
-      "sharedStateKeys" : "dirPath, directoryList",
+      "sharedStateKeys" : "project_path",
       "source" : "Planner",
       "target" : "List directory tool"
     },

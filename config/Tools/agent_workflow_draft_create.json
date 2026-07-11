@@ -1,83 +1,83 @@
 {
-  "annotations": {
-    "audience": [
+  "annotations" : {
+    "audience" : [
       "user",
       "assistant"
     ],
-    "lastModified": "2026-07-04T04:46:18.493Z",
-    "priority": 0.9
+    "lastModified" : "2026-07-09T10:25:52.295Z",
+    "priority" : 0.9
   },
-  "description": "Create and normalize a draft multi-agent workflow without saving it. Use this before validating or committing a generated workflow. Drafts should include explicit agents, links, sharedStateKeys, artifactPolicy, and configurable properties when the user asks for a concrete workflow.",
-  "execHandler": "MultiAgentWorkflowDraftHandler",
-  "execMethod": "createMultiAgentWorkflowDraft",
-  "inputSchema": {
-    "properties": {
-      "draft": {
-        "description": "Workflow draft object with name, summary, goal, pattern, systemInstruction, agents, and connections. Prefer explicit ADK-style drafts over fallback generation for concrete user goals. Allowed pattern values: coordinator, hierarchical, peerReview, pipeline, parallelDebate. Agent roles: rootCoordinator, planner, specialist, reviewer, toolRunner, synthesizer. Execution modes: llmInstruction, mcpTool. Connection kinds: delegation, handoff, review, sharedState, artifactFlow. Recommended artifactPolicy values: pass-latest, pass-structured, pass-summary, pass-all, allow-failed-diagnostics. Use sharedStateKeys for named artifacts such as workflowPlan, calendarList, appointmentRecords, reviewFindings, finalAnswer.",
-        "name": "draft",
-        "type": "object"
+  "description" : "Create and normalize a draft multi-agent workflow without saving it. Use this before validating or committing a generated workflow. Drafts should include explicit agents, links, sharedStateKeys, artifactPolicy, and configurable properties when the user asks for a concrete workflow.",
+  "execHandler" : "MultiAgentWorkflowDraftHandler",
+  "execMethod" : "createMultiAgentWorkflowDraft",
+  "inputSchema" : {
+    "properties" : {
+      "draft" : {
+        "description" : "Workflow draft object with name, summary, goal, pattern, systemInstruction, agents, and connections. Prefer explicit ADK-style drafts over fallback generation for concrete user goals. Allowed pattern values: coordinator, hierarchical, peerReview, pipeline, parallelDebate. Agent roles: rootCoordinator, planner, specialist, reviewer, toolRunner, synthesizer. Execution modes: llmInstruction, mcpTool. Connection kinds: delegation, handoff, review, sharedState, artifactFlow. Recommended artifactPolicy values: pass-latest, pass-structured, pass-summary, pass-all, allow-failed-diagnostics. Use sharedStateKeys for named artifacts such as workflowPlan, calendarList, appointmentRecords, reviewFindings, finalAnswer.",
+        "name" : "draft",
+        "type" : "object"
       },
-      "draft_json": {
-        "description": "Alternative JSON string representation of the workflow draft.",
-        "name": "draft_json",
-        "type": "string"
+      "draft_json" : {
+        "description" : "Alternative JSON string representation of the workflow draft.",
+        "name" : "draft_json",
+        "type" : "string"
       },
-      "goal": {
-        "description": "High-level workflow goal used when no draft object is supplied. For concrete workflow requests, the assistant should usually construct an explicit draft instead of relying on the fallback coordinator/specialist generation.",
-        "name": "goal",
-        "type": "string"
+      "goal" : {
+        "description" : "High-level workflow goal used when no draft object is supplied. For concrete workflow requests, the assistant should usually construct an explicit draft instead of relying on the fallback coordinator\/specialist generation.",
+        "name" : "goal",
+        "type" : "string"
       },
-      "name": {
-        "description": "Workflow name used when no draft object is supplied.",
-        "name": "name",
-        "type": "string"
+      "name" : {
+        "description" : "Workflow name used when no draft object is supplied.",
+        "name" : "name",
+        "type" : "string"
       }
     },
-    "type": "object"
+    "type" : "object"
   },
-  "name": "agent_workflow_draft_create",
-  "outputSchema": {
-    "properties": {
-      "draft": {
-        "description": "Normalized workflow draft preview.",
-        "name": "draft",
-        "type": "object"
+  "name" : "agent_workflow_draft_create",
+  "outputSchema" : {
+    "properties" : {
+      "draft" : {
+        "description" : "Normalized workflow draft preview.",
+        "name" : "draft",
+        "type" : "object"
       },
-      "draft_id": {
-        "description": "Temporary draft identifier that can be passed to validate or commit.",
-        "name": "draft_id",
-        "type": "string"
+      "draft_id" : {
+        "description" : "Temporary draft identifier that can be passed to validate or commit.",
+        "name" : "draft_id",
+        "type" : "string"
       },
-      "errors": {
-        "description": "Validation errors.",
-        "name": "errors",
-        "type": "array"
+      "errors" : {
+        "description" : "Validation errors.",
+        "name" : "errors",
+        "type" : "array"
       },
-      "success": {
-        "description": "Operation status.",
-        "name": "success",
-        "type": "boolean"
+      "success" : {
+        "description" : "Operation status.",
+        "name" : "success",
+        "type" : "boolean"
       },
-      "valid": {
-        "description": "Whether the draft can be committed.",
-        "name": "valid",
-        "type": "boolean"
+      "valid" : {
+        "description" : "Whether the draft can be committed.",
+        "name" : "valid",
+        "type" : "boolean"
       },
-      "warnings": {
-        "description": "Validation warnings.",
-        "name": "warnings",
-        "type": "array"
+      "warnings" : {
+        "description" : "Validation warnings.",
+        "name" : "warnings",
+        "type" : "array"
       }
     },
-    "required": [
+    "required" : [
       "success",
       "draft",
       "draft_id",
       "valid"
     ],
-    "type": "object"
+    "type" : "object"
   },
-  "pluginName": "",
-  "scriptName": "",
-  "toolType": "BuiltinTool"
+  "pluginName" : "",
+  "scriptName" : "",
+  "toolType" : "BuiltinTool"
 }

@@ -1,7 +1,17 @@
 {
   "description" : "Builds a Qt application with make after detecting QTDIR.",
   "enabledToolNames" : [
-    "skill_execute"
+    "check_with_gcc",
+    "clang_check_syntax",
+    "file_exists",
+    "get_documents_path",
+    "get_temp_path",
+    "list_files",
+    "mkdir",
+    "qmake_build",
+    "read_file",
+    "skill_execute",
+    "write_file"
   ],
   "modelPreferences" : {
 

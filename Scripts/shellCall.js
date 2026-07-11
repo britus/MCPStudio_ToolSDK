@@ -66,12 +66,14 @@ function shellCall(params) {
     
     // Build command with parameters based on function parameters
     shellScript += 'set -euo pipefail\n';
-    shellScript += "cd \"$(dirname \"$0\")\" || exit 1\n";
-    shellScript += "echo \"Current path: `pwd`\"\n";
+    shellScript += 'cd \"$(dirname \"$0\")\" || exit 1\n';
+    shellScript += 'if [ -n "${QTDIR:-}" ] && [ -d "$QTDIR" ]; then\n'
+    shellScript += 'export PATH="$QTDIR/bin:$PATH"\n'
+    shellScript += 'fi\n'
+
+    shellScript += 'echo "Current path: `pwd`"\n';
     
     if (parameters && parameters.length > 0) {
-        taskLog("[Script] Building command with parameters...");
-        
         var paramString = "";
         for (var i = 0; i < parameters.length; i++) {
             var arg = parameters[i];
@@ -82,12 +84,12 @@ function shellCall(params) {
                    //.replace(/"/g, '\\"')
                    // .replace(/\$/g, '\\$')
                    // .replace(/`/g, '\\`');
-               console.log("[Script] Argument:" + escapedArg);
                paramString += " " + escapedArg + " ";
             } else {
                paramString = "";
             }
         }
+        taskLog("[Script] Arguments:" + paramString);
         shellScript += command + paramString + '\n';
     } else {
         // Single command without additional parameters
@@ -138,7 +140,7 @@ function shellCall(params) {
                 stderr: stdErr,
             }
         }));
-        taskLog("[Script] Command failed!" + 
+        taskLog("[Script] Command failed! " + 
                (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
                (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
     }

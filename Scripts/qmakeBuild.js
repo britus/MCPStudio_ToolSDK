@@ -91,8 +91,8 @@ function qmakeBuild(params) {
     `set -euo pipefail`,
     // Ensure qmake and make are in PATH. Common Qt6 path added.
     // User might need to adjust /opt/Qt/6.x.x/gcc_64/bin depending on their Qt installation path.
-    `export QTDIR=${shared.quoteShellArgument(qtPlatformDir)}`,
-    `export PATH=$QTDIR/bin:/usr/local/qt6/bin:/usr/local/bin:/bin:/usr/bin:$PATH`,
+    `[ -e ${QTDIR} ] || export QTDIR=${shared.quoteShellArgument(qtPlatformDir)}`,
+    `[ ! -e ${QTDIR} ] || export PATH="${QTDIR}/bin:${PATH}"`,
     `cd ${shared.quoteShellArgument(projectDir)} || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
     (verbose ? `echo 'Ensuring build directory...'` : ''),
     `mkdir -p build || { echo 'Failed to create build directory.'; exit 1; }`,

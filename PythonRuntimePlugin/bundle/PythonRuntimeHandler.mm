@@ -46,8 +46,9 @@
     NSString *workingDirectory = [self resolvedWorkingDirectory:[self stringValue:args[@"workingDirectory"]]
                                                      scriptPath:scriptPath];
     if (workingDirectory.length == 0) {
-        return [PythonRuntimeHandler errorEnvelope:@"Could not resolve working directory"
-                                          metadata:@{ @"workingDirectory": [self stringValue:args[@"workingDirectory"]] ?: @"" }];
+        workingDirectory = NSHomeDirectory();
+        //return [PythonRuntimeHandler errorEnvelope:@"Could not resolve working directory"
+        //                                  metadata:@{ @"workingDirectory": [self stringValue:args[@"workingDirectory"]] ?: @"" }];
     }
 
     NSMutableArray<NSString *> *processArguments = [NSMutableArray array];
@@ -368,7 +369,7 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:standard isDirectory:&isDirectory] && isDirectory) {
         return standard;
     }
-    return @"";
+    return NSHomeDirectory();
 }
 
 - (NSString *)validatedAbsoluteFilePath:(NSString *)path label:(NSString *)label

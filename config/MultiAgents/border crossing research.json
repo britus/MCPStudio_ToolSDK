@@ -2,14 +2,13 @@
   "agents" : [
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Coordinate search-first border research. Delegate one-URL crawl plans, run configured Python runners, then route outputs to specialists, review, and synthesis. Require URLs, titles, fetch metadata, search provenance, translations, and uncertainty notes.",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "warning",
+      "instruction" : "Coordinate search-first land border crossing research. Delegate URL's crawl plans, run configured crawler runners, then route outputs to specialists, review, and synthesis. Require URLs, titles, fetch metadata, search provenance, translations, and uncertainty notes.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
       "maxTurns" : 10,
-      "modelName" : "mistral-medium-latest",
       "name" : "ResearchCoordinator",
-      "positionX" : 507.92578125,
-      "positionY" : 83.1953125,
+      "positionX" : 508.5234375,
+      "positionY" : 82.9453125,
       "properties" : [
         {
           "description" : "Output language.",
@@ -39,14 +38,14 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Plan Azerbaijan crawl with given Python script file name \/Users\/eofmc\/EoF\/python_crawler\/crawler_az_border_status.py \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nURLs:\nhttps:\/\/www.migration.gov.az\/en\/press\/26,\nhttps:\/\/mfa.gov.az\/en\/news,\nhttps:\/\/mfa.gov.az\/en\/category\/announcements,\nhttps:\/\/www.gov.uk\/foreign-travel-advice\/azerbaijan,\nhttps:\/\/en.apa.az\/\n\nUse the agent properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": \"<complete script file name>\",\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
-      "llmProviderID" : "mistralai",
+      "instruction" : "Plan Azerbaijan land border crossing status for 2026 crawl with given Python script file name. \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nOutput format:\nJSON\n\nURLs:\nhttps:\/\/bordercrossinghub.com\/tsiteli-red-bridge-shikhly-ii-border-crossing\/\nhttps:\/\/caravanistan.com\/border-crossings\/azerbaijan\/\nhttps:\/\/mfa.gov.az\/en\/news\nhttps:\/\/mfa.gov.az\/en\/category\/announcements\nhttps:\/\/www.migration.gov.az\/en\/\nhttps:\/\/www.gov.uk\/foreign-travel-advice\/azerbaijan\nhttps:\/\/en.apa.az\/\n\nUse the agent properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": <copy from agent property scriptPath>,\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
+      "llmProviderID" : "lmStudioOpenAI",
       "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "devstral-latest",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "AzerbaijanScriptPlanner",
-      "positionX" : 174.01486545138889,
-      "positionY" : 197.36328125,
+      "positionX" : 173.7572227883454,
+      "positionY" : 196.83984375,
       "properties" : [
         {
           "description" : "Input parameter from research coordinator agent.",
@@ -56,6 +55,13 @@
           "valueType" : "string"
         },
         {
+          "description" : "Python script to use",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_az_border_status.py",
+          "valueType" : "string"
+        },
+        {
           "description" : "",
           "key" : "stdinJSON.maxBytesPerUrl",
           "required" : false,
@@ -104,14 +110,14 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Plan Russia\/North Caucasus crawl with given Python script file name \/Users\/eofmc\/EoF\/python_crawler\/crawler_ru_border_status.py \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nURLs:\nhttps:\/\/mid.ru\/en\/foreign_policy\/news\/,\nhttps:\/\/mid.ru\/en\/foreign_policy\/international_safety\/,\nhttps:\/\/russiable.com\/russia-borders\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": \"<complete script file name>\",\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "warning",
+      "instruction" : "Plan Russia\/North Caucasus land border crossing status for 2026 crawl with given Python script file name. \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nOutput format:\nJSON\n\nURLs:\nhttps:\/\/regionalert.com\/tracker\/upper-lars-border\/\nhttps:\/\/bordercrossinghub.com\/dariali-verkhny-lars-border-crossing\/\nhttps:\/\/mid.ru\/en\/foreign_policy\/news\/\nhttps:\/\/mid.ru\/en\/foreign_policy\/international_safety\/\nhttps:\/\/russiable.com\/russia-borders\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": <copy from agent property scriptPath>,\n  \"stdinJSON\": {\n    \"country\": \"Russia\/North Caucasus\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "devstral-latest",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "RussiaScriptPlanner",
-      "positionX" : 912.8583984375,
-      "positionY" : 199.595703125,
+      "positionX" : 913.3427734375,
+      "positionY" : 199.208984375,
       "properties" : [
         {
           "description" : "Input parameter from research coordinator agent.",
@@ -121,6 +127,13 @@
           "valueType" : "string"
         },
         {
+          "description" : "Python crawler script to use",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_ru_border_status.py",
+          "valueType" : "string"
+        },
+        {
           "description" : "",
           "key" : "stdinJSON.maxBytesPerUrl",
           "required" : false,
@@ -169,14 +182,14 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Plan Georgia crawl with given Python script file name \/Users\/eofmc\/EoF\/python_crawler\/crawler_ge_border_status.py\n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nURLs:\nhttps:\/\/mfa.gov.ge\/en\/news,\nhttps:\/\/mfa.gov.ge\/en\/statements-by-mfa\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": \"<complete script file name>\",\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "warning",
+      "instruction" : "Plan Georgia land border crossing status for 2026 crawl with given Python script file name.\n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nOutput format:\nJSON\n\nURLs:\nhttps:\/\/mfa.gov.ge\/en\/news\nhttps:\/\/mfa.gov.ge\/en\/statements-by-mfa\nhttps:\/\/bordercrossinghub.com\/tsiteli-red-bridge-shikhly-ii-border-crossing\/\nhttps:\/\/bordercrossinghub.com\/dariali-north-ossetia-alania-republic-border-crossing\/\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": <copy from agent property scriptPath>,\n  \"stdinJSON\": {\n    \"country\": \"Georgia\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "devstral-latest",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "GeorgiaScriptPlanner",
-      "positionX" : 506.43489583333326,
-      "positionY" : 303.9267578125,
+      "positionX" : 506.40755208333326,
+      "positionY" : 303.2822265625,
       "properties" : [
         {
           "description" : "Input parameter from research coordinator agent.",
@@ -186,6 +199,13 @@
           "valueType" : "string"
         },
         {
+          "description" : "Python script to use",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_ge_border_status.py",
+          "valueType" : "string"
+        },
+        {
           "description" : "",
           "key" : "stdinJSON.maxBytesPerUrl",
           "required" : false,
@@ -234,14 +254,14 @@
     },
     {
       "executionMode" : "mcpTool",
-      "instruction" : "Run the bound python_runtime crawler with configured stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
+      "instruction" : "Run the bound python_runtime crawler with configured scriptPath and stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
       "llmProviderID" : "lmStudio",
-      "logLevel" : "warning",
+      "logLevel" : "debug",
       "maxTurns" : 3,
       "modelName" : "",
       "name" : "RussiaScriptRunnerAgent",
-      "positionX" : 881.07421875,
-      "positionY" : 437.3681640625,
+      "positionX" : 880.953125,
+      "positionY" : 437.2392578125,
       "properties" : [
         {
           "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
@@ -275,7 +295,7 @@
           "description" : "Bound crawler script.",
           "key" : "scriptPath",
           "required" : true,
-          "value" : "\/Users\/eofmc\/EoF\/python_crawler\/crawler_ru_border_status.py",
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_ru_border_status.py",
           "valueType" : "string"
         },
         {
@@ -313,14 +333,14 @@
     },
     {
       "executionMode" : "mcpTool",
-      "instruction" : "Run the bound python_runtime crawler with configured stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
+      "instruction" : "Run the bound python_runtime crawler with configured scriptPath and stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
       "llmProviderID" : "lmStudio",
       "logLevel" : "debug",
       "maxTurns" : 3,
       "modelName" : "",
       "name" : "AzerbaijanScriptRunnerAgent",
-      "positionX" : 172.2919921875,
-      "positionY" : 460.109375,
+      "positionX" : 172.1513671875,
+      "positionY" : 459.58203125,
       "properties" : [
         {
           "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
@@ -354,7 +374,7 @@
           "description" : "Bound crawler script.",
           "key" : "scriptPath",
           "required" : true,
-          "value" : "\/Users\/eofmc\/EoF\/python_crawler\/crawler_az_border_status.py",
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_az_border_status.py",
           "valueType" : "string"
         },
         {
@@ -392,14 +412,14 @@
     },
     {
       "executionMode" : "mcpTool",
-      "instruction" : "Run the bound python_runtime crawler with configured stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
+      "instruction" : "Run the bound python_runtime crawler with configured scriptPath and stdinJSON only. Preserve stdout, stderr, exitCode, timeout, fetched pages, selected links, and search provenance.",
       "llmProviderID" : "lmStudio",
-      "logLevel" : "warning",
+      "logLevel" : "debug",
       "maxTurns" : 3,
       "modelName" : "",
       "name" : "GeorgiaScriptRunnerAgent",
-      "positionX" : 558.185546875,
-      "positionY" : 540.8505859375,
+      "positionX" : 558.306640625,
+      "positionY" : 540.9755859375,
       "properties" : [
         {
           "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
@@ -433,7 +453,7 @@
           "description" : "Bound crawler script.",
           "key" : "scriptPath",
           "required" : true,
-          "value" : "\/Users\/eofmc\/EoF\/python_crawler\/crawler_ge_border_status.py",
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_ge_border_status.py",
           "valueType" : "string"
         },
         {
@@ -472,13 +492,13 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Analyze Azerbaijan from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return azResult with findings, risks, limits, and uncertainties.",
-      "llmProviderID" : "mistralai",
+      "llmProviderID" : "lmStudioOpenAI",
       "logLevel" : "debug",
       "maxTurns" : 6,
-      "modelName" : "mistral-large-2512",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "AzerbaijanBorderSpecialist",
-      "positionX" : 170.1123046875,
-      "positionY" : 712.5751953125,
+      "positionX" : 169.9873046875,
+      "positionY" : 712.0009765625,
       "properties" : [
         {
           "description" : "Azerbaijan result.",
@@ -495,13 +515,13 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Analyze Russia\/North Caucasus from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return ruResult with findings, risks, limits, and uncertainties.",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "warning",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
       "maxTurns" : 6,
-      "modelName" : "mistral-large-2512",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "RussiaNorthCaucasusSpecialist",
-      "positionX" : 884.783203125,
-      "positionY" : 712.955078125,
+      "positionX" : 880.302734375,
+      "positionY" : 712.681640625,
       "properties" : [
         {
           "description" : "Russia result.",
@@ -518,13 +538,13 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Analyze Georgia from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return geResult with findings, risks, limits, and uncertainties.",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "warning",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
       "maxTurns" : 6,
-      "modelName" : "mistral-large-2512",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "GeorgiaBorderSpecialist",
-      "positionX" : 579.80859375,
-      "positionY" : 763.9443359375,
+      "positionX" : 579.95703125,
+      "positionY" : 763.8232421875,
       "properties" : [
         {
           "description" : "Georgia result.",
@@ -541,12 +561,13 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Synthesize reviewed findings in the user language. Cover border status, disputes, security dynamics, evidence, URLs\/queries used, source gaps, and uncertainties. Produce finalSummary.",
-      "llmProviderID" : "none",
-      "logLevel" : "warning",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
       "maxTurns" : 5,
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "FinalReportSynthesizer",
       "positionX" : 175.1494140625,
-      "positionY" : 993.025390625,
+      "positionY" : 993.146484375,
       "properties" : [
         {
           "description" : "Final report.",
@@ -570,12 +591,12 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Review country findings for accuracy, attribution, search provenance, execution evidence, translation, gaps, and uncertainty. Produce reviewFindings.",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "warning",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "mistral-large-2512",
+      "modelName" : "qwen\/qwen3.6-27b",
       "name" : "BorderAnalysisReviewer",
-      "positionX" : 580.51171875,
+      "positionX" : 580.6328125,
       "positionY" : 1059.5595703125,
       "properties" : [
         {
@@ -669,28 +690,28 @@
     },
     {
       "artifactPolicy" : "pass-override",
-      "condition" : "",
+      "condition" : "if output format is JSON",
       "kind" : "artifactFlow",
       "label" : "Run Azerbaijan Python script",
-      "sharedStateKeys" : "inlineScript, scriptPath, stdinJSON",
+      "sharedStateKeys" : "stdinJSON",
       "source" : "AzerbaijanScriptPlanner",
       "target" : "AzerbaijanScriptRunnerAgent"
     },
     {
       "artifactPolicy" : "pass-override",
-      "condition" : "",
+      "condition" : "if output format is JSON",
       "kind" : "artifactFlow",
       "label" : "Run Georgia Python Script",
-      "sharedStateKeys" : "scriptPath, stdinJSON",
+      "sharedStateKeys" : "stdinJSON",
       "source" : "GeorgiaScriptPlanner",
       "target" : "GeorgiaScriptRunnerAgent"
     },
     {
       "artifactPolicy" : "pass-override",
-      "condition" : "",
+      "condition" : "if output format is JSON",
       "kind" : "artifactFlow",
       "label" : "Run Russia Python Script",
-      "sharedStateKeys" : "scriptPath, stdinJSON",
+      "sharedStateKeys" : "stdinJSON",
       "source" : "RussiaScriptPlanner",
       "target" : "RussiaScriptRunnerAgent"
     },

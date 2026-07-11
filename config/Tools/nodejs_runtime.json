@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-04T04:46:18.482Z",
+    "lastModified" : "2026-07-09T10:25:52.286Z",
     "priority" : 0.9
   },
   "description" : "Execute JavaScript using Node.js. Provide inline JavaScript or a script path; the tool runs it with the configured Node.js executable and returns stdout, stderr, exit code, and execution status.",

@@ -8,8 +8,6 @@ const shared = require('sharedFunctions');
 // Toolchain
 const analyzedir = require('analyzeDirectory');
 const httpTools = require('httpTools');
-const fetchPrompt = require('fetchPrompt');
-const fetchResource = require('fetchResource');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
 const shellCall = require('shellCall');
@@ -57,10 +55,6 @@ const HANDLERS = {
     createDirectory: (params) => createDirectory.createDirectory(params),
     getDocumentsPath: (params) => getDocumentsPath.getDocumentsPath(params),
     getTempPath: (params) => getTempPath.getTempPath(params),
-
-    // Retrieve MCP Prompt, Resource for processing
-    fetchPrompt: (params) => fetchPrompt.fetchPrompt(params),
-    fetchResource: (params) => fetchResource.fetchResource(params),
 
     // HTTP Toolchain
     fetchData: (params) => httpTools.httpTools("fetchData", params),
