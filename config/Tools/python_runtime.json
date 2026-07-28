@@ -12,13 +12,18 @@
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
+      "environment" : {
+        "description" : "Optional string environment variables for the Python child process. PATH does not control executable resolution.",
+        "name" : "environment",
+        "type" : "object"
+      },
       "inlineScript" : {
         "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
         "name" : "inlineScript",
         "type" : "string"
       },
       "pythonExecutable" : {
-        "description" : "Optional absolute path to the Python executable, or 'python3' to resolve via \/usr\/bin\/env.",
+        "description" : "Optional absolute path to the Python executable, or 'python'\/'python3' to resolve from trusted host locations.",
         "name" : "pythonExecutable",
         "type" : "string"
       },
@@ -57,12 +62,12 @@
         "type" : "object"
       },
       "timeoutSeconds" : {
-        "description" : "Maximum execution time in seconds. Defaults to 60 and is capped by the plugin.",
+        "description" : "Maximum execution time in seconds. Defaults to 60 and is capped at 600.",
         "name" : "timeoutSeconds",
         "type" : "number"
       },
       "workingDirectory" : {
-        "description" : "Optional working directory for the Python process.",
+        "description" : "Optional existing absolute working directory for the Python process.",
         "name" : "workingDirectory",
         "type" : "string"
       }
@@ -81,6 +86,16 @@
         "description" : "Launch error details if the Python process could not be started.",
         "name" : "launchError",
         "type" : "string"
+      },
+      "maxOutputBytes" : {
+        "description" : "Maximum combined number of stdout and stderr bytes captured.",
+        "name" : "maxOutputBytes",
+        "type" : "integer"
+      },
+      "outputLimitExceeded" : {
+        "description" : "Whether the process was terminated after exceeding the output limit.",
+        "name" : "outputLimitExceeded",
+        "type" : "boolean"
       },
       "pythonExecutable" : {
         "description" : "Resolved Python executable used for execution.",

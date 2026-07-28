@@ -8,11 +8,15 @@
 #include "CustomToolExports.h"
 #include "ToolABI.h"
 
+#ifndef NODEJS_RUNTIME_VERSION
+#define NODEJS_RUNTIME_VERSION "1.0.0"
+#endif
+
 static ToolPluginDescriptor desc = {
     .abiVersion       = TOOL_ABI_VERSION,
     .toolVersion      = 1,
     .name             = "NodeJSRuntimeTool",
-    .version          = "1.0.0",
+    .version          = NODEJS_RUNTIME_VERSION,
     .author           = "EoF Software Lab",
     .description      = "Runs JavaScript tools with a Node.js executable and returns stdout/stderr as MCP tool results",
     .toolEntryPoint   = "toolEntry",

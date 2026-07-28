@@ -1,0 +1,244 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan the calendar viewing workflow from the user request. Preserve the requested date range, timezone assumptions, and output constraints. Delegate calendar discovery first, then event\/reminder extraction, then review, then final synthesis. Do not call tools yourself unless explicitly needed; downstream agents are responsible for tool work.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
+      "maxTurns" : 8,
+      "modelName" : "qwen\/qwen3.5-9b",
+      "name" : "Coordinator",
+      "positionX" : 119.87109375,
+      "positionY" : 79.47265625,
+      "properties" : [
+        {
+          "description" : "Appointment scope is derived from the user prompt; default to upcoming when unspecified.",
+          "key" : "appointmentScope",
+          "required" : false,
+          "value" : "user-requested-date-range-or-upcoming",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Scope of calendars to include.",
+          "key" : "calendarScope",
+          "required" : false,
+          "value" : "all-calendars",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Primary workflow objective.",
+          "key" : "objective",
+          "required" : true,
+          "value" : "Show calendar events and reminders for the user requested time range.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Target audience for the final output.",
+          "key" : "outputAudience",
+          "required" : false,
+          "value" : "end-user",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final answer format.",
+          "key" : "outputFormat",
+          "required" : false,
+          "value" : "chat-summary-no-markdown-tables",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Do not expose private notes\/details more than needed for a calendar overview.",
+          "key" : "privacyPolicy",
+          "required" : false,
+          "value" : "summarize-private",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Use the user local timezone unless the prompt says otherwise.",
+          "key" : "timezonePolicy",
+          "required" : false,
+          "value" : "user-local",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "temperature" : 0.2
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Produce the final end-user calendar\/reminder view for chat. Do not use Markdown tables. Use short headings and bullet lists grouped by date or by calendar, whichever is clearer. Include the covered date range, then events, reminders, and concise notes about empty results, permissions, or partial tool failures. Do not expose internal workflow details.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
+      "maxTurns" : 4,
+      "modelName" : "qwen\/qwen3.5-9b",
+      "name" : "End User Synthesizer",
+      "positionX" : 818.66015625,
+      "positionY" : 81.05078125,
+      "properties" : [
+        {
+          "description" : "Reviewed events and reminders.",
+          "key" : "appointmentRecords",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final output format constraint.",
+          "key" : "outputFormat",
+          "required" : false,
+          "value" : "chat-summary-no-markdown-tables",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Reviewer guidance and caveats.",
+          "key" : "reviewFindings",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "synthesizer",
+      "temperature" : 0.2
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Using the incoming calendarRecords and the user requested date range, call the necessary MCP tools on the fly to collect events and reminders. Use list_events with calendar_id plus ISO 8601 start_date and end_date for each relevant calendar. Use list_reminder_lists first when reminder list ids are needed, then call list_reminders with list_id and include_completed=false unless the user asks for completed reminders. Combine the results into appointmentRecords with separate events and reminders sections, preserving calendar\/list names, dates, titles, locations, due dates, and any tool errors. Do not invent calendar data. If the user did not specify a date range, choose a reasonable upcoming range and state it in appointmentRecords.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
+      "maxTurns" : 8,
+      "name" : "Events and Reminders Specialist",
+      "positionX" : 479.9921875,
+      "positionY" : 329.7421875,
+      "properties" : [
+        {
+          "description" : "Tool output artifact containing events, reminders, date range, and diagnostics.",
+          "key" : "appointmentRecords",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Structured calendars returned by list_calendars.",
+          "key" : "calendarRecords",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Requested or inferred date range for event loading.",
+          "key" : "dateRange",
+          "required" : false,
+          "value" : "from user prompt; default upcoming",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Fetch all available calendars from the user calendar store using list_calendars. Return the structured calendars payload as calendarRecords.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "qwen\/qwen3.5-9b",
+      "name" : "Calendar Discovery",
+      "positionX" : 119.74609375,
+      "positionY" : 329.75,
+      "properties" : [
+        {
+          "description" : "",
+          "key" : "calendarScope",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0,
+      "toolName" : "list_calendars"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Review appointmentRecords for completeness, date-range consistency, calendar\/list attribution, privacy, timezone clarity, duplicate items, and readable grouping. Produce reviewFindings and a cleaned appointmentRecords summary for synthesis. Keep tool errors or missing permission diagnostics visible but concise.",
+      "llmProviderID" : "lmStudioOpenAI",
+      "logLevel" : "debug",
+      "maxTurns" : 4,
+      "modelName" : "qwen\/qwen3.5-9b",
+      "name" : "Calendar Output Reviewer",
+      "positionX" : 820,
+      "positionY" : 329.875,
+      "properties" : [
+        {
+          "description" : "Events and reminders collected by the specialist.",
+          "key" : "appointmentRecords",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Reviewer findings for synthesis.",
+          "key" : "reviewFindings",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "reviewer",
+      "temperature" : 0.2
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "",
+      "kind" : "delegation",
+      "label" : "Delegate calendar discovery",
+      "sharedStateKeys" : "objective, calendarScope",
+      "source" : "Coordinator",
+      "target" : "Calendar Discovery"
+    },
+    {
+      "artifactPolicy" : "pass-summary",
+      "condition" : "",
+      "kind" : "delegation",
+      "label" : "Delegate final chat output",
+      "sharedStateKeys" : "objective, outputFormat, outputAudience",
+      "source" : "Coordinator",
+      "target" : "End User Synthesizer"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Calendar records available",
+      "kind" : "artifactFlow",
+      "label" : "Provide calendar records",
+      "sharedStateKeys" : "calendarRecords",
+      "source" : "Calendar Discovery",
+      "target" : "Events and Reminders Specialist"
+    },
+    {
+      "artifactPolicy" : "pass-all",
+      "condition" : "",
+      "kind" : "artifactFlow",
+      "label" : "Provide reviewed data",
+      "sharedStateKeys" : "appointmentRecords, reviewFindings",
+      "source" : "Calendar Output Reviewer",
+      "target" : "End User Synthesizer"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Events or reminders loaded, or diagnostics available",
+      "kind" : "review",
+      "label" : "Review extracted events and reminders",
+      "sharedStateKeys" : "appointmentRecords",
+      "source" : "Events and Reminders Specialist",
+      "target" : "Calendar Output Reviewer"
+    }
+  ],
+  "goal" : "List available calendars, load events and reminders for the user requested time range, review the collected data, and present it clearly in chat without Markdown tables.",
+  "name" : "calender_viewer",
+  "pattern" : "coordinator",
+  "summary" : "Lists calendars, lets an LLM specialist load events and reminders for the requested date range, reviews the records, and produces a chat-friendly answer without Markdown tables.",
+  "systemInstruction" : "Coordinate the calendar workflow, preserve shared context, use only enabled calendar\/reminder tools when needed, and return one synthesized answer. Final user-facing output must not use Markdown tables."
+}

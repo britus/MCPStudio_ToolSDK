@@ -8,11 +8,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeJSRuntimeHandler : NSObject
 
+/**
+ Executes a Node.js invocation and always returns an MCP tool-result envelope.
+
+ `params` accepts either the tool arguments directly or a host envelope whose
+ `arguments` value is a dictionary. Supported arguments include `scriptPath`
+ or `inlineScript`, `scriptArguments`, `workingDirectory`, `stdin`,
+ `stdinJSON`, `environment`, `timeoutSeconds` (maximum 600 seconds), and
+ `resultMode`.
+ */
 - (NSDictionary *)handleToolEntryWithSID:(NSString *)sid
                                 toolName:(NSString *)toolName
-                                  params:(NSDictionary *)params
-                                   error:(NSError **)error;
+                                  params:(NSDictionary *)params;
 
+/** Returns a non-nil MCP error envelope with optional structured metadata. */
 + (NSDictionary *)errorEnvelope:(NSString *)message
                        metadata:(nullable NSDictionary *)metadata;
 

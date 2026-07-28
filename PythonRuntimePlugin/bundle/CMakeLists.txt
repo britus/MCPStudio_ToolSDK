@@ -3,14 +3,6 @@
 #  MCPStudio ToolSDK - Python Runtime Plugin Bundle
 # ===================================================================
 
-project(PythonRuntimeBundle VERSION 1.0.0 LANGUAGES C CXX OBJC OBJCXX)
-
-set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0")
-
-include_directories(../../include)
-include_directories(../../ToolJSONBridge)
-
 add_library(PythonRuntimeBundle MODULE
     ToolDescriptor.c
     PluginMain.mm
@@ -31,9 +23,7 @@ set_target_properties(PythonRuntimeBundle PROPERTIES
 
 target_link_libraries(PythonRuntimeBundle
     PRIVATE ToolJSONBridge
-    PRIVATE "-framework Cocoa"
     PRIVATE "-framework Foundation"
-    PRIVATE "-framework AppKit"
 )
 
 set_target_properties(PythonRuntimeBundle PROPERTIES
@@ -41,12 +31,16 @@ set_target_properties(PythonRuntimeBundle PROPERTIES
     BUILD_WITH_INSTALL_RPATH TRUE
 )
 
-set_target_properties(PythonRuntimeBundle PROPERTIES COMPILE_DEFINITIONS
-    "TOOL_BUNDLE=1"
+target_compile_definitions(PythonRuntimeBundle PRIVATE
+    TOOL_BUNDLE=1
+    PYTHON_RUNTIME_VERSION="${PROJECT_VERSION}"
 )
 
+# ToolJSONBridge is loaded through @loader_path/../../.., i.e. from the
+# directory containing PythonRuntimeTool.bundle.
 add_custom_command(TARGET PythonRuntimeBundle POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         $<TARGET_FILE:ToolJSONBridge>
-        $<TARGET_FILE_DIR:PythonRuntimeBundle>/../../..
+        $<TARGET_BUNDLE_DIR:PythonRuntimeBundle>/..
+    VERBATIM
 )

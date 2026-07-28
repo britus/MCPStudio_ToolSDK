@@ -31,5 +31,5 @@ TOOL_API const ToolPluginDescriptor *toolDescribe(void);
 TOOL_API void toolEntry(const char* sid,            // AI client session ID
                         const char* toolName,       // Tooling name
                         const char* params,         // Tooling parameters
-                        char** resultJson,          // Generated result as JSON
-                        size_t* resultSize);        // Size of generated result (caller freeing)
+                        char** resultJson,          // malloc-allocated JSON; caller must free()
+                        size_t* resultSize);        // Buffer size including the trailing NUL

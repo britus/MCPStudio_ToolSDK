@@ -32,9 +32,20 @@ build/bundle/PythonRuntimeTool.bundle
 }
 ```
 
-`pythonExecutable` is optional. If omitted, the plugin checks common Homebrew and system locations and falls back to `/usr/bin/env python3`.
+`pythonExecutable` is optional. If omitted or set to `python` or `python3`, the
+plugin resolves an absolute executable from common Homebrew/system locations
+and the MCP Studio process environment. The child `environment.PATH` does not
+change which executable is launched. Other values must be existing absolute
+executable paths.
 
 `scriptPath` is required unless `inlineScript` is provided.
+
+`workingDirectory`, when supplied, must be an existing absolute directory.
+
+`timeoutSeconds` defaults to 60 seconds and is capped at 600 seconds.
+
+Captured stdout and stderr share a 10 MiB limit. Exceeding it terminates the
+process and returns `outputLimitExceeded: true`.
 
 `resultMode` supports:
 
@@ -46,7 +57,7 @@ build/bundle/PythonRuntimeTool.bundle
 ```json
 {
   "pythonExecutable": "python3",
-  "scriptPath": "~/toolsdk/PythonRuntimePlugin/examples/echo_tool.py",
+  "scriptPath": "/Users/you/toolsdk/PythonRuntimePlugin/examples/echo_tool.py",
   "stdinJSON": { "message": "hello" },
   "timeoutSeconds": 10,
   "resultMode": "capture"

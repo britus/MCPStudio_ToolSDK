@@ -141,8 +141,6 @@
 		F75AC4252FAF73220008BE10 /* delete_event.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_event.json; sourceTree = "<group>"; };
 		F75AC4262FAF73220008BE10 /* delete_file.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_file.json; sourceTree = "<group>"; };
 		F75AC4272FAF73220008BE10 /* delete_reminder.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = delete_reminder.json; sourceTree = "<group>"; };
-		F75AC4282FAF73220008BE10 /* fetch_prompt.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fetch_prompt.json; sourceTree = "<group>"; };
-		F75AC4292FAF73220008BE10 /* fetch_resource.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fetch_resource.json; sourceTree = "<group>"; };
 		F75AC42A2FAF73220008BE10 /* file_exists.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = file_exists.json; sourceTree = "<group>"; };
 		F75AC42B2FAF73220008BE10 /* gcc_settings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = gcc_settings.json; sourceTree = "<group>"; };
 		F75AC42C2FAF73220008BE10 /* get_documents_path.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = get_documents_path.json; sourceTree = "<group>"; };
@@ -151,7 +149,6 @@
 		F75AC42F2FAF73220008BE10 /* http_download.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_download.json; sourceTree = "<group>"; };
 		F75AC4302FAF73220008BE10 /* http_get_data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_get_data.json; sourceTree = "<group>"; };
 		F75AC4312FAF73220008BE10 /* http_post_data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_post_data.json; sourceTree = "<group>"; };
-		F75AC4322FAF73220008BE10 /* library_handler.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = library_handler.json; sourceTree = "<group>"; };
 		F75AC4332FAF73220008BE10 /* list_calendars.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_calendars.json; sourceTree = "<group>"; };
 		F75AC4342FAF73220008BE10 /* list_contacts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_contacts.json; sourceTree = "<group>"; };
 		F75AC4362FAF73220008BE10 /* list_events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = list_events.json; sourceTree = "<group>"; };
@@ -398,8 +395,6 @@
 				F75AC4252FAF73220008BE10 /* delete_event.json */,
 				F75AC4262FAF73220008BE10 /* delete_file.json */,
 				F75AC4272FAF73220008BE10 /* delete_reminder.json */,
-				F75AC4282FAF73220008BE10 /* fetch_prompt.json */,
-				F75AC4292FAF73220008BE10 /* fetch_resource.json */,
 				F75AC42A2FAF73220008BE10 /* file_exists.json */,
 				F75AC42B2FAF73220008BE10 /* gcc_settings.json */,
 				F75AC42C2FAF73220008BE10 /* get_documents_path.json */,
@@ -408,7 +403,6 @@
 				F75AC42F2FAF73220008BE10 /* http_download.json */,
 				F75AC4302FAF73220008BE10 /* http_get_data.json */,
 				F75AC4312FAF73220008BE10 /* http_post_data.json */,
-				F75AC4322FAF73220008BE10 /* library_handler.json */,
 				F75AC4332FAF73220008BE10 /* list_calendars.json */,
 				F75AC4342FAF73220008BE10 /* list_contacts.json */,
 				F75AC4362FAF73220008BE10 /* list_events.json */,

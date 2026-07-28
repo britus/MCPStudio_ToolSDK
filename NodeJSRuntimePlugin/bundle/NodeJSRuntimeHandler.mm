@@ -4,29 +4,28 @@
 // ===================================================================
 
 #import <Foundation/Foundation.h>
+#include <signal.h>
+
 #import "NodeJSRuntimeHandler.h"
 #import "ToolJSONBridge.h"
 
-@interface NodeJSRuntimeHandler ()
-@property (nonatomic, copy) NSString *sid;
-@property (nonatomic, copy) NSString *toolName;
-@end
+static const NSUInteger NodeJSRuntimeMaxOutputBytes = 10 * 1024 * 1024;
+static const NSTimeInterval NodeJSRuntimeTerminationGraceSeconds = 2.0;
 
 @implementation NodeJSRuntimeHandler
 
 - (NSDictionary *)handleToolEntryWithSID:(NSString *)sid
                                 toolName:(NSString *)toolName
                                   params:(NSDictionary *)params
-                                   error:(NSError **)error
 {
-    self.sid = sid ?: @"";
-    self.toolName = toolName ?: @"";
+    NSString *normalizedSID = sid ?: @"";
+    NSString *normalizedToolName = toolName ?: @"";
     NSDictionary *args = [self normalizedArgumentsFromParams:params ?: @{}];
 
-    if (self.sid.length == 0) {
+    if (normalizedSID.length == 0) {
         return [NodeJSRuntimeHandler errorEnvelope:@"Missing SID" metadata:nil];
     }
-    if (self.toolName.length == 0) {
+    if (normalizedToolName.length == 0) {
         return [NodeJSRuntimeHandler errorEnvelope:@"Missing tool name" metadata:nil];
     }
 
@@ -46,15 +45,11 @@
     NSString *workingDirectory = [self resolvedWorkingDirectory:[self stringValue:args[@"workingDirectory"]]
                                                      scriptPath:scriptPath];
     if (workingDirectory.length == 0) {
-        workingDirectory = NSHomeDirectory();
-        //return [NodeJSRuntimeHandler errorEnvelope:@"Could not resolve working directory"
-        //                                  metadata:@{ @"workingDirectory": [self stringValue:args[@"workingDirectory"]] ?: @"" }];
+        return [NodeJSRuntimeHandler errorEnvelope:@"workingDirectory must be an existing absolute directory"
+                                          metadata:@{ @"workingDirectory": [self stringValue:args[@"workingDirectory"]] ?: @"" }];
     }
 
     NSMutableArray<NSString *> *processArguments = [NSMutableArray array];
-    if ([nodeExecutable isEqualToString:@"/usr/bin/env"]) {
-        [processArguments addObject:@"node"];
-    }
 
     if (inlineScript.length > 0) {
         [processArguments addObject:@"-e"];
@@ -94,6 +89,10 @@
 
     NSString *resultMode = [[self stringValue:args[@"resultMode"]] lowercaseString];
     if ([resultMode isEqualToString:@"toolresultjson"] || [resultMode isEqualToString:@"tool_result_json"]) {
+        if (![run[@"success"] boolValue]) {
+            return [NodeJSRuntimeHandler errorEnvelope:@"Node.js process failed before producing a successful tool result"
+                                             metadata:run];
+        }
         NSDictionary *parsed = [self parseToolResultFromStdout:[self stringValue:run[@"stdout"]]];
         if (parsed) {
             return parsed;
@@ -141,7 +140,11 @@
     NSString *stderrText = [self stringValue:run[@"stderr"]];
     NSNumber *exitCode = [run[@"exitCode"] isKindOfClass:[NSNumber class]] ? run[@"exitCode"] : @(-1);
     BOOL timedOut = [run[@"timedOut"] boolValue];
-    BOOL success = ([exitCode integerValue] == 0 && !timedOut);
+    BOOL outputLimitExceeded = [run[@"outputLimitExceeded"] boolValue];
+    NSNumber *maxOutputBytes = [run[@"maxOutputBytes"] isKindOfClass:[NSNumber class]]
+        ? run[@"maxOutputBytes"]
+        : @(NodeJSRuntimeMaxOutputBytes);
+    BOOL success = ([exitCode integerValue] == 0 && !timedOut && !outputLimitExceeded);
 
     NSMutableArray *content = [NSMutableArray array];
     if (stdoutText.length > 0) {
@@ -161,6 +164,8 @@
         @"stdout": stdoutText ?: @"",
         @"stderr": stderrText ?: @"",
         @"timedOut": @(timedOut),
+        @"outputLimitExceeded": @(outputLimitExceeded),
+        @"maxOutputBytes": maxOutputBytes,
         @"nodeExecutable": nodeExecutable ?: @"",
         @"scriptPath": scriptPath ?: @"",
         @"workingDirectory": workingDirectory ?: @"",
@@ -210,6 +215,8 @@
     NSPipe *stdinPipe = [NSPipe pipe];
     NSMutableData *stdoutData = [NSMutableData data];
     NSMutableData *stderrData = [NSMutableData data];
+    NSObject *outputLock = [[NSObject alloc] init];
+    __block BOOL outputLimitExceeded = NO;
 
     task.launchPath = executable;
     task.arguments = arguments ?: @[];
@@ -228,21 +235,41 @@
     NSFileHandle *stdoutHandle = [stdoutPipe fileHandleForReading];
     NSFileHandle *stderrHandle = [stderrPipe fileHandleForReading];
 
-    stdoutHandle.readabilityHandler = ^(NSFileHandle *handle) {
-        NSData *data = [handle availableData];
-        if (data.length > 0) {
-            @synchronized (stdoutData) {
-                [stdoutData appendData:data];
+    void (^appendOutput)(NSData *, NSMutableData *) = ^(NSData *data, NSMutableData *target) {
+        if (data.length == 0) {
+            return;
+        }
+
+        BOOL shouldKill = NO;
+        @synchronized (outputLock) {
+            if (outputLimitExceeded) {
+                return;
             }
+
+            NSUInteger capturedBytes = stdoutData.length + stderrData.length;
+            NSUInteger remainingBytes = capturedBytes < NodeJSRuntimeMaxOutputBytes
+                ? NodeJSRuntimeMaxOutputBytes - capturedBytes
+                : 0;
+            NSUInteger bytesToAppend = MIN(data.length, remainingBytes);
+            if (bytesToAppend > 0) {
+                [target appendBytes:data.bytes length:bytesToAppend];
+            }
+            if (bytesToAppend < data.length) {
+                outputLimitExceeded = YES;
+                shouldKill = YES;
+            }
+        }
+
+        if (shouldKill && task.isRunning) {
+            kill(task.processIdentifier, SIGKILL);
         }
     };
+
+    stdoutHandle.readabilityHandler = ^(NSFileHandle *handle) {
+        appendOutput([handle availableData], stdoutData);
+    };
     stderrHandle.readabilityHandler = ^(NSFileHandle *handle) {
-        NSData *data = [handle availableData];
-        if (data.length > 0) {
-            @synchronized (stderrData) {
-                [stderrData appendData:data];
-            }
-        }
+        appendOutput([handle availableData], stderrData);
     };
 
     dispatch_semaphore_t done = dispatch_semaphore_create(0);
@@ -266,19 +293,31 @@
     }
 
     NSFileHandle *stdinHandle = [stdinPipe fileHandleForWriting];
-    if (stdinText.length > 0) {
-        NSData *stdinData = [stdinText dataUsingEncoding:NSUTF8StringEncoding];
-        if (stdinData.length > 0) {
-            [stdinHandle writeData:stdinData];
+    NSData *stdinData = [stdinText dataUsingEncoding:NSUTF8StringEncoding];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+        @try {
+            if (stdinData.length > 0) {
+                [stdinHandle writeData:stdinData];
+            }
+        } @catch (__unused NSException *exception) {
+            // The child may exit or be terminated before consuming all input.
         }
-    }
-    [stdinHandle closeFile];
+        [stdinHandle closeFile];
+    });
 
     long waitResult = dispatch_semaphore_wait(done, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)));
     BOOL timedOut = (waitResult != 0);
     if (timedOut && task.isRunning) {
         [task terminate];
-        dispatch_semaphore_wait(done, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)));
+        long terminationResult = dispatch_semaphore_wait(
+            done,
+            dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NodeJSRuntimeTerminationGraceSeconds * NSEC_PER_SEC)));
+        if (terminationResult != 0 && task.isRunning) {
+            kill(task.processIdentifier, SIGKILL);
+            dispatch_semaphore_wait(
+                done,
+                dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NodeJSRuntimeTerminationGraceSeconds * NSEC_PER_SEC)));
+        }
     }
 
     stdoutHandle.readabilityHandler = nil;
@@ -286,27 +325,34 @@
 
     NSData *remainingStdout = [stdoutHandle readDataToEndOfFile];
     NSData *remainingStderr = [stderrHandle readDataToEndOfFile];
-    @synchronized (stdoutData) {
-        if (remainingStdout.length > 0) {
-            [stdoutData appendData:remainingStdout];
-        }
-    }
-    @synchronized (stderrData) {
-        if (remainingStderr.length > 0) {
-            [stderrData appendData:remainingStderr];
-        }
+    appendOutput(remainingStdout, stdoutData);
+    appendOutput(remainingStderr, stderrData);
+
+    BOOL didExceedOutputLimit = NO;
+    @synchronized (outputLock) {
+        didExceedOutputLimit = outputLimitExceeded;
     }
 
-    NSString *stdoutText = [[NSString alloc] initWithData:stdoutData encoding:NSUTF8StringEncoding] ?: @"";
-    NSString *stderrText = [[NSString alloc] initWithData:stderrData encoding:NSUTF8StringEncoding] ?: @"";
+    NSString *stdoutText = [self textFromOutputData:stdoutData streamName:@"stdout"];
+    NSString *stderrText = [self textFromOutputData:stderrData streamName:@"stderr"];
+    if (didExceedOutputLimit) {
+        NSString *diagnostic = [NSString stringWithFormat:
+            @"Node.js process exceeded the %lu-byte combined stdout/stderr limit",
+            (unsigned long)NodeJSRuntimeMaxOutputBytes];
+        stderrText = stderrText.length > 0
+            ? [stderrText stringByAppendingFormat:@"\n%@", diagnostic]
+            : diagnostic;
+    }
     int exitCode = timedOut ? -1 : task.terminationStatus;
 
     return @{
-        @"success": @(!timedOut && exitCode == 0),
+        @"success": @(!timedOut && !didExceedOutputLimit && exitCode == 0),
         @"exitCode": @(exitCode),
         @"stdout": stdoutText,
         @"stderr": stderrText,
-        @"timedOut": @(timedOut)
+        @"timedOut": @(timedOut),
+        @"outputLimitExceeded": @(didExceedOutputLimit),
+        @"maxOutputBytes": @(NodeJSRuntimeMaxOutputBytes)
     };
 }
 
@@ -331,27 +377,34 @@
 {
     NSString *trimmed = [candidate stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (trimmed.length > 0) {
-        if ([trimmed isEqualToString:@"node"]) {
-            return @"/usr/bin/env";
+        if (![trimmed isEqualToString:@"node"]) {
+            if (![trimmed isAbsolutePath]) {
+                return @"";
+            }
+            NSString *standard = [trimmed stringByStandardizingPath];
+            return [[NSFileManager defaultManager] isExecutableFileAtPath:standard] ? standard : @"";
         }
-        NSString *standard = [trimmed stringByStandardizingPath];
-        if ([standard hasPrefix:@"/"] && [[NSFileManager defaultManager] isExecutableFileAtPath:standard]) {
-            return standard;
-        }
-        return @"";
     }
 
-    NSArray *candidates = @[
+    NSMutableArray<NSString *> *candidates = [NSMutableArray arrayWithArray:@[
         @"/opt/homebrew/bin/node",
         @"/usr/local/bin/node",
         @"/usr/bin/node"
-    ];
-    for (NSString *path in candidates) {
-        if ([[NSFileManager defaultManager] isExecutableFileAtPath:path]) {
-            return path;
+    ]];
+    NSString *processPath = [[[NSProcessInfo processInfo] environment] objectForKey:@"PATH"];
+    for (NSString *directory in [processPath componentsSeparatedByString:@":"]) {
+        if (directory.length > 0 && directory.isAbsolutePath) {
+            [candidates addObject:[directory stringByAppendingPathComponent:@"node"]];
         }
     }
-    return @"/usr/bin/env";
+
+    for (NSString *path in candidates) {
+        NSString *standard = [path stringByStandardizingPath];
+        if ([[NSFileManager defaultManager] isExecutableFileAtPath:standard]) {
+            return standard;
+        }
+    }
+    return @"";
 }
 
 - (NSString *)resolvedWorkingDirectory:(NSString *)candidate scriptPath:(NSString *)scriptPath
@@ -364,25 +417,45 @@
     if (path.length == 0) {
         path = [[NSFileManager defaultManager] currentDirectoryPath];
     }
+    if (![path isAbsolutePath]) {
+        return @"";
+    }
     NSString *standard = [path stringByStandardizingPath];
     BOOL isDirectory = NO;
     if ([[NSFileManager defaultManager] fileExistsAtPath:standard isDirectory:&isDirectory] && isDirectory) {
         return standard;
     }
-    return NSHomeDirectory();
+    return @"";
 }
 
 - (NSString *)validatedAbsoluteFilePath:(NSString *)path label:(NSString *)label
 {
-    NSString *standard = [[self stringValue:path] stringByStandardizingPath];
-    if (![standard hasPrefix:@"/"]) {
+    NSString *rawPath = [self stringValue:path];
+    if (![rawPath isAbsolutePath]) {
         return @"";
     }
+    NSString *standard = [rawPath stringByStandardizingPath];
     BOOL isDirectory = NO;
     if (![[NSFileManager defaultManager] fileExistsAtPath:standard isDirectory:&isDirectory] || isDirectory) {
         return @"";
     }
     return standard;
+}
+
+- (NSString *)textFromOutputData:(NSData *)data streamName:(NSString *)streamName
+{
+    if (data.length == 0) {
+        return @"";
+    }
+
+    NSString *text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    if (text) {
+        return text;
+    }
+
+    return [NSString stringWithFormat:@"<%@ contained %lu bytes of non-UTF-8 data>",
+                                      streamName,
+                                      (unsigned long)data.length];
 }
 
 - (NSString *)stdinTextFromArguments:(NSDictionary *)args

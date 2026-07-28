@@ -44,6 +44,36 @@
       "maxBase64EmbedBytes": 750000
     },
     {
+      "id": "kimi",
+      "displayName": "Kimi LLM",
+      "baseURL": "https://api.moonshot.ai",
+      "protocolFamily": "kimiChatCompletions",
+      "authMode": "bearer",
+      "modelsEndpoint": "/v1/models",
+      "chatEndpoint": "/v1/chat/completions",
+      "requiresToken": true,
+      "supportsModelList": true,
+      "supportsVision": true,
+      "supportsDocuments": false,
+      "maxBase64EmbedBytes": 750000,
+      "defaultModels": ["kimi-k3", "kimi-k2.7-code", "kimi-k2.6"]
+    },
+    {
+      "id": "openRouter",
+      "displayName": "OpenRouter.ai",
+      "baseURL": "https://openrouter.ai/api/v1",
+      "protocolFamily": "openAICompatible",
+      "authMode": "bearer",
+      "modelsEndpoint": "/models",
+      "chatEndpoint": "/chat/completions",
+      "requiresToken": true,
+      "supportsModelList": true,
+      "supportsVision": true,
+      "supportsDocuments": false,
+      "maxBase64EmbedBytes": 750000,
+      "defaultModels": ["~openai/gpt-latest"]
+    },
+    {
       "id": "anthropic",
       "displayName": "Claude (Anthropic)",
       "baseURL": "https://api.anthropic.com",

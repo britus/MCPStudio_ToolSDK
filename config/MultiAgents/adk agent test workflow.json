@@ -1,0 +1,268 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate this ADK runtime smoke test. Start both ToolRunner agents in parallel, then hand both outputs to Review. Do not simulate tool output; rely only on the runtime results.",
+      "logLevel" : "debug",
+      "maxTurns" : 4,
+      "name" : "ADK Test Coordinator",
+      "positionX" : 295.5498046875,
+      "positionY" : 86.564453125,
+      "properties" : [
+        {
+          "description" : "Expected NodeJS runtime output.",
+          "key" : "expectedNodeOutput",
+          "required" : true,
+          "value" : "Hello NodeJS",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Expected Python runtime output.",
+          "key" : "expectedPythonOutput",
+          "required" : true,
+          "value" : "Hello Python",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute the configured NodeJS runtime inline script exactly as provided. The script waits for 5 seconds and prints `Hello NodeJS`.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "NodeJS ToolRunner",
+      "positionX" : 142.6953125,
+      "positionY" : 308.458984375,
+      "properties" : [
+        {
+          "description" : "Inline JavaScript with a 5 second delay and deterministic stdout.",
+          "key" : "inlineScript",
+          "required" : true,
+          "value" : "setTimeout(() => {\n  console.log('Hello NodeJS');\n}, 5000);\n",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Resolve Node.js via environment.",
+          "key" : "nodeExecutable",
+          "required" : false,
+          "value" : "\/opt\/homebrew\/bin\/node",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout and stderr from the NodeJS runtime.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Arguments passed to the JavaScript script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Absolute path to a JavaScript file to execute. Use this or inlineScript.",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Node.js process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional JSON object passed to the Node.js process via stdin.",
+          "key" : "stdinJSON",
+          "required" : false,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Runtime timeout for the delayed NodeJS script.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "20",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Optional working directory for the Node.js process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.1,
+      "toolName" : "nodejs_runtime"
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute the configured Python runtime inline script exactly as provided. The script waits for 5 seconds and prints `Hello Python`.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Python ToolRunner",
+      "positionX" : 447.671875,
+      "positionY" : 310.056640625,
+      "properties" : [
+        {
+          "description" : "Inline Python with a 5 second delay and deterministic stdout.",
+          "key" : "inlineScript",
+          "required" : true,
+          "value" : "import time\n\ntime.sleep(5)\nprint('Hello Python')\n",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Resolve Python via environment.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout and stderr from the Python runtime.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Absolute path to a Python file to execute. Use this or inlineScript.",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional JSON object passed to the Python process via stdin.",
+          "key" : "stdinJSON",
+          "required" : false,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Runtime timeout for the delayed Python script.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "20",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Optional working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0.1,
+      "toolName" : "python_runtime"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Review the two ToolRunner results. Verify that the NodeJS output contains exactly `Hello NodeJS` in stdout and that the Python output contains exactly `Hello Python` in stdout. Confirm both tools report success=true, exitCode=0, timedOut=false, and no meaningful stderr. Report PASS only if both outputs match; otherwise report FAIL with the mismatched fields.",
+      "logLevel" : "debug",
+      "maxTurns" : 4,
+      "name" : "Review",
+      "positionX" : 298.8671875,
+      "positionY" : 540.841796875,
+      "properties" : [
+        {
+          "description" : "Expected NodeJS stdout text.",
+          "key" : "expectedNodeOutput",
+          "required" : true,
+          "value" : "Hello NodeJS",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Expected Python stdout text.",
+          "key" : "expectedPythonOutput",
+          "required" : true,
+          "value" : "Hello Python",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Review decision.",
+          "key" : "reviewResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "reviewer",
+      "temperature" : 0.1,
+      "toolName" : ""
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Verify the NodeJS stdout and execution metadata.",
+      "kind" : "review",
+      "label" : "Review NodeJS output",
+      "sharedStateKeys" : "nodeResult",
+      "source" : "NodeJS ToolRunner",
+      "target" : "Review"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Verify the Python stdout and execution metadata.",
+      "kind" : "review",
+      "label" : "Review Python output",
+      "sharedStateKeys" : "pythonResult",
+      "source" : "Python ToolRunner",
+      "target" : "Review"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Run the NodeJS runtime smoke test.",
+      "kind" : "delegation",
+      "label" : "Run NodeJS",
+      "sharedStateKeys" : "",
+      "source" : "ADK Test Coordinator",
+      "target" : "NodeJS ToolRunner"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Run the Python runtime smoke test.",
+      "kind" : "delegation",
+      "label" : "Run Python",
+      "sharedStateKeys" : "",
+      "source" : "ADK Test Coordinator",
+      "target" : "Python ToolRunner"
+    }
+  ],
+  "goal" : "Run an ADK agent smoke-test workflow with parallel NodeJS and Python ToolRunner agents. Each runner waits 5 seconds, returns a deterministic hello message, and Review verifies both outputs.",
+  "name" : "ADK Agent Test Workflow",
+  "pattern" : "coordinator",
+  "summary" : "ADK runtime smoke test with delayed NodeJS and Python ToolRunner agents plus review verification.",
+  "systemInstruction" : "Use the active AI Chat connection for non-tool agents (`llmProviderID` is `none`). Execute ToolRunner agents through their configured MCP runtime tools. Preserve stdout, stderr, exitCode, success, and timedOut metadata for Review."
+}
