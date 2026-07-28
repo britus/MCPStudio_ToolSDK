@@ -4,7 +4,7 @@ Official SDK of the EoF MCP Studio App for macOS
 
 ## Overview
 
-The MCPStudio_ToolSDK provides a comprehensive framework for building custom tools, plugins, and scripts for the MCP Studio application. This SDK enables developers to extend MCP Studio functionality through:
+The MCPStudio Tool SDK provides a comprehensive framework for building custom tools, plugins, and scripts for the MCP Studio application. This SDK enables developers to extend MCP Studio functionality through:
 
 - **JavaScript Scripting** - Full API access via built-in utilities
 - **C/C++ Plugins** - Build dynamic libraries (dylib) and bundles
@@ -12,6 +12,11 @@ The MCPStudio_ToolSDK provides a comprehensive framework for building custom too
 - **File Operations** - Secure file access with macOS sandboxing
 - **HTTP Tools** - REST API client for network operations
 - **Build Automation** - Project build management utilities
+
+## Releases
+
+[Download EoF MCP Studio (sandboxed version)](https://apps.apple.com/us/app/eof-mcp-studio/id6758146445?mt=12)
+[Download EoF MCP Studio (full access version)](https://mcpstudio.eofsl.com/download.html)
 
 ## SDK Structure
 
