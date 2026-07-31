@@ -1,42 +1,67 @@
-# EoF Neural Network Lab - Implementation Report
+# EoF Neural Network Lab: implementation status
 
-## Result
+## Current repository status
 
-The original reconstruction autoencoder was replaced with a causal, generative character model. Training and inference run in Node.js without external libraries. `model.safetensors` contains the weights, bias, vocabulary, and metadata, and can be loaded on its own for inference.
+PoC 3 is implemented as a dependency-free causal character model in Node.js. Training, incremental vocabulary expansion, Safetensors persistence, deterministic generation, dataset replay, CLI inspection, a local web interface, and automated tests are present.
 
-By default, subsequent training runs continue from the existing model. New characters expand the vocabulary and weight tensors without discarding existing token IDs or parameters. Only `--fresh` deliberately starts with a new model.
+The generated `model.safetensors` and default `dataset.txt` were removed from the current checkout. Consequently:
 
-## Current Training Run
+- source-level tests can run immediately with `npm test`;
+- inference and model inspection require a locally generated `model.safetensors`;
+- `npm run train` and UI-triggered training require a local `dataset.txt`, unless training is invoked directly with another dataset path;
+- `datasets/english.txt` can seed a fresh local model.
 
-- Corpus: 213 non-empty lines from `dataset.txt`
-- Context: 16 characters
-- Vocabulary: 55 characters
-- Trainable parameters: 3,604,535
-- Training runs: 2
-- Cumulative epochs: 36
-- Cross-entropy of the first run: 2.7414 → 0.5152
-- Cross-entropy after the subsequent training run: 0.5126
-- Current perplexity: 1.67
-- Safetensors size: approximately 14 MB
+## Historical training snapshot
 
-The figures are also written in machine-readable form to `train_output.json` on every run.
+`train_output.json` is retained as the machine-readable record of the last captured run. It references working artifacts that are no longer present and should not be interpreted as proof that the current checkout is inference-ready.
 
-## Ways to Use It
+Recorded values:
 
-1. `npm run train` loads the model, continues training, and atomically writes back the complete expanded file.
-2. `npm run infer` displays a generated continuation directly in the terminal.
-3. `npm start` starts the local visual interface.
-4. The interface can initiate training, poll its progress, and display generative inference with an animated character sequence and Top-5 probabilities.
+- Mode: continuation
+- Input: `dataset.txt`
+- Corpus: 2,000 non-empty lines, 19,864 characters
+- Context size: 16
+- Vocabulary: 29 characters
+- Parameters: 1,900,573
+- Run: 5
+- Cumulative epochs: 250
+- Run hyperparameters: 50 epochs, learning rate 0.075, seed 42
+- Cross-entropy: 0.83137 to 0.80074
+- Perplexity: 2.29647 to 2.22719
+- Recorded duration: 13,701 ms
+- Recorded model size: 7,603,526 bytes
+
+Absolute paths in this historical JSON reflect the machine on which the run was captured. Consumers should resolve their own project and artifact paths instead of reusing them.
+
+## Implemented components
+
+| Component | Status |
+|---|---|
+| Causal hashed-suffix language model | implemented in `src/nn.js` |
+| Vocabulary and causal-example construction | implemented in `src/vectorizer.js` |
+| Safetensors read/write | implemented in `src/safetensors.js` |
+| Model loading and autoregressive generation | implemented in `src/generator.js` |
+| Fresh and continuation training CLI | implemented in `train.js` |
+| Terminal/JSON inference CLI | implemented in `infer.js` |
+| Versioned dataset archive and replay mix | implemented in `agent_dataset_builder.js` |
+| Single/sharded Safetensors inspection | implemented in `dump_safetensors.js` |
+| Local visualization and training API | implemented in `server.js` and `public/` |
+| Automated tests | implemented under `test/` |
 
 ## Verification
 
-- Safetensors serialization and deserialization are covered by a round-trip test.
-- The training test requires cross-entropy to decrease.
-- Softmax outputs are checked for a normalized distribution.
-- Sampling with a fixed seed is checked for reproducibility.
-- Vocabulary expansion is checked for complete preservation of the old weights.
-- The CLI, model API, and browser assets were run locally.
+Run from `nnlab/poc3`:
 
-## PoC Limitations
+```bash
+npm test
+node train.js datasets/english.txt --fresh --epochs 1
+node infer.js --prompt "The " --length 40 --seed 42 --json
+./dump_safetensors.sh model.safetensors --values 4
+npm start
+```
 
-The model is small and trained on only approximately 12,000 characters. It learns recognizable words and sentence patterns but has no semantic world knowledge. Production-quality text would require a larger corpus, subword-level tokenization, and a Transformer or RNN architecture.
+The one-epoch training command is a smoke test and replaces/creates the local model because it uses `--fresh`. Use a copied working directory if an existing trained model must be preserved.
+
+## Remaining limitations
+
+The model is an educational linear next-character predictor, not a general-purpose language model. Its quality is bounded by the 2,000-line training cap, character-level tokenization, hashed features, and lack of attention or recurrence. The browser server is intended only for trusted local access and the checked-in historical metrics are not a reproducible benchmark without the original dataset/model artifacts.

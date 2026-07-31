@@ -1,80 +1,153 @@
-# EoF Neural Network Lab
+# EoF Neural Network Lab: PoC 3
 
-This project trains a small generative character model entirely in Node.js. The model learns to predict the next character from a given context. During inference, this prediction is sampled repeatedly, producing new text rather than merely reconstructing the input.
+This experiment implements a small generative character model entirely in Node.js. It trains a causal next-character predictor, stores its learned parameters in Safetensors, generates text from the command line, and serves a local browser visualization.
 
-`model.safetensors` is the central model artifact. It contains:
+No npm dependencies are required. Node.js 18 or newer is sufficient.
 
-- all trained network weights,
-- the output bias,
-- the complete character vocabulary,
-- architecture and training metadata.
+## Checkout state
 
-The raw text intentionally remains in `dataset.txt`; Safetensors contains the parameters learned from it, not a copy of the corpus.
+The repository contains the source, tests, `datasets/english.txt`, `vocab.json`, and a historical `train_output.json`. Generated `model.safetensors` and the default `dataset.txt` are not currently checked in.
 
-## Quick Start
-
-Node.js 18 or newer is required. No npm dependencies are needed.
+Create a fresh local model before running inference or the browser UI:
 
 ```bash
-npm run train
-npm run infer
+cd nnlab/poc3
+node train.js datasets/english.txt --fresh
+node infer.js --prompt "The "
 npm start
 ```
 
-The visual interface is then available at [http://127.0.0.1:3000](http://127.0.0.1:3000). It lets you change the prompt, output length, temperature, Top-K, and random seed. The token radar shows the five most likely predictions for the most recently generated character.
+The server listens on [http://127.0.0.1:3000](http://127.0.0.1:3000) by default. Use `HOST` and `PORT` environment variables to change the binding.
+
+`npm run train` without arguments expects `dataset.txt`; it will fail until that file exists. The browser's training endpoint also uses `dataset.txt`, so copy or create a local dataset alias if UI-triggered retraining is needed:
+
+```bash
+cp datasets/english.txt dataset.txt
+```
+
+`dataset.txt`, `model.safetensors`, and generated archive/mix files are working artifacts. Decide explicitly whether they should be versioned before committing them.
+
+## Commands
+
+```bash
+npm run train                         # train from dataset.txt
+npm run infer                         # generate with defaults
+npm run dump -- --values 4            # inspect model.safetensors
+npm start                             # serve the browser UI
+npm test                              # run the Node test suite
+```
+
+Direct CLI use provides more control:
+
+```bash
+node train.js datasets/english.txt --fresh --epochs 50 --context 16
+node train.js new-corpus.txt --epochs 35 --learning-rate 0.12 --seed 42
+node infer.js --prompt "Reading " --length 220 --temperature 0.55 --top-k 6
+```
 
 ## Training
 
-```bash
-node train.js dataset.txt
-node train.js custom-corpus.txt --epochs 50 --learning-rate 0.1
-node train.js dataset.txt --fresh --context 20
+`train.js` reads at most 2,000 non-empty lines and turns them into causal `context -> next character` examples. It writes progress events to stderr, a JSON report to stdout and `train_output.json`, and the learned model to `model.safetensors`.
+
+Defaults and limits:
+
+| Option | Default | Accepted values |
+|---|---:|---|
+| input file | `dataset.txt` | first positional path |
+| `--epochs` | 50 | integer 1–500 |
+| `--context` | existing model value, or 16 for a fresh model | integer 2–64 |
+| `--learning-rate` | 0.075 | greater than 0 and at most 1 |
+| `--seed` | 42 | integer |
+| `--fresh` | off | start without existing weights |
+| `--quiet` | off | suppress progress events |
+
+Without `--fresh`, training loads the existing `model.safetensors` and continues from its weights. If the new corpus contains unknown characters, the vocabulary and tensors expand while preserving existing token IDs and parameters. Supplying a different context size for an existing model is rejected; omit `--context` to keep the architecture or use `--fresh` to replace it.
+
+Safetensors is not appendable. Training serializes a complete replacement to a temporary file and atomically renames it only after successful completion, so the previous model remains available if serialization fails.
+
+## Model artifact
+
+`model.safetensors` contains:
+
+- trainable feature weights and output bias
+- ordered character vocabulary
+- architecture and training metadata
+
+It does not contain a copy of the training corpus. `vocab.json` is also emitted as a human-readable vocabulary artifact, but inference restores the vocabulary and architecture from the Safetensors metadata.
+
+The architecture activates hashed one-hot features for suffixes of the current context:
+
+```text
+character context
+  -> hashed 1..N-gram features
+  -> trainable weight matrix and bias
+  -> softmax probability distribution
+  -> sampled next character
 ```
 
-Without `--fresh`, every subsequent run is incremental: the existing `model.safetensors` is loaded, its weights are used as the starting point, and training then continues. If the new corpus contains previously unknown characters, they are appended to the existing vocabulary and the weight tensors are expanded accordingly. Existing token IDs and parameters are preserved.
+Training minimizes cross-entropy with stochastic gradient descent and a decaying learning rate. This compact design is educational; it is not intended to compete with a Transformer language model.
 
-Safetensors is not an appendable log format. Instead of appending bytes to the old file, the application builds a complete, expanded Safetensors file and then atomically replaces the old file with it. This keeps the previous model usable until the operation completes successfully.
+## Inference
 
-Defaults:
+```bash
+node infer.js --prompt "The " --length 220 --temperature 0.55 --top-k 6
+node infer.js --prompt "Reading " --seed 12
+node infer.js --prompt "A " --multiline --json
+```
 
-| Option | Value | Description |
+Inference defaults:
+
+| Option | Default | Meaning |
 |---|---:|---|
-| `--epochs` | 35 | complete training passes |
-| `--context` | existing value or 16 | maximum number of preceding characters; configurable with `--fresh` |
-| `--learning-rate` | 0.12 | initial SGD learning rate |
-| `--seed` | 42 | reproducible ordering |
-| `--fresh` | off | deliberately discard existing weights and start over |
+| `--prompt` | `The ` | initial context |
+| `--length` | 180 | maximum generated characters |
+| `--temperature` | 0.55 | sampling randomness |
+| `--top-k` | 6 | retained candidates per step |
+| `--seed` | 42 | deterministic pseudo-random seed |
+| `--multiline` | off | continue after a generated newline |
+| `--json` | off | emit machine-readable generation and trace data |
 
-Training writes its JSON report to stdout and to `train_output.json`; progress events are written to stderr. The new Safetensors file atomically replaces the previous model only after training completes successfully.
+Lower temperature favors likely continuations; higher temperature increases variation. Matching model, prompt, options, and seed produces reproducible sampling.
 
-## Versioned Datasets and Historical Replay
+## Browser UI and API
 
-`agent_dataset_builder.js` reads the explicitly provided resources, normalizes and deduplicates them, and stores every new dataset version as an immutable snapshot:
+`server.js` serves static files from `public/` and provides:
+
+- `GET /api/model`: current model metadata
+- `POST /api/generate`: generate text and probability traces
+- `POST /api/train`: start one background training run using `dataset.txt`
+- `GET /api/train/status`: poll the active/last training state
+
+The UI changes prompt, output length, temperature, Top-K, and seed. Its token radar shows the five most likely predictions for the most recently generated character. The server is designed for local use and has no authentication; do not expose it to an untrusted network.
+
+## Versioned datasets and replay
+
+`agent_dataset_builder.js` accepts JSON on stdin, reads explicitly declared website/file/directory resources, normalizes and deduplicates their lines, archives the new dataset, and creates a deterministic current-plus-history mix.
+
+It requires an existing `model.safetensors` because its workflow is continuation training. By default, 60% of the mix is current data and 40% is historical replay, with at most 2,000 lines.
+
+Generated layout:
 
 ```text
 datasets/
 ├── archive/
 │   ├── dataset_000001.txt
-│   ├── dataset_000001.manifest.json
-│   ├── dataset_000002.txt
-│   └── dataset_000002.manifest.json
+│   └── dataset_000001.manifest.json
 ├── mixed/
-│   ├── training_mix_000002.txt
-│   └── training_mix_000002.manifest.json
+│   ├── training_mix_000001.txt
+│   └── training_mix_000001.manifest.json
 └── latest.json
 ```
 
-By default, the mixed dataset contains 60% current data and 40% deterministically selected historical replay data. It is limited to 2,000 lines, matching the maximum input size of `train.js`. On the first run, an existing legacy `adk_training_dataset.txt` is migrated once as a historical dataset version.
-
-The builder receives its configuration as JSON via stdin and returns the mixed dataset path as the first element of `scriptArguments`:
+Example:
 
 ```bash
 printf '%s' '{
   "datasetResources": [
     {"type": "file", "value": "/absolute/path/new-data.txt"}
   ],
-  "projectDirectory": "${TOOLSDK}/nnlab/poc3",
-  "datasetDirectory": "${TOOLSDK}/nnlab/poc3/datasets",
+  "projectDirectory": "/absolute/path/to/MCPStudio_ToolSDK/nnlab/poc3",
+  "datasetDirectory": "/absolute/path/to/MCPStudio_ToolSDK/nnlab/poc3/datasets",
   "newDataRatio": 0.6,
   "epochs": 35,
   "learningRate": 0.12,
@@ -82,72 +155,21 @@ printf '%s' '{
 }' | node agent_dataset_builder.js
 ```
 
-The “Continue Trainer” workflow agent passes these arguments unchanged to `train.js`. As a result, training always uses the numbered mixed dataset rather than only the most recently added raw dataset.
+The result's `scriptArguments` starts with the numbered mixed-dataset path followed by the training options. `adk_training_dataset.txt` is maintained as a compatibility alias, but the workflow should use the numbered path.
 
-## Generative Inference
-
-```bash
-node infer.js --prompt "The " --length 220 --temperature 0.55 --top-k 6
-node infer.js --prompt "Reading " --seed 12
-node infer.js --prompt "A " --json
-```
-
-A lower temperature produces more conservative, stable continuations. A higher temperature increases variation as well as the risk of implausible character sequences. Output is reproducible when using the same seed and settings.
-
-## Dumping a Safetensors File
-
-The Node.js dumper is invoked through the shell script:
+## Safetensors inspection
 
 ```bash
 ./dump_safetensors.sh
 ./dump_safetensors.sh model.safetensors --values 16
-./dump_safetensors.sh /path/to/a-model.safetensors --no-stats
-npm run dump -- --values 4
-```
-
-If no file is specified, the project's `model.safetensors` is used. The output includes the file size, SHA-256, header and data lengths, all metadata, and—for each tensor—its data type, shape, element count, byte range, minimum, maximum, mean, and a limited value preview.
-
-A directory containing multiple shards can be passed directly. For the installed Gemma model:
-
-```bash
-./dump_safetensors.sh \
-  /Users/eofmc/.lmstudio/models/lmstudio-community/gemma-4-26B-A4B-it-MLX-4bit \
-  --values 4
-```
-
-The dumper automatically finds all three `model-0000x-of-00003.safetensors` files in the directory. It also evaluates `model.safetensors.index.json`, creates an overall summary, and checks whether each tensor resides in the expected shard.
-
-For machine-readable output:
-
-```bash
-./dump_safetensors.sh --json
-./dump_safetensors.sh --json --no-stats > model-dump.json
-./dump_safetensors.sh \
-  /Users/eofmc/.lmstudio/models/lmstudio-community/gemma-4-26B-A4B-it-MLX-4bit \
-  --json --values 0 > gemma-model-dump.json
-```
-
-Files larger than 256 MiB are read using offsets and are never loaded in full into a Node.js buffer. Full tensor statistics and SHA-256 are skipped by default for such files because calculating them would require reading all approximately 15 GB. If needed, they can be explicitly enabled with `--stats` and `--sha256`, respectively.
-
-All options:
-
-```bash
+./dump_safetensors.sh /path/to/model-directory --no-stats
+./dump_safetensors.sh --json --values 0
 ./dump_safetensors.sh --help
 ```
 
-## Architecture
+The dumper accepts one file or a directory of shards. For sharded models it reads `model.safetensors.index.json`, summarizes the set, and checks tensor-to-shard placement.
 
-The model activates a hashed one-hot feature for each suffix of the current character context. These features are fully connected to a softmax output over the vocabulary:
-
-```text
-Character context
-   → hashed 1..N-gram features
-   → trainable weight matrix
-   → softmax distribution
-   → next-character sampling
-```
-
-Cross-entropy is optimized using stochastic gradient descent with a decaying learning rate. The implementation is deliberately compact and avoids native ML dependencies so that training, persistence, and inference remain easy to understand.
+Files larger than 256 MiB are read by offset rather than loaded into one buffer. Full tensor statistics and SHA-256 are skipped by default for those files; use `--stats` and `--sha256` to force the scans.
 
 ## Tests
 
@@ -155,4 +177,19 @@ Cross-entropy is optimized using stochastic gradient descent with a decaying lea
 npm test
 ```
 
-The tests cover Safetensors round-tripping, decreasing training loss, valid probability distributions, deterministic sampling, and lossless vocabulary expansion.
+The tests use temporary fixtures and do not require the repository's generated model. They cover:
+
+- Safetensors serialization/deserialization
+- decreasing training loss
+- normalized model probabilities
+- deterministic generation
+- lossless vocabulary expansion
+- versioned dataset replay behavior
+
+## Limitations
+
+- Character tokens make long-range structure expensive.
+- The hashed linear feature model has no attention or recurrent state.
+- Training is CPU-only JavaScript and capped at 2,000 lines per run.
+- The local server has no authentication or multi-user isolation.
+- Quality depends strongly on the local dataset and generated model, neither of which is guaranteed by the checkout.

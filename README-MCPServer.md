@@ -1,108 +1,73 @@
-# MCP HTTP Server - EoF MCP Studio
+# MCP integration boundary
 
-A production-ready Model Context Protocol (MCP) server implementation 
-for macOS using native Cocoa/AppKit frameworks and C++. Idea and some
-techniques copied from qmcp project. Thank's ;)
+The Tool SDK does not contain the EoF MCP Studio HTTP server, transport, router, or application service implementations. Those components belong to the host application. This repository provides tool plugins, scripting handlers, and configuration that the host exposes through Model Context Protocol (MCP).
 
-## Features
+## What is in this repository
 
-**Full MCP Protocol Support** - Implements MCP specification version 2025-06-18  
-**HTTP/1.1 Transport** - Native socket-based HTTP server with high concurrency  
-**Three Core Services** - Tools, Resources, and Prompts  
-**Native macOS Integration** - Uses Foundation/Cocoa/AppKit instead of Qt  
-**MCPStudio-Friendly API** - Modern async/await MCPStudio interface  
-**Thread-Safe** - Proper synchronization using GCD and mutexes  
-**Zero Dependencies** - No external libraries required  
+- The native custom-tool ABI in `include/ToolABI.h`
+- JavaScript handler dispatch in `Scripts/tool_entry.js`
+- Native sample and language-runtime plugins
+- Importable tool definitions in `config/Tools/`
+- A linked MCP reference resource in `config/Resources/message context protocol (mcp) specification.json`
 
-## Architecture
+The configured reference targets MCP specification version `2025-06-18` and links to the Tools, Resources, and Prompts server documentation.
 
-```
-┌─────────────────────────────────────┐
-│      MCPStudio Application Layer    │
-│    (MCPServer.MCPStudio wrapper)    │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│   Objective-C++ Bridge Layer        │
-│    (MCPServerBridge.h/.mm)          │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│      C++ Core Implementation        │
-│  MCPServer / Services / Router      │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│      HTTP Transport Layer           │
-│   (BSD Sockets + GCD queues)        │
-└─────────────────────────────────────┘
-```
+## Host-to-plugin call
 
-## MCP Protocol Endpoints
+For a native custom tool, MCP Studio:
 
-The server implements these JSON-RPC methods:
-```
-| Method           | Description                                     |
-|------------------|-------------------------------------------------|
-| `initialize`     | Initialize connection and exchange capabilities |
-| `tools/list`     | List all available tools                        |
-| `tools/call`     | Execute a specific tool                         |
-| `resources/list` | List all available resources                    |
-| `resources/read` | Read resource content                           |
-| `prompts/list`   | List all available prompts                      |
-| `prompts/get`    | Render a prompt template                        |
-```
+1. Loads the plugin and validates the descriptor returned by `toolDescribe()`.
+2. Calls the exported `toolEntry()` function with the session ID, tool/handler name, and UTF-8 JSON parameters.
+3. Reads `resultJson` using `resultSize` and then releases the plugin-allocated buffer with `free()`.
+4. Converts the returned object into the response for the protocol tool call.
 
-## HTTP API
+The parameter object can be passed directly or as a host envelope whose `arguments` member contains the tool arguments. The sample and runtime bundles normalize both forms.
 
-### Request Format
+## Tool-result contract
 
-```http
-POST / HTTP/1.1
-Content-Type: application/json
+Native plugins return a complete MCP-compatible tool-result object:
 
+```json
 {
-  "jsonrpc": "2.0",
-  "id": "1",
-  "method": "tools/list",
-  "params": {}
+  "structuredContent": {
+    "success": true,
+    "value": 42
+  },
+  "content": [
+    { "type": "text", "text": "Completed" }
+  ],
+  "isError": false
 }
 ```
 
-### Response Format
+On failure, set `isError` to `true`, provide a useful text content item, and put machine-readable diagnostics in `structuredContent` or its metadata. The Node.js and Python runtime plugins generate this envelope automatically in `capture` mode. In `toolResultJSON` mode, the child process must print one complete JSON object containing both `content` (array) and `structuredContent` (object).
 
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
+JavaScript handlers use the older scripting-host wrapper from `Scripts/sharedFunctions.js`:
 
+```json
 {
-  "jsonrpc": "2.0",
-  "id": "1",
-  "result": {}
+  "text": "{\"value\":42}",
+  "success": true,
+  "metadata": {}
 }
 ```
 
-## Performance Characteristics
+MCP Studio adapts that wrapper to the protocol-facing result.
 
-- **Concurrent Connections**: Handled via GCD concurrent queue
-- **Request Processing**: Asynchronous with semaphore-based synchronization
-- **Memory Management**: Automatic via ARC for ObjC and RAII for C++
-- **Typical Latency**: < 5ms for simple tool calls
+## Tool definitions
 
-## License
+The examples in `config/Tools/` show the three implementation types understood by the host:
 
-Copyright © 2026 EoF Software Lab. All rights reserved.
+| `toolType` | Implementation location | Examples |
+|---|---|---|
+| `ScriptTool` | `Scripts/tool_entry.js` and its modules | `cmake_build`, `shell_call` |
+| `CustomTool` | Native bundle loaded by `pluginName` | `nodejs_runtime`, `python_runtime` |
+| `BuiltinTool` | MCP Studio application | Calendar, Contacts, file resources |
 
-## Troubleshooting
+A tool definition connects the public tool `name` and JSON schemas to `execHandler`, `execMethod`, and—where applicable—`scriptName` or `pluginName`.
 
-### Server fails to start
+## Protocol reference resource
 
-- Check if port is already in use: `lsof -i :8080`
-- Verify firewall settings allow incoming connections
-- Check console logs for specific error messages
+`config/Resources/message context protocol (mcp) specification.json` is a `resourceLink`, not a local copy of the specification. Network access is required when MCP Studio follows its URI or related-resource links.
 
-### Tools not executing
-
-- Verify tool registration completed successfully
-- Check parameter formats match the input schema
-- Review handler implementations for exceptions
+For current protocol behavior, use the version declared by the imported resource or the version negotiated by the running MCP Studio host. Do not infer server transport behavior from this SDK alone.

@@ -1,187 +1,147 @@
-# MCPStudio_ToolSDK
+# MCP Studio Tool SDK
 
-Official SDK of the EoF MCP Studio App for macOS
+The MCP Studio Tool SDK is the extension-development repository for EoF MCP Studio on macOS. It contains the native custom-tool ABI, example C/Objective-C++ plugins, Node.js and Python runtime plugins, JavaScript tool handlers, importable MCP Studio configuration, and an experimental Node.js neural-network lab.
 
-## Overview
+## Requirements
 
-The MCPStudio Tool SDK provides a comprehensive framework for building custom tools, plugins, and scripts for the MCP Studio application. This SDK enables developers to extend MCP Studio functionality through:
+- macOS 15 or newer
+- Xcode and the Xcode command-line tools
+- CMake 3.25 or newer for CMake builds
+- Node.js 18 or newer for `nnlab/poc3`
+- Node.js and/or Python 3 when using the corresponding runtime plugin
 
-- **JavaScript Scripting** - Full API access via built-in utilities
-- **C/C++ Plugins** - Build dynamic libraries (dylib) and bundles
-- **Build Integration** - CMake, Xcode, QMake support
-- **File Operations** - Secure file access with macOS sandboxing
-- **HTTP Tools** - REST API client for network operations
-- **Build Automation** - Project build management utilities
+## Repository layout
+
+| Path | Purpose |
+|---|---|
+| `include/` | Public C ABI and logging declarations for native plugins |
+| `ToolJSONBridge/` | Foundation-based JSON bridge shared by Objective-C++ plugins |
+| `SamplePlugin/` | Example dynamic-library and macOS bundle implementations |
+| `NodeJSRuntimePlugin/` | Custom-tool bundle that launches Node.js scripts |
+| `PythonRuntimePlugin/` | Custom-tool bundle that launches Python scripts |
+| `Scripts/` | JavaScript handlers executed by MCP Studio's scripting host |
+| `config/` | Importable tools, skills, prompts, resources, multi-agent workflows, and provider examples |
+| `skills/codereview/` | Markdown prompt assets used by the code-review skill configuration |
+| `nnlab/poc3/` | Dependency-free generative character-model experiment |
+| `ToolSDK.xcodeproj` | Xcode project for all native SDK targets |
+
+## Build the native targets
+
+### Xcode
+
+The shared `ToolSDK` scheme builds all native products:
+
+```bash
+xcodebuild \
+  -project ToolSDK.xcodeproj \
+  -scheme ToolSDK \
+  -configuration Debug \
+  build
+```
+
+Individual shared schemes are available for `NodeJSRuntimeTool`, `PythonRuntimeTool`, and `SamplePluginDyLib`. The project contains these targets:
+
+- `NodeJSRuntimeTool`
+- `PythonRuntimeTool`
+- `SamplePluginBundle`
+- `SamplePluginDyLib`
+- `ToolJSONBridge`
+
+### CMake
+
+Each plugin can also be configured independently:
+
+```bash
+cmake -S SamplePlugin -B SamplePlugin/build
+cmake --build SamplePlugin/build
+
+cmake -S NodeJSRuntimePlugin -B NodeJSRuntimePlugin/build
+cmake --build NodeJSRuntimePlugin/build
+
+cmake -S PythonRuntimePlugin -B PythonRuntimePlugin/build
+cmake --build PythonRuntimePlugin/build
+```
+
+The projects default to universal `arm64;x86_64` builds with a macOS 15.0 deployment target. See the plugin-specific guides for output paths and runtime packaging:
+
+- [Sample plugin](README-SamplePlugin.md)
+- [Node.js runtime](NodeJSRuntimePlugin/README.md)
+- [Python runtime](PythonRuntimePlugin/README.md)
+
+## Native plugin ABI
+
+[`include/ToolABI.h`](include/ToolABI.h) defines ABI version 3. Every native custom-tool plugin exports:
+
+```c
+const ToolPluginDescriptor *toolDescribe(void);
+
+void toolEntry(const char *sid,
+               const char *toolName,
+               const char *params,
+               char **resultJson,
+               size_t *resultSize);
+```
+
+`toolDescribe()` returns static metadata, including the ABI version, tool identifier, entry-point name, and capability JSON. `toolEntry()` returns a UTF-8 JSON buffer allocated with `malloc`; the host owns that buffer and releases it with `free`. `resultSize` includes the trailing NUL byte.
+
+A successful native result normally uses the MCP tool-result shape:
+
+```json
+{
+  "structuredContent": { "success": true },
+  "content": [{ "type": "text", "text": "Completed" }],
+  "isError": false
+}
+```
+
+## JavaScript tools
+
+[`Scripts/tool_entry.js`](Scripts/tool_entry.js) dispatches the script handlers used by the JSON definitions in `config/Tools/`. The registered handler groups are:
+
+- file and directory access
+- Clang, GCC, CMake, QMake, Xcode, and shell operations
+- HTTP requests, downloads, status checks, webhooks, and HTML extraction
+- document/temp path discovery
+- skill-script execution
+
+Script tools run inside MCP Studio's scripting environment and use host-provided APIs such as `MCPStudio.fileExists`, `MCPStudio.process`, and `MCPStudio.httpRequest`; they are not standalone Node.js modules. See the [scripting reference](README-Scripting.md) and [handler catalog](README-Handler.md).
+
+## Configuration examples
+
+`config/` is example/import content for MCP Studio:
+
+- `config/Tools/`: script, built-in, and native custom-tool definitions
+- `config/Skills/`: reusable task workflows
+- `config/Prompts/`: prompt definitions
+- `config/Resources/`: linked reference resources
+- `config/MultiAgents/`: example agent workflows
+- `config/aiproviders.json` and `config/sysprompts.json`: provider and system-prompt examples
+
+`${TOOLSDK}` in a configuration path is resolved by MCP Studio to the installed SDK root. Built-in tool definitions such as Calendar, Contacts, and `FileResourceHandler` describe host-app capabilities; their implementations are not part of this repository.
+
+## MCP integration
+
+This repository supplies tools and configuration consumed by MCP Studio. It does not contain the application's MCP HTTP server implementation. [README-MCPServer.md](README-MCPServer.md) documents that boundary and the protocol-facing result contract used by SDK plugins.
+
+## Neural-network lab
+
+`nnlab/poc3` trains and serves a small character-level generative model in plain Node.js. It includes Safetensors persistence, incremental training, deterministic dataset replay, CLI inference, a browser UI, and tests. Generated `model.safetensors` and the default `dataset.txt` are not currently checked in; follow the [PoC quick start](nnlab/poc3/README.md) to create them.
 
 ## Releases
 
-[Download EoF MCP Studio (sandboxed version)](https://apps.apple.com/us/app/eof-mcp-studio/id6758146445?mt=12)
-[Download EoF MCP Studio (full access version)](https://mcpstudio.eofsl.com/download.html)
+- [EoF MCP Studio on the Mac App Store](https://apps.apple.com/us/app/eof-mcp-studio/id6758146445?mt=12)
+- [EoF MCP Studio direct download](https://mcpstudio.eofsl.com/download.html)
 
-## SDK Structure
+## Documentation
 
-```
-MCPStudio_ToolSDK/
-├── Scripts/                    # JavaScript utility scripts
-│   ├── clangTools.js          # Clang compiler tools
-│   ├── cmakeBuild.js          # CMake build automation
-│   ├── checkWithXcode.js      # Xcode project validation
-│   ├── fileRead.js            # File reading utilities
-│   ├── fileSave.js            # File writing utilities
-│   ├── shellCall.js           # Shell command execution
-│   ├── httpTools.js           # HTTP request utilities
-│   ├── directoryList.js       # Directory listing operations
-│   ├── directoryCreate.js     # Directory creation utilities
-│   └── tool_entry.js          # Tool entry point registry
-├── SamplePlugin/              # Sample plugin template
-│   ├── dylib/                 # Dynamic library implementation
-│   ├── bundle/                # Bundle implementation
-│   ├── CMakeLists.txt         # Master build configuration
-│   └── ToolCapabilities.json  # Plugin capabilities definition
-├── test-scripts/             # Test suite for utilities
-│   ├── testFileOps.js        # File operation tests
-│   ├── testHttpAll.js        # HTTP method tests
-│   ├── testJSON.js           # JSON handling tests
-│   └── ...                   # Additional test scripts
-└── README*.md               # Documentation files
-
-## Quick Start Guide
-
-### 1. Build a Sample Plugin
-
-```bash
-cd SamplePlugin
-mkdir build
-cd build
-cmake ..
-make
-```
-
-This generates both `SampleTool` dylib and `SampleTool.bundle`.
-
-### 2. Create Custom Tool Scripts
-
-Add scripts to the `Scripts/` directory:
-
-```javascript
-// Example: customTools.js
-function toolEntry(sid, toolName, params, resultJson, resultSize) {
-    // Your tool implementation here
-    return null;
-}
-
-module.exports = {
-    toolEntry
-};
-```
-
-### 3. Execute via MCP Studio
-
-Use the MCP Studio UI to:
-- Configure custom tools in Tools/ directory
-- Load scripts from Scripts/ directory
-- Execute with parameters and view results
-
-## API Reference
-
-### File Operations
-- [`fileRead.js`](Scripts/fileRead.js) - Read file contents
-- [`fileSave.js`](Scripts/fileSave.js) - Write file contents
-- [`fileExists.js`](Scripts/fileExists.js) - Check file existence
-- [`fileDelete.js`](Scripts/fileDelete.js) - Delete files
-
-### Build Tools
-- [`cmakeBuild.js`](Scripts/cmakeBuild.js) - CMake project builds
-- [`checkWithXcode.js`](Scripts/checkWithXcode.js) - Xcode project validation
-- [`qmakeBuild.js`](Scripts/qmakeBuild.js) - QMake project builds
-
-### Shell Utilities
-- [`shellCall.js`](Scripts/shellCall.js) - Execute shell commands
-- [`getGccInfo.js`](Scripts/getGccInfo.js) - GCC compiler information
-- [`gccSettings.js`](Scripts/gccSettings.js) - GCC configuration utilities
-
-### Directory Operations
-- [`directoryList.js`](Scripts/directoryList.js) - List directory contents
-- [`directoryCreate.js`](Scripts/directoryCreate.js) - Create directories
-- [`mkdir.js`](Scripts/mkdir.js) - Create single directory
-
-### HTTP Tools
-- [`httpTools.js`](Scripts/httpTools.js) - HTTP request utilities
-- [`fetchResource.js`](Scripts/fetchResource.js) - MCP resource fetching
-- [`previewFile.js`](Scripts/previewFile.js) - File preview functionality
-
-### Core Utilities
-- [`tool_entry.js`](Scripts/tool_entry.js) - Tool entry point registry
-- [`bootstrap.js`](Scripts/bootstrap.js) - Bootstrap utilities
-- [`sharedFunctions.js`](Scripts/sharedFunctions.js) - Shared helper functions
-
-## Documentation Links
-
-### Handler Components
-- **[README-Handler.md](README-Handler.md)** - Detailed handler components documentation including MyResourceHandler and FileAccessHandler
-
-### Scripting System
-- **[README-Scripting.md](README-Scripting.md)** - JavaScript scripting integration with full API reference and examples
-
-### Sample Plugin
-- **[README-SamplePlugin.md](README-SamplePlugin.md)** - Building SamplePlugin bundle and dylib documentation
-
-### Server Implementation
-- **[README-MCPServer.md](README-MCPServer.md)** - MCP HTTP Server implementation with architecture and protocol methods
-
-## Project Structure Summary
-
-### MCPStudio_ToolSDK/
-- **Scripts/** - JavaScript utilities for file operations, build tools, shell commands, HTTP requests
-- **SamplePlugin/** - CMake-based plugin template with dylib and bundle implementations
-- **test-scripts/** - Test suite for validating utility functions
-
-## Key Features
-
-### JavaScript Scripting Integration
-- Full API access to file system, build tools, HTTP client
-- Parameterized tool execution with logging
-- Secure macOS sandbox support
-
-### Plugin System
-- Support for dynamic libraries (.dylib) and bundles (.bundle)
-- CMake-based build configuration
-- Tool descriptor registration via `toolDescribe()`
-- ABI-compliant entry points (`toolEntry`, `toolExecute`)
-
-### Build Automation
-- CMake project builds with custom flags
-- Xcode project validation and building
-- QMake support for Qt projects
-- GCC/Clang compiler integration
-
-### Secure Operations
-- macOS security-scoped file access
-- Plugin loading with secure bookmarks
-- Sandboxed execution environment
-
-## Configuration
-
-The MCP Studio application uses the following configuration directories:
-
-```
-Tools/     - Custom tool configurations
-Resources/ - Resource definitions
-Prompts/   - Prompt templates and configurations
-```
-
-## Getting Started
-
-1. **Clone or navigate to the SDK directory**
-2. **Review the README files** linked above for detailed documentation
-3. **Build the SamplePlugin** to understand plugin structure
-4. **Create custom scripts** in the Scripts/ directory
-5. **Configure tools** via [MCP Studio App](https://mcpstudio.eofsl.com/download.html) or configuration files
+- [JavaScript scripting reference](README-Scripting.md)
+- [Handler catalog](README-Handler.md)
+- [Native sample plugin](README-SamplePlugin.md)
+- [MCP integration boundary](README-MCPServer.md)
+- [Node.js runtime plugin](NodeJSRuntimePlugin/README.md)
+- [Python runtime plugin](PythonRuntimePlugin/README.md)
+- [Neural-network PoC](nnlab/poc3/README.md)
 
 ## License
 
-Copyright (C) 2026 EoF Software Lab. All rights reserved.
-
----
-
-*Last updated: 2026 | SDK Version: 1.0*
+Copyright (C) 2026 EoF Software Lab. All rights reserved. See [LICENSE](LICENSE).

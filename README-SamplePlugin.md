@@ -1,97 +1,129 @@
-# Building SamplePlugin Bundle and Dylib
+# Sample native plugin
 
-This document provides instructions on how to build the SamplePlugin 
-bundle and dylib for the MCPStudio Custom Tool SDK.
+`SamplePlugin` demonstrates both native plugin formats supported by the Tool SDK:
 
-## Overview
+- `SampleTool`: a small C dynamic library that returns a fixed MCP tool result
+- `SampleTool.bundle`: an Objective-C++ macOS bundle with file, build, configuration lookup, and HTTP handlers
 
-The SamplePlugin is a sample implementation of a custom tool plugin 
-that can be built as either a dynamic library (dylib) or a macOS bundle. 
-The build process uses CMake to manage the build configuration. The bundle 
-and dylib are always built together.
+Both export ABI version 3 through `toolDescribe()` and `toolEntry()`.
 
-## Building the SamplePlugin
+## Prerequisites
 
-### Prerequisites
+- macOS 15 or newer
+- CMake 3.25 or newer, or Xcode
+- Xcode command-line tools
 
-- CMake 3.25 or higher
-- Xcode command line tools
-- macOS 15.0 or higher
+The CMake build creates universal `arm64;x86_64` products.
 
-### Building Both Bundle and Dylib
+## Build with CMake
 
-To build both the SamplePlugin bundle and dylib, navigate to the `SamplePlugin` directory and run:
+From the SDK root:
 
 ```bash
-mkdir build
-cd build
-cmake ..
-make
+cmake -S SamplePlugin -B SamplePlugin/build
+cmake --build SamplePlugin/build
 ```
 
-This will generate both the `SampleTool` dylib and the `SampleTool.bundle` files.
+Outputs:
 
-## Files
-
-### Dynamic Library
-
-- `SamplePlugin/CMakeLists.txt`: 
-Master CMake configuration that builds both the dylib and the bundle.
-
-- `SamplePlugin/dylib/CMakeLists.txt`: 
-CMake configuration for the dylib build (used by the master CMakeLists.txt).
-
-- `SamplePlugin/dylib/PluginMain.c`: 
-Main implementation of the dylib plugin.
-
-- `SamplePlugin/dylib/ToolDescriptor.c`: 
-Tool descriptor for the dylib plugin.
-
-### Bundle
-
-- `SamplePlugin/bundle/CMakeLists.txt`: 
-CMake configuration for the bundle build (used by the master CMakeLists.txt).
-
-- `SamplePlugin/bundle/PluginMain.mm`: 
-Main implementation of the bundle plugin.
-
-- `SamplePlugin/bundle/ToolDescriptor.c`: 
-Tool descriptor for the bundle plugin.
-
-# ToolABI.h API Reference
-
-## Functions
-
-### toolDescribe()
-Returns a pointer to the tool descriptor structure.
-
-**Parameters:** None
-**Returns:** Pointer to `ToolPluginDescriptor` structure
-
-### toolEntry()
-Main entry point for tool execution.
-
-**Parameters:**
-- `sid`: Session identifier
-- `toolName`: Name of the tool to execute
-- `params`: Tool parameters as JSON string
-- `resultJson`: Output parameter for result JSON
-- `resultSize`: Output parameter for result size
-
-**Returns:** None
-
-### Call Parameter Structure JSON format
-
+```text
+SamplePlugin/build/dylib/libSampleTool.dylib
+SamplePlugin/build/bundle/SampleTool.bundle
 ```
+
+For a clean reconfiguration, remove or choose a new build directory before running `cmake -S` again.
+
+## Build with Xcode
+
+```bash
+xcodebuild \
+  -project ToolSDK.xcodeproj \
+  -scheme SamplePluginDyLib \
+  -configuration Debug \
+  build
+```
+
+The `ToolSDK` scheme builds both sample targets together with the runtime plugins and `ToolJSONBridge`:
+
+```bash
+xcodebuild -project ToolSDK.xcodeproj -scheme ToolSDK -configuration Debug build
+```
+
+The Xcode products are named `libSamplePluginDyLib.dylib` and `SamplePluginBundle.plugin`; the CMake products intentionally use the names shown above.
+
+## Source layout
+
+| Path | Purpose |
+|---|---|
+| `CMakeLists.txt` | Adds both CMake subprojects |
+| `dylib/ToolDescriptor.c` | Dynamic-library descriptor |
+| `dylib/PluginMain.c` | Minimal C `toolEntry()` implementation |
+| `bundle/ToolDescriptor.c` | Bundle descriptor |
+| `bundle/PluginMain.mm` | ABI entry point, JSON conversion, and buffer allocation |
+| `bundle/ToolEntryHandler.mm` | Native handler dispatch and implementations |
+| `ToolCapabilities.json` | Example filesystem/network permission declaration |
+
+The bundle builds `ToolJSONBridge.mm` directly. It links Foundation, Cocoa, and AppKit.
+
+## ABI requirements
+
+`include/ToolABI.h` currently declares `TOOL_ABI_VERSION 3`:
+
+```c
+TOOL_API const ToolPluginDescriptor *toolDescribe(void);
+
+TOOL_API void toolEntry(const char *sid,
+                        const char *toolName,
+                        const char *params,
+                        char **resultJson,
+                        size_t *resultSize);
+```
+
+The descriptor returned by `toolDescribe()` has static lifetime. On a successful call to `toolEntry()`, the plugin allocates `resultJson` with `malloc`; the host frees it. `resultSize` includes the NUL terminator. Set `*resultJson` and `*resultSize` to safe initial values before any operation that can fail.
+
+## Parameter forms
+
+The Objective-C++ bundle accepts either direct arguments:
+
+```json
 {
-  "name" : "sample_c_handler",
-  "toolType" : "CustomTool",
-  "execHandler" : "doSomething",
-  "sessionId" : "BAD5C3A6-5CF6-437A-83C2-41C89B790CC8",
-  "pluginName" : "SampleTool_C_Handler",
-  "arguments" : {
-    "path_name" : "\/usr\/lib"
-  },
-  "execMethod" : "toolEntry"
+  "path": "/absolute/path/to/file.txt"
 }
 ```
+
+or a host envelope:
+
+```json
+{
+  "name": "read_file",
+  "execHandler": "readFile",
+  "arguments": {
+    "path": "/absolute/path/to/file.txt"
+  }
+}
+```
+
+`execHandler` selects the native handler when present; otherwise the `toolName` argument passed to `toolEntry()` is used. See [README-Handler.md](README-Handler.md) for the current handler list.
+
+## Result form
+
+The bundle returns a complete MCP tool-result object:
+
+```json
+{
+  "structuredContent": {
+    "text": "{\n  \"exists\": true\n}",
+    "success": true,
+    "metadata": {
+      "operation": "fileExists",
+      "success": true
+    }
+  },
+  "content": [
+    { "type": "text", "text": "{\n  \"exists\": true\n}" }
+  ],
+  "isError": false
+}
+```
+
+The C dylib returns a fixed `Hello world from custom tool plugin!` result and is intended only as the smallest possible ABI example.

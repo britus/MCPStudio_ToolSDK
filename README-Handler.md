@@ -1,598 +1,189 @@
-# MCP Studio Tool SDK - Handler Documentation
+# Tool handler catalog
 
-This document provides comprehensive documentation for all available tool handlers in the MCP Studio Tool SDK. Each handler follows a consistent interface pattern and can be called through the `toolEntry` entry point.
+This guide describes the handler names implemented in the repository. There are two dispatchers:
 
----
+- `Scripts/tool_entry.js` dispatches JavaScript handlers inside the MCP Studio scripting host.
+- `SamplePlugin/bundle/ToolEntryHandler.mm` dispatches native Objective-C++ handlers in the sample bundle.
 
-## Table of Contents
+The native dispatcher contains most script equivalents plus a few bundle-only handlers. Tool definitions in `config/Tools/` are the authoritative public names and input schemas shipped with this checkout.
 
-1. [Handler System Overview](#handler-system-overview)
-2. [Toolchain Handlers](#toolchain-handlers)
-3. [File Operation Handlers](#file-operation-handlers)
-4. [HTTP/MCP Handlers](#httpmcp-handlers)
-5. [Path Utility Handlers](#path-utility-handlers)
-6. [Handler Parameters Format](#handler-parameters-format)
-7. [Error Handling](#error-handling)
+## Calling conventions
 
----
-
-## Handler System Overview
-
-All handlers are orchestrated through the `tool_entry.js` entry point script. Each handler accepts a JSON object as parameters and returns either:
-- A **JSON result** for structured data operations
-- **Plain text** for simple operations (e.g., log messages)
-
-### Calling Convention
+### JavaScript dispatcher
 
 ```javascript
-// Basic call format
-const result = toolEntry(sessionId, handlerName, JSON.stringify(params));
+const result = toolEntry(sessionId, handlerName, JSON.stringify(arguments));
 ```
 
-Example:
-```javascript
-toolEntry("session123", "fileExists", JSON.stringify({
-    "path": "/path/to/test/file.txt"
-}));
+`jsonParams` must be a JSON object encoded as a string. Unknown handlers and invalid JSON return an error wrapper from `Scripts/sharedFunctions.js`.
+
+### Native dispatcher
+
+```c
+toolEntry(sessionId, toolName, paramsJSON, &resultJSON, &resultSize);
 ```
 
----
-
-## Toolchain Handlers
-
-### analyzeDirectory
-
-**Description**: Analyzes and summarizes directory contents with detailed statistics.
-
-**Parameters**:
-```json
-{
-  "dirPath": "/path/to/directory",
-  "recursive": true,
-  "extensions": [".js", ".cpp"],
-  "sort": "name"
-}
-```
-
-**Returns**: JSON object with directory analysis results including file counts, sizes, and metadata.
-
-**Example**:
-```json
-{
-  "dirPath": "/path/to/directory",
-  "fileCount": 45,
-  "totalSize": 234567,
-  "files": [...]
-}
-```
-
----
-
-### checkWithXcode
-
-**Description**: Builds a project using Xcode with `xcodebuild`.
-
-**Parameters**:
-```json
-{
-  "projectDir": "/path/to/project",
-  "projectName": "MyProject",
-  "scheme": "",
-  "configuration": "Debug",
-  "platform": "macosx",
-  "clean": false,
-  "archive": false,
-  "codeSigningIdentity": null,
-  "onlyActiveArchs": false,
-  "showOperationLogs": false
-}
-```
-
-**Returns**: JSON build result with success status and logs.
-
----
-
-### clangCheckSyntax
-
-**Description**: Checks source code syntax using the Clang compiler.
-
-**Parameters**:
-```json
-{
-  "sourceFile": "/path/to/source.cpp"
-}
-```
-
-**Returns**: JSON result indicating syntax validity or errors.
-
----
-
-### clangCompile
-
-**Description**: Compiles source code using the Clang compiler.
-
-**Parameters**:
-```json
-{
-  "sourceFile": "/path/to/source.cpp"
-}
-```
-
-**Returns**: JSON compilation result with build status.
-
----
-
-### clangMake
-
-**Description**: Builds a Unix make project using `make`.
-
-**Parameters**:
-```json
-{
-  "makeFile": "/path/to/Makefile"
-}
-```
-
-**Returns**: JSON build result with make output.
-
----
-
-### cmakeBuild
-
-**Description**: Builds a CMake project.
-
-**Parameters**:
-```json
-{
-  "projectDir": "/path/to/project",
-  "projectTarget": "myapp",
-  "buildType": "debug",
-  "cmakeFlags": ["-DCMAKE_CXX_STANDARD=17"],
-  "verbose": true
-}
-```
-
-**Returns**: JSON build result with CMake output.
-
----
-
-### qmakeBuild
-
-**Description**: Builds a Qt/QMake project.
-
-**Parameters**:
-```json
-{
-  "projectDir": "/path/to/project",
-  "projectTarget": "myapp",
-  "qtdir": "/usr/local/qt6",
-  "buildType": "debug",
-  "verbose": true
-}
-```
-
-**Returns**: JSON build result with QMake output.
-
----
-
-### shellCall
-
-**Description**: Executes arbitrary Unix shell commands.
-
-**Parameters**:
-```json
-{
-  "command": "ls -la",
-  "parameters": [],
-  "shell": "/bin/bash"
-}
-```
-
-**Returns**: JSON result with command output (stdout/stderr).
-
----
-
-## File Operation Handlers
-
-### mkdir
-
-**Description**: Creates a directory at the specified path.
-
-**Parameters**:
-```json
-{
-  "dirPath": "/path/to/new/directory"
-}
-```
-
-**Returns**: Plain text success message or error.
-
----
-
-### fileExists
-
-**Description**: Checks if a file exists at the specified path.
-
-**Parameters**:
-```json
-{
-  "path": "/path/to/file.txt"
-}
-```
-
-**Returns**: JSON object with `exists: true/false` and metadata.
-
-**Example**:
-```json
-{
-  "exists": true,
-  "path": "/path/to/test/file.txt",
-  "size": 1024,
-  "modified": "2026-03-30T16:09:03.417Z"
-}
-```
-
----
-
-### readFile
-
-**Description**: Reads file contents from the specified path.
-
-**Parameters**:
-```json
-{
-  "file_path": "/path/to/file.txt"
-}
-```
-
-**Returns**: JSON object with `content` field containing file text.
-
----
-
-### saveFile
-
-**Description**: Saves/writes content to a file.
-
-**Parameters**:
-```json
-{
-  "file_path": "/path/to/file.txt",
-  "content": "Hello, World!"
-}
-```
-
-**Returns**: Plain text success message or error.
-
----
-
-### openFile
-
-**Description**: Opens a file for reading (returns file handle/content).
-
-**Parameters**:
-```json
-{
-  "file_path": "/path/to/file.txt"
-}
-```
-
-**Returns**: JSON object with file content.
-
----
-
-### deleteFile
-
-**Description**: Deletes a file at the specified path.
-
-**Parameters**:
-```json
-{
-  "path": "/path/to/file.txt"
-}
-```
-
-**Returns**: Plain text success message or error.
-
----
-
-### listDirectory
-
-**Description**: Lists all files in a directory (supports filtering by extension).
-
-**Parameters**:
-```json
-{
-  "path": "/path/to/directory",
-  "extensions": [".js"],
-  "recursive": true,
-  "sort": "name"
-}
-```
-
-**Returns**: JSON array of file objects with metadata.
-
----
-
-### createDirectory
-
-**Description**: Creates a directory at the specified path.
-
-**Parameters**:
-```json
-{
-  "dirPath": "/path/to/new/directory"
-}
-```
-
-**Returns**: Plain text success message or error.
-
----
-
-### getDocumentsPath
-
-**Description**: Returns the user's Documents folder path.
-
-**Parameters**: None (or `{"path": ""}` for consistency).
-
-**Returns**: String containing the Documents folder path.
-
----
-
-### getTempPath
-
-**Description**: Returns the system temporary directory path.
-
-**Parameters**: None (or `{"path": ""}` for consistency).
-
-**Returns**: String containing the temp directory path.
-
----
-
-## HTTP/MCP Handlers
-
-### fetchData (fetchData)
-
-**Description**: Fetches data from a URL (GET request).
-
-**Parameters**:
-```json
-{
-  "url": "https://api.example.com/data"
-}
-```
-
-**Returns**: JSON object with `status`, `headers`, and `body` fields.
-
----
-
-### postData (postData)
-
-**Description**: Sends POST request to a URL.
-
-**Parameters**:
-```json
-{
-  "url": "https://api.example.com/endpoint",
-  "method": "POST",
-  "contentType": "application/json",
-  "body": {"key": "value"}
-}
-```
-
-**Returns**: JSON object with response data.
-
----
-
-### fetchJSON (fetchJSON)
-
-**Description**: Fetches and parses JSON from a URL.
-
-**Parameters**:
-```json
-{
-  "url": "https://api.example.com/data.json"
-}
-```
-
-**Returns**: Parsed JSON object or error message.
-
----
-
-### downloadFile (downloadFile)
-
-**Description**: Downloads a file from a URL and saves to local path.
-
-**Parameters**:
-```json
-{
-  "url": "https://example.com/file.zip",
-  "destPath": "/path/to/save/file.zip"
-}
-```
-
-**Returns**: JSON object with download status and file info.
-
----
-
-### scrapeWebpage (scrapeWebpage)
-
-**Description**: Scrapes HTML content from a webpage.
-
-**Parameters**:
-```json
-{
-  "url": "https://example.com",
-  "selector": ".content"
-}
-```
-
-**Returns**: JSON object with scraped content.
-
----
-
-### apiRequest (apiRequest)
-
-**Description**: Generic API request handler supporting all HTTP methods.
-
-**Parameters**:
-```json
-{
-  "url": "https://api.example.com/endpoint",
-  "method": "GET|POST|PUT|DELETE",
-  "headers": {"Authorization": "Bearer token"},
-  "body": {"key": "value"}
-}
-```
-
-**Returns**: JSON object with API response.
-
----
-
-### checkStatus (checkStatus)
-
-**Description**: Checks HTTP status of a URL.
-
-**Parameters**:
-```json
-{
-  "url": "https://example.com"
-}
-```
-
-**Returns**: JSON object with HTTP status code and headers.
-
----
-
-### webhookCall (webhookCall)
-
-**Description**: Sends a webhook notification.
-
-**Parameters**:
-```json
-{
-  "url": "https://webhook.site/endpoint",
-  "method": "POST",
-  "body": {"message": "Hello"}
-}
-```
-
-**Returns**: JSON object with webhook delivery status.
-
----
-
-## Path Utility Handlers
-
-### getDocumentsPath
-
-**Description**: Returns the user's Documents folder path.
-
-**Parameters**: None (or `{"path": ""}` for consistency).
-
-**Returns**: String containing the Documents folder path.
-
----
-
-### getTempPath
-
-**Description**: Returns the system temporary directory path.
-
-**Parameters**: None (or `{"path": ""}` for consistency).
-
-**Returns**: String containing the temp directory path.
-
----
-
-## Handler Parameters Format
-
-All handlers accept parameters as a JSON object. The structure varies by handler but typically includes:
+The sample bundle accepts direct arguments or a host envelope:
 
 ```json
 {
-  "key1": "value1",
-  "key2": "value2"
+  "execHandler": "fileExists",
+  "arguments": { "path": "/absolute/path" }
 }
 ```
 
-### Common Parameter Types
+When an envelope is used, the bundle unwraps `arguments`. `testHandler` has highest routing priority, followed by `execHandler`, followed by the `toolName` function argument. `testHandler` is intended for local testing and should not be used in production definitions.
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `string` | Path, URL, or text content | `"/path/to/file"` |
-| `boolean` | Enable/disable flags | `true/false` |
-| `array` | Lists of items (files, extensions) | `[".js", ".cpp"]` |
-| `object` | Complex data structures | `{ "key": "value" }` |
+## Availability matrix
 
----
+| Handler | JavaScript | Sample bundle | Main parameters |
+|---|:---:|:---:|---|
+| `analyzeDirectory` | yes | yes | `dirPath` |
+| `mkdir` | yes | yes | `dirPath` |
+| `fileExists` | yes | yes | `path` |
+| `readFile` | yes | yes | `path` |
+| `saveFile` / `writeFile` | yes | yes | `file_path`, `content` |
+| `openFile` | yes | yes | `path` |
+| `deleteFile` | yes | yes | `path` |
+| `listDirectory` | yes | yes | `path` |
+| `createDirectory` | yes | yes | `dirPath` |
+| `getDocumentsPath` | yes | yes | none |
+| `getTempPath` | yes | yes | none |
+| `previewFile` | no | yes | `filePath` |
+| `fetchPrompt` | no | yes | `promptName` or `name` |
+| `fetchResource` | no | yes | `resourceName` or `name` |
+| `checkWithXcode` | yes | yes | `projectDir`, `projectName`, build options |
+| `clangCheckSyntax` | yes | yes | `sourceFile` |
+| `clangCompile` | yes | yes | `sourceFile` |
+| `clangMake` | yes | yes | `makeFile` |
+| `cmakeBuild` | yes | yes | `projectDir`, build options |
+| `qmakeBuild` | yes | yes | `projectDir`, QMake options |
+| `shellCall` | yes | yes | `command`, `parameters`, `shell` |
+| `checkWithGcc` | yes | yes | `arch`, `verbose` |
+| `gccSettings` | yes | yes | `compiler`, `verbose` |
+| `getGccInfo` | yes | yes | `compiler` |
+| `skillExecute` | yes | no | `content`, `operation` |
+| `fetchData` | yes | yes | `url`, `headers`, `saveToFile` |
+| `postData` | yes | yes | `url`, `data`, `headers` |
+| `fetchJSON` | yes | yes | `url`, `headers`, transform/save options |
+| `downloadFile` | yes | yes | `url`, `destination` |
+| `apiRequest` | yes | yes | `url`, `method`, `data`, `headers` |
+| `scrapeWebpage` | yes | yes | `url`, extraction/save options |
+| `checkStatus` | yes | yes | `urls` |
+| `webhookCall` | yes | yes | `webhookUrl` or `url`, `payload`, `method` |
 
-## Error Handling
+## File and path handlers
 
-All handlers return errors in a consistent JSON format:
+### `analyzeDirectory`
+
+Uses `dirPath`, defaulting to the MCP Studio Documents path. The JavaScript implementation returns the directory entries, item count, total file size, and analyzed path. The native implementation returns entry names and item count.
+
+### `mkdir` and `createDirectory`
+
+Create the directory in `dirPath`. If omitted, both implementations default to `<Documents>/.eof.mcpstudio`. Existing directories are treated as successful results by the JavaScript helpers.
+
+### `fileExists`
+
+Requires `path` and reports whether it exists. The path validator rejects empty strings, control characters, and `..` traversal components.
+
+### `readFile` and `openFile`
+
+Require `path`. Both read text content; `openFile` is an alias-like handler rather than a GUI open operation. The public built-in `read_file` configuration uses `file_path` and `FileResourceHandler`, so do not confuse that host tool with the script/native `readFile` handler.
+
+### `saveFile` and `writeFile`
+
+Require `file_path`; `content` defaults to an empty string. They create or replace the target file through the host API or Foundation implementation.
+
+### `deleteFile`
+
+Requires `path` and deletes that target. Callers should resolve and validate the exact target before invocation because deletion is not recoverable through this handler.
+
+### `listDirectory`
+
+Uses `path`, defaulting to `<Documents>/.eof.mcpstudio`, and returns the immediate entries. It is not recursive.
+
+### `getDocumentsPath` and `getTempPath`
+
+Take no meaningful arguments and return the path supplied by the scripting host or native platform APIs.
+
+### Bundle-only file/config handlers
+
+- `previewFile` reads `filePath` and returns a text preview with metadata.
+- `fetchPrompt` looks up JSON by `promptName` or `name` under `config/Prompts`.
+- `fetchResource` looks up JSON by `resourceName` or `name` under `config/Resources`.
+
+Lookup accepts an exact JSON filename or a normalized name. These handlers locate the SDK root relative to the bundle/environment, so moved installations must preserve or configure that relationship.
+
+## Build and process handlers
+
+### `checkWithXcode`
+
+Required parameters:
+
+- `projectDir`: absolute project directory
+- `projectName`: project name without `.xcodeproj`
+
+Optional parameters include `scheme`, `configuration` (default `Debug`), `platform` (default `macosx`), `codesign`/`codeSigningIdentity`, `clean`, `showOperationLogs`, and script-only `alltargets`. Some fields present in `config/Tools/build_with_xcode.json`, such as `archive`, `derivedDataPath`, and `onlyActiveArchs`, are host-schema compatibility fields and are not consumed by the current JavaScript implementation.
+
+### Clang handlers
+
+- `clangCheckSyntax`: runs Clang syntax checking for `sourceFile`.
+- `clangCompile`: compiles `sourceFile`.
+- `clangMake`: runs Make using the absolute `makeFile` path.
+
+### `cmakeBuild`
+
+Requires `projectDir`. Optional fields are `projectTarget` (default `app`), `buildType` (default `Debug`), `cmakeFlags`, `cmakeArgs`, and `verbose`. The current JavaScript implementation expects the two extra-argument fields as strings.
+
+### `qmakeBuild`
+
+Requires `projectDir`. Optional fields are `projectTarget`, `projectFile`, `buildType`, `qmakeArgs`, `makeArgs`, and `verbose`. `projectFile` must be relative and defaults to `<projectTarget>.pro`.
+
+### `shellCall`
+
+Requires `command`. `parameters` is an array and `shell` defaults to `/bin/bash`. This handler executes commands with the authority of its MCP Studio host, so expose it only in trusted configurations.
+
+### GCC inspection
+
+- `checkWithGcc`: discovers compiler/toolchain capabilities; accepts `arch` and `verbose`.
+- `gccSettings`: inspects one of `gcc`, `g++`, `ar`, or `nm`; accepts `compiler` and `verbose`.
+- `getGccInfo`: reports details for `compiler`, defaulting to `gcc`.
+
+### `skillExecute`
+
+JavaScript-only handler for shell content supplied as `content`, `script`, or `shellScript`. `operation` defaults to `skillExecute`. It is a privileged execution surface and should be enabled only for trusted skill definitions.
+
+## HTTP handlers
+
+The JavaScript implementations use `MCPStudio.httpRequest`; the native sample bundle uses Foundation networking. Network access must also be permitted by the host and plugin capability policy.
+
+| Handler | Behavior |
+|---|---|
+| `fetchData` | GET text from `url`; optional `headers` and `saveToFile` path |
+| `postData` | POST `data` to `url`; optional `headers` |
+| `fetchJSON` | GET and parse JSON; optional transform and save path |
+| `downloadFile` | Download `url` to `destination` or a temp path |
+| `apiRequest` | Request with `GET`, `POST`, `PUT`, or `PATCH` and optional body/headers |
+| `scrapeWebpage` | Fetch HTML and extract basic page information |
+| `checkStatus` | Check each URL in `urls` |
+| `webhookCall` | Send `payload` to `webhookUrl`/`url` with `POST` or `PUT` |
+
+Do not put credentials directly in checked-in tool definitions. Supply authorization headers at runtime and avoid returning secret-bearing response content to untrusted callers.
+
+## Results and errors
+
+JavaScript handlers return the scripting wrapper:
 
 ```json
 {
-  "error": true,
-  "message": "Error description here",
-  "code": "ERROR_CODE"
+  "text": "{\n  \"exists\": true\n}",
+  "success": true,
+  "metadata": {}
 }
 ```
 
-### Common Error Codes
+The native sample bundle returns a full MCP tool-result object with `structuredContent`, `content`, and `isError`. Both dispatchers catch or convert ordinary handler failures into error results, but ABI-level failures such as invalid output pointers cannot return a buffer safely.
 
-- `FILE_NOT_FOUND`: File or directory does not exist
-- `PERMISSION_DENIED`: Insufficient permissions
-- `INVALID_PATH`: Path format is invalid
-- `BUILD_FAILED`: Build operation failed
-- `NETWORK_ERROR`: Network connectivity issue
+## Public tool names versus handler names
 
----
-
-## Shared Functions
-
-The SDK includes a shared functions module for common operations:
-
-```javascript
-const shared = require('sharedFunctions');
-
-// Error handling
-shared.error("Error message");
-
-// Logging (if implemented)
-shared.log("Log message");
-```
-
----
-
-## Best Practices
-
-1. **Always validate paths** before file operations
-2. **Handle errors gracefully** by checking return values
-3. **Use appropriate build types** (Debug/Release) for builds
-4. **Clean builds** when necessary to avoid stale artifacts
-5. **Log important operations** for debugging
-
----
-
-## Quick Reference
-
-| Handler | Category | Use Case |
-|---------|----------|----------|
-| `analyzeDirectory` | Toolchain | Directory analysis |
-| `checkWithXcode` | Toolchain | Xcode builds |
-| `clangCheckSyntax` | Toolchain | Syntax checking |
-| `cmakeBuild` | Toolchain | CMake builds |
-| `qmakeBuild` | Toolchain | Qt builds |
-| `shellCall` | Toolchain | Shell commands |
-| `mkdir` | File Ops | Create directories |
-| `fileExists` | File Ops | Check file existence |
-| `readFile` | File Ops | Read file contents |
-| `saveFile` | File Ops | Write file contents |
-| `listDirectory` | File Ops | List directory contents |
-| `fetchData` | HTTP | GET requests |
-| `postData` | HTTP | POST requests |
-| `fetchJSON` | HTTP | JSON fetching |
-| `downloadFile` | HTTP | File downloads |
-
----
-
-**Last Updated**: 2026-03-30  
-**SDK Version**: MCPStudio_ToolSDK v1.0
+Tool names are snake case (`cmake_build`, `file_exists`), while script/native handler names are camel case (`cmakeBuild`, `fileExists`). The mapping is declared by `execHandler` in each `config/Tools/*.json` file. Built-in definitions point to application handlers not implemented in this repository.
