@@ -1,0 +1,404 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate the continuation-training workflow. Delegate the user request to Dataset Resource Gate. The workflow must archive each new dataset, build a deterministic historical replay mix, and train only from that mixed dataset. Do not invent dataset resources, do not start training directly, and do not modify project source code.",
+      "logLevel" : "info",
+      "maxTurns" : 2,
+      "modelName" : "",
+      "name" : "AI Trainer Coordinator",
+      "positionX" : 117.1240234375,
+      "positionY" : 85.8935546875,
+      "properties" : [
+
+      ],
+      "role" : "rootCoordinator",
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Extract dataset resources only when the user explicitly supplied them in the current request. Accepted resources are HTTP\/HTTPS website URLs, absolute local file paths, and absolute local directory paths. Never infer, invent, search for, or silently fall back to a resource; in particular, do not use the project's existing dataset.txt unless the user explicitly named that path. Return ONLY one valid JSON object, without Markdown, with this exact outer shape: {\"stdinJSON\":{\"datasetResources\":[{\"type\":\"url|file|directory\",\"value\":\"...\"}],\"projectDirectory\":\"${TOOLSDK}\/nnlab\/poc3\",\"datasetDirectory\":\"${TOOLSDK}\/nnlab\/poc3\/datasets\",\"newDataRatio\":0.6,\"epochs\":35,\"learningRate\":0.12,\"seed\":42}}. Preserve every explicitly supplied resource. Classify http\/https values as url; classify absolute local paths as file or directory only if the user wording makes the type clear. If no dataset resource was explicitly supplied, return the same JSON shape with datasetResources set to [] and add haltReason inside stdinJSON with the value \"Dataset resource missing: provide at least one website URL, local file, or local directory.\" The Dataset Builder intentionally exits with failure for an empty list, which halts all downstream agents. Do not include --fresh anywhere.",
+      "logLevel" : "info",
+      "maxTurns" : 3,
+      "name" : "Dataset Resource Gate",
+      "positionX" : 470.6591796875,
+      "positionY" : 86.6142578125,
+      "properties" : [
+        {
+          "description" : "Root directory for immutable archived datasets, replay mixes, and manifests.",
+          "key" : "datasetDirectory",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3\/datasets",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Explicit user-provided website URLs, local files, or local directories. Leave empty when none were supplied; never default to dataset.txt.",
+          "key" : "datasetResources",
+          "required" : true,
+          "value" : "[]",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Continuation-training epochs.",
+          "key" : "epochs",
+          "required" : true,
+          "value" : "50",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Continuation-training learning rate.",
+          "key" : "learningRate",
+          "required" : true,
+          "value" : "0.12",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Target share of current data in the mixed training dataset; the remainder is historical replay.",
+          "key" : "newDataRatio",
+          "required" : true,
+          "value" : "0.6",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Fixed AI project directory.",
+          "key" : "projectDirectory",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Deterministic training seed.",
+          "key" : "seed",
+          "required" : true,
+          "value" : "42",
+          "valueType" : "number"
+        }
+      ],
+      "role" : "planner",
+      "temperature" : 0,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Execute ${TOOLSDK}\/nnlab\/poc3\/agent_dataset_builder.js with stdinJSON from Dataset Resource Gate. The script must validate explicit resources, archive the normalized current dataset under datasets\/archive, create a deterministic mixed dataset under datasets\/mixed using historical replay, and emit scriptArguments whose first element is that mixed dataset. If resources are empty or invalid, exit non-zero. Do not use inline code, do not modify source code, and do not train the model in this step.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Dataset Builder",
+      "positionX" : 863.8310546875,
+      "positionY" : 87.3056640625,
+      "properties" : [
+        {
+          "description" : "Unused. Dataset Builder executes the maintained project script via scriptPath.",
+          "key" : "inlineScript",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Resolve Node.js from PATH.",
+          "key" : "nodeExecutable",
+          "required" : false,
+          "value" : "node",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture stdout, stderr, success, exit code, and timeout metadata.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Dataset Builder reads stdinJSON and does not use command-line arguments.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "[]",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Maintained Dataset Builder script that archives new data and creates the historical replay mix.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3\/agent_dataset_builder.js",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Node.js process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Resource, replay-ratio, and training settings supplied by Dataset Resource Gate.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "{}",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Maximum runtime for URL scraping and local dataset preparation.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "300",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Fixed AI project working directory.",
+          "key" : "workingDirectory",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0,
+      "toolName" : "nodejs_runtime"
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Run ${TOOLSDK}\/nnlab\/poc3\/train.js with scriptArguments emitted by Dataset Builder. The first argument must be the generated numbered mixed dataset under ${TOOLSDK}\/nnlab\/poc3\/datasets\/mixed\/, followed by epochs, learning rate, and seed. Continue learning the existing model.safetensors and never pass --fresh. A missing mixed dataset, a training error, or a stdout result whose mode is not exactly continue must be treated as failure.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Continue Trainer",
+      "positionX" : 335.6689453125,
+      "positionY" : 333.2177734375,
+      "properties" : [
+        {
+          "description" : "JavaScript source code to execute with Node.js. Use this or scriptPath.",
+          "key" : "inlineScript",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Resolve Node.js from PATH.",
+          "key" : "nodeExecutable",
+          "required" : false,
+          "value" : "node",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture the JSON training result and execution metadata.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Injected by Dataset Builder. The first item must be datasets\/mixed\/training_mix_NNNNNN.txt; remaining items contain epochs, learning rate, and seed. It must never contain --fresh.",
+          "key" : "scriptArguments",
+          "required" : true,
+          "value" : "[]",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Existing project training script.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3\/train.js",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Node.js process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional JSON object passed to the Node.js process via stdin.",
+          "key" : "stdinJSON",
+          "required" : false,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Maximum supported NodeJS runtime timeout.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "600",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Fixed AI project working directory.",
+          "key" : "workingDirectory",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0,
+      "toolName" : "nodejs_runtime"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Review only actual upstream tool results. Report success only when Dataset Builder succeeded with at least one explicit resource, archived the new numbered dataset, created a numbered mixed dataset with historical replay evidence, Continue Trainer succeeded without timeout using that exact mixed dataset, its stdout JSON says mode is exactly continue, and Model Verifier succeeded for ${TOOLSDK}\/nnlab\/poc3\/model.safetensors. Summarize resources, archive sequence, new\/replay line counts, requested and actual mix ratio, mixed dataset path, epochs, loss, model path, and relevant SafeTensors metadata. If any requirement is missing or contradictory, report failure clearly.",
+      "logLevel" : "info",
+      "maxTurns" : 4,
+      "name" : "Training Report",
+      "positionX" : 863.095703125,
+      "positionY" : 469.7509765625,
+      "properties" : [
+        {
+          "description" : "Dataset Builder result.",
+          "key" : "datasetBuildResult",
+          "required" : true,
+          "value" : "",
+          "valueType" : "json"
+        },
+        {
+          "description" : "SafeTensors verification result.",
+          "key" : "modelVerification",
+          "required" : true,
+          "value" : "",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Continuation-training result.",
+          "key" : "trainingResult",
+          "required" : true,
+          "value" : "",
+          "valueType" : "json"
+        }
+      ],
+      "role" : "reviewer",
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Inspect the updated model.safetensors with the project's existing dump_safetensors.js script. Return JSON metadata for the final review. Do not alter the model.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Model Verifier",
+      "positionX" : 333.7890625,
+      "positionY" : 579.375,
+      "properties" : [
+        {
+          "description" : "Resolve Node.js from PATH.",
+          "key" : "nodeExecutable",
+          "required" : false,
+          "value" : "node",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Capture model metadata JSON.",
+          "key" : "resultMode",
+          "required" : false,
+          "value" : "capture",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Inspect the model in JSON mode without tensor statistics.",
+          "key" : "scriptArguments",
+          "required" : true,
+          "value" : "[\"${TOOLSDK}\/nnlab\/poc3\/model.safetensors\",\"--json\",\"--no-stats\"]",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Existing SafeTensors inspection script.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3\/dump_safetensors.js",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Inspection timeout.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "120",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Fixed AI project working directory.",
+          "key" : "workingDirectory",
+          "required" : true,
+          "value" : "${TOOLSDK}\/nnlab\/poc3",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "temperature" : 0,
+      "toolName" : "nodejs_runtime"
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Run only after Dataset Builder succeeds; inject its scriptArguments unchanged. The first argument must be the generated datasets\/mixed\/training_mix_NNNNNN.txt path. Never add --fresh.",
+      "kind" : "delegation",
+      "label" : "Continue training",
+      "sharedStateKeys" : "scriptArguments",
+      "source" : "Dataset Builder",
+      "target" : "Continue Trainer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Delegate the current user request for strict dataset-resource extraction.",
+      "kind" : "delegation",
+      "label" : "Extract resources",
+      "sharedStateKeys" : "",
+      "source" : "AI Trainer Coordinator",
+      "target" : "Dataset Resource Gate"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Include dataset preparation evidence in the final report.",
+      "kind" : "artifactFlow",
+      "label" : "Report dataset",
+      "sharedStateKeys" : "datasetBuildResult",
+      "source" : "Dataset Builder",
+      "target" : "Training Report"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Include post-training model metadata in the final report.",
+      "kind" : "review",
+      "label" : "Report verification",
+      "sharedStateKeys" : "modelVerification",
+      "source" : "Model Verifier",
+      "target" : "Training Report"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Include the actual train.js result in the final report.",
+      "kind" : "review",
+      "label" : "Review training",
+      "sharedStateKeys" : "trainingResult",
+      "source" : "Continue Trainer",
+      "target" : "Training Report"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Pass stdinJSON exactly to agent_dataset_builder.js. An empty datasetResources array intentionally makes the script fail and halts downstream execution.",
+      "kind" : "artifactFlow",
+      "label" : "Validate and build dataset",
+      "sharedStateKeys" : "stdinJSON",
+      "source" : "Dataset Resource Gate",
+      "target" : "Dataset Builder"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Run only after successful continuation training.",
+      "kind" : "review",
+      "label" : "Verify updated model",
+      "sharedStateKeys" : "",
+      "source" : "Continue Trainer",
+      "target" : "Model Verifier"
+    }
+  ],
+  "goal" : "Continue training ${TOOLSDK}\/nnlab\/poc3\/model.safetensors using only explicit user resources. Archive every normalized input dataset, build a deterministic numbered mixed dataset with historical replay, train exclusively from that mixed dataset, halt when no resource was supplied, and verify the updated model. Run this workflow by using tool 'run_workflow'.",
+  "name" : "Casual LM Continue Trainer",
+  "pattern" : "coordinator",
+  "summary" : "Strict resource gate, script-based versioned dataset archive, deterministic historical replay mix, continuation training, SafeTensors verification, and evidence-based reporting.",
+  "systemInstruction" : "Use the active AI Chat connection for instruction agents and nodejs_runtime for executable steps. Dataset Builder must execute ${TOOLSDK}\/nnlab\/poc3\/agent_dataset_builder.js, never an inline copy. Dataset resources must come explicitly from the user. Do not search for defaults, do not use dataset.txt unless explicitly supplied, and never pass --fresh. Continue Trainer must consume the mixedDatasetPath emitted through scriptArguments. A failed builder, trainer, or verifier must stop dependent agents. Workflow execution may create versioned dataset artifacts and update model.safetensors but must not modify project source code."
+}
