@@ -1,0 +1,17 @@
+{
+  "name": "neural-network-poc-3",
+  "version": "1.0.0",
+  "description": "Generative character-level neural network in Node.js with training, safetensors persistence, CLI inference, and a live visualizer.",
+  "type": "commonjs",
+  "license": "MIT",
+  "scripts": {
+    "train": "node train.js",
+    "infer": "node infer.js",
+    "dump": "./dump_safetensors.sh",
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

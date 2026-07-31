@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lokales Training und generative Inferenz für ein neuronales Zeichenmodell.">
+  <title>EoF Neural Network Lab</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>EoF Neural Network Lab - 🤓</span>
+      </div>
+      <div class="model-state"><span id="state-dot" class="state-dot"></span><span id="state-label">Modell wird geprüft</span></div>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">NODE.JS · SAFETENSORS · CAUSAL LM</p>
+      <h2>Beobachte, wie das Modell <em>Zeichen für Zeichen</em> denkt.</h2>
+      <p class="lede">Trainiere das Netzwerk auf dem lokalen Datensatz und erzeuge neue Texte aus den gelernten Wahrscheinlichkeiten.</p>
+    </section>
+
+    <section class="workspace">
+      <article class="panel generator-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="step-number">01</span>
+            <h2>Generative Inferenz</h2>
+          </div>
+          <button id="generate" class="primary">Text erzeugen <span aria-hidden="true">→</span></button>
+        </div>
+
+        <label for="prompt">Starttext</label>
+        <textarea id="prompt" rows="3" spellcheck="false">The </textarea>
+
+        <div class="controls-grid">
+          <label>Länge <output id="length-value">180</output>
+            <input id="length" type="range" min="20" max="500" step="10" value="180">
+          </label>
+          <label>Temperatur <output id="temperature-value">0.55</output>
+            <input id="temperature" type="range" min="0.2" max="1.5" step="0.05" value="0.55">
+          </label>
+          <label>Top-K <output id="topk-value">6</output>
+            <input id="topk" type="range" min="1" max="20" step="1" value="6">
+          </label>
+          <label>Seed
+            <input id="seed" type="number" min="0" max="999999" value="42">
+          </label>
+        </div>
+
+        <div class="output-card">
+          <div class="output-meta">
+            <span>MODELLAUSGABE</span>
+            <span id="token-counter">0 Zeichen</span>
+          </div>
+          <pre id="output" aria-live="polite"><span class="placeholder">Noch keine Ausgabe generiert.</span></pre>
+          <div id="cursor" class="cursor" hidden></div>
+        </div>
+      </article>
+
+      <aside class="panel insight-panel">
+        <div class="panel-heading compact">
+          <div>
+            <span class="step-number">02</span>
+            <h2>Token-Radar</h2>
+          </div>
+        </div>
+        <p class="muted">Die fünf wahrscheinlichsten nächsten Zeichen des zuletzt erzeugten Schritts.</p>
+        <div id="probabilities" class="probabilities">
+          <div class="empty-radar">Nach der Generierung werden hier die Vorhersagen sichtbar.</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="model-title">
+          <h3>Modellzustand</h3>
+          <span id="model-file">model.safetensors</span>
+        </div>
+        <dl id="model-stats" class="stats">
+          <div><dt>Parameter</dt><dd>—</dd></div>
+          <div><dt>Kontext</dt><dd>—</dd></div>
+          <div><dt>Vokabular</dt><dd>—</dd></div>
+          <div><dt>Perplexität</dt><dd>—</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="panel train-panel">
+      <div class="train-copy">
+        <span class="step-number">03</span>
+        <div>
+          <h2>Training</h2>
+          <p>Lädt <code>model.safetensors</code>, lernt mit <code>dataset.txt</code> weiter und schreibt die erweiterten Gewichte nach erfolgreichem Abschluss atomar zurück.</p>
+        </div>
+      </div>
+      <div class="train-settings">
+        <label>Epochen <input id="epochs" type="number" min="1" max="200" value="35"></label>
+        <label>Kontext <input id="context" type="number" min="2" max="64" value="16" disabled></label>
+        <button id="train" class="secondary">Modell weiterlernen</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+        <div id="train-status" class="train-status">Bereit zum Weiterlernen.</div>
+      </div>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

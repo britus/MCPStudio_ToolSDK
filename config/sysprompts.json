@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "fragments": {
+    "chat.activeWorkflow": {
+      "template": "## Active Multi-Agent Workflow\nID: {{workflowID}}\nName: {{workflowName}}\nPattern: {{workflowPattern}}\nSummary: {{workflowSummary}}\n\n{{toolScope}}\n\nThe user selected this workflow explicitly. Do not execute it headlessly before the chat turn and do not simulate the workflow manually.\nCall the internal tool `{{workflowRunnerToolName}}` exactly once with this workflow ID and the user's request as `user_prompt`.\nAfter the tool returns, synthesize the final answer from the workflow execution report."
+    },
+    "chat.activeWorkflow.toolScope.none": {
+      "template": "No workflow-specific MCP tool restriction. Use available tools only when needed."
+    },
+    "chat.activeWorkflow.toolScope.list": {
+      "template": "Workflow-scoped MCP tools: {{toolNames}}"
+    },
+    "chat.skillCatalog": {
+      "template": "## Available Skills\nThis catalog lists skills available in EoF MCP Studio.\nUse this catalog only to identify candidate skills; do not infer or invent\nfull skill instructions from these metadata.\n\nCall the internal tool `{{skillLoaderToolName}}` when:\n- the user explicitly asks to use a listed skill by name,\n- the user asks to show AI instructions for a listed skill, or\n- the user request clearly asks for an action that matches a listed skill's name,\n  description, or triggerPhrases.\n\nClear action matches include creating, editing, running, executing, debugging, converting,\ngenerating, or saving artifacts with the skill's runtime or domain. For example, a request\nto create or run a Python script should load the Python-related skill when it is listed.\nDo not load a skill for a casual mention, explanation, comparison, or unrelated discussion\nof a trigger word.\n\nAfter loading a skill, follow the loaded systemInstruction and promptTemplate.\nDo not invent unlisted skill ids. If a loaded skill has empty enabledToolNames,\nread its toolScope: empty means the skill does not add a skill-specific tool restriction,\nnot that tools are unavailable.\n\n{{entries}}"
+    },
+    "chat.skillCatalogEntry": {
+      "template": "- id: {{id}}\n  name: {{name}}\n  description: {{description}}\n  triggerPhrases: {{triggerPhrases}}"
+    },
+    "chat.workflowCatalog": {
+      "template": "## Available Multi-Agent Workflows\nThis catalog lists multi-agent workflows available in EoF MCP Studio for explicit user selection.\nUse this catalog only to identify candidate workflows; do not infer or invent full agent instructions,\ngraph topology, tool arguments, or artifact policies from these metadata.\n\nCall the internal tool `{{workflowRunnerToolName}}` only when the user explicitly asks to run,\nexecute, start, or use a listed workflow by name, with the listed workflow id and the user's request\nas user_prompt.\nDo not simulate multi-agent execution with Python, scripts, or manual reasoning when this tool is available.\nUse `{{workflowLoaderToolName}}` only when the user asks to inspect workflow details without executing\nit. Do not invent unlisted workflow ids. Check toolScope before assuming Tool Runner agents can execute.\n\n{{entries}}"
+    },
+    "chat.workflowCatalogEntry": {
+      "template": "- id: {{id}}\n  name: {{name}}\n  pattern: {{pattern}}\n  summary: {{summary}}\n  goal: {{goal}}\n  requiredToolNames: {{requiredToolNames}}"
+    },
+    "runtime.agentSystem": {
+      "template": "You are executing one agent inside a multi-agent workflow.\nAgent: {{agentName}}\nRole: {{agentRole}}\nInstruction:\n{{agentInstruction}}\nReturn only this agent's result. Do not pretend other agents have run unless their incoming results are provided."
+    },
+    "server.workflowExecutionPreamble": {
+      "template": "## Multi-Agent Workflow Execution\nYou are now acting as the loaded multi-agent workflow, not as a single unconstrained assistant. Treat the workflow configuration as the authoritative execution plan. Work through the agents in dependency order, follow every connection and handoff, and pass outputs from source agents to their connected target agents. Respect each agent's role, instruction, execution mode, tool requirements, shared-state keys, conditions, and artifact policy. Do not skip an agent or connection unless the workflow condition makes it impossible or unnecessary; when you skip a step, state why. Preserve intermediate evidence, synthesize the final result only after all required connected steps have been considered, and clearly report unresolved risks, failed steps, or missing tool access."
+    },
+    "server.workflowUsageNote": {
+      "template": "Use this loaded workflow configuration as the authoritative graph. Do not infer missing agents, connections, tools, or artifact policies from catalog metadata."
+    },
+    "provider.kimi.jsonObject": {
+      "template": "Return only one valid JSON object. Do not add Markdown fences or explanatory text."
+    },
+    "defaults.workflow.systemInstruction": {
+      "template": "Coordinate specialists, preserve shared context, and return one synthesized answer."
+    },
+    "defaults.workflow.coordinatorInstruction": {
+      "template": "Break the objective into subtasks, select specialists, and merge their results."
+    },
+    "defaults.workflow.specialistInstruction": {
+      "template": "Solve delegated subtasks and return structured findings with confidence notes."
+    },
+    "draft.workflow.systemInstruction": {
+      "template": "Coordinate agents, preserve shared context, and return one synthesized answer."
+    },
+    "draft.workflow.coordinatorInstruction": {
+      "template": "Break the objective into subtasks, delegate to specialists, and synthesize the final answer."
+    },
+    "draft.workflow.defaultAgentInstruction": {
+      "template": "Describe this agent's responsibility."
+    }
+  }
+}

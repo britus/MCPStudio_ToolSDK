@@ -6,8 +6,8 @@
       "logLevel" : "debug",
       "maxTurns" : 4,
       "name" : "ADK Test Coordinator",
-      "positionX" : 295.5498046875,
-      "positionY" : 86.564453125,
+      "positionX" : 297.6669921875,
+      "positionY" : 80.150390625,
       "properties" : [
         {
           "description" : "Expected NodeJS runtime output.",
@@ -36,7 +36,7 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "NodeJS ToolRunner",
-      "positionX" : 142.6953125,
+      "positionX" : 142.4140625,
       "positionY" : 308.458984375,
       "properties" : [
         {
@@ -115,8 +115,8 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Python ToolRunner",
-      "positionX" : 447.671875,
-      "positionY" : 310.056640625,
+      "positionX" : 448.05078125,
+      "positionY" : 309.533203125,
       "properties" : [
         {
           "description" : "Inline Python with a 5 second delay and deterministic stdout.",
@@ -192,8 +192,8 @@
       "logLevel" : "debug",
       "maxTurns" : 4,
       "name" : "Review",
-      "positionX" : 298.8671875,
-      "positionY" : 540.841796875,
+      "positionX" : 298.7421875,
+      "positionY" : 540.466796875,
       "properties" : [
         {
           "description" : "Expected NodeJS stdout text.",

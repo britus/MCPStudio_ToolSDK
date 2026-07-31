@@ -3,13 +3,11 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Act as the root coordinator. Decompose the user's software task, assign work to specialist agents, preserve shared context, and synthesize a final implementation plan or answer. Ask the Reviewer for risk checks before finalizing.",
-      "llmProviderID" : "lmStudioOpenAI",
-      "logLevel" : "none",
-      "maxTurns" : 8,
-      "modelName" : "qwen\/qwen3.5-9b",
+      "logLevel" : "debug",
+      "maxTurns" : 16,
       "name" : "Coordinator",
-      "positionX" : 134.81995738636365,
-      "positionY" : 85.56889204545453,
+      "positionX" : 134.41370738636365,
+      "positionY" : 84.88920454545453,
       "properties" : [
         {
           "description" : "Enter the concrete delivery objective. Suitable for keeping all agents aligned; changes the acceptance criteria the coordinator enforces.",
@@ -22,7 +20,7 @@
           "description" : "Comma-separated shared state keys passed between agents. Useful when work products must be traceable across handoffs.",
           "key" : "sharedStateKeys",
           "required" : false,
-          "value" : "requirements, directoryList, plan, changedFiles, testEvidence, reviewFindings, project_path",
+          "value" : "requirements, directoryList, plan, changedFiles, testEvidence, reviewFindings, project_path, directoryList",
           "valueType" : "string"
         }
       ],
@@ -32,14 +30,12 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Transform the user's request into a concise engineering plan. Identify files or subsystems to inspect, implementation steps, risks, and verification commands. Return a plan the Implementer can execute. If the user prompt contains a project or work directory then hand over to property `project_path `.",
-      "llmProviderID" : "lmStudioOpenAI",
-      "logLevel" : "none",
-      "maxTurns" : 6,
-      "modelName" : "qwen\/qwen3.5-9b",
+      "instruction" : "Transform the user's request into a concise engineering plan. Identify files or subsystems to inspect, implementation steps, risks, and verification commands. Return a plan the Implementer can execute. If the user prompt contains a project or work directory then hand over to property `project_path` otherwise set the value of the `project_path` to ${HOME}\/temp.",
+      "logLevel" : "debug",
+      "maxTurns" : 16,
       "name" : "Planner",
-      "positionX" : 582.688565340909,
-      "positionY" : 85.94176136363636,
+      "positionX" : 582.930752840909,
+      "positionY" : 85.93394886363636,
       "properties" : [
         {
           "description" : "Optional constraints such as platform, architecture, or code style. Suitable for narrowing the plan and avoiding broad refactors.",
@@ -49,7 +45,7 @@
           "valueType" : "string"
         },
         {
-          "description" : "Use this project path to work with resources",
+          "description" : "Use the value of this property to set active project path.",
           "key" : "project_path",
           "required" : false,
           "value" : "${CHAT_PROJECT_DIR}",
@@ -62,27 +58,40 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Implement the plan. Propose exact code edits, preserve local conventions, and produce a concise change summary. If tool access is available, request only the tools required for file inspection or edits.",
-      "llmProviderID" : "lmStudioOpenAI",
-      "logLevel" : "none",
-      "maxTurns" : 8,
-      "modelName" : "qwen\/qwen3.5-9b",
-      "name" : "Implementer",
-      "positionX" : 804.0639204545454,
-      "positionY" : 317.7041903409091,
+      "instruction" : "Describe this agent's responsibility.",
+      "logLevel" : "debug",
+      "maxTurns" : 16,
+      "name" : "Synthesize Review",
+      "positionX" : 270.19921875,
+      "positionY" : 310.25,
       "properties" : [
-        {
-          "description" : "",
-          "key" : "directoryList",
-          "required" : false,
-          "value" : "The directory list of the given project directory",
-          "valueType" : "string"
-        },
+
+      ],
+      "role" : "synthesizer",
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Implement the plan. Propose exact code edits, preserve local conventions, and produce a concise change summary. If tool access is available, request only the tools required for file inspection or edits.",
+      "logLevel" : "debug",
+      "maxTurns" : 16,
+      "name" : "Implementer",
+      "positionX" : 804.3022017045454,
+      "positionY" : 317.7002840909091,
+      "properties" : [
         {
           "description" : "Named tools that are useful for implementation. Suitable for scoping MCP tool calls and reducing accidental tool use.",
           "key" : "preferredTools",
           "required" : true,
-          "value" : "read_file, write_file, list_files, load_skill, mkdir, skill_execute, file_exist",
+          "value" : "read_file, write_file, list_files, load_skill, mkdir, shell_call, file_exist, nodejs_runtime, python_runtime",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Project working directory.",
+          "key" : "project_path",
+          "required" : true,
+          "value" : "",
           "valueType" : "string"
         }
       ],
@@ -91,59 +100,13 @@
       "toolName" : ""
     },
     {
-      "executionMode" : "mcpTool",
-      "instruction" : "Read user given directory structure.",
-      "llmProviderID" : "lmStudio",
-      "logLevel" : "none",
-      "maxTurns" : 6,
-      "modelName" : "gpt-4.1",
-      "name" : "List directory tool",
-      "positionX" : 415.68181818181824,
-      "positionY" : 318.2769886363637,
-      "properties" : [
-        {
-          "description" : "List of file extensions to be filtered, in the form e.g. \".js\" or \".cpp\"",
-          "key" : "extensions",
-          "required" : false,
-          "value" : "",
-          "valueType" : "array"
-        },
-        {
-          "description" : "Path to the project directory",
-          "key" : "project_path",
-          "required" : true,
-          "value" : "",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Boolean parameter to enable recursive traversal of the directory tree. Set the value 'false' to list the contents of the directory or the value 'true' to include subdirectories.",
-          "key" : "recursive",
-          "required" : false,
-          "value" : "true",
-          "valueType" : "boolean"
-        },
-        {
-          "description" : "Sort by name, date, size",
-          "key" : "sort",
-          "required" : false,
-          "value" : "",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "toolRunner",
-      "temperature" : 0.3,
-      "toolName" : "list_files"
-    },
-    {
       "executionMode" : "llmInstruction",
       "instruction" : "Review the proposed implementation and verification evidence. Look for correctness issues, regressions, missing tests, license\/tool restrictions, and unclear handoffs. Return prioritized findings and a final go\/no-go signal.",
-      "llmProviderID" : "mistralai",
-      "logLevel" : "none",
-      "maxTurns" : 5,
-      "modelName" : "mistral-code-agent-latest",
+      "logLevel" : "debug",
+      "maxTurns" : 16,
       "name" : "Reviewer",
-      "positionX" : 132.6600378787879,
-      "positionY" : 423.87500000000006,
+      "positionX" : 272.0819128787879,
+      "positionY" : 559.78125,
       "properties" : [
         {
           "description" : "Risk areas to audit. Suitable for steering the reviewer toward product-specific concerns.",
@@ -158,29 +121,29 @@
       "toolName" : ""
     },
     {
-      "executionMode" : "mcpTool",
+      "executionMode" : "llmInstruction",
       "instruction" : "Run or request verification. Prefer syntax checks and focused build\/test commands. Return command, result, failure reason, and next debugging hint.",
       "llmProviderID" : "lmStudio",
-      "logLevel" : "none",
-      "maxTurns" : 4,
-      "modelName" : "",
-      "name" : "Verifier",
-      "positionX" : 728.5191761363637,
-      "positionY" : 560.8334517045455,
+      "logLevel" : "debug",
+      "maxTurns" : 16,
+      "modelName" : "google\/gemma-4-26b-a4b",
+      "name" : "Execute",
+      "positionX" : 685.3902698863637,
+      "positionY" : 560.4701704545455,
       "properties" : [
         {
-          "description" : "Shell script content generated from the Skill instructions.",
-          "key" : "content",
+          "description" : "List of changed files",
+          "key" : "changedFiles",
           "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Optional operation name for logging and result metadata.",
-          "key" : "operation",
-          "required" : false,
+          "description" : "Evidence of tests",
+          "key" : "testEvidence",
+          "required" : true,
           "value" : "",
-          "valueType" : "string"
+          "valueType" : "array"
         },
         {
           "description" : "The verification command or tool input. Useful for making test evidence repeatable.",
@@ -190,21 +153,12 @@
           "valueType" : "string"
         }
       ],
-      "role" : "toolRunner",
+      "role" : "specialist",
       "temperature" : 0.1,
-      "toolName" : "skill_execute"
+      "toolName" : "shell_call"
     }
   ],
   "connections" : [
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "If successfully listed",
-      "kind" : "sharedState",
-      "label" : "Directory List",
-      "sharedStateKeys" : "directoryList",
-      "source" : "List directory tool",
-      "target" : "Implementer"
-    },
     {
       "artifactPolicy" : "pass-latest",
       "condition" : "Planner has produced actionable steps.",
@@ -213,15 +167,6 @@
       "sharedStateKeys" : "plan, changedFiles",
       "source" : "Planner",
       "target" : "Implementer"
-    },
-    {
-      "artifactPolicy" : "pass-latest",
-      "condition" : "if user provide a directory name then run as first step.",
-      "kind" : "delegation",
-      "label" : "List directory",
-      "sharedStateKeys" : "project_path",
-      "source" : "Planner",
-      "target" : "List directory tool"
     },
     {
       "artifactPolicy" : "pass-latest",
@@ -238,7 +183,7 @@
       "kind" : "review",
       "label" : "Review result",
       "sharedStateKeys" : "testEvidence, reviewFindings",
-      "source" : "Verifier",
+      "source" : "Execute",
       "target" : "Reviewer"
     },
     {
@@ -248,21 +193,21 @@
       "label" : "Synthesize final answer",
       "sharedStateKeys" : "reviewFindings, finalSummary",
       "source" : "Reviewer",
-      "target" : "Coordinator"
+      "target" : "Synthesize Review"
     },
     {
       "artifactPolicy" : "pass-latest",
       "condition" : "Implementation draft is ready.",
       "kind" : "artifactFlow",
       "label" : "Verify changes",
-      "sharedStateKeys" : "changedFiles, testEvidence",
+      "sharedStateKeys" : "changedFiles, testEvidence, project_path",
       "source" : "Implementer",
-      "target" : "Verifier"
+      "target" : "Execute"
     }
   ],
   "goal" : "Coordinate specialized software-engineering agents to plan, implement, verify, review, and synthesize a production-ready answer.",
   "name" : "Software Delivery Squad",
   "pattern" : "coordinator",
-  "summary" : "A typical planner-coder-verifier-reviewer multi-agent workflow for software delivery.",
+  "summary" : "planner-coder-verifier-reviewer multi-agent workflow for software delivery.",
   "systemInstruction" : "Use an ADK-style collaborative multi-agent pattern. The Coordinator delegates to specialists, specialists return explicit artifacts, links define handoff conditions, and the final response must include the plan, implementation summary, verification evidence, risks, and next steps. This sample is inspired by common multi-agent software engineering examples that use Planner, Coder\/Implementer, Debugger\/Verifier, and Reviewer\/Critic roles."
 }

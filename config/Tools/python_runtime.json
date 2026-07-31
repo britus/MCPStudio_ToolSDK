@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-09T10:25:52.294Z",
+    "lastModified" : "2026-07-30T14:13:32.224Z",
     "priority" : 0.9
   },
   "description" : "Execute Python using Python 3. Provide inline Python or a script path; the tool runs it with the configured Python executable and returns stdout, stderr, exit code, and execution status.",
@@ -12,18 +12,13 @@
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
-      "environment" : {
-        "description" : "Optional string environment variables for the Python child process. PATH does not control executable resolution.",
-        "name" : "environment",
-        "type" : "object"
-      },
       "inlineScript" : {
         "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
         "name" : "inlineScript",
         "type" : "string"
       },
       "pythonExecutable" : {
-        "description" : "Optional absolute path to the Python executable, or 'python'\/'python3' to resolve from trusted host locations.",
+        "description" : "Optional absolute path to the Python executable, or 'python3' to resolve via \/usr\/bin\/env.",
         "name" : "pythonExecutable",
         "type" : "string"
       },
@@ -62,12 +57,12 @@
         "type" : "object"
       },
       "timeoutSeconds" : {
-        "description" : "Maximum execution time in seconds. Defaults to 60 and is capped at 600.",
+        "description" : "Maximum execution time in seconds. Defaults to 60 and is capped by the plugin.",
         "name" : "timeoutSeconds",
         "type" : "number"
       },
       "workingDirectory" : {
-        "description" : "Optional existing absolute working directory for the Python process.",
+        "description" : "Optional working directory for the Python process.",
         "name" : "workingDirectory",
         "type" : "string"
       }
@@ -86,16 +81,6 @@
         "description" : "Launch error details if the Python process could not be started.",
         "name" : "launchError",
         "type" : "string"
-      },
-      "maxOutputBytes" : {
-        "description" : "Maximum combined number of stdout and stderr bytes captured.",
-        "name" : "maxOutputBytes",
-        "type" : "integer"
-      },
-      "outputLimitExceeded" : {
-        "description" : "Whether the process was terminated after exceeding the output limit.",
-        "name" : "outputLimitExceeded",
-        "type" : "boolean"
       },
       "pythonExecutable" : {
         "description" : "Resolved Python executable used for execution.",

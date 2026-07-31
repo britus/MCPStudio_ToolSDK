@@ -2,6 +2,28 @@
   "agents" : [
     {
       "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate the workflow: The Specialist plans the DuckDuckGo search, the Python DuckDuckGo Runner executes the mini-script, and Agent #3 reviews the Runner's output and synthesizes the results for the search term `EoF MCP Studio`.",
+      "llmProviderID" : "none",
+      "logLevel" : "none",
+      "maxTurns" : 6,
+      "name" : "Coordinator",
+      "positionX" : 124.73828125,
+      "positionY" : 106.7109375,
+      "properties" : [
+        {
+          "description" : "",
+          "key" : "handoffPolicy",
+          "required" : true,
+          "value" : "delegate-run-review-synthesize",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
       "instruction" : "Set directory \/Users\/eofmc\/temp to property dirPath",
       "llmProviderID" : "none",
       "logLevel" : "none",
@@ -20,28 +42,6 @@
       ],
       "role" : "specialist",
       "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Coordinate the workflow: The Specialist plans the DuckDuckGo search, the Python DuckDuckGo Runner executes the mini-script, and Agent #3 reviews the Runner's output and synthesizes the results for the search term `EoF MCP Studio`.",
-      "llmProviderID" : "none",
-      "logLevel" : "none",
-      "maxTurns" : 6,
-      "name" : "Coordinator",
-      "positionX" : 124.73828125,
-      "positionY" : 110.9765625,
-      "properties" : [
-        {
-          "description" : "",
-          "key" : "handoffPolicy",
-          "required" : true,
-          "value" : "delegate-run-review-synthesize",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "rootCoordinator",
-      "temperature" : 0.3,
       "toolName" : ""
     },
     {

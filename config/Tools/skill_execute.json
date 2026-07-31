@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-09T10:25:52.294Z",
+    "lastModified" : "2026-07-30T14:13:32.224Z",
     "priority" : 0.9
   },
   "description" : "Execute a shell script snippet supplied by an MCP Studio Skill.",

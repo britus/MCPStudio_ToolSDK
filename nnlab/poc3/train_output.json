@@ -1,0 +1,345 @@
+{
+  "phase": "train",
+  "mode": "continue",
+  "inputFile": "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/nnlab/poc3/dataset.txt",
+  "corpus": {
+    "lines": 2000,
+    "characters": 19864,
+    "examples": 19865,
+    "vocabSize": 29
+  },
+  "architecture": {
+    "type": "causal-char-softmax",
+    "contextSize": 16,
+    "vocabularySize": 29,
+    "parameters": 1900573,
+    "vocabularyAdded": []
+  },
+  "hyperparameters": {
+    "epochs": 50,
+    "learningRate": 0.075,
+    "seed": 42
+  },
+  "training": {
+    "run": 5,
+    "totalEpochs": 250,
+    "firstLoss": 0.8313736499418225,
+    "finalLoss": 0.8007410963894004,
+    "firstPerplexity": 2.296471122057171,
+    "finalPerplexity": 2.227190880150128,
+    "lossReductionPct": 3.684571137726786,
+    "durationMs": 13701,
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.8313736499418225,
+        "perplexity": 2.296471122057171,
+        "learningRate": 0.075
+      },
+      {
+        "epoch": 2,
+        "loss": 0.8285992284183236,
+        "perplexity": 2.29010857342524,
+        "learningRate": 0.06696428571428571
+      },
+      {
+        "epoch": 3,
+        "loss": 0.8260748188804692,
+        "perplexity": 2.2843346923861865,
+        "learningRate": 0.06048387096774193
+      },
+      {
+        "epoch": 4,
+        "loss": 0.8237024323151108,
+        "perplexity": 2.278921790737512,
+        "learningRate": 0.05514705882352942
+      },
+      {
+        "epoch": 5,
+        "loss": 0.8206758085980859,
+        "perplexity": 2.2720347794496156,
+        "learningRate": 0.05067567567567567
+      },
+      {
+        "epoch": 6,
+        "loss": 0.8198979768802948,
+        "perplexity": 2.270268205871784,
+        "learningRate": 0.04687499999999999
+      },
+      {
+        "epoch": 7,
+        "loss": 0.817571327432047,
+        "perplexity": 2.2649922276591528,
+        "learningRate": 0.0436046511627907
+      },
+      {
+        "epoch": 8,
+        "loss": 0.8167070741778696,
+        "perplexity": 2.2630355464115723,
+        "learningRate": 0.04076086956521739
+      },
+      {
+        "epoch": 9,
+        "loss": 0.8160285029147204,
+        "perplexity": 2.2615004364219593,
+        "learningRate": 0.03826530612244898
+      },
+      {
+        "epoch": 10,
+        "loss": 0.8153935035830071,
+        "perplexity": 2.260064841005466,
+        "learningRate": 0.036057692307692304
+      },
+      {
+        "epoch": 11,
+        "loss": 0.8137009562008346,
+        "perplexity": 2.25624280957235,
+        "learningRate": 0.03409090909090909
+      },
+      {
+        "epoch": 12,
+        "loss": 0.8130088182361075,
+        "perplexity": 2.2546817185736963,
+        "learningRate": 0.032327586206896554
+      },
+      {
+        "epoch": 13,
+        "loss": 0.8123465454089148,
+        "perplexity": 2.2531889984860527,
+        "learningRate": 0.030737704918032786
+      },
+      {
+        "epoch": 14,
+        "loss": 0.8113462702965007,
+        "perplexity": 2.2509363164460194,
+        "learningRate": 0.029296875
+      },
+      {
+        "epoch": 15,
+        "loss": 0.8104450878119283,
+        "perplexity": 2.2489087258155536,
+        "learningRate": 0.027985074626865673
+      },
+      {
+        "epoch": 16,
+        "loss": 0.8106043551068585,
+        "perplexity": 2.2492669319493626,
+        "learningRate": 0.026785714285714288
+      },
+      {
+        "epoch": 17,
+        "loss": 0.8092995245397571,
+        "perplexity": 2.24633393365204,
+        "learningRate": 0.025684931506849314
+      },
+      {
+        "epoch": 18,
+        "loss": 0.8089389070345734,
+        "perplexity": 2.2455240123577522,
+        "learningRate": 0.024671052631578948
+      },
+      {
+        "epoch": 19,
+        "loss": 0.8085741465027964,
+        "perplexity": 2.244705083190486,
+        "learningRate": 0.02373417721518987
+      },
+      {
+        "epoch": 20,
+        "loss": 0.80775422513455,
+        "perplexity": 2.2428653558463134,
+        "learningRate": 0.022865853658536585
+      },
+      {
+        "epoch": 21,
+        "loss": 0.807401127312105,
+        "perplexity": 2.2420735447747364,
+        "learningRate": 0.022058823529411766
+      },
+      {
+        "epoch": 22,
+        "loss": 0.8072057755648717,
+        "perplexity": 2.241635594568901,
+        "learningRate": 0.02130681818181818
+      },
+      {
+        "epoch": 23,
+        "loss": 0.806745926505674,
+        "perplexity": 2.2406050175227774,
+        "learningRate": 0.020604395604395604
+      },
+      {
+        "epoch": 24,
+        "loss": 0.806745294022406,
+        "perplexity": 2.2406036003780416,
+        "learningRate": 0.0199468085106383
+      },
+      {
+        "epoch": 25,
+        "loss": 0.8060500470062294,
+        "perplexity": 2.2390463688034736,
+        "learningRate": 0.019329896907216496
+      },
+      {
+        "epoch": 26,
+        "loss": 0.805914103058045,
+        "perplexity": 2.238742004688629,
+        "learningRate": 0.01875
+      },
+      {
+        "epoch": 27,
+        "loss": 0.805393950584481,
+        "perplexity": 2.2375778203001615,
+        "learningRate": 0.01820388349514563
+      },
+      {
+        "epoch": 28,
+        "loss": 0.8050554260424108,
+        "perplexity": 2.2368204734906714,
+        "learningRate": 0.01768867924528302
+      },
+      {
+        "epoch": 29,
+        "loss": 0.804907795762045,
+        "perplexity": 2.2364902754312577,
+        "learningRate": 0.017201834862385322
+      },
+      {
+        "epoch": 30,
+        "loss": 0.8043791912365429,
+        "perplexity": 2.2353083689584996,
+        "learningRate": 0.016741071428571428
+      },
+      {
+        "epoch": 31,
+        "loss": 0.8044482242807816,
+        "perplexity": 2.235462684426393,
+        "learningRate": 0.016304347826086956
+      },
+      {
+        "epoch": 32,
+        "loss": 0.8040410293244844,
+        "perplexity": 2.2345526005996508,
+        "learningRate": 0.015889830508474576
+      },
+      {
+        "epoch": 33,
+        "loss": 0.8033769067682441,
+        "perplexity": 2.233069076489926,
+        "learningRate": 0.015495867768595042
+      },
+      {
+        "epoch": 34,
+        "loss": 0.8034832080790995,
+        "perplexity": 2.23330646727724,
+        "learningRate": 0.015120967741935483
+      },
+      {
+        "epoch": 35,
+        "loss": 0.8032371231260128,
+        "perplexity": 2.232756951776533,
+        "learningRate": 0.014763779527559055
+      },
+      {
+        "epoch": 36,
+        "loss": 0.8030615148051554,
+        "perplexity": 2.2323648955025286,
+        "learningRate": 0.014423076923076922
+      },
+      {
+        "epoch": 37,
+        "loss": 0.8028913137522092,
+        "perplexity": 2.2319849769789375,
+        "learningRate": 0.014097744360902255
+      },
+      {
+        "epoch": 38,
+        "loss": 0.8025549296884095,
+        "perplexity": 2.2312342990671628,
+        "learningRate": 0.013786764705882354
+      },
+      {
+        "epoch": 39,
+        "loss": 0.8025426473399898,
+        "perplexity": 2.231206894438393,
+        "learningRate": 0.013489208633093526
+      },
+      {
+        "epoch": 40,
+        "loss": 0.8022265643822568,
+        "perplexity": 2.230501759410338,
+        "learningRate": 0.013204225352112676
+      },
+      {
+        "epoch": 41,
+        "loss": 0.801880226636914,
+        "perplexity": 2.229729386218716,
+        "learningRate": 0.01293103448275862
+      },
+      {
+        "epoch": 42,
+        "loss": 0.801928412186487,
+        "perplexity": 2.229836829543177,
+        "learningRate": 0.012668918918918918
+      },
+      {
+        "epoch": 43,
+        "loss": 0.8015683441381206,
+        "perplexity": 2.229034081078497,
+        "learningRate": 0.012417218543046357
+      },
+      {
+        "epoch": 44,
+        "loss": 0.8014930421940051,
+        "perplexity": 2.228866236798272,
+        "learningRate": 0.012175324675324674
+      },
+      {
+        "epoch": 45,
+        "loss": 0.8015359606543426,
+        "perplexity": 2.2289618983582624,
+        "learningRate": 0.01194267515923567
+      },
+      {
+        "epoch": 46,
+        "loss": 0.8012167134899338,
+        "perplexity": 2.2282504221670574,
+        "learningRate": 0.01171875
+      },
+      {
+        "epoch": 47,
+        "loss": 0.8009456997229849,
+        "perplexity": 2.2276466174498313,
+        "learningRate": 0.011503067484662576
+      },
+      {
+        "epoch": 48,
+        "loss": 0.8009840715250286,
+        "perplexity": 2.2277320979048687,
+        "learningRate": 0.011295180722891566
+      },
+      {
+        "epoch": 49,
+        "loss": 0.8007776698391248,
+        "perplexity": 2.2272723376933925,
+        "learningRate": 0.011094674556213017
+      },
+      {
+        "epoch": 50,
+        "loss": 0.8007410963894004,
+        "perplexity": 2.227190880150128,
+        "learningRate": 0.010901162790697675
+      }
+    ]
+  },
+  "previousModel": {
+    "vocabSize": 29,
+    "parameters": 1900573,
+    "sha256": "0f88f4b919cf76ac12ca804da4e0ac33520ebc7d240ff1f2d9524cb83e9aec6d"
+  },
+  "artifacts": {
+    "model": "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/nnlab/poc3/model.safetensors",
+    "modelBytes": 7603526,
+    "vocabulary": "/Users/eofmc/EoF/mcpstudio/MCPStudio_ToolSDK/nnlab/poc3/vocab.json"
+  }
+}

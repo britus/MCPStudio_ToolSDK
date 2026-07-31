@@ -1,0 +1,1 @@
+Über Größe und Qualität lernt das Modell zusätzliche Zeichen: ä, ö, ü und ß.

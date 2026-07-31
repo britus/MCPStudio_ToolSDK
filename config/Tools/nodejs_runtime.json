@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-09T10:25:52.286Z",
+    "lastModified" : "2026-07-30T14:13:32.212Z",
     "priority" : 0.9
   },
   "description" : "Execute JavaScript using Node.js. Provide inline JavaScript or a script path; the tool runs it with the configured Node.js executable and returns stdout, stderr, exit code, and execution status.",
@@ -12,18 +12,13 @@
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
-      "environment" : {
-        "description" : "Optional string environment variables for the Node.js child process. PATH does not control executable resolution.",
-        "name" : "environment",
-        "type" : "object"
-      },
       "inlineScript" : {
         "description" : "JavaScript source code to execute with Node.js. Use this or scriptPath.",
         "name" : "inlineScript",
         "type" : "string"
       },
       "nodeExecutable" : {
-        "description" : "Optional absolute path to the Node.js executable, or 'node' to resolve from trusted host locations.",
+        "description" : "Optional absolute path to the Node.js executable, or 'node' to resolve via \/usr\/bin\/env.",
         "name" : "nodeExecutable",
         "type" : "string"
       },
@@ -62,12 +57,12 @@
         "type" : "object"
       },
       "timeoutSeconds" : {
-        "description" : "Maximum execution time in seconds. Defaults to 60 and is capped at 600.",
+        "description" : "Maximum execution time in seconds. Defaults to 60 and is capped by the plugin.",
         "name" : "timeoutSeconds",
         "type" : "number"
       },
       "workingDirectory" : {
-        "description" : "Optional existing absolute working directory for the Node.js process.",
+        "description" : "Optional working directory for the Node.js process.",
         "name" : "workingDirectory",
         "type" : "string"
       }
@@ -87,11 +82,6 @@
         "name" : "launchError",
         "type" : "string"
       },
-      "maxOutputBytes" : {
-        "description" : "Maximum combined number of stdout and stderr bytes captured.",
-        "name" : "maxOutputBytes",
-        "type" : "integer"
-      },
       "nodeExecutable" : {
         "description" : "Resolved Node.js executable used for execution.",
         "name" : "nodeExecutable",
@@ -101,11 +91,6 @@
         "description" : "Result handling mode used by the tool.",
         "name" : "resultMode",
         "type" : "string"
-      },
-      "outputLimitExceeded" : {
-        "description" : "Whether the process was terminated after exceeding the output limit.",
-        "name" : "outputLimitExceeded",
-        "type" : "boolean"
       },
       "scriptPath" : {
         "description" : "JavaScript file path used for execution, if any.",
