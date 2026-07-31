@@ -69,7 +69,7 @@ Supply either `scriptPath` or `inlineScript`:
 
 | Field | Behavior |
 |---|---|
-| `pythonExecutable` | Optional. Empty, `python`, or `python3` searches `/opt/homebrew/bin/python3`, `/usr/local/bin/python3`, `/usr/bin/python3`, then absolute directories on the host process `PATH`. Any other value must be an existing absolute executable path. |
+| `pythonExecutable` | Optional. Empty searches common absolute locations and falls back to `python3` through `/usr/bin/env`; `python` or `python3` uses `/usr/bin/env` directly. Any other value must be an absolute path and is validated by the process launch so the result includes the real `launchError`. |
 | `scriptPath` | Existing absolute Python file path. Required unless `inlineScript` is non-empty. |
 | `inlineScript` | Python source passed to `python -c`; takes precedence over `scriptPath`. |
 | `scriptArguments` | String-like values appended after the script. |
@@ -79,7 +79,7 @@ Supply either `scriptPath` or `inlineScript`:
 | `timeoutSeconds` | Defaults to 60; non-positive values reset to 60; values above 600 are capped at 600. |
 | `resultMode` | `capture` (default) or `toolResultJSON`. |
 
-The handler also understands an `arguments` array as an additional script-argument alias, an `environment` object of child-process variables, and `passParamsToStdin`; these are implementation-level options not exposed by the shipped public tool schema.
+The handler also understands an `arguments` array as an additional script-argument alias, an `environment` object of child-process variables, and `passParamsToStdin`; these are implementation-level options not exposed by the shipped public tool schema. An explicit `environment.PATH` is used unchanged by `/usr/bin/env`; otherwise the handler prepends the common Homebrew and system binary directories to the host process `PATH`.
 
 The plugin accepts arguments directly or inside a host envelope's `arguments` object. A dictionary-valued host `arguments` member is unwrapped before execution.
 

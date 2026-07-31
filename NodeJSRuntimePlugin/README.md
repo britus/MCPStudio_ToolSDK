@@ -69,7 +69,7 @@ Supply either `scriptPath` or `inlineScript`:
 
 | Field | Behavior |
 |---|---|
-| `nodeExecutable` | Optional. Empty or `node` searches `/opt/homebrew/bin/node`, `/usr/local/bin/node`, `/usr/bin/node`, then absolute directories on the host process `PATH`. Any other value must be an existing absolute executable path. |
+| `nodeExecutable` | Optional. Empty searches common absolute locations and falls back to `node` through `/usr/bin/env`; `node` uses `/usr/bin/env` directly. Any other value must be an absolute path and is validated by the process launch so the result includes the real `launchError`. |
 | `scriptPath` | Existing absolute JavaScript file path. Required unless `inlineScript` is non-empty. |
 | `inlineScript` | JavaScript source passed to `node -e`; takes precedence over `scriptPath`. |
 | `scriptArguments` | String-like values appended after the script. |
@@ -79,7 +79,7 @@ Supply either `scriptPath` or `inlineScript`:
 | `timeoutSeconds` | Defaults to 60; non-positive values reset to 60; values above 600 are capped at 600. |
 | `resultMode` | `capture` (default) or `toolResultJSON`. |
 
-The handler also understands an `arguments` array as an additional script-argument alias, an `environment` object of child-process variables, and `passParamsToStdin`; these are implementation-level options not exposed by the shipped public tool schema.
+The handler also understands an `arguments` array as an additional script-argument alias, an `environment` object of child-process variables, and `passParamsToStdin`; these are implementation-level options not exposed by the shipped public tool schema. An explicit `environment.PATH` is used unchanged by `/usr/bin/env`; otherwise the handler prepends the common Homebrew and system binary directories to the host process `PATH`.
 
 The plugin accepts arguments directly or inside a host envelope's `arguments` object. A dictionary-valued host `arguments` member is unwrapped before execution.
 

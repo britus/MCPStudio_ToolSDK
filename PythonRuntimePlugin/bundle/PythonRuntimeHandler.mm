@@ -50,6 +50,9 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
     }
 
     NSMutableArray<NSString *> *processArguments = [NSMutableArray array];
+    if ([pythonExecutable isEqualToString:@"/usr/bin/env"]) {
+        [processArguments addObject:@"python3"];
+    }
 
     if (inlineScript.length > 0) {
         [processArguments addObject:@"-c"];
@@ -227,8 +230,14 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
 
     NSMutableDictionary *mergedEnvironment = [NSMutableDictionary dictionaryWithDictionary:[[NSProcessInfo processInfo] environment]];
     [mergedEnvironment addEntriesFromDictionary:environment ?: @{}];
-    if (!mergedEnvironment[@"PATH"]) {
-        mergedEnvironment[@"PATH"] = @"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin";
+    if (![environment[@"PATH"] isKindOfClass:[NSString class]] || [environment[@"PATH"] length] == 0) {
+        NSString *hostPath = [mergedEnvironment[@"PATH"] isKindOfClass:[NSString class]]
+            ? mergedEnvironment[@"PATH"]
+            : @"";
+        NSString *runtimePath = @"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin";
+        mergedEnvironment[@"PATH"] = hostPath.length > 0
+            ? [runtimePath stringByAppendingFormat:@":%@", hostPath]
+            : runtimePath;
     }
     task.environment = mergedEnvironment;
 
@@ -377,13 +386,18 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
 {
     NSString *trimmed = [candidate stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (trimmed.length > 0) {
-        if (![trimmed isEqualToString:@"python"] && ![trimmed isEqualToString:@"python3"]) {
-            if (![trimmed isAbsolutePath]) {
-                return @"";
-            }
-            NSString *standard = [trimmed stringByStandardizingPath];
-            return [[NSFileManager defaultManager] isExecutableFileAtPath:standard] ? standard : @"";
+        if ([trimmed isEqualToString:@"python"] || [trimmed isEqualToString:@"python3"]) {
+            return @"/usr/bin/env";
         }
+        if (![trimmed isAbsolutePath]) {
+            return @"";
+        }
+
+        // Let NSTask validate an explicitly configured absolute path. A
+        // preflight through NSFileManager can return a false negative in a
+        // GUI host process (notably for Homebrew symlinks), hiding the real
+        // launch error from the caller.
+        return [trimmed stringByStandardizingPath];
     }
 
     NSMutableArray<NSString *> *candidates = [NSMutableArray arrayWithArray:@[
@@ -404,7 +418,7 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
             return standard;
         }
     }
-    return @"";
+    return @"/usr/bin/env";
 }
 
 - (NSString *)resolvedWorkingDirectory:(NSString *)candidate scriptPath:(NSString *)scriptPath
