@@ -66,9 +66,13 @@ function shellCall(params) {
     
     // Build command with parameters based on function parameters
     shellScript += 'set -euo pipefail\n';
+    shellScript += 'export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:.venv/bin:${HOME}/bin:.\n';
     shellScript += 'cd \"$(dirname \"$0\")\" || exit 1\n';
     shellScript += 'if [ -n "${QTDIR:-}" ] && [ -d "$QTDIR" ]; then\n'
     shellScript += 'export PATH="$QTDIR/bin:$PATH"\n'
+    shellScript += 'fi\n'
+    shellScript += 'if [ -n "${CHAT_PROJECT_DIR:-}" ] && [ -d "$CHAT_PROJECT_DIR" ]; then\n'
+    shellScript += 'export PATH="$CHAT_PROJECT_DIR/bin:$PATH"\n'
     shellScript += 'fi\n'
 
     shellScript += 'echo "Current path: `pwd`"\n';
