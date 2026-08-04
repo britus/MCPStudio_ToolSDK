@@ -1,8 +1,8 @@
 {
-  "description" : "Runs standard make in a selected project directory.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "skill_execute"
   ],
+  "description" : "Runs standard make in a selected project directory.",
   "modelPreferences" : {
 
   },
@@ -13,6 +13,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "Run standard make in the selected project directory.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "standard make",
     "make in projekt directory",

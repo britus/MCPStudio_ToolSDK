@@ -2,13 +2,36 @@
   "agents" : [
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Coordinate the workflow: The Specialist plans the DuckDuckGo search, the Python DuckDuckGo Runner executes the mini-script, and Agent #3 reviews the Runner's output and synthesizes the results for the search term `EoF MCP Studio`.",
-      "llmProviderID" : "none",
+      "instruction" : "Set directory \/Users\/eofmc\/temp to property dirPath",
+      "logLevel" : "none",
+      "maxTurns" : 4,
+      "name" : "Specialist",
+      "positionX" : 448.26953125,
+      "positionY" : 108.578125,
+      "properties" : [
+        {
+          "description" : "Verzeichnisermittlung und Inhaltsprüfung für \/Users\/eofmc\/temp",
+          "key" : "capability",
+          "required" : true,
+          "value" : "analyze-directory-listing",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate the workflow: The Specialist plans which directory to inspect, the Directory Listing Runner executes analyze_directory, and Agent #3 reviews the Runner's output and synthesizes the results for the directory `\/Users\/eofmc\/temp`.",
       "logLevel" : "none",
       "maxTurns" : 6,
       "name" : "Coordinator",
       "positionX" : 124.73828125,
-      "positionY" : 106.7109375,
+      "positionY" : 110.9765625,
       "properties" : [
         {
           "description" : "",
@@ -19,35 +42,15 @@
         }
       ],
       "role" : "rootCoordinator",
+      "skillNames" : [
+
+      ],
       "temperature" : 0.3,
       "toolName" : ""
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Set directory \/Users\/eofmc\/temp to property dirPath",
-      "llmProviderID" : "none",
-      "logLevel" : "none",
-      "maxTurns" : 4,
-      "name" : "Specialist",
-      "positionX" : 448.26953125,
-      "positionY" : 108.578125,
-      "properties" : [
-        {
-          "description" : "DuckDuckGo Linkermittlung und Trefferprüfung für EoF MCP Studio",
-          "key" : "capability",
-          "required" : true,
-          "value" : "duckduckgo-python-link-analysis",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "specialist",
-      "temperature" : 0.2,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Review the Python DuckDuckGo Runner output. Validate which checkedPages have containsPhrase=true, summarize hits with URLs, titles, snippets, status codes, and errors. If hitCount is 0, report that no fetched DuckDuckGo result page contained the exact phrase `EoF MCP Studio` and list the checked links.",
-      "llmProviderID" : "none",
+      "instruction" : "Review the Directory Listing Runner output. Validate which entries were found, summarize files and subdirectories with names, types, and sizes when available, and list any errors. If the listing is empty, report that no entries were found in `\/Users\/eofmc\/temp` and list the checked path.",
       "logLevel" : "none",
       "maxTurns" : 6,
       "name" : "Agent #3",
@@ -55,7 +58,7 @@
       "positionY" : 349.421875,
       "properties" : [
         {
-          "description" : "Verified DuckDuckGo\/Python runtime data for EoF MCP Studio",
+          "description" : "Verified directory listing data for \/Users\/eofmc\/temp",
           "key" : "solvedData",
           "required" : false,
           "value" : "",
@@ -63,15 +66,18 @@
         }
       ],
       "role" : "synthesizer",
+      "skillNames" : [
+
+      ],
       "temperature" : 0.2,
       "toolName" : ""
     },
     {
       "executionMode" : "mcpTool",
-      "instruction" : "List files in directory",
+      "instruction" : "Analyze the directory given by property dirPath with the analyze_directory tool and return the structured listing.",
       "logLevel" : "none",
       "maxTurns" : 3,
-      "name" : "DuckDuckGo",
+      "name" : "Directory Listing Runner",
       "positionX" : 448.3046875,
       "positionY" : 349.98828125,
       "properties" : [
@@ -84,6 +90,9 @@
         }
       ],
       "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
       "temperature" : 0.1,
       "toolName" : "analyze_directory"
     }
@@ -93,7 +102,7 @@
       "artifactPolicy" : "pass-latest",
       "condition" : "",
       "kind" : "delegation",
-      "label" : "Plan DuckDuckGo search",
+      "label" : "Plan directory analysis",
       "sharedStateKeys" : "",
       "source" : "Coordinator",
       "target" : "Specialist"
@@ -104,22 +113,22 @@
       "kind" : "review",
       "label" : "Review checked links and hits",
       "sharedStateKeys" : "solvedData",
-      "source" : "DuckDuckGo",
+      "source" : "Directory Listing Runner",
       "target" : "Agent #3"
     },
     {
       "artifactPolicy" : "pass-latest",
       "condition" : "",
       "kind" : "artifactFlow",
-      "label" : "Run Python DuckDuckGo script",
+      "label" : "Run analyze_directory",
       "sharedStateKeys" : "dirPath",
       "source" : "Specialist",
-      "target" : "DuckDuckGo"
+      "target" : "Directory Listing Runner"
     }
   ],
-  "goal" : "Query DuckDuckGo for `EoF MCP Studio`, inspect result links with Python runtime, review hits, and synthesize the findings.",
+  "goal" : "Analyze the directory `\/Users\/eofmc\/temp` with analyze_directory, review the listing, and synthesize the findings.",
   "name" : "Plan Delegate Review",
   "pattern" : "coordinator",
-  "summary" : "Coordinator workflow with Python runtime DuckDuckGo link analysis",
-  "systemInstruction" : "Coordinate the DuckDuckGo Python-runtime workflow. Keep planning, tool execution, review, and synthesis separate. Preserve source URLs, checked links, hitCount, errors, and fetch metadata from the Python runtime output."
+  "summary" : "Coordinator workflow with analyze_directory directory listing and review.",
+  "systemInstruction" : "Coordinate the directory analysis workflow. Keep planning, tool execution, review, and synthesis separate. Preserve paths, entry names, types, sizes, and errors from the analyze_directory output."
 }

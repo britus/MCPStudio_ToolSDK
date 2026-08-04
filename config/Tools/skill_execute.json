@@ -4,10 +4,10 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-30T14:13:32.224Z",
+    "lastModified" : "2026-08-04T06:37:36.579Z",
     "priority" : 0.9
   },
-  "description" : "Execute a shell script snippet supplied by an MCP Studio Skill.",
+  "description" : "Executes a shell script snippet supplied by the currently active MCP Studio Skill. Only callable when the active skill's tool scope authorizes this tool.",
   "execHandler" : "skillExecute",
   "execMethod" : "toolEntry",
   "inputSchema" : {

@@ -1,6 +1,5 @@
 {
-  "description" : "Generates a Makefile for a selectable Qt .pro project using QMake after determining QTDIR.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "check_with_gcc",
     "clang_check_syntax",
     "file_exists",
@@ -16,6 +15,7 @@
     "skill_execute",
     "write_file"
   ],
+  "description" : "Generates a Makefile for a selectable Qt .pro project using QMake after determining QTDIR.",
   "modelPreferences" : {
 
   },
@@ -26,6 +26,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "Use QMake to generate the Makefile for the user-selected .pro file. Detect and export QTDIR first.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "qt app makefile mit qmake erzeugen",
     "qmake makefile erzeugen",

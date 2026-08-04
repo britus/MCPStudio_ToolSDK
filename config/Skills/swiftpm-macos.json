@@ -1,8 +1,14 @@
 {
-  "description" : "Build, run, and test pure SwiftPM-based macOS packages and executables. Use when the repo is package-first, when there is no Xcode project, or when Swift package workflows are the fastest path to diagnosis.",
-  "enabledToolNames" : [
-
+  "allowedToolNames" : [
+    "file_exists",
+    "list_files",
+    "mkdir",
+    "read_file",
+    "shell_call",
+    "skill_execute",
+    "write_file"
   ],
+  "description" : "Build, run, and test pure SwiftPM-based macOS packages and executables. Use when the repo is package-first, when there is no Xcode project, or when Swift package workflows are the fastest path to diagnosis.",
   "name" : "swiftpm-macos",
   "promptTemplate" : "",
   "resourceNames" : [
@@ -10,6 +16,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "SwiftPM for macOS\nQuick Start\nUse this skill when Package.swift is the primary entrypoint or when SwiftPM is\nthe fastest path to a reproducible result.\n\nWorkflow\nInspect the package.\n\nRead Package.swift.\nIdentify executable, library, and test products.\nBuild with SwiftPM.\n\nUse swift build by default.\nUse release mode only when the user explicitly needs it.\nRun the right product.\n\nUse swift run <product> when an executable exists.\nIf multiple executables exist, explain the default choice.\nTest narrowly.\n\nUse swift test.\nApply filters when a specific test target or case is known.\nSummarize failures.\n\nModule\/import resolution\nPackage graph or dependency issue\nLinker failure\nRuntime failure\nTest regression\nGuardrails\nPrefer SwiftPM over Xcode when both exist and the package path is clearly simpler.\nDo not assume an app bundle exists in a pure package workflow.\nExplain when the package is library-only and therefore not directly runnable.\nOutput Expectations\nProvide:\n\nthe package products you found\nthe command you ran\nwhether build, run, or test succeeded\nthe top blocker if not",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "swiftpm for macOS",
     "swiftpm for macos"

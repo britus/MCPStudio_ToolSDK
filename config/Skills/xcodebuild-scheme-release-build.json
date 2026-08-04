@@ -1,6 +1,5 @@
 {
-  "description" : "Executes a Release xcodebuild for an Xcode project and the selected schema.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "file_exists",
     "get_documents_path",
     "get_temp_path",
@@ -10,6 +9,7 @@
     "skill_execute",
     "write_file"
   ],
+  "description" : "Executes a Release xcodebuild for an Xcode project and the selected schema.",
   "modelPreferences" : {
 
   },
@@ -20,6 +20,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "Run xcodebuild for the selected project and scheme using the Release configuration.\n\nCreate and execute the following shell script with `skill_execute`, passing it as `content`.  If you find the makro `project_xcodeproj` between a double `{` and `}` replace `project_xcodeproj` including the makro marker with the user selected .xcodeproj path. If the user does not specify a project directory then use ${CHAT_PROJECT_DIR}.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nPROJECT_XCODEPROJ=\"{{project_xcodeproj}}\"\nSCHEME=\"{{schema}}\"\n[ -n \"$PROJECT_XCODEPROJ\" ] && [ \"$PROJECT_XCODEPROJ\" != \"{{project_xcodeproj}}\" ] || { echo \"Missing project_xcodeproj\" >&2; exit 1; }\n[ -n \"$SCHEME\" ] && [ \"$SCHEME\" != \"{{schema}}\" ] || { echo \"Missing schema\" >&2; exit 1; }\n\nPROJECT_DIR=\"$(cd \"$(dirname \"$PROJECT_XCODEPROJ\")\" && pwd)\"\n\nfind \"$PROJECT_DIR\" -type f -name \"*.backup\" -delete\nxattr -w com.apple.xcode.CreatedByBuildSystem true $PROJECT_DIR\/build\nxcodebuild -project \"$PROJECT_XCODEPROJ\" -scheme \"$SCHEME\" -configuration Release build\n```\n\nReturn the xcodebuild output.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "xcode schema release build",
     "xcode scheme release",

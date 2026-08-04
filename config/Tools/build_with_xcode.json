@@ -4,10 +4,10 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-30T14:13:32.220Z",
+    "lastModified" : "2026-08-04T06:37:36.577Z",
     "priority" : 0.9
   },
-  "description" : "Use this tool every time you finish modifying source code files in a project folder or if the user request to build a Xcode project with xcodebuild. This tool provides information about the validity of the build. If errors occur, try to fix them.",
+  "description" : "Builds an Xcode project with xcodebuild and reports whether the build is valid. Returns compiler and linker errors when the build fails.",
   "execHandler" : "checkWithXcode",
   "execMethod" : "toolEntry",
   "inputSchema" : {

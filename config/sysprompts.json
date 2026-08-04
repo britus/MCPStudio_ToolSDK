@@ -1,17 +1,23 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "fragments": {
     "chat.activeWorkflow": {
-      "template": "## Active Multi-Agent Workflow\nID: {{workflowID}}\nName: {{workflowName}}\nPattern: {{workflowPattern}}\nSummary: {{workflowSummary}}\n\n{{toolScope}}\n\nThe user selected this workflow explicitly. Do not execute it headlessly before the chat turn and do not simulate the workflow manually.\nCall the internal tool `{{workflowRunnerToolName}}` exactly once with this workflow ID and the user's request as `user_prompt`.\nAfter the tool returns, synthesize the final answer from the workflow execution report."
+      "template": "## Active Multi-Agent Workflow\nID: {{workflowID}}\nName: {{workflowName}}\nPattern: {{workflowPattern}}\nSummary: {{workflowSummary}}\n\n{{toolScope}}\n\nThe user selected this workflow explicitly. Do not execute it headlessly before the chat turn and do not simulate the workflow manually.\nCall the internal tool `{{workflowRunnerToolName}}` exactly once with this workflow ID and the user's request as `user_prompt`.\nAfter the tool returns, synthesize the final answer from the workflow execution report.\nDo not call any other domain tools while a workflow is active."
     },
     "chat.activeWorkflow.toolScope.none": {
-      "template": "No workflow-specific MCP tool restriction. Use available tools only when needed."
+      "template": "No workflow-specific MCP tool restriction. The workflow does not declare any required MCP tools; only control-plane tools are available to the outer chat."
     },
     "chat.activeWorkflow.toolScope.list": {
       "template": "Workflow-scoped MCP tools: {{toolNames}}"
     },
+    "chat.activeSkill": {
+      "template": "## Active Skill\nName: {{skillName}}\nTool scope mode: {{toolScopeMode}}\nAllowed tools: {{allowedToolNames}}\n\nYou are operating under this skill. Follow the skill instructions above. Do not consult the Skill Catalog or Workflow Catalog while this skill is active. If you need a tool that is not listed in the allowed tools, stop and report the missing tool access."
+    },
+    "chat.activeSkill.toolScope.stopRule": {
+      "template": "## Tool Scope Stop Rule\nTool scope mode: {{toolScopeMode}}\nAllowed tool names: {{allowedToolNames}}\n\nallowedToolNames is a closed allowlist. A tool is not authorized just because it is visible in the global tool library. If a required tool is not listed in allowedToolNames or is not available, stop execution and report the missing tool access, the skill name, and the reason. Do not use an alternative execution tool (for example shell, Python, or Node.js) unless that tool is also listed in allowedToolNames."
+    },
     "chat.skillCatalog": {
-      "template": "## Available Skills\nThis catalog lists skills available in EoF MCP Studio.\nUse this catalog only to identify candidate skills; do not infer or invent\nfull skill instructions from these metadata.\n\nCall the internal tool `{{skillLoaderToolName}}` when:\n- the user explicitly asks to use a listed skill by name,\n- the user asks to show AI instructions for a listed skill, or\n- the user request clearly asks for an action that matches a listed skill's name,\n  description, or triggerPhrases.\n\nClear action matches include creating, editing, running, executing, debugging, converting,\ngenerating, or saving artifacts with the skill's runtime or domain. For example, a request\nto create or run a Python script should load the Python-related skill when it is listed.\nDo not load a skill for a casual mention, explanation, comparison, or unrelated discussion\nof a trigger word.\n\nAfter loading a skill, follow the loaded systemInstruction and promptTemplate.\nDo not invent unlisted skill ids. If a loaded skill has empty enabledToolNames,\nread its toolScope: empty means the skill does not add a skill-specific tool restriction,\nnot that tools are unavailable.\n\n{{entries}}"
+      "template": "## Available Skills\nThis catalog lists skills available in EoF MCP Studio.\nUse this catalog only to identify candidate skills; do not infer or invent\nfull skill instructions from these metadata.\n\nCall the internal tool `{{skillLoaderToolName}}` when:\n- the user explicitly asks to use a listed skill by name,\n- the user asks to show AI instructions for a listed skill, or\n- the user request clearly asks for an action that matches a listed skill's name,\n  description, or triggerPhrases.\n\nClear action matches include creating, editing, running, executing, debugging, converting,\ngenerating, or saving artifacts with the skill's runtime or domain. For example, a request\nto create or run a Python or NodeJS script should load the Python-related or NodeJS-related skill when it is listed.\nDo not load a skill for a casual mention, explanation, comparison, or unrelated discussion\nof a trigger word.\n\nAfter loading a skill, follow the loaded systemInstruction and promptTemplate.\nDo not invent unlisted skill ids.\n\n{{entries}}"
     },
     "chat.skillCatalogEntry": {
       "template": "- id: {{id}}\n  name: {{name}}\n  description: {{description}}\n  triggerPhrases: {{triggerPhrases}}"

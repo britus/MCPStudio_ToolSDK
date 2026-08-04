@@ -1,8 +1,8 @@
 {
-  "description" : "Runs a standard CMake configure step in a selected project directory.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "skill_execute"
   ],
+  "description" : "Runs a standard CMake configure step in a selected project directory.",
   "modelPreferences" : {
 
   },
@@ -13,6 +13,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "Run a standard CMake configure command in the selected project directory.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "standard cmake config",
     "cmake config projekt directory",

@@ -1,8 +1,8 @@
 {
-  "description" : "Runs a syntax check with clang for a selected C, C++, Objective-C, or Objective-C++ source file.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "skill_execute"
   ],
+  "description" : "Runs a syntax check with clang for a selected C, C++, Objective-C, or Objective-C++ source file.",
   "modelPreferences" : {
 
   },
@@ -13,6 +13,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "Run clang syntax checking only. Do not produce an object file or executable.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "syntax check mit clang",
     "clang syntax check",

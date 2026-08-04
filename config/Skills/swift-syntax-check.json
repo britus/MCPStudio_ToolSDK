@@ -1,6 +1,5 @@
 {
-  "description" : "Runs a syntax check with the Swift compiler for a selected Swift source file.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "file_exists",
     "get_documents_path",
     "get_temp_path",
@@ -10,6 +9,7 @@
     "skill_execute",
     "write_file"
   ],
+  "description" : "Runs a syntax check with the Swift compiler for a selected Swift source file.",
   "modelPreferences" : {
 
   },
@@ -20,6 +20,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "Run Swift syntax parsing only. Do not emit an executable.\n\nCreate and execute the following shell script with `skill_execute`, passing it as `content`. Replace `{{source_file}}` with the selected Swift file and optionally provide `{{swift_args}}` for SDK, target, package, or framework flags.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nSOURCE_FILE=\"{{source_file}}\"\nSWIFT_ARGS=\"{{swift_args}}\"\n[ -n \"$SOURCE_FILE\" ] && [ \"$SOURCE_FILE\" != \"{{source_file}}\" ] || { echo \"Missing source_file\" >&2; exit 1; }\nif [ \"$SWIFT_ARGS\" = \"{{swift_args}}\" ]; then SWIFT_ARGS=\"\"; fi\n\nswiftc -parse $SWIFT_ARGS \"$SOURCE_FILE\"\n```\n\nReturn Swift compiler diagnostics.\n",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "syntax check mit swift compiler",
     "swift syntax check",

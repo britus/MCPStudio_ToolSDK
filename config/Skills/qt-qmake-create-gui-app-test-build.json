@@ -1,6 +1,5 @@
 {
-  "description" : "Creates a minimal Qt Widgets GUI application project with QMake, determines QTDIR, generates the Makefile, and runs a test build.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "check_with_gcc",
     "clang_check_syntax",
     "file_exists",
@@ -16,6 +15,7 @@
     "skill_execute",
     "write_file"
   ],
+  "description" : "Creates a minimal Qt Widgets GUI application project with QMake, determines QTDIR, generates the Makefile, and runs a test build.",
   "modelPreferences" : {
 
   },
@@ -26,6 +26,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "You are a careful build automation assistant. Use the skill_execute tool to run the provided shell script snippet. Do not substitute QMAKE with CMake.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "qt gui app projekt anlegen",
     "qt qmake gui test build",

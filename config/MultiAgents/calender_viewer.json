@@ -3,10 +3,8 @@
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Plan the calendar viewing workflow from the user request. Preserve the requested date range, timezone assumptions, and output constraints. Delegate calendar discovery first, then event\/reminder extraction, then review, then final synthesis. Do not call tools yourself unless explicitly needed; downstream agents are responsible for tool work.",
-      "llmProviderID" : "lmStudioOpenAI",
       "logLevel" : "debug",
       "maxTurns" : 8,
-      "modelName" : "qwen\/qwen3.5-9b",
       "name" : "Coordinator",
       "positionX" : 119.87109375,
       "positionY" : 79.47265625,
@@ -62,18 +60,19 @@
         }
       ],
       "role" : "rootCoordinator",
+      "skillNames" : [
+
+      ],
       "temperature" : 0.2
     },
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Produce the final end-user calendar\/reminder view for chat. Do not use Markdown tables. Use short headings and bullet lists grouped by date or by calendar, whichever is clearer. Include the covered date range, then events, reminders, and concise notes about empty results, permissions, or partial tool failures. Do not expose internal workflow details.",
-      "llmProviderID" : "lmStudioOpenAI",
       "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "qwen\/qwen3.5-9b",
       "name" : "End User Synthesizer",
       "positionX" : 818.66015625,
-      "positionY" : 81.05078125,
+      "positionY" : 80.92578125,
       "properties" : [
         {
           "description" : "Reviewed events and reminders.",
@@ -98,12 +97,14 @@
         }
       ],
       "role" : "synthesizer",
+      "skillNames" : [
+
+      ],
       "temperature" : 0.2
     },
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Using the incoming calendarRecords and the user requested date range, call the necessary MCP tools on the fly to collect events and reminders. Use list_events with calendar_id plus ISO 8601 start_date and end_date for each relevant calendar. Use list_reminder_lists first when reminder list ids are needed, then call list_reminders with list_id and include_completed=false unless the user asks for completed reminders. Combine the results into appointmentRecords with separate events and reminders sections, preserving calendar\/list names, dates, titles, locations, due dates, and any tool errors. Do not invent calendar data. If the user did not specify a date range, choose a reasonable upcoming range and state it in appointmentRecords.",
-      "llmProviderID" : "lmStudioOpenAI",
       "logLevel" : "debug",
       "maxTurns" : 8,
       "name" : "Events and Reminders Specialist",
@@ -133,6 +134,9 @@
         }
       ],
       "role" : "specialist",
+      "skillNames" : [
+        "calendar-reminder-access"
+      ],
       "temperature" : 0.2,
       "toolName" : ""
     },
@@ -156,16 +160,17 @@
         }
       ],
       "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
       "temperature" : 0,
       "toolName" : "list_calendars"
     },
     {
       "executionMode" : "llmInstruction",
       "instruction" : "Review appointmentRecords for completeness, date-range consistency, calendar\/list attribution, privacy, timezone clarity, duplicate items, and readable grouping. Produce reviewFindings and a cleaned appointmentRecords summary for synthesis. Keep tool errors or missing permission diagnostics visible but concise.",
-      "llmProviderID" : "lmStudioOpenAI",
       "logLevel" : "debug",
       "maxTurns" : 4,
-      "modelName" : "qwen\/qwen3.5-9b",
       "name" : "Calendar Output Reviewer",
       "positionX" : 820,
       "positionY" : 329.875,
@@ -186,6 +191,9 @@
         }
       ],
       "role" : "reviewer",
+      "skillNames" : [
+
+      ],
       "temperature" : 0.2
     }
   ],

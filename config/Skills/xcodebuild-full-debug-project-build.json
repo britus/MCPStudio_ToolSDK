@@ -1,6 +1,5 @@
 {
-  "description" : "Runs a full Debug xcodebuild for an Xcode project.",
-  "enabledToolNames" : [
+  "allowedToolNames" : [
     "file_exists",
     "get_documents_path",
     "get_temp_path",
@@ -10,6 +9,7 @@
     "skill_execute",
     "write_file"
   ],
+  "description" : "Runs a full Debug xcodebuild for an Xcode project.",
   "modelPreferences" : {
 
   },
@@ -20,6 +20,7 @@
   ],
   "skillEnabled" : true,
   "systemInstruction" : "You are a cereful Swift, SwiftUI and ObjectiveC programmer. Run xcodebuild for the selected project as a full Debug clean build.\n\nIf the user does not specify a project directory then use ${CHAT_PROJECT_DIR} as project directory.\nCreate and execute the following shell script with `skill_execute`, passing it as `content`.  If you find the makro `project_xcodeproj` between a double `{` and `}` replace `project_xcodeproj` including the makro marker with the user selected .xcodeproj path. \n\nUse `xcodeproj show {{project_xcodeproj}}` to determine the project configuration first.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\n\nBUILD_TYPE=\"Debug\"\n\nPROJECT_XCODEPROJ=\"{{project_xcodeproj}}\"\n[ -n \"$PROJECT_XCODEPROJ\" ] && [ \"$PROJECT_XCODEPROJ\" != \"{{project_xcodeproj}}\" ] || { echo \"Missing project_xcodeproj\" >&2; exit 1; }\n\nPROJECT_DIR=\"$(cd \"$(dirname \"$PROJECT_XCODEPROJ\")\" && pwd)\"\n\nfind \"$PROJECT_DIR\" -type f -name \"*.backup\" -delete\nxattr -w com.apple.xcode.CreatedByBuildSystem true $PROJECT_DIR\/build\nxcodebuild -project \"$PROJECT_XCODEPROJ\" -configuration \"$BUILD_TYPE\" clean build\n\n```\n\nReturn the xcodebuild output.",
+  "toolScopeMode" : "restricted",
   "triggerPhrases" : [
     "build xcode project",
     "run xcode debug build",

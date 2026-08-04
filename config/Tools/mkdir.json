@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-07-30T14:13:32.212Z",
+    "lastModified" : "2026-08-04T06:37:36.571Z",
     "priority" : 0.9
   },
   "description" : "Create a directory, including intermediate directories when supported by the runtime.",
