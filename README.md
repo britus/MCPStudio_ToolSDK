@@ -96,7 +96,8 @@ A successful native result normally uses the MCP tool-result shape:
 
 ## JavaScript tools
 
-[`Scripts/tool_entry.js`](Scripts/tool_entry.js) dispatches the script handlers used by the JSON definitions in `config/Tools/`. The registered handler groups are:
+[Scripts/tool_entry.js](Scripts/tool_entry.js) dispatches the script handlers used by the JSON 
+definitions in `config/Tools/`. The registered handler groups are:
 
 - file and directory access
 - Clang, GCC, CMake, QMake, Xcode, and shell operations
@@ -104,28 +105,40 @@ A successful native result normally uses the MCP tool-result shape:
 - document/temp path discovery
 - skill-script execution
 
-Script tools run inside MCP Studio's scripting environment and use host-provided APIs such as `MCPStudio.fileExists`, `MCPStudio.process`, and `MCPStudio.httpRequest`; they are not standalone Node.js modules. See the [scripting reference](README-Scripting.md) and [handler catalog](README-Handler.md).
+Script tools run inside EoF MCP Studio's scripting environment and use host-provided APIs such as 
+`MCPStudio.fileExists`, `MCPStudio.process`, and `MCPStudio.httpRequest`; they are not standalone
+Node.js modules. 
+See the [scripting reference](README-Scripting.md) and [handler catalog](README-Handler.md).
 
 ## Configuration examples
 
-`config/` is example/import content for MCP Studio:
+`config/` is example/import content for EoF MCP Studio:
 
 - `config/Tools/`: script, built-in, and native custom-tool definitions
 - `config/Skills/`: reusable task workflows
 - `config/Prompts/`: prompt definitions
 - `config/Resources/`: linked reference resources
 - `config/MultiAgents/`: example agent workflows
-- `config/aiproviders.json` and `config/sysprompts.json`: provider and system-prompt examples
+- `config/aiproviders.json` and `config/sysprompts.json`: provider and system prompts
 
-`${TOOLSDK}` in a configuration path is resolved by MCP Studio to the installed SDK root. Built-in tool definitions such as Calendar, Contacts, and `FileResourceHandler` describe host-app capabilities; their implementations are not part of this repository.
+`${TOOLSDK}` in a configuration path is resolved by EoF MCP Studio to the installed SDK root. 
+Built-in tool definitions such as Calendar, Contacts, and `FileResourceHandler` describe host-app 
+capabilities; their implementations are not part of this repository.
 
 ## MCP integration
 
-This repository supplies tools and configuration consumed by MCP Studio. It does not contain the application's MCP HTTP server implementation. [README-MCPServer.md](README-MCPServer.md) documents that boundary and the protocol-facing result contract used by SDK plugins.
+This repository supplies tools and configuration consumed by EoF MCP Studio. 
+It does not contain the application's MCP HTTP server implementation. 
+[README-MCPServer.md](README-MCPServer.md) documents that boundary and 
+the protocol-facing result contract used by SDK plugins.
 
 ## Neural-network lab
 
-`nnlab/poc3` trains and serves a small character-level generative model in plain Node.js. It includes Safetensors persistence, incremental training, deterministic dataset replay, CLI inference, a browser UI, and tests. Generated `model.safetensors` and the default `dataset.txt` are not currently checked in; follow the [PoC quick start](nnlab/poc3/README.md) to create them.
+`nnlab/poc3` trains and serves a small character-level generative model in plain
+Node.js. It includes Safetensors persistence, incremental training, deterministic 
+dataset replay, CLI inference, a browser UI, and tests. Generated `model.safetensors` 
+and the default `dataset.txt` are not currently checked in; follow the 
+[PoC quick start](nnlab/poc3/README.md) to create them.
 
 ## Releases
 
