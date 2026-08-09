@@ -23,7 +23,6 @@ function taskLog(message) {
  * @param {boolean} [params.clean=false] - Clean build before building
  * @param {boolean} [params.showOperationLogs=false] - Show verbose operation logs
  */
-
 function checkWithXcode(params) {
     var projectName = params.projectName || "";
     var projectDir = params.projectDir || "";
@@ -108,7 +107,11 @@ function checkWithXcode(params) {
     shellScript += 'ARCH=`uname -m`\n';
     shellScript += 'cd "${PROJECT_DIR}" || exit 1\n';
     shellScript += 'xcodebuild';
-    // Use only valid xcodebuild parameters
+
+    /* less context output */
+    shellScript += ' -quiet';
+
+    /* Use only valid xcodebuild parameters */
     shellScript += ' -project "${PROJECT_NAME}.xcodeproj"';
     
     /* additional xcodebuild params */
