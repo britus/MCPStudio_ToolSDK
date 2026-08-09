@@ -1,6 +1,10 @@
 /build/
 /Build/
 **/xcuserdata/
+
+# EoF MCP Studio ToolSDK Packager
+.toolsdk.package.chksum
+
 # Prerequisites
 *.d
 
