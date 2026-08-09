@@ -5,6 +5,14 @@
 # EoF MCP Studio ToolSDK Packager
 .toolsdk.package.chksum
 
+# not this
+config/MultiAgents/border crossing research.json
+config/Prompts/coding_refactoring_short.json
+config/Skills/calendar-tools.json
+config/Skills/duckduckgo-research.json
+nnlab/agent_workflow_clm_trainer_v1_home_temp.json
+nnlab/agent_workflow_clm_trainer_v2_home_temp.json
+
 # Prerequisites
 *.d
 
