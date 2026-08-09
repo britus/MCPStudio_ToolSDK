@@ -18,6 +18,8 @@ function listDirectory(params) {
     );
     var path;
     var contents;
+    var totalItems;
+    var truncated;
     var result;
 
     if (!pathValidation.ok) {
@@ -39,14 +41,21 @@ function listDirectory(params) {
             path: path
         });
     }
+
+    totalItems = contents.length;
+    truncated = totalItems > 1000;
+    if (truncated) {
+        contents = contents.slice(0, 1000);
+    }
     
     result = {
         contents: contents,
-        path: path
+        path: path,
+        totalItems: totalItems,
+        truncated: truncated
     };
 
     return shared.setSuccessResult(result, {
-        contents: contents,
         path: path,
         operation: "listDirectory"
     });

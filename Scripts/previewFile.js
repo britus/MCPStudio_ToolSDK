@@ -11,6 +11,7 @@ function previewFile(params) {
     var content;
     var lines;
     var wordCount;
+    var preview;
     var result;
 
     if (!pathValidation.ok) {
@@ -43,13 +44,15 @@ function previewFile(params) {
     // Process the content (example: count lines and words)
     lines = content.split('\n');
     wordCount = content.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+    preview = shared.limitText(lines.slice(0, 10).join('\n'), 10000);
     
     result = {
         filePath: filePath,
         lineCount: lines.length,
         wordCount: wordCount,
         charCount: content.length,
-        preview: lines.slice(0, 10).join('\n')
+        preview: preview.text,
+        previewTruncated: preview.truncated
     };
 
     return shared.setSuccessResult(result, {

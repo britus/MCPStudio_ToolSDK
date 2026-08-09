@@ -22,16 +22,10 @@ function getTempPath(params) {
     };
     
     // Set result using MCPStudio bridge
-    MCPStudio.setToolResult(JSON.stringify({
-        text: JSON.stringify(result, null, 2),
-        metadata: {
-            path: path,
-            operation: "getTempPath",
-            success: true
-        }
-    }));
-    
-    return null; // Result already set via MCPStudio.setToolResult
+    return shared.setSuccessResult(result, {
+        path: path,
+        operation: "getTempPath"
+    });
 }
 
 module.exports = {

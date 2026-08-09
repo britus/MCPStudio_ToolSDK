@@ -15,6 +15,7 @@ function openFile(params) {
     var pathValidation = shared.validateFilePath(params.path || "", "path");
     var path;
     var content;
+    var limited;
     var result;
     
     if (!pathValidation.ok) {
@@ -28,7 +29,7 @@ function openFile(params) {
     console.log("Open file: " + path);
     
     // Open file (alias for readFile)
-    content = MCPStudio.openFile(path);
+    content = MCPStudio.readFile(path);
     
     if (content === null) {
         return shared.setErrorResult("Failed to open file: " + path, {
@@ -36,15 +37,18 @@ function openFile(params) {
             path: path
         });
     }
+
+    limited = shared.limitText(content);
     
     result = {
-        content: content,
-        path: path
+        content: limited.text,
+        path: path,
+        originalLength: limited.originalLength,
+        truncated: limited.truncated
     };
 
     return shared.setSuccessResult(result, {
         path: path,
-        content: content,
         operation: "openFile"
     });
 }

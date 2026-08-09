@@ -13,14 +13,21 @@ const shared = require('sharedFunctions');
  * @returns {null|null} Returns null after setting tool result with save status or error
  */
 function saveFile(params) {
+    params = params || {};
     var pathValidation = shared.validateFilePath(params.file_path || "", "file_path");
     var path;
-    var content = params.content || "";
+    var content = params.content === undefined || params.content === null ? "" : params.content;
     var success;
     var result;
     
     if (!pathValidation.ok) {
         return shared.setErrorResult(pathValidation.message, {
+            operation: "saveFile"
+        });
+    }
+
+    if (typeof content !== "string") {
+        return shared.setErrorResult("content must be a string", {
             operation: "saveFile"
         });
     }
@@ -40,7 +47,7 @@ function saveFile(params) {
     }
     
     result = {
-        success: "File successfully saved.",
+        message: "File successfully saved.",
         path: path
     };
 

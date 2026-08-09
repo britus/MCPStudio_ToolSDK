@@ -45,10 +45,17 @@ function analyzeDirectory(params) {
             path: dirPath
         });
     }
+
+    var totalItems = items.length;
+    var truncated = totalItems > 1000;
+    if (truncated) {
+        items = items.slice(0, 1000);
+    }
     
     analysis = {
         path: dirPath,
-        totalItems: items.length,
+        totalItems: totalItems,
+        truncated: truncated,
         items: items.map(function(item) {
             var fullPath = shared.joinPath(dirPath, item);
             return {

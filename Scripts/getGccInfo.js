@@ -8,8 +8,7 @@
 const shared = require('sharedFunctions');
 
 function taskLog(message) {
-    console.log(message);
-    stdOut.push(message);
+    shared.appendStandardOutput(message);
 }
 
 /**
@@ -19,7 +18,16 @@ function taskLog(message) {
  */
 
 function getGccInfo(params) {
+    params = params || {};
     var compiler = params.compiler || "gcc";
+    var compilerValidation = shared.validateExecutable(compiler, "compiler");
+
+    if (!compilerValidation.ok) {
+        return shared.setErrorResult(compilerValidation.message, {
+            operation: "getGccInfo"
+        });
+    }
+    compiler = compilerValidation.value;
     
     taskLog("=== Basic GCC Info Task ===");
     taskLog("Compiler: " + compiler);
@@ -27,7 +35,7 @@ function getGccInfo(params) {
     // Validate input parameters
     var compilerPath = compiler;
     
-    if (!MCPStudio.fileExists(compilerPath)) {
+    if (compilerPath.indexOf("/") >= 0 && !MCPStudio.fileExists(compilerPath)) {
         return shared.setErrorResult(
             "GCC compiler not found at " + compilerPath + ". Please install GCC using: brew install gcc or sudo apt-get install gcc",
             {
@@ -45,6 +53,9 @@ function getGccInfo(params) {
     
     // Get notified
     shellScript += 'set -euo pipefail\n';
+    shellScript += 'COMPILER=' + shared.quoteShellArgument(compiler) + '\n';
+    shellScript += 'if ! command -v "${COMPILER}" >/dev/null 2>&1; then echo "Compiler not found: ${COMPILER}" >&2; exit 1; fi\n';
+    compiler = '"${COMPILER}"';
 
     // Basic version information
     shellScript += 'echo "=== Basic Version Information ==="\n';
@@ -66,40 +77,16 @@ function getGccInfo(params) {
     
     success = MCPStudio.shell(shellScript);
     
-    if (!success) {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] Basic GCC Info FAILED\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: compilerPath,
-                compiler: compiler,
-                operation: "getGccInfo",
-                success: false,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] Basic GCC info failed!");
-    }
-    else {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] Basic GCC Info completed successfully\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: compilerPath,
-                compiler: compiler,
-                operation: "getGccInfo",
-                success: true,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] Basic GCC info successful!");
-    }
-
-    return null; // Result already set via MCPStudio.setToolResult
+    return shared.setProcessResult(
+        success,
+        "Basic GCC information collected successfully.",
+        "Failed to collect basic GCC information.",
+        {
+            path: compilerPath,
+            compiler: compilerPath,
+            operation: "getGccInfo"
+        }
+    );
 }
 
 module.exports = {

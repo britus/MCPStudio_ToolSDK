@@ -15,6 +15,7 @@ function readFile(params) {
     var pathValidation = shared.validateFilePath(params.path || "", "path");
     var path;
     var content;
+    var limited;
     var result;
     
     if (!pathValidation.ok) {
@@ -36,15 +37,18 @@ function readFile(params) {
             path: path
         });
     }
+
+    limited = shared.limitText(content);
     
     result = {
-        content: content,
-        path: path
+        content: limited.text,
+        path: path,
+        originalLength: limited.originalLength,
+        truncated: limited.truncated
     };
 
     return shared.setSuccessResult(result, {
         path: path,
-        content: content,
         operation: "readFile"
     });
 }

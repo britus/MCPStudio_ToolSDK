@@ -28,11 +28,11 @@
 
     //  Internal module registry 
     // key: resolved absolute path  -  value: cached module.exports
-    var _moduleCache = {};
+    var _moduleCache = Object.create(null);
 
     //  Built-in / virtual module stubs 
     // Modules that have no real file on disk but must not throw.
-    var _builtins = {};
+    var _builtins = Object.create(null);
 
     //  dotenv stub 
     // Reads KEY=VALUE pairs from the .env file through the MCPStudio bridge
@@ -40,7 +40,7 @@
     _builtins['dotenv'] = {
         config: function (options) {
             var envPath = (options && options.path) ? options.path : './.env';
-            var envPath = _resolvePath('', envPath);
+            envPath = _resolvePath('', envPath);
 
             if (!MCPStudio.fileExists(envPath)) {
                 MCPStudio.log('warning', -10, '[PreProcessor] dotenv: file not found: ' + envPath);
@@ -53,7 +53,7 @@
                 return { parsed: {} };
             }
 
-            var parsed = {};
+            var parsed = Object.create(null);
             raw.split('\n').forEach(function (line) {
                 // Strip comments and blank lines
                 var trimmed = line.trim();
@@ -75,12 +75,14 @@
                     }
                 }
 
-                parsed[key] = value;
+                if (key !== '__proto__' && key !== 'constructor' && key !== 'prototype') {
+                    parsed[key] = value;
+                }
             });
 
             // Merge into process.env (non-destructive – real env wins)
             Object.keys(parsed).forEach(function (k) {
-                if (!globalScope.process.env.hasOwnProperty(k)) {
+                if (!Object.prototype.hasOwnProperty.call(globalScope.process.env, k)) {
                     globalScope.process.env[k] = parsed[k];
                 }
             });
@@ -96,6 +98,9 @@
      * Does NOT access the file system.
      */
     function _normalisePath(path) {
+        if (typeof path !== 'string') {
+            throw new TypeError('Path must be a string');
+        }
         var parts  = path.split('/');
         var result = [];
         parts.forEach(function (part) {
@@ -118,11 +123,16 @@
      *  1. Builtin names  - returned as-is (special sentinel)
      *  2. Absolute path  - normalised as-is
      *  3. Relative path  - joined with callerDir then normalised
-     *  4. No extension   - '.js' appended
+     *  4. Bare name      - resolved beside the calling module
+     *  5. No extension   - '.js' appended
      */
     function _resolvePath(callerPath, modulePath) {
+        if (typeof modulePath !== 'string' || modulePath.length === 0) {
+            throw new TypeError('Module identifier must be a non-empty string');
+        }
+
         // Already in builtins registry?
-        if (_builtins.hasOwnProperty(modulePath)) {
+        if (Object.prototype.hasOwnProperty.call(_builtins, modulePath)) {
             return '__builtin__:' + modulePath;
         }
 
@@ -138,9 +148,12 @@
                 : '.';
             absolute = callerDir + '/' + modulePath;
         } else {
-            // Bare name that is NOT a builtin - treat as relative to '.'
-            // (no node_modules support needed inside JSCore sandbox)
-            absolute = './' + modulePath;
+            // Bare name that is NOT a builtin - resolve beside the caller.
+            // There is intentionally no node_modules lookup in the sandbox.
+            var bareCallerDir = callerPath.indexOf('/') !== -1
+                ? callerPath.substring(0, callerPath.lastIndexOf('/'))
+                : '.';
+            absolute = bareCallerDir + '/' + modulePath;
         }
 
         // Append .js if no extension present
@@ -172,7 +185,7 @@
         }
 
         //  2. Cache hit 
-        if (_moduleCache.hasOwnProperty(resolved)) {
+        if (Object.prototype.hasOwnProperty.call(_moduleCache, resolved)) {
             //MCPStudio.log('debug', -1, '[PreProcessor] require cached: ' + resolved);
             return _moduleCache[resolved];
         }
@@ -253,8 +266,11 @@
             },
             cwd: function () { return '.'; },
             platform: 'darwin',
-            version: 'v18.0.0'
+            version: 'v0.0.0-javascriptcore'
         };
+    }
+    if (!globalScope.process.env) {
+        globalScope.process.env = {};
     }
 
     //  Buffer stub 
@@ -273,7 +289,7 @@
     // JSCore has no event loop; provide no-op stubs so modules that
     // reference these at load time don't throw.
     if (!globalScope.setTimeout) {
-        globalScope.setTimeout  = function (fn) { fn && fn(); return 0; };
+        globalScope.setTimeout  = function () { return 0; };
         globalScope.clearTimeout = function () {};
     }
     if (!globalScope.setInterval) {
@@ -285,11 +301,16 @@
     // The entry-point plugin script calls require() at the top level.
     // We expose it on globalScope so it is available without a module
     // wrapper.
+    function _entryCallerPath() {
+        var moduleDir = globalScope.__moduleDir || '.';
+        return moduleDir + '/__entry__.js';
+    }
+
     globalScope.require = function (modulePath) {
-        return _requireFrom(modulePath, globalScope.__moduleDir || '.');
+        return _requireFrom(modulePath, _entryCallerPath());
     };
     globalScope.require.resolve = function (modulePath) {
-        return _resolvePath(globalScope.__moduleDir || '.', modulePath);
+        return _resolvePath(_entryCallerPath(), modulePath);
     };
 
     //  module / exports shims for the entry-point script 

@@ -38,7 +38,7 @@ function deleteFile(params) {
     }
     
     result = {
-        success: "File successfully deleted.",
+        message: "File successfully deleted.",
         path: path
     };
 

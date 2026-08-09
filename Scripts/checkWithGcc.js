@@ -8,8 +8,7 @@
 const shared = require('sharedFunctions');
 
 function taskLog(message) {
-    console.log(message);
-    stdOut.push(message);
+    shared.appendStandardOutput(message);
 }
 
 /**
@@ -19,20 +18,37 @@ function taskLog(message) {
  * @param {boolean} [params.verbose=false] - Show verbose output during detection
  */
 function checkWithGcc(params) {
+    params = params || {};
     var arch = params.arch || "";
-    var compilerPath = params. compilerPath || "/usr/local/bin";
+    var compilerPath = params.compilerPath || "";
     var verbose = (params.verbose === true);
+    var compilerPathValidation;
     
     taskLog("=== GCC Compiler Detection Task ===");
     taskLog("Architecture: " + arch);
     taskLog("Verbose: " + verbose);
 
-    // Validate input parameters
-    // if (!MCPStudio.fileExists("/usr/bin/gcc")) {
-    //     return shared.createErrorResult("GCC compiler not found at /usr/bin/gcc. Please install GCC using: brew install gcc or sudo apt-get install gcc");
-    // }
+    if (compilerPath) {
+        compilerPathValidation = shared.validateDirectoryPath(
+            compilerPath,
+            "compilerPath",
+            { absolute: true }
+        );
+        if (!compilerPathValidation.ok) {
+            return shared.setErrorResult(compilerPathValidation.message, {
+                operation: "checkWithGcc"
+            });
+        }
+        compilerPath = compilerPathValidation.value;
+        if (!MCPStudio.fileExists(compilerPath)) {
+            return shared.setErrorResult("Compiler path not found: " + compilerPath, {
+                operation: "checkWithGcc",
+                path: compilerPath
+            });
+        }
+    }
 
-    taskLog("[Script] GCC compiler detected at /usr/bin/gcc");
+    taskLog("[Script] GCC compiler will be resolved from " + (compilerPath || "PATH"));
 
     // Build shell script for comprehensive GCC detection
     var shellScript = '#!/bin/bash\n';
@@ -40,6 +56,13 @@ function checkWithGcc(params) {
     
     // Get notified
     shellScript += 'set -euo pipefail\n';
+    if (verbose) {
+        shellScript += 'set -x\n';
+    }
+    if (compilerPath) {
+        shellScript += 'export PATH=' + shared.quoteShellArgument(compilerPath) + ':"${PATH}"\n';
+    }
+    shellScript += 'if ! command -v gcc >/dev/null 2>&1; then echo "gcc not found in PATH" >&2; exit 1; fi\n';
     shellScript += 'which gcc 2>&1\n';
 
     // Basic version check
@@ -138,42 +161,16 @@ function checkWithGcc(params) {
     
     success = MCPStudio.shell(shellScript);
     
-    if (!success) {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] GCC Detection FAILED\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: "gcc",
-                arch: arch,
-                operation: "checkWithGcc",
-                success: false,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] GCC detection failed!"+ 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
-    }
-    else {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] GCC Detection completed successfully\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: "gcc",
-                arch: arch,
-                operation: "checkWithGcc",
-                success: true,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] GCC detection successful!");
-    }
-
-    return null; // Result already set via MCPStudio.setToolResult
+    return shared.setProcessResult(
+        success,
+        "GCC detection completed successfully.",
+        "GCC detection failed.",
+        {
+            path: compilerPath || "PATH",
+            arch: arch,
+            operation: "checkWithGcc"
+        }
+    );
 }
 
 module.exports = {

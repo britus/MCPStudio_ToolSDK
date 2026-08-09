@@ -76,7 +76,7 @@ When an envelope is used, the bundle unwraps `arguments`. `testHandler` has high
 
 ### `analyzeDirectory`
 
-Uses `dirPath`, defaulting to the MCP Studio Documents path. The JavaScript implementation returns the directory entries, item count, total file size, and analyzed path. The native implementation returns entry names and item count.
+Uses `dirPath`, defaulting to the MCP Studio Documents path. The JavaScript implementation returns the directory entries, item count, truncation status, and analyzed path. It caps returned entries at 1,000. The native implementation returns entry names and item count.
 
 ### `mkdir` and `createDirectory`
 
@@ -88,7 +88,7 @@ Requires `path` and reports whether it exists. The path validator rejects empty 
 
 ### `readFile` and `openFile`
 
-Require `path`. Both read text content; `openFile` is an alias-like handler rather than a GUI open operation. The public built-in `read_file` configuration uses `file_path` and `FileResourceHandler`, so do not confuse that host tool with the script/native `readFile` handler.
+Require `path`. Both read text content through the same host API; `openFile` is an alias-like handler rather than a GUI open operation. Script results cap returned content at 50,000 characters and report the original length and truncation status. The public built-in `read_file` configuration uses `file_path` and `FileResourceHandler`, so do not confuse that host tool with the script/native `readFile` handler.
 
 ### `saveFile` and `writeFile`
 
@@ -100,7 +100,7 @@ Requires `path` and deletes that target. Callers should resolve and validate the
 
 ### `listDirectory`
 
-Uses `path`, defaulting to `<Documents>/.eof.mcpstudio`, and returns the immediate entries. It is not recursive.
+Uses `path`, defaulting to `<Documents>/.eof.mcpstudio`, and returns the immediate entries. It is not recursive. The JavaScript result contains at most 1,000 entries and reports the total count and truncation status.
 
 ### `getDocumentsPath` and `getTempPath`
 
@@ -123,25 +123,25 @@ Required parameters:
 - `projectDir`: absolute project directory
 - `projectName`: project name without `.xcodeproj`
 
-Optional parameters include `scheme`, `configuration` (default `Debug`), `platform` (default `macosx`), `codesign`/`codeSigningIdentity`, `clean`, `showOperationLogs`, and script-only `alltargets`. Some fields present in `config/Tools/build_with_xcode.json`, such as `archive`, `derivedDataPath`, and `onlyActiveArchs`, are host-schema compatibility fields and are not consumed by the current JavaScript implementation.
+Optional parameters include `scheme`, `configuration` (default `Debug`), `platform` (default `macosx`), `codesign` (the development-team identifier), `codeSigningIdentity`, `clean`, `archive`, `derivedDataPath`, `onlyActiveArchs`, `showOperationLogs`, and script-only `alltargets`. The JavaScript implementation uses `xcodebuild clean` rather than deleting build directories directly and suppresses routine output unless operation logs are requested.
 
 ### Clang handlers
 
 - `clangCheckSyntax`: runs Clang syntax checking for `sourceFile`.
-- `clangCompile`: compiles `sourceFile`.
+- `clangCompile`: compiles `sourceFile` to a neighboring `.o` object file.
 - `clangMake`: runs Make using the absolute `makeFile` path.
 
 ### `cmakeBuild`
 
-Requires `projectDir`. Optional fields are `projectTarget` (default `app`), `buildType` (default `Debug`), `cmakeFlags`, `cmakeArgs`, and `verbose`. The current JavaScript implementation expects the two extra-argument fields as strings.
+Requires `projectDir`. Optional fields are `projectTarget` (default `app`), `buildType` (default `Debug`), `cmakeFlags`, `cmakeArgs`, and `verbose`. The JavaScript implementation expects the two extra-argument fields as single-line option strings, rejects shell metacharacters, and builds the requested target through `cmake --build`.
 
 ### `qmakeBuild`
 
-Requires `projectDir`. Optional fields are `projectTarget`, `projectFile`, `buildType`, `qmakeArgs`, `makeArgs`, and `verbose`. `projectFile` must be relative and defaults to `<projectTarget>.pro`.
+Requires `projectDir`. Optional fields are `projectTarget`, `projectFile`, `buildType`, `qmakeArgs`, `makeArgs`, and `verbose`. `projectFile` must be relative and defaults to `<projectTarget>.pro`. QMake is resolved from `QTDIR` or `PATH`; no Qt version is hard-coded.
 
 ### `shellCall`
 
-Requires `command`. `parameters` is an array and `shell` defaults to `/bin/bash`. This handler executes commands with the authority of its MCP Studio host, so expose it only in trusted configurations.
+Requires `command`. `parameters` is an array whose values are shell-quoted, and `shell` accepts `/bin/bash` (the default) or `/bin/sh`. The command itself remains an intentional shell fragment. This handler executes commands with the authority of its MCP Studio host, so expose it only in trusted configurations.
 
 ### GCC inspection
 
@@ -155,7 +155,7 @@ JavaScript-only handler for shell content supplied as `content`, `script`, or `s
 
 ## HTTP handlers
 
-The JavaScript implementations use `MCPStudio.httpRequest`; the native sample bundle uses Foundation networking. Network access must also be permitted by the host and plugin capability policy.
+The JavaScript implementations prefer `MCPStudio.httpRequest` and retain compatible fallbacks for older method-specific host bridges; binary downloads use `MCPStudio.downloadFile`. The native sample bundle uses Foundation networking. Network access must also be permitted by the host and plugin capability policy.
 
 | Handler | Behavior |
 |---|---|

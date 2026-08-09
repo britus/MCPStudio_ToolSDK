@@ -20,65 +20,84 @@ const shared = require('sharedFunctions');
 function qmakeBuild(params) {
   var projectDirValidation;
   var projectFileValidation;
+  var qmakeArgsValidation;
+  var makeArgsValidation;
 
   // Validate required parameters
   if (!params || !params.projectDir) {
     return shared.setErrorResult("[Script] QMake project directory parameter required.\n", {
-      operation: "qmakeBuild",
-      stdout: stdOut,
-      stderr: stdErr
+      operation: "qmakeBuild"
     });
   }
 
-  const qtVersion = "6.11.0";
-  const homePath = MCPStudio.getHomePath();
-  
-  const qtPlatformDir = homePath + "/Qt/" + qtVersion + "/macos";
-  const projectTarget = params.projectTarget || 'QMAKE project target name missing';
+  var projectTarget = params.projectTarget || 'app';
+  if (typeof projectTarget !== "string" || projectTarget.trim().length === 0) {
+    return shared.setErrorResult("projectTarget must be a non-empty string", {
+      operation: "qmakeBuild"
+    });
+  }
+  projectTarget = projectTarget.trim();
   projectDirValidation = shared.validateDirectoryPath(params.projectDir, "projectDir");
   if (!projectDirValidation.ok) {
     return shared.setErrorResult(projectDirValidation.message, {
-      operation: "qmakeBuild",
-      stdout: stdOut,
-      stderr: stdErr
+      operation: "qmakeBuild"
     });
   }
 
-  const projectDir = projectDirValidation.value;
+  var projectDir = projectDirValidation.value;
   projectFileValidation = shared.validatePath(params.projectFile || projectTarget + '.pro', "projectFile", { relative: true });
   if (!projectFileValidation.ok) {
     return shared.setErrorResult(projectFileValidation.message, {
       operation: "qmakeBuild",
-      path: projectDir,
-      stdout: stdOut,
-      stderr: stdErr
+      path: projectDir
     });
   }
 
-  const projectFile = projectFileValidation.value;
-  const buildType = params.buildType || 'Debug'; // 'Debug' or 'Release'
-  const qmakeArgs = params.qmakeArgs || '';
-  const makeArgs = params.makeArgs || '';
-  const verbose = params.verbose !== undefined ? params.verbose : false;
+  var projectFile = projectFileValidation.value;
+  var buildType = params.buildType || 'Debug';
+  var verbose = params.verbose === true;
+
+  if (typeof buildType !== "string" || ["debug", "release"].indexOf(buildType.toLowerCase()) < 0) {
+    return shared.setErrorResult("Unsupported buildType: " + buildType, {
+      operation: "qmakeBuild",
+      path: projectDir
+    });
+  }
+  buildType = buildType.toLowerCase() === "release" ? "Release" : "Debug";
+
+  qmakeArgsValidation = shared.validateShellFragment(params.qmakeArgs, "qmakeArgs");
+  makeArgsValidation = shared.validateShellFragment(params.makeArgs, "makeArgs");
+  if (!qmakeArgsValidation.ok || !makeArgsValidation.ok) {
+    return shared.setErrorResult(
+      !qmakeArgsValidation.ok ? qmakeArgsValidation.message : makeArgsValidation.message,
+      { operation: "qmakeBuild", path: projectDir }
+    );
+  }
+
+  var qmakeArgs = qmakeArgsValidation.value;
+  var makeArgs = makeArgsValidation.value;
 
   // Validate directory exists using MCPStudio API
   if (!MCPStudio.fileExists(projectDir)) {
     return shared.setErrorResult("QMake project directory '" + projectDir + "' not found.", {
       operation: "qmakeBuild",
-      path: projectDir,
-      stdout: stdOut,
-      stderr: stdErr
+      path: projectDir
     });
   }
 
   // Ensure build directory exists
-  const buildPath = projectDir + '/build';
+  var buildPath = projectDir + '/build';
   if (!MCPStudio.fileExists(buildPath)) {
-    MCPStudio.createDirectory(buildPath);
+    if (!MCPStudio.createDirectory(buildPath)) {
+      return shared.setErrorResult("Failed to create build directory: " + buildPath, {
+        operation: "qmakeBuild",
+        path: buildPath
+      });
+    }
   }
 
   // Construct QMake CONFIG arguments based on buildType
-  let configArgsForQMake = '';
+  var configArgsForQMake = '';
   if (buildType.toLowerCase() === 'release') {
     configArgsForQMake = 'CONFIG+=release';
   } else { // Default to Debug
@@ -86,56 +105,51 @@ function qmakeBuild(params) {
   }
 
   // Build command (as shell script)
-  const shellScript = [
-    `#!/bin/bash`,
-    `set -euo pipefail`,
-    // Ensure qmake and make are in PATH. Common Qt6 path added.
-    // User might need to adjust /opt/Qt/6.x.x/gcc_64/bin depending on their Qt installation path.
-    `[ -e ${QTDIR} ] || export QTDIR=${shared.quoteShellArgument(qtPlatformDir)}`,
-    `[ ! -e ${QTDIR} ] || export PATH="${QTDIR}/bin:${PATH}"`,
-    `cd ${shared.quoteShellArgument(projectDir)} || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
-    (verbose ? `echo 'Ensuring build directory...'` : ''),
-    `mkdir -p build || { echo 'Failed to create build directory.'; exit 1; }`,
-    `cd build || { echo 'Failed to change to build directory.'; exit 1; }`,
-    `echo 'Running QMake...'`,
-    // Run qmake from the build directory, pointing to the .pro file in the parent project directory
-    `qmake ../${shared.quoteShellArgument(projectFile)} ${configArgsForQMake} ${qmakeArgs} || { echo 'QMake failed.'; exit 1; }`,
-    `echo 'Building...'`,
-    `make -j8 ${makeArgs} || { echo 'Build failed.'; exit 1; }`,
-    `echo 'Build completed successfully.'`
+  var qmakeCommand = "qmake " + shared.quoteShellArgument("../" + projectFile) +
+    " " + configArgsForQMake;
+  var makeCommand = "make -j8";
+  if (qmakeArgs) {
+    qmakeCommand += " " + qmakeArgs;
+  }
+  if (makeArgs) {
+    makeCommand += " " + makeArgs;
+  }
+
+  var shellScript = [
+    "#!/bin/bash",
+    "set -euo pipefail",
+    "export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH",
+    "if [ -n \"${QTDIR:-}\" ] && [ -d \"${QTDIR}\" ]; then",
+    "  export PATH=\"${QTDIR}/bin:${PATH}\"",
+    "fi",
+    "if ! command -v qmake >/dev/null 2>&1; then",
+    "  echo 'qmake was not found in PATH or QTDIR.' >&2",
+    "  exit 1",
+    "fi",
+    "cd " + shared.quoteShellArgument(projectDir),
+    (verbose ? "echo 'Ensuring build directory...'" : ""),
+    "mkdir -p build",
+    "cd build",
+    "echo 'Running QMake...'",
+    qmakeCommand,
+    "echo 'Building...'",
+    makeCommand,
+    "echo 'Build completed successfully.'"
   ].join('\n');
 
   var success = MCPStudio.shell(shellScript);
 
-  // Return result as JSON (success/failure)
-  if (success) {
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "[Script] QMake project built successfully.\n\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-        metadata: {
-            operation: "qmakeBuild",
-            shellScript: shellScript,
-            success: true,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-  } else {    
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "[Script] QMake project build failed.\n\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-        metadata: {
-            operation: "qmakeBuild",
-            shellScript: shellScript,
-            success: false,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-  }
-  return null; // result already set (setToolResult)
+  return shared.setProcessResult(
+    success,
+    "QMake build succeeded.",
+    "QMake build failed.",
+    {
+      operation: "qmakeBuild",
+      path: projectDir,
+      projectFile: projectFile,
+      buildType: buildType
+    }
+  );
 }
 
 // Example usage:

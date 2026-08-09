@@ -5,7 +5,6 @@
 // ===================================================================
 
 const shared = require('sharedFunctions');
-const shellCall = require('shellCall').shellCall;
 
 /** 
  * Builds a CMake project with flexible parameters.
@@ -22,100 +21,116 @@ const shellCall = require('shellCall').shellCall;
 
 function cmakeBuild(params) {
   var projectDirValidation;
+  var cmakeFlagsValidation;
+  var cmakeArgsValidation;
 
   // Validate required parameters
   if (!params || !params.projectDir) {
     return shared.setErrorResult("[Script] cmake Project directory parameter required.\n", {
-      operation: "cmakeBuild",
-      stdout: stdOut,
-      stderr: stdErr
+      operation: "cmakeBuild"
     });
   }
 
   projectDirValidation = shared.validateDirectoryPath(params.projectDir, "projectDir");
   if (!projectDirValidation.ok) {
     return shared.setErrorResult(projectDirValidation.message, {
-      operation: "cmakeBuild",
-      stdout: stdOut,
-      stderr: stdErr
+      operation: "cmakeBuild"
     });
   }
 
-  const projectDir = projectDirValidation.value;
-  const projectTarget = params.projectTarget || 'app';
-  const buildType = params.buildType || 'Debug';
-  const cmakeFlags = params.cmakeFlags || '';
-  const cmakeArgs = params.cmakeArgs || '';
-  const verbose = params.verbose !== undefined ? params.verbose : false;
+  var projectDir = projectDirValidation.value;
+  var projectTarget = params.projectTarget || 'app';
+  var buildType = params.buildType || 'Debug';
+  var verbose = params.verbose === true;
+
+  var buildTypes = {
+    debug: "Debug",
+    release: "Release",
+    relwithdebinfo: "RelWithDebInfo",
+    minsizerel: "MinSizeRel"
+  };
+  if (typeof projectTarget !== "string" || projectTarget.trim().length === 0) {
+    return shared.setErrorResult("projectTarget must be a non-empty string", {
+      operation: "cmakeBuild",
+      path: projectDir
+    });
+  }
+  projectTarget = projectTarget.trim();
+
+  if (typeof buildType !== "string" ||
+      !Object.prototype.hasOwnProperty.call(buildTypes, buildType.toLowerCase())) {
+    return shared.setErrorResult("Unsupported buildType: " + buildType, {
+      operation: "cmakeBuild",
+      path: projectDir
+    });
+  }
+  buildType = buildTypes[buildType.toLowerCase()];
+
+  cmakeFlagsValidation = shared.validateShellFragment(params.cmakeFlags, "cmakeFlags");
+  cmakeArgsValidation = shared.validateShellFragment(params.cmakeArgs, "cmakeArgs");
+  if (!cmakeFlagsValidation.ok || !cmakeArgsValidation.ok) {
+    return shared.setErrorResult(
+      !cmakeFlagsValidation.ok ? cmakeFlagsValidation.message : cmakeArgsValidation.message,
+      { operation: "cmakeBuild", path: projectDir }
+    );
+  }
+
+  var cmakeFlags = cmakeFlagsValidation.value;
+  var cmakeArgs = cmakeArgsValidation.value;
 
   // Validate directory exists using MCPStudio API
   if (!MCPStudio.fileExists(projectDir)) {
     return shared.setErrorResult("cmake Project directory '" + projectDir + "' not found.", {
       operation: "cmakeBuild",
-      path: projectDir,
-      stdout: stdOut,
-      stderr: stdErr
+      path: projectDir
     });
   }
 
   // Ensure build directory exists
-  const buildPath = projectDir + '/build';
+  var buildPath = projectDir + '/build';
   if (!MCPStudio.fileExists(buildPath)) {
-    MCPStudio.createDirectory(buildPath);
-  }
-
-  // Set default CMAKE_FLAGS if empty
-  let finalCmakeFlags = cmakeFlags;
-  if (!finalCmakeFlags) {
-    finalCmakeFlags = `-DCMAKE_BUILD_TYPE=${buildType}`;
+    if (!MCPStudio.createDirectory(buildPath)) {
+      return shared.setErrorResult("Failed to create build directory: " + buildPath, {
+        operation: "cmakeBuild",
+        path: buildPath
+      });
+    }
   }
 
   // Build command (as shell script)
-  const shellScript = [
-    `#!/bin/bash`,
-    `set -euo pipefail`,
-    `export PATH=/usr/local/bin:/bin:/usr/bin:$PATH`,
-    `cd ${shared.quoteShellArgument(projectDir)} || { echo 'Failed to change to project directory: ${projectDir}'; exit 1; }`,
-    `echo 'Running CMake...';`,
-    `cmake -S . -B build -DCMAKE_BUILD_TYPE=${buildType} ${finalCmakeFlags} ${cmakeArgs} || { echo 'CMake failed.'; exit 1; }`,
-    `echo 'Building...';`,
-    //`cmake --build build --config ${buildType} --target ${projectTarget} || { echo 'Build failed.'; exit 1; }`,
-    `cd build || exit 1`,
-    `make -j8 || exit 1`,
-    `echo 'Build completed successfully.'`
+  var configureCommand = "cmake -S . -B build -DCMAKE_BUILD_TYPE=" + shared.quoteShellArgument(buildType);
+  var buildCommand = "cmake --build build --config " + shared.quoteShellArgument(buildType) +
+    " --target " + shared.quoteShellArgument(projectTarget);
+  if (cmakeFlags) {
+    configureCommand += " " + cmakeFlags;
+  }
+  if (cmakeArgs) {
+    configureCommand += " " + cmakeArgs;
+  }
+  if (verbose) {
+    buildCommand += " --verbose";
+  }
+
+  var shellScript = [
+    "#!/bin/bash",
+    "set -euo pipefail",
+    "export PATH=/opt/homebrew/bin:/usr/local/bin:/bin:/usr/bin:$PATH",
+    "cd " + shared.quoteShellArgument(projectDir),
+    "echo 'Configuring CMake project...'",
+    configureCommand,
+    "echo 'Building CMake target...'",
+    buildCommand,
+    "echo 'Build completed successfully.'"
   ].join('\n');
 
   var success = MCPStudio.shell(shellScript);
 
-  // Return result as JSON (success/failure)
-  if (success) {
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "[Script] cmake successfully\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-        metadata: {
-            operation: "cmakeBuild",
-            shellScript: shellScript,
-            success: true,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-  } else {    
-    MCPStudio.setToolResult(JSON.stringify({
-        text: "[Script] cmake failed.\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-        metadata: {
-            operation: "cmakeBuild",
-            shellScript: shellScript,
-            success: false,
-            stdout: stdOut,
-            stderr: stdErr,
-        }
-    }));
-  }
-  return null; // result already set (setToolResult)
+  return shared.setProcessResult(success, "CMake build succeeded.", "CMake build failed.", {
+    operation: "cmakeBuild",
+    path: projectDir,
+    target: projectTarget,
+    buildType: buildType
+  });
 }
 
 // Example usage:

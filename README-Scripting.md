@@ -105,7 +105,7 @@ return shared.error('The operation failed');
 
 ### Results set through the host
 
-`setToolResultPayload`, `setSuccessResult`, and `setErrorResult` call `MCPStudio.setToolResult(...)` and return `null`. Use one result mechanism per code path: either return a serialized wrapper or set the host result.
+`setToolResultPayload`, `setSuccessResult`, and `setErrorResult` call `MCPStudio.setToolResult(...)` and return `null`. Success and error helpers include the top-level `success` flag as well as metadata for compatibility with the host adapter. Serialized success data is bounded to 50,000 characters and reports truncation in metadata. Use one result mechanism per code path: either return a serialized wrapper or set the host result.
 
 ## Validation and utility helpers
 
@@ -117,6 +117,10 @@ return shared.error('The operation failed');
 | `normalizePath(path)` | Normalizes separators and `.` segments; returns `null` for parent traversal |
 | `joinPath(base, child)` | Joins two path components without resolving the filesystem |
 | `quoteShellArgument(value)` | Single-quotes one shell argument |
+| `validateExecutable(value, name)` | Accepts a safe executable name or validated path |
+| `validateShellFragment(value, name)` | Rejects non-string and multiline option fragments |
+| `limitText(value, max)` / `limitOutput(lines, max)` | Bounds content returned to the assistant |
+| `setProcessResult(...)` | Produces a consistent process result from injected stdout/stderr |
 | `ensureDirectory(path)` | Creates a missing directory through the host |
 | `countWords(text)` | Counts non-empty whitespace-separated words |
 | `getOutput()` / `getStandardOutput()` | Returns injected `stdOut` or `[]` |
@@ -143,13 +147,13 @@ The schemas in `config/Tools/` are the public configuration examples. The underl
 | `createDirectory` | optional `dirPath` |
 | `getDocumentsPath`, `getTempPath` | none |
 
-The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/.eof.mcpstudio`. `analyzeDirectory` defaults to the Documents directory itself.
+The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/.eof.mcpstudio`. `analyzeDirectory` defaults to the Documents directory itself. File reads are limited to 50,000 characters, and directory listings/analyses return at most 1,000 entries; their results report whether truncation occurred.
 
 ### Build and process tools
 
 | Handler | Required | Optional/defaults |
 |---|---|---|
-| `checkWithXcode` | `projectName`, `projectDir` | `scheme`, `configuration=Debug`, `platform=macosx`, `codesign`, `clean=false`, `showOperationLogs=false`, `alltargets=false` |
+| `checkWithXcode` | `projectName`, `projectDir` | `scheme`, `configuration=Debug`, `platform=macosx`, `codesign`, `codeSigningIdentity`, `clean=false`, `archive=false`, `derivedDataPath`, `onlyActiveArchs=false`, `showOperationLogs=false`, `alltargets=false` |
 | `clangCheckSyntax` | `sourceFile` | — |
 | `clangCompile` | `sourceFile` | — |
 | `clangMake` | `makeFile` | — |
@@ -161,7 +165,7 @@ The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/
 | `getGccInfo` | — | `compiler=gcc` |
 | `skillExecute` | `content` (aliases: `script`, `shellScript`) | `operation=skillExecute` |
 
-`cmakeFlags`, `cmakeArgs`, `qmakeArgs`, and `makeArgs` are strings in the current implementations. Avoid interpolating untrusted content into build or shell parameters.
+`clangCompile` writes an object file next to the source. `cmakeBuild` uses `cmake --build` and honors `projectTarget`; `qmakeBuild` resolves qmake from `QTDIR` or `PATH` instead of assuming a fixed Qt version. `cmakeFlags`, `cmakeArgs`, `qmakeArgs`, and `makeArgs` remain privileged option strings; multiline values and shell metacharacters are rejected, but the options can still materially alter a build.
 
 ### HTTP tools
 
@@ -176,7 +180,7 @@ The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/
 | `checkStatus` | `urls` | — |
 | `webhookCall` | `webhookUrl` or `url` | `payload`, `method=POST`, `headers` |
 
-`apiRequest` accepts `GET`, `POST`, `PUT`, and `PATCH`. `webhookCall` accepts `POST` and `PUT`. The HTML extraction helpers are intentionally lightweight and are not a standards-compliant DOM parser.
+`apiRequest` accepts `GET`, `POST`, `PUT`, and `PATCH`. `webhookCall` accepts `POST` and `PUT`. HTTP handlers prefer the documented `MCPStudio.httpRequest` bridge and fall back to legacy method-specific bridges when available. Text responses are bounded before being returned, sensitive response headers are redacted, and `fetchJSON.transform` accepts only declarative `filter`, `map`, and `extract` objects/arrays—caller-supplied JavaScript is never evaluated. The HTML extraction helpers are intentionally lightweight and are not a standards-compliant DOM parser.
 
 ## Script module pattern
 
@@ -217,7 +221,7 @@ Then import the module and add its name to `HANDLERS` in `Scripts/tool_entry.js`
 - Validate exact paths before destructive writes or deletion.
 - Do not assume path validation grants access; macOS sandbox and security-scoped resource rules still apply.
 - Do not store credentials in tool JSON files or log authorization headers.
-- Limit response and process output in new handlers to prevent memory exhaustion.
+- Response text, directory entries, and process output are bounded by the shared helpers; retain those limits in new handlers to prevent context and memory exhaustion.
 - Prefer argument arrays and `quoteShellArgument` when constructing shell commands.
 
 ## Related documentation

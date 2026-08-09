@@ -8,8 +8,7 @@
 const shared = require('sharedFunctions');
 
 function taskLog(message) {
-    console.log(message);
-    stdOut.push(message);
+    shared.appendStandardOutput(message);
 }
 
 /**
@@ -20,8 +19,17 @@ function taskLog(message) {
  */
 
 function gccSettings(params) {
+    params = params || {};
     var compiler = params.compiler || "gcc";
     var verbose = (params.verbose === true);
+    var compilerValidation = shared.validateExecutable(compiler, "compiler");
+
+    if (!compilerValidation.ok) {
+        return shared.setErrorResult(compilerValidation.message, {
+            operation: "gccSettings"
+        });
+    }
+    compiler = compilerValidation.value;
     
     taskLog("=== GCC Settings Detection Task ===");
     taskLog("Compiler: " + compiler);
@@ -29,8 +37,10 @@ function gccSettings(params) {
 
     // Validate input parameters
     var compilerPath = compiler;
+    var compilerName = compilerPath.substring(compilerPath.lastIndexOf("/") + 1);
+    var isCppCompiler = /^g\+\+(-[0-9.]+)?$/.test(compilerName);
     
-    if (!MCPStudio.fileExists(compilerPath)) {
+    if (compilerPath.indexOf("/") >= 0 && !MCPStudio.fileExists(compilerPath)) {
         return shared.setErrorResult(
             "GCC compiler not found at " + compilerPath + ". Please install GCC using: brew install gcc or sudo apt-get install gcc",
             {
@@ -48,6 +58,12 @@ function gccSettings(params) {
     
     // Get notified
     shellScript += 'set -euo pipefail\n';
+    if (verbose) {
+        shellScript += 'set -x\n';
+    }
+    shellScript += 'COMPILER=' + shared.quoteShellArgument(compiler) + '\n';
+    shellScript += 'if ! command -v "${COMPILER}" >/dev/null 2>&1; then echo "Compiler not found: ${COMPILER}" >&2; exit 1; fi\n';
+    compiler = '"${COMPILER}"';
 
     // Basic version information
     shellScript += 'echo "=== Version Information ==="\n';
@@ -98,11 +114,11 @@ function gccSettings(params) {
 
     // Check for native target detection
     shellScript += 'echo "=== Target Architecture Detection ==="\n';
-    shellScript += compiler + ' -dumpmachine\n';
-    shellScript += compiler + ' -dumpversion\n\n';
+    shellScript += compiler + ' -dumpmachine || true\n';
+    shellScript += compiler + ' -dumpversion || true\n\n';
 
     // If C++ compiler, check additional settings
-    if (compiler === "g++") {
+    if (isCppCompiler) {
         shellScript += 'echo "=== C++ Specific Settings ==="\n';
         shellScript += 'echo "Checking C++ standard support:"\n';
         shellScript += compiler + ' -dM -E -x c++ /dev/null 2>&1 | grep -i __cplusplus || echo "C++ standard version not detected"\n\n';
@@ -120,47 +136,23 @@ function gccSettings(params) {
     // Summary section
     shellScript += 'echo "=== Compiler Settings Summary ==="\n';
     shellScript += compiler + ' --version 2>&1 | head -1\n';
-    shellScript += compiler + ' -dumpmachine\n';
-    shellScript += compiler + ' -dumpversion\n';
+    shellScript += compiler + ' -dumpmachine || true\n';
+    shellScript += compiler + ' -dumpversion || true\n';
 
     taskLog("[Script] Running GCC settings detection script...");
     
     success = MCPStudio.shell(shellScript);
     
-    if (!success) {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] GCC Settings Detection FAILED\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: compilerPath,
-                compiler: compiler,
-                operation: "gccSettings",
-                success: false,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] GCC settings detection failed!");
-    }
-    else {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] GCC Settings Detection completed successfully\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: compilerPath,
-                compiler: compiler,
-                operation: "gccSettings",
-                success: true,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] GCC settings detection successful!");
-    }
-
-    return null; // Result already set via MCPStudio.setToolResult
+    return shared.setProcessResult(
+        success,
+        "GCC settings detection completed successfully.",
+        "GCC settings detection failed.",
+        {
+            path: compilerPath,
+            compiler: compilerPath,
+            operation: "gccSettings"
+        }
+    );
 }
 
 module.exports = {

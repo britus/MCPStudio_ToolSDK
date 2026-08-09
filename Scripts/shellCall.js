@@ -8,8 +8,7 @@
 const shared = require('sharedFunctions');
 
 function taskLog(message) {
-    console.log(message);
-    stdOut.push(message);
+    shared.appendStandardOutput(message);
 }
 
 /**
@@ -21,19 +20,25 @@ function taskLog(message) {
  */
 
 function shellCall(params) {
+    params = params || {};
+
     var command = params.command || "";
     var parameters = params.parameters || [];
     var shell = params.shell || "/bin/bash";
     var shellValidation;
     
     taskLog("=== Shell Call Task ===");
-    taskLog("Command: " + command);
-    taskLog("Parameters: " + JSON.stringify(parameters));
     taskLog("Shell: " + shell);
 
     // Validate input parameters
-    if (!command) {
+    if (typeof command !== "string" || command.trim().length === 0) {
         return shared.setErrorResult("Missing required parameter: command", {
+            operation: "shellCall"
+        });
+    }
+
+    if (!Array.isArray(parameters)) {
+        return shared.setErrorResult("parameters must be an array", {
             operation: "shellCall"
         });
     }
@@ -51,21 +56,19 @@ function shellCall(params) {
 
     shell = shellValidation.value;
 
-    var isCustomShell = false;
-    
-    // Build shell script based on function parameters
-    // Parameter 3 : string : shell (/bin/sh /bin/bash)
-    //  -> Optional -> default /bin/bash This is used at #! first line
-    
-    // Check if shell parameter differs from default - treat as custom shell
-    var shellScript = "#!/usr/bin/env bash\n";
-    if (shell === "/bin/bash") {
-        shellScript += "#!/bin/bash -e\n";
-        isCustomShell = true;
-    } 
+    if (shell !== "/bin/bash" && shell !== "/bin/sh") {
+        return shared.setErrorResult("shell must be /bin/bash or /bin/sh", {
+            operation: "shellCall",
+            shell: shell
+        });
+    }
+
+    // MCPStudio executes this content as a temporary script, so the selected
+    // interpreter belongs in the one and only shebang.
+    var shellScript = "#!" + shell + "\n";
     
     // Build command with parameters based on function parameters
-    shellScript += 'set -euo pipefail\n';
+    shellScript += shell === "/bin/sh" ? 'set -eu\n' : 'set -euo pipefail\n';
     shellScript += 'export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:.venv/bin:${HOME}/bin:.\n';
     shellScript += 'cd \"$(dirname \"$0\")\" || exit 1\n';
     shellScript += 'if [ -n "${QTDIR:-}" ] && [ -d "$QTDIR" ]; then\n'
@@ -75,81 +78,39 @@ function shellCall(params) {
     shellScript += 'export PATH="$CHAT_PROJECT_DIR/bin:$PATH"\n'
     shellScript += 'fi\n'
 
-    shellScript += 'echo "Current path: `pwd`"\n';
+    shellScript += 'echo "Current path: $(pwd)"\n';
     
     if (parameters && parameters.length > 0) {
         var paramString = "";
         for (var i = 0; i < parameters.length; i++) {
             var arg = parameters[i];
             if (arg != null) {
-                var argStr = String(arg);
-                // cleanup JSON escapings
-                var escapedArg = argStr;
-                   //.replace(/"/g, '\\"')
-                   // .replace(/\$/g, '\\$')
-                   // .replace(/`/g, '\\`');
-               paramString += " " + escapedArg + " ";
+                paramString += " " + shared.quoteShellArgument(arg);
             } else {
-               paramString = "";
+                return shared.setErrorResult("parameters must not contain null values", {
+                    operation: "shellCall"
+                });
             }
         }
-        taskLog("[Script] Arguments:" + paramString);
-        shellScript += command + paramString + '\n';
+        shellScript += command.trim() + paramString + '\n';
     } else {
         // Single command without additional parameters
         shellScript += command + '\n';
     }
 
-    taskLog("[Script] Run: " + shellScript);
-    
     var success = MCPStudio.shell(shellScript);
-    
-    if (stdOut && stdOut.length > 0) {
-        console.log("[Script] stdout:\n" + stdOut.join("\n"));
-    }
-    if (stdErr && stdErr.length > 0) {
-        console.log("[Script] stderr:\n" + stdErr.join("\n"));
-    }
 
-    if (success) {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] Command executed successfully\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: ".",
-                command: command,
-                shell: shell,
-                parameters: parameters,
-                operation: "shellCall",
-                success: true,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] Command successful!");
-    } else {
-        MCPStudio.setToolResult(JSON.stringify({
-            text: "[Script] Command failed.\n" + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""),
-            metadata: {
-                path: ".",
-                command: command,
-                shell: shell,
-                parameters: parameters,
-                operation: "shellCall",
-                success: false,
-                stdout: stdOut,
-                stderr: stdErr,
-            }
-        }));
-        taskLog("[Script] Command failed! " + 
-               (stdOut && stdOut.length > 0 ? stdOut.join("\n") : "") +  
-               (stdErr && stdErr.length > 0 ? "\nErrors and Warnings:\n" + stdErr.join("\n") : ""));
-    }
-
-    return null; // Result already set via MCPStudio.setToolResult
+    return shared.setProcessResult(
+        success,
+        "Command executed successfully.",
+        "Command failed.",
+        {
+            path: ".",
+            command: command,
+            shell: shell,
+            operation: "shellCall"
+        }
+    );
 }
 
 module.exports = {

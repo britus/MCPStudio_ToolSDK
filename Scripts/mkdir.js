@@ -42,7 +42,7 @@ function mkdir(params) {
     }
         
     result = {
-        success: "Directory successfully created.",
+        message: "Directory successfully created.",
         path: dirPath
     };
 
