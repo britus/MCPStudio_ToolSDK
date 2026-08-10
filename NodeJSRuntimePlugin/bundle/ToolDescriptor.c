@@ -13,7 +13,7 @@
 #endif
 
 static ToolPluginDescriptor desc = {
-    .abiVersion       = TOOL_ABI_VERSION,
+    .abiVersion       = TOOL_ABI_VERSION_LATEST,
     .toolVersion      = 1,
     .name             = "NodeJSRuntimeTool",
     .version          = NODEJS_RUNTIME_VERSION,
@@ -21,7 +21,7 @@ static ToolPluginDescriptor desc = {
     .description      = "Runs JavaScript tools with a Node.js executable and returns stdout/stderr as MCP tool results",
     .toolEntryPoint   = "toolEntry",
     .toolIdentifier   = "org.eof.tools.MCPStudio.NodeJSRuntimeTool",
-    .capabilitiesJSON = "{\"runtime\":\"nodejs\",\"outputs\":[\"stdout\",\"stderr\",\"exitCode\"]}",
+    .capabilitiesJSON = "{\"runtime\":\"nodejs\",\"hostProcessServices\":1,\"outputs\":[\"stdout\",\"stderr\",\"exitCode\"]}",
 };
 
 TOOL_API const ToolPluginDescriptor *toolDescribe(void) {

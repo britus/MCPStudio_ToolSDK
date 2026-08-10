@@ -9,7 +9,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface PythonRuntimeHandler : NSObject
 
 /**
- Executes a Python invocation and always returns an MCP tool-result envelope.
+ Builds a typed Python execution request for the host-provided process service
+ and always returns an MCP tool-result envelope. The plugin never launches a
+ process directly.
 
  `params` accepts either the tool arguments directly or a host envelope whose
  `arguments` value is a dictionary. Supported arguments include `scriptPath`

@@ -4,13 +4,12 @@
 // ===================================================================
 
 #import <Foundation/Foundation.h>
-#include <signal.h>
 
 #import "PythonRuntimeHandler.h"
+#import "RuntimeHostServices.h"
 #import "ToolJSONBridge.h"
 
 static const NSUInteger PythonRuntimeMaxOutputBytes = 10 * 1024 * 1024;
-static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
 
 @implementation PythonRuntimeHandler
 
@@ -88,7 +87,9 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
                            workingDirectory:workingDirectory
                                       stdin:stdinText
                                 environment:environment
-                             timeoutSeconds:timeout];
+                             timeoutSeconds:timeout
+                                        sid:normalizedSID
+                                   toolName:normalizedToolName];
 
     NSString *resultMode = [[self stringValue:args[@"resultMode"]] lowercaseString];
     if ([resultMode isEqualToString:@"toolresultjson"] || [resultMode isEqualToString:@"tool_result_json"]) {
@@ -211,157 +212,100 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
                           stdin:(NSString *)stdinText
                     environment:(NSDictionary<NSString *, NSString *> *)environment
                  timeoutSeconds:(NSTimeInterval)timeout
+                            sid:(NSString *)sid
+                       toolName:(NSString *)toolName
 {
-    NSTask *task = [[NSTask alloc] init];
-    NSPipe *stdoutPipe = [NSPipe pipe];
-    NSPipe *stderrPipe = [NSPipe pipe];
-    NSPipe *stdinPipe = [NSPipe pipe];
-    NSMutableData *stdoutData = [NSMutableData data];
-    NSMutableData *stderrData = [NSMutableData data];
-    NSObject *outputLock = [[NSObject alloc] init];
-    __block BOOL outputLimitExceeded = NO;
-
-    task.launchPath = executable;
-    task.arguments = arguments ?: @[];
-    task.currentDirectoryPath = workingDirectory;
-    task.standardOutput = stdoutPipe;
-    task.standardError = stderrPipe;
-    task.standardInput = stdinPipe;
-
-    NSMutableDictionary *mergedEnvironment = [NSMutableDictionary dictionaryWithDictionary:[[NSProcessInfo processInfo] environment]];
-    [mergedEnvironment addEntriesFromDictionary:environment ?: @{}];
-    if (![environment[@"PATH"] isKindOfClass:[NSString class]] || [environment[@"PATH"] length] == 0) {
-        NSString *hostPath = [mergedEnvironment[@"PATH"] isKindOfClass:[NSString class]]
-            ? mergedEnvironment[@"PATH"]
-            : @"";
-        NSString *runtimePath = @"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin";
-        mergedEnvironment[@"PATH"] = hostPath.length > 0
-            ? [runtimePath stringByAppendingFormat:@":%@", hostPath]
-            : runtimePath;
+    NSMutableArray<NSString *> *runtimeArguments = [NSMutableArray arrayWithArray:arguments ?: @[]];
+    if ([executable isEqualToString:@"/usr/bin/env"] &&
+        runtimeArguments.count > 0 &&
+        [runtimeArguments.firstObject isEqualToString:@"python3"]) {
+        [runtimeArguments removeObjectAtIndex:0];
     }
-    task.environment = mergedEnvironment;
 
-    NSFileHandle *stdoutHandle = [stdoutPipe fileHandleForReading];
-    NSFileHandle *stderrHandle = [stderrPipe fileHandleForReading];
+    NSString *sourceKind = @"none";
+    NSString *source = nil;
+    if (runtimeArguments.count >= 2 && [runtimeArguments.firstObject isEqualToString:@"-c"]) {
+        sourceKind = @"inline";
+        source = runtimeArguments[1];
+        [runtimeArguments removeObjectsInRange:NSMakeRange(0, 2)];
+    } else if (runtimeArguments.count >= 1) {
+        sourceKind = @"path";
+        source = runtimeArguments.firstObject;
+        [runtimeArguments removeObjectAtIndex:0];
+    }
 
-    void (^appendOutput)(NSData *, NSMutableData *) = ^(NSData *data, NSMutableData *target) {
-        if (data.length == 0) {
-            return;
-        }
+    NSMutableDictionary *request = [NSMutableDictionary dictionaryWithDictionary:@{
+        @"requestID": [NSUUID UUID].UUIDString,
+        @"conversationID": sid ?: @"",
+        @"toolID": toolName ?: @"PythonRuntimeTool",
+        @"policyProfileID": @"runtime.python.v1",
+        @"runtime": @"python",
+        @"sourceKind": sourceKind,
+        @"arguments": runtimeArguments,
+        @"workingDirectory": workingDirectory ?: NSHomeDirectory(),
+        @"environment": environment ?: @{},
+        @"timeoutSeconds": @(timeout),
+        @"outputLimitBytes": @(PythonRuntimeMaxOutputBytes)
+    }];
+    if (source) {
+        request[@"source"] = source;
+    }
+    if (executable.length > 0 && ![executable isEqualToString:@"/usr/bin/env"]) {
+        request[@"executableHint"] = executable;
+    }
+    NSData *stdinData = [stdinText dataUsingEncoding:NSUTF8StringEncoding];
+    if (stdinData.length > 0) {
+        request[@"standardInput"] = [stdinData base64EncodedStringWithOptions:0];
+    }
 
-        BOOL shouldKill = NO;
-        @synchronized (outputLock) {
-            if (outputLimitExceeded) {
-                return;
-            }
-
-            NSUInteger capturedBytes = stdoutData.length + stderrData.length;
-            NSUInteger remainingBytes = capturedBytes < PythonRuntimeMaxOutputBytes
-                ? PythonRuntimeMaxOutputBytes - capturedBytes
-                : 0;
-            NSUInteger bytesToAppend = MIN(data.length, remainingBytes);
-            if (bytesToAppend > 0) {
-                [target appendBytes:data.bytes length:bytesToAppend];
-            }
-            if (bytesToAppend < data.length) {
-                outputLimitExceeded = YES;
-                shouldKill = YES;
-            }
-        }
-
-        if (shouldKill && task.isRunning) {
-            kill(task.processIdentifier, SIGKILL);
-        }
-    };
-
-    stdoutHandle.readabilityHandler = ^(NSFileHandle *handle) {
-        appendOutput([handle availableData], stdoutData);
-    };
-    stderrHandle.readabilityHandler = ^(NSFileHandle *handle) {
-        appendOutput([handle availableData], stderrData);
-    };
-
-    dispatch_semaphore_t done = dispatch_semaphore_create(0);
-    task.terminationHandler = ^(NSTask *finishedTask) {
-        dispatch_semaphore_signal(done);
-    };
-
-    @try {
-        [task launch];
-    } @catch (NSException *exception) {
-        stdoutHandle.readabilityHandler = nil;
-        stderrHandle.readabilityHandler = nil;
+    NSError *hostError = nil;
+    NSDictionary *response = MCPStudioExecuteHostProcessRequest(request, &hostError);
+    if (!response || hostError) {
+        NSString *message = hostError.localizedDescription ?: @"The host process service failed.";
         return @{
             @"success": @NO,
             @"exitCode": @(-1),
             @"stdout": @"",
-            @"stderr": exception.reason ?: @"Failed to launch Python executable",
+            @"stderr": message,
             @"timedOut": @NO,
-            @"launchError": exception.reason ?: @"Failed to launch Python executable"
+            @"outputLimitExceeded": @NO,
+            @"maxOutputBytes": @(PythonRuntimeMaxOutputBytes),
+            @"launchError": message
         };
     }
 
-    NSFileHandle *stdinHandle = [stdinPipe fileHandleForWriting];
-    NSData *stdinData = [stdinText dataUsingEncoding:NSUTF8StringEncoding];
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
-        @try {
-            if (stdinData.length > 0) {
-                [stdinHandle writeData:stdinData];
-            }
-        } @catch (__unused NSException *exception) {
-            // The child may exit or be terminated before consuming all input.
-        }
-        [stdinHandle closeFile];
-    });
-
-    long waitResult = dispatch_semaphore_wait(done, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)));
-    BOOL timedOut = (waitResult != 0);
-    if (timedOut && task.isRunning) {
-        [task terminate];
-        long terminationResult = dispatch_semaphore_wait(
-            done,
-            dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PythonRuntimeTerminationGraceSeconds * NSEC_PER_SEC)));
-        if (terminationResult != 0 && task.isRunning) {
-            kill(task.processIdentifier, SIGKILL);
-            dispatch_semaphore_wait(
-                done,
-                dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PythonRuntimeTerminationGraceSeconds * NSEC_PER_SEC)));
-        }
+    if (![response[@"hostServiceSuccess"] boolValue]) {
+        NSString *message = [self stringValue:response[@"errorMessage"]] ?: @"The host process service rejected the request.";
+        return @{
+            @"success": @NO,
+            @"exitCode": @(-1),
+            @"stdout": @"",
+            @"stderr": message,
+            @"timedOut": @NO,
+            @"outputLimitExceeded": @NO,
+            @"maxOutputBytes": @(PythonRuntimeMaxOutputBytes),
+            @"launchError": message
+        };
     }
 
-    stdoutHandle.readabilityHandler = nil;
-    stderrHandle.readabilityHandler = nil;
-
-    NSData *remainingStdout = [stdoutHandle readDataToEndOfFile];
-    NSData *remainingStderr = [stderrHandle readDataToEndOfFile];
-    appendOutput(remainingStdout, stdoutData);
-    appendOutput(remainingStderr, stderrData);
-
-    BOOL didExceedOutputLimit = NO;
-    @synchronized (outputLock) {
-        didExceedOutputLimit = outputLimitExceeded;
-    }
-
-    NSString *stdoutText = [self textFromOutputData:stdoutData streamName:@"stdout"];
-    NSString *stderrText = [self textFromOutputData:stderrData streamName:@"stderr"];
-    if (didExceedOutputLimit) {
-        NSString *diagnostic = [NSString stringWithFormat:
-            @"Python process exceeded the %lu-byte combined stdout/stderr limit",
-            (unsigned long)PythonRuntimeMaxOutputBytes];
-        stderrText = stderrText.length > 0
-            ? [stderrText stringByAppendingFormat:@"\n%@", diagnostic]
-            : diagnostic;
-    }
-    int exitCode = timedOut ? -1 : task.terminationStatus;
+    NSDictionary *result = [response[@"result"] isKindOfClass:[NSDictionary class]] ? response[@"result"] : @{};
+    NSData *stdoutData = [[NSData alloc] initWithBase64EncodedString:[self stringValue:result[@"standardOutput"]] ?: @"" options:0];
+    NSData *stderrData = [[NSData alloc] initWithBase64EncodedString:[self stringValue:result[@"standardError"]] ?: @"" options:0];
+    NSString *terminationReason = [self stringValue:result[@"terminationReason"]] ?: @"launchFailed";
+    NSNumber *exitCode = [result[@"exitCode"] isKindOfClass:[NSNumber class]] ? result[@"exitCode"] : @(-1);
+    BOOL timedOut = [terminationReason isEqualToString:@"timedOut"];
+    BOOL outputLimitExceeded = [terminationReason isEqualToString:@"outputLimitExceeded"] || [result[@"outputTruncated"] boolValue];
+    BOOL success = [terminationReason isEqualToString:@"exited"] && exitCode.integerValue == 0;
 
     return @{
-        @"success": @(!timedOut && !didExceedOutputLimit && exitCode == 0),
-        @"exitCode": @(exitCode),
-        @"stdout": stdoutText,
-        @"stderr": stderrText,
+        @"success": @(success),
+        @"exitCode": exitCode,
+        @"stdout": [self textFromOutputData:stdoutData ?: [NSData data] streamName:@"stdout"],
+        @"stderr": [self textFromOutputData:stderrData ?: [NSData data] streamName:@"stderr"],
         @"timedOut": @(timedOut),
-        @"outputLimitExceeded": @(didExceedOutputLimit),
-        @"maxOutputBytes": @(PythonRuntimeMaxOutputBytes)
+        @"outputLimitExceeded": @(outputLimitExceeded),
+        @"maxOutputBytes": @(PythonRuntimeMaxOutputBytes),
+        @"resolvedExecutable": [self stringValue:result[@"resolvedExecutable"]] ?: @""
     };
 }
 
@@ -392,32 +336,9 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
         if (![trimmed isAbsolutePath]) {
             return @"";
         }
-
-        // Let NSTask validate an explicitly configured absolute path. A
-        // preflight through NSFileManager can return a false negative in a
-        // GUI host process (notably for Homebrew symlinks), hiding the real
-        // launch error from the caller.
         return [trimmed stringByStandardizingPath];
     }
-
-    NSMutableArray<NSString *> *candidates = [NSMutableArray arrayWithArray:@[
-        @"/opt/homebrew/bin/python3",
-        @"/usr/local/bin/python3",
-        @"/usr/bin/python3"
-    ]];
-    NSString *processPath = [[[NSProcessInfo processInfo] environment] objectForKey:@"PATH"];
-    for (NSString *directory in [processPath componentsSeparatedByString:@":"]) {
-        if (directory.length > 0 && directory.isAbsolutePath) {
-            [candidates addObject:[directory stringByAppendingPathComponent:@"python3"]];
-        }
-    }
-
-    for (NSString *path in candidates) {
-        NSString *standard = [path stringByStandardizingPath];
-        if ([[NSFileManager defaultManager] isExecutableFileAtPath:standard]) {
-            return standard;
-        }
-    }
+    // The out-of-sandbox host service resolves its approved runtime paths.
     return @"/usr/bin/env";
 }
 
@@ -434,12 +355,7 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
     if (![path isAbsolutePath]) {
         return @"";
     }
-    NSString *standard = [path stringByStandardizingPath];
-    BOOL isDirectory = NO;
-    if ([[NSFileManager defaultManager] fileExistsAtPath:standard isDirectory:&isDirectory] && isDirectory) {
-        return standard;
-    }
-    return @"";
+    return [path stringByStandardizingPath];
 }
 
 - (NSString *)validatedAbsoluteFilePath:(NSString *)path label:(NSString *)label
@@ -448,12 +364,7 @@ static const NSTimeInterval PythonRuntimeTerminationGraceSeconds = 2.0;
     if (![rawPath isAbsolutePath]) {
         return @"";
     }
-    NSString *standard = [rawPath stringByStandardizingPath];
-    BOOL isDirectory = NO;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:standard isDirectory:&isDirectory] || isDirectory) {
-        return @"";
-    }
-    return standard;
+    return [rawPath stringByStandardizingPath];
 }
 
 - (NSString *)textFromOutputData:(NSData *)data streamName:(NSString *)streamName

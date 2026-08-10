@@ -13,7 +13,7 @@
 #endif
 
 static ToolPluginDescriptor desc = {
-    .abiVersion       = TOOL_ABI_VERSION,
+    .abiVersion       = TOOL_ABI_VERSION_LATEST,
     .toolVersion      = 1,
     .name             = "PythonRuntimeTool",
     .version          = PYTHON_RUNTIME_VERSION,
@@ -21,7 +21,7 @@ static ToolPluginDescriptor desc = {
     .description      = "Runs Python tools with a Python executable and returns stdout/stderr as MCP tool results",
     .toolEntryPoint   = "toolEntry",
     .toolIdentifier   = "org.eof.tools.MCPStudio.PythonRuntimeTool",
-    .capabilitiesJSON = "{\"runtime\":\"python\",\"outputs\":[\"stdout\",\"stderr\",\"exitCode\"]}",
+    .capabilitiesJSON = "{\"runtime\":\"python\",\"hostProcessServices\":1,\"outputs\":[\"stdout\",\"stderr\",\"exitCode\"]}",
 };
 
 TOOL_API const ToolPluginDescriptor *toolDescribe(void) {
