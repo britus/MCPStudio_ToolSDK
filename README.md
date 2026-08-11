@@ -143,7 +143,7 @@ and the default `dataset.txt` are not currently checked in; follow the
 ## Releases
 
 - [EoF MCP Studio on the Mac App Store](https://apps.apple.com/us/app/eof-mcp-studio/id6758146445?mt=12)
-- [EoF MCP Studio direct download](https://mcpstudio.eofsl.com/download.html)
+- [EoF MCP Studio without Sandbox](https://mcpstudio.eofsl.com/download.html)
 
 ## Documentation
 
