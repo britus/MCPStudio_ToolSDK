@@ -41,6 +41,7 @@ function skillExecute(params) {
         });
     }
 
+    parameters = (resolved.prefixArguments || []).concat(parameters);
     run = shared.executeProcess(resolved.value, parameters);
     return shared.setProcessResult(
         run.success,
@@ -49,7 +50,8 @@ function skillExecute(params) {
         {
             operation: operation,
             command: command,
-            executable: resolved.value
+            executable: resolved.value,
+            delegatedTool: resolved.requestedExecutable || ""
         },
         run.stdout,
         run.stderr

@@ -143,6 +143,8 @@ Requires `projectDir`. Optional fields are `projectTarget`, `projectFile`, `buil
 
 Requires `command`, which must name a Launch Agent V1 approved developer tool or provide its absolute executable path. `parameters` is a verbatim string array. The handler does not start a command interpreter, so pipelines, redirections, substitutions, and script strings are unavailable. This remains a privileged execution surface and should be exposed only in trusted configurations.
 
+For compatibility, `command: "xed"` and absolute `xed` paths are delegated to `/usr/bin/xcrun xed`, which is accepted by the V1 policy.
+
 ### GCC inspection
 
 - `checkWithGcc`: discovers compiler/toolchain capabilities; accepts `arch` and `verbose`.

@@ -327,6 +327,15 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
 
     executable = validation.value;
     name = executable.substring(executable.lastIndexOf("/") + 1);
+    if (name === "xed") {
+        validation = resolveDeveloperTool("xcrun", label, ["/usr/bin/xcrun"]);
+        if (!validation.ok) {
+            return validation;
+        }
+        validation.prefixArguments = ["xed"];
+        validation.requestedExecutable = executable;
+        return validation;
+    }
     if (!approvedDeveloperTools[name]) {
         return {
             ok: false,

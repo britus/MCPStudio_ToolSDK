@@ -68,6 +68,8 @@ Depending on the handler, MCP Studio supplies functions such as:
 
 Build/process helpers also read injected `stdOut` and `stdErr` arrays through `sharedFunctions.js`. External tools are launched directly with an absolute executable path and an argument array; command interpreters, pipelines, redirections, substitutions, and script strings are not supported. Scripts that use these values will fail in plain Node.js unless a test harness provides compatible globals.
 
+`xed` is exposed as a compatibility alias and is delegated to the policy-approved `/usr/bin/xcrun xed` invocation.
+
 ## Shared result helpers
 
 Import the shared module once:

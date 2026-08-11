@@ -47,6 +47,7 @@ function shellCall(params) {
         });
     }
 
+    parameters = (resolved.prefixArguments || []).concat(parameters);
     run = shared.executeProcess(resolved.value, parameters);
     return shared.setProcessResult(
         run.success,
@@ -55,6 +56,7 @@ function shellCall(params) {
         {
             command: command,
             executable: resolved.value,
+            delegatedTool: resolved.requestedExecutable || "",
             operation: "shellCall"
         },
         run.stdout,
