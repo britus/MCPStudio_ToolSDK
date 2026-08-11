@@ -83,25 +83,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analyzeDirectory.js; sourceTree = "<group>"; };
 		F71170DB2F7AA79A00F39DFE /* bootstrap.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = bootstrap.js; sourceTree = "<group>"; };
 		F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = checkWithXcode.js; sourceTree = "<group>"; };
 		F71170DD2F7AA79A00F39DFE /* clangTools.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = clangTools.js; sourceTree = "<group>"; };
 		F71170DE2F7AA79A00F39DFE /* cmakeBuild.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = cmakeBuild.js; sourceTree = "<group>"; };
-		F71170DF2F7AA79A00F39DFE /* directoryCreate.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = directoryCreate.js; sourceTree = "<group>"; };
-		F71170E02F7AA79A00F39DFE /* directoryList.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = directoryList.js; sourceTree = "<group>"; };
+		F71170FF2F7AA79A00F39DFE /* fsTools.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fsTools.js; sourceTree = "<group>"; };
 		F71170E12F7AA79A00F39DFE /* fetchPrompt.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fetchPrompt.js; sourceTree = "<group>"; };
 		F71170E22F7AA79A00F39DFE /* fetchResource.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fetchResource.js; sourceTree = "<group>"; };
-		F71170E32F7AA79A00F39DFE /* fileDelete.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileDelete.js; sourceTree = "<group>"; };
-		F71170E42F7AA79A00F39DFE /* fileExists.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileExists.js; sourceTree = "<group>"; };
-		F71170E52F7AA79A00F39DFE /* fileOpen.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileOpen.js; sourceTree = "<group>"; };
-		F71170E62F7AA79A00F39DFE /* fileRead.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileRead.js; sourceTree = "<group>"; };
-		F71170E72F7AA79A00F39DFE /* fileSave.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fileSave.js; sourceTree = "<group>"; };
-		F71170E82F7AA79A00F39DFE /* getPathDocuments.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = getPathDocuments.js; sourceTree = "<group>"; };
-		F71170E92F7AA79A00F39DFE /* getPathTemp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = getPathTemp.js; sourceTree = "<group>"; };
 		F71170EA2F7AA79A00F39DFE /* httpTools.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = httpTools.js; sourceTree = "<group>"; };
-		F71170EB2F7AA79A00F39DFE /* mkdir.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mkdir.js; sourceTree = "<group>"; };
-		F71170ED2F7AA79A00F39DFE /* previewFile.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = previewFile.js; sourceTree = "<group>"; };
 		F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = qmakeBuild.js; sourceTree = "<group>"; };
 		F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = sharedFunctions.js; sourceTree = "<group>"; };
 		F71170F02F7AA79A00F39DFE /* shellCall.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = shellCall.js; sourceTree = "<group>"; };
@@ -488,25 +477,14 @@
 			isa = PBXGroup;
 			children = (
 				F71170FD2F7AA79A00F39DFE /* tool_entry.js */,
-				F71170DA2F7AA79A00F39DFE /* analyzeDirectory.js */,
 				F71170DB2F7AA79A00F39DFE /* bootstrap.js */,
 				F71170DC2F7AA79A00F39DFE /* checkWithXcode.js */,
 				F71170DD2F7AA79A00F39DFE /* clangTools.js */,
 				F71170DE2F7AA79A00F39DFE /* cmakeBuild.js */,
-				F71170DF2F7AA79A00F39DFE /* directoryCreate.js */,
-				F71170E02F7AA79A00F39DFE /* directoryList.js */,
+				F71170FF2F7AA79A00F39DFE /* fsTools.js */,
 				F71170E12F7AA79A00F39DFE /* fetchPrompt.js */,
 				F71170E22F7AA79A00F39DFE /* fetchResource.js */,
-				F71170E32F7AA79A00F39DFE /* fileDelete.js */,
-				F71170E42F7AA79A00F39DFE /* fileExists.js */,
-				F71170E52F7AA79A00F39DFE /* fileOpen.js */,
-				F71170E62F7AA79A00F39DFE /* fileRead.js */,
-				F71170E72F7AA79A00F39DFE /* fileSave.js */,
-				F71170E82F7AA79A00F39DFE /* getPathDocuments.js */,
-				F71170E92F7AA79A00F39DFE /* getPathTemp.js */,
 				F71170EA2F7AA79A00F39DFE /* httpTools.js */,
-				F71170EB2F7AA79A00F39DFE /* mkdir.js */,
-				F71170ED2F7AA79A00F39DFE /* previewFile.js */,
 				F71170EE2F7AA79A00F39DFE /* qmakeBuild.js */,
 				F71170EF2F7AA79A00F39DFE /* sharedFunctions.js */,
 				F71170F02F7AA79A00F39DFE /* shellCall.js */,

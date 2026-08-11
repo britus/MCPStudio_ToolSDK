@@ -6,7 +6,6 @@
 const shared = require('sharedFunctions');
 
 // Toolchain
-const analyzedir = require('analyzeDirectory');
 const httpTools = require('httpTools');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
@@ -18,22 +17,13 @@ const checkWithGcc = require('checkWithGcc');
 const gccSettings = require('gccSettings');
 const getGccInfo = require('getGccInfo');
 
-// File operation handlers
-const mkdir = require('mkdir');
-const fileExists = require('fileExists');
-const readFile = require('fileRead');
-const saveFile = require('fileSave');
-const openFile = require('fileOpen');
-const deleteFile = require('fileDelete');
-const listDirectory = require('directoryList');
-const createDirectory = require('directoryCreate');
-const getDocumentsPath = require('getPathDocuments');
-const getTempPath = require('getPathTemp');
+// File system operation handlers
+const fsTools = require('fsTools');
 
 const HANDLERS = {
     // File based Toolchain
-    analyzeDirectory: analyzedir.analyzeDirectory,
-    mkdir: mkdir.mkdir,
+    analyzeDirectory: fsTools.analyzeDirectory,
+    mkdir: fsTools.mkdir,
     checkWithXcode: checkWithXcode.checkWithXcode,
     clangCheckSyntax: clangTools.clangCheckSyntax,
     clangCompile: clangTools.clangCompile,
@@ -45,16 +35,16 @@ const HANDLERS = {
     checkWithGcc: checkWithGcc.checkWithGcc,
     gccSettings: gccSettings.gccSettings,
     getGccInfo: getGccInfo.getGccInfo,
-    fileExists: fileExists.fileExists,
-    readFile: readFile.readFile,
-    saveFile: saveFile.saveFile,
-    writeFile: saveFile.saveFile,
-    openFile: openFile.openFile,
-    deleteFile: deleteFile.deleteFile,
-    listDirectory: listDirectory.listDirectory,
-    createDirectory: createDirectory.createDirectory,
-    getDocumentsPath: getDocumentsPath.getDocumentsPath,
-    getTempPath: getTempPath.getTempPath,
+    fileExists: fsTools.fileExists,
+    readFile: fsTools.readFile,
+    saveFile: fsTools.saveFile,
+    writeFile: fsTools.saveFile,
+    openFile: fsTools.openFile,
+    deleteFile: fsTools.deleteFile,
+    listDirectory: fsTools.listDirectory,
+    createDirectory: fsTools.createDirectory,
+    getDocumentsPath: fsTools.getDocumentsPath,
+    getTempPath: fsTools.getTempPath,
 
     // HTTP Toolchain
     fetchData: function (params) { return httpTools.httpTools("fetchData", params); },
@@ -105,7 +95,7 @@ function parseParams(jsonParams) {
  */
 function toolEntry(sid, handlerName, jsonParams) {
     console.log("[toolEntry]: handler=" + (handlerName || "Unknown"));
-    try {   
+    try {
         var handler = getHandler(handlerName);
 
         if (!handler) {
@@ -114,7 +104,7 @@ function toolEntry(sid, handlerName, jsonParams) {
 
         var params = parseParams(jsonParams);
         return handler(params);
-    
+
     } catch(e) {
         console.error("[toolEntry] " + (e.message || e));
         return shared.error(e.message || e.toString());

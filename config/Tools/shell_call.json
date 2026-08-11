@@ -13,7 +13,7 @@
   "inputSchema" : {
     "properties" : {
       "command" : {
-        "description" : "Approved developer-tool name or absolute executable path.",
+        "description" : "Approved developer-tool name, absolute executable path, or a whitespace-separated invocation such as 'git status --short'. Prefer parameters for arguments that must remain a single value.",
         "name" : "command",
         "type" : "string"
       },

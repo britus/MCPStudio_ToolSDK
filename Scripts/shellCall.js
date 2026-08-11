@@ -9,7 +9,7 @@ const shared = require('sharedFunctions');
 /**
  * Execute an approved developer tool with an argument array.
  * @param {Object} params - Process parameters
- * @param {string} params.command - Approved executable name or absolute path
+ * @param {string} params.command - Approved executable or compact invocation
  * @param {Array<string>} [params.parameters=[]] - Verbatim process arguments
  */
 function shellCall(params) {
@@ -17,6 +17,7 @@ function shellCall(params) {
 
     var command = params.command || "";
     var parameters = params.parameters || [];
+    var commandParts;
     var resolved;
     var run;
     var i;
@@ -39,7 +40,24 @@ function shellCall(params) {
         }
     }
 
-    resolved = shared.resolveDeveloperTool(command.trim(), "command");
+    // Preserve executable paths containing whitespace by resolving the entire
+    // value first. If that fails, accept the common compact form
+    // `command: "git status --short"` as a compatibility convenience.
+    // splitArgumentString rejects shell control characters and only separates
+    // on whitespace; no shell is invoked.
+    commandParts = { ok: true, value: [command.trim()] };
+    resolved = shared.resolveDeveloperTool(commandParts.value[0], "command");
+    if (!resolved.ok && /\s/.test(command.trim())) {
+        commandParts = shared.splitArgumentString(command, "command");
+        if (!commandParts.ok) {
+            return shared.setErrorResult(commandParts.message, {
+                operation: "shellCall",
+                command: command
+            });
+        }
+        resolved = shared.resolveDeveloperTool(commandParts.value[0], "command");
+    }
+
     if (!resolved.ok) {
         return shared.setErrorResult(resolved.message, {
             operation: "shellCall",
@@ -47,7 +65,8 @@ function shellCall(params) {
         });
     }
 
-    parameters = (resolved.prefixArguments || []).concat(parameters);
+    parameters = (resolved.prefixArguments || [])
+        .concat(commandParts.value.slice(1), parameters);
     run = shared.executeProcess(resolved.value, parameters);
     return shared.setProcessResult(
         run.success,

@@ -53,7 +53,7 @@ scrapeWebpage     apiRequest         checkStatus
 webhookCall
 ```
 
-`saveFile` and `writeFile` route to the same implementation. `previewFile.js` exists as a reusable module but is not currently registered by the JavaScript dispatcher. `bootstrap.js` provides bootstrap content and does not export a handler.
+`saveFile` and `writeFile` route to the same implementation. `previewFile` is implemented in `fsTools.js` but is not currently registered by the JavaScript dispatcher. `bootstrap.js` provides bootstrap content and does not export a handler.
 
 ## Host APIs used by the scripts
 
