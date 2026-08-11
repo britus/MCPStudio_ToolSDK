@@ -1,59 +1,51 @@
 // ===================================================================
 // Handler Function: checkWithXcode
-// Builds Xcode projects with configurable options
-// Fixed version - removes problematic shell script generation
+// Direct process-based Xcode project build.
 // ===================================================================
 
-// Import shared functions
 const shared = require('sharedFunctions');
 
-function taskLog(message) {
-    shared.appendStandardOutput(message);
-}
-
-/**
- * Check and build project with Xcode using xcodebuild
- * @param {Object} params - Command parameters
- * @param {string} params.projectName - Name of the project (without .xcodeproj extension)
- * @param {string} params.projectDir - Absolute path to the project directory
- * @param {string} [params.scheme=""] - Scheme name (defaults to first scheme if empty)
- * @param {string} [params.configuration="Debug"] - Build configuration (Debug/Release/Profile)
- * @param {string} [params.platform="macosx"] - Target platform (macosx/iphoneos/iphonesimulator)
- * @param {boolean} [params.clean=false] - Clean build before building
- * @param {boolean} [params.showOperationLogs=false] - Show verbose operation logs
- */
 function checkWithXcode(params) {
     params = params || {};
+
     var projectName = params.projectName || "";
     var projectDir = params.projectDir || "";
+    var scheme = params.scheme || "";
+    var configuration = params.configuration || "Debug";
+    var platform = params.platform || "macosx";
+    var developmentTeam = params.codesign || "";
+    var codeSigningIdentity = params.codeSigningIdentity || "";
+    var cleanBuild = params.clean === true;
+    var showOperationLogs = params.showOperationLogs === true;
+    var alltargets = params.alltargets === true;
+    var archive = params.archive === true;
+    var onlyActiveArchs = params.onlyActiveArchs === true;
+    var derivedDataPath = params.derivedDataPath || "";
     var dirValidation;
-    
-    taskLog("=== Xcode Build Task ===");
-    taskLog("Project: " + projectName);
-    taskLog("Directory: " + projectDir);
+    var derivedValidation;
+    var optionValues;
+    var optionNames;
+    var i;
+    var projectPath;
+    var executableValidation;
+    var args = [];
+    var run;
 
-    // Validate input parameters
     if (!projectDir) {
         return shared.setErrorResult("Missing required parameter: projectDir", {
             operation: "checkWithXcode"
         });
     }
-
     if (typeof projectName !== "string" || projectName.trim().length === 0) {
         return shared.setErrorResult("Missing required parameter: projectName", {
             operation: "checkWithXcode"
         });
     }
-
     dirValidation = shared.validateDirectoryPath(projectDir, "projectDir", { absolute: true });
     if (!dirValidation.ok) {
-        return shared.setErrorResult(dirValidation.message, {
-            operation: "checkWithXcode"
-        });
+        return shared.setErrorResult(dirValidation.message, { operation: "checkWithXcode" });
     }
-
     projectDir = dirValidation.value;
-    
     if (!MCPStudio.fileExists(projectDir)) {
         return shared.setErrorResult("Project directory not found: " + projectDir, {
             operation: "checkWithXcode",
@@ -61,7 +53,6 @@ function checkWithXcode(params) {
         });
     }
 
-    // Normalize project name (remove .xcodeproj extension if present)
     projectName = projectName.trim().replace(/\.xcodeproj$/i, "");
     if (/[\/\\\0\r\n]/.test(projectName)) {
         return shared.setErrorResult("projectName must be a project name, not a path", {
@@ -69,27 +60,11 @@ function checkWithXcode(params) {
             path: projectDir
         });
     }
-    
-    // Set default values from params
-    var scheme = params.scheme || "";
-    var configuration = params.configuration || "Debug";
-    var platform = params.platform || "macosx";
-    var developmentTeam = params.codesign || "";
-    var codeSigningIdentity = params.codeSigningIdentity || "";
-    var cleanBuild = (params.clean === true);
-    var showOperationLogs = (params.showOperationLogs === true);
-    var alltargets = (params.alltargets === true);
-    var archive = (params.archive === true);
-    var onlyActiveArchs = (params.onlyActiveArchs === true);
-    var derivedDataPath = params.derivedDataPath || "";
-    var derivedDataValidation;
-    var optionValues = [scheme, configuration, platform, developmentTeam, codeSigningIdentity];
-    var optionNames = ["scheme", "configuration", "platform", "codesign", "codeSigningIdentity"];
-    var optionIndex;
-
-    for (optionIndex = 0; optionIndex < optionValues.length; optionIndex += 1) {
-        if (typeof optionValues[optionIndex] !== "string") {
-            return shared.setErrorResult(optionNames[optionIndex] + " must be a string", {
+    optionValues = [scheme, configuration, platform, developmentTeam, codeSigningIdentity];
+    optionNames = ["scheme", "configuration", "platform", "codesign", "codeSigningIdentity"];
+    for (i = 0; i < optionValues.length; i += 1) {
+        if (typeof optionValues[i] !== "string" || /[\0\r\n]/.test(optionValues[i])) {
+            return shared.setErrorResult(optionNames[i] + " must be a single-line string", {
                 operation: "checkWithXcode",
                 path: projectDir
             });
@@ -97,94 +72,76 @@ function checkWithXcode(params) {
     }
 
     if (derivedDataPath) {
-        derivedDataValidation = shared.validateDirectoryPath(
+        derivedValidation = shared.validateDirectoryPath(
             derivedDataPath,
             "derivedDataPath",
             { absolute: true }
         );
-        if (!derivedDataValidation.ok) {
-            return shared.setErrorResult(derivedDataValidation.message, {
+        if (!derivedValidation.ok) {
+            return shared.setErrorResult(derivedValidation.message, {
                 operation: "checkWithXcode",
                 path: projectDir
             });
         }
-        derivedDataPath = derivedDataValidation.value;
+        derivedDataPath = derivedValidation.value;
     }
 
-    taskLog("[Script] Scheme: " + scheme);
-    taskLog("[Script] Configuration: " + configuration);
-    taskLog("[Script] Platform: " + platform);
-    taskLog("[Script] Clean Build: " + cleanBuild);
-    taskLog("[Script] Show Operation Logs: " + showOperationLogs);
-    taskLog("[Script] Team Identifier: " + developmentTeam);
+    projectPath = shared.joinPath(projectDir, projectName + ".xcodeproj");
+    if (!MCPStudio.fileExists(projectPath)) {
+        return shared.setErrorResult("Xcode project not found: " + projectPath, {
+            operation: "checkWithXcode",
+            path: projectPath
+        });
+    }
+    executableValidation = shared.resolveDeveloperTool("xcodebuild", "xcodebuild", [
+        "/usr/bin/xcodebuild"
+    ]);
+    if (!executableValidation.ok) {
+        return shared.setErrorResult(executableValidation.message, {
+            operation: "checkWithXcode",
+            path: projectDir
+        });
+    }
 
-    var shellScript = '#!/bin/bash\n';
-    var success = false;
-    
-    // get notified
-    shellScript += 'set -euo pipefail\n';
-
-    shellScript += 'PROJECT_NAME=' + shared.quoteShellArgument(projectName) + '\n';
-    shellScript += 'PROJECT_DIR=' + shared.quoteShellArgument(projectDir) + '\n';
-    shellScript += 'ARCH=$(uname -m)\n';
-    shellScript += 'cd "${PROJECT_DIR}" || exit 1\n';
-    shellScript += 'xcodebuild';
-
-    /* less context output unless detailed operation logs were requested */
     if (!showOperationLogs) {
-        shellScript += ' -quiet';
+        args.push("-quiet");
     }
-
-    /* Use only valid xcodebuild parameters */
-    shellScript += ' -project "${PROJECT_NAME}.xcodeproj"';
-    
-    /* additional xcodebuild params */
-    shellScript += ' -arch ${ARCH}';
-
-    if (alltargets === true) {
-        shellScript += ' -alltargets ';
+    args.push("-project", projectPath);
+    if (alltargets) {
+        args.push("-alltargets");
     }
-    
     if (scheme.length > 0) {
-        shellScript += ' -scheme ' + shared.quoteShellArgument(scheme);
+        args.push("-scheme", scheme);
     }
     if (platform.length > 0) {
-        shellScript += ' -sdk ' + shared.quoteShellArgument(platform);
+        args.push("-sdk", platform);
     }
-    // Fixed: check if configuration is not empty string instead of numeric comparison
-    if (configuration && configuration.length > 0) {
-        shellScript += ' -configuration ' + shared.quoteShellArgument(configuration);
+    if (configuration.length > 0) {
+        args.push("-configuration", configuration);
     }
     if (derivedDataPath) {
-        shellScript += ' -derivedDataPath ' + shared.quoteShellArgument(derivedDataPath);
+        args.push("-derivedDataPath", derivedDataPath);
     }
     if (onlyActiveArchs) {
-        shellScript += ' ONLY_ACTIVE_ARCH=YES';
+        args.push("ONLY_ACTIVE_ARCH=YES");
     }
     if (developmentTeam.length > 0) {
-        shellScript += ' DEVELOPMENT_TEAM=' + shared.quoteShellArgument(developmentTeam);
+        args.push("DEVELOPMENT_TEAM=" + developmentTeam);
     }
     if (codeSigningIdentity.length > 0) {
-        shellScript += ' CODE_SIGN_IDENTITY=' + shared.quoteShellArgument(codeSigningIdentity);
+        args.push("CODE_SIGN_IDENTITY=" + codeSigningIdentity);
     }
-    /* end */
     if (developmentTeam.length === 0 && codeSigningIdentity.length === 0) {
-        shellScript += ' CODE_SIGNING_ALLOWED=NO';
+        args.push("CODE_SIGNING_ALLOWED=NO");
     }
     if (cleanBuild) {
-        shellScript += ' clean';
+        args.push("clean");
     }
-    if (archive) {
-        shellScript += ' archive || exit 1\n';
-    } else {
-        shellScript += ' build || exit 1\n';
-    }
-    shellScript += 'exit 0\n';
+    args.push(archive ? "archive" : "build");
 
-    success = MCPStudio.shell(shellScript);
-
+    run = shared.executeProcess(executableValidation.value, args);
     return shared.setProcessResult(
-        success,
+        run.success,
         (archive ? "Archive" : "Build") + " completed successfully for " + projectName + ".",
         (archive ? "Archive" : "Build") + " failed for " + projectName + ".",
         {
@@ -193,8 +150,11 @@ function checkWithXcode(params) {
             configuration: configuration,
             platform: platform,
             operation: "checkWithXcode",
-            archive: archive
-        }
+            archive: archive,
+            executable: executableValidation.value
+        },
+        run.stdout,
+        run.stderr
     );
 }
 

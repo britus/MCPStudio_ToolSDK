@@ -4,31 +4,26 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.578Z",
+    "lastModified" : "2026-08-11T00:00:00.000Z",
     "priority" : 0.9
   },
-  "description" : "Execute a shell command with optional parameters.",
+  "description" : "Execute one Launch Agent V1 approved developer tool directly with a verbatim argument array. Command interpreters, pipelines, redirections, and script text are not supported.",
   "execHandler" : "shellCall",
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
       "command" : {
-        "description" : "Shell command to execute.",
+        "description" : "Approved developer-tool name or absolute executable path.",
         "name" : "command",
         "type" : "string"
       },
       "parameters" : {
-        "description" : "Array of command arguments.",
+        "description" : "Verbatim process arguments. Each array item is passed as one argument.",
         "items" : {
           "type" : "string"
         },
         "name" : "parameters",
         "type" : "array"
-      },
-      "shell" : {
-        "description" : "Absolute path to the shell interpreter.",
-        "name" : "shell",
-        "type" : "string"
       }
     },
     "required" : [

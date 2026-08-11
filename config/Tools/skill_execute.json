@@ -4,27 +4,35 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.579Z",
+    "lastModified" : "2026-08-11T00:00:00.000Z",
     "priority" : 0.9
   },
-  "description" : "Executes a shell script snippet supplied by the currently active MCP Studio Skill. Only callable when the active skill's tool scope authorizes this tool.",
+  "description" : "Executes one Launch Agent V1 approved developer tool for the currently active MCP Studio Skill. Only callable when the active skill's tool scope authorizes this tool.",
   "execHandler" : "skillExecute",
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
-      "content" : {
-        "description" : "Shell script content generated from the Skill instructions.",
-        "name" : "content",
+      "command" : {
+        "description" : "Approved developer-tool name or absolute executable path.",
+        "name" : "command",
         "type" : "string"
       },
       "operation" : {
         "description" : "Optional operation name for logging and result metadata.",
         "name" : "operation",
         "type" : "string"
+      },
+      "parameters" : {
+        "description" : "Verbatim process arguments. Each array item is passed as one argument.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "parameters",
+        "type" : "array"
       }
     },
     "required" : [
-      "content"
+      "command"
     ],
     "type" : "object"
   },

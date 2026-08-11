@@ -254,7 +254,7 @@ function validateShellFragment(value, parameterName) {
         return { ok: false, message: label + " must not contain control characters" };
     }
     if (/[`$;&|<>\\(){}\[\]*?!#'\"]/.test(value)) {
-        return { ok: false, message: label + " contains unsupported shell metacharacters" };
+        return { ok: false, message: label + " contains unsupported command metacharacters" };
     }
 
     return { ok: true, value: value.trim() };
@@ -283,6 +283,160 @@ function validateExecutable(value, parameterName) {
     }
 
     return { ok: true, value: executable };
+}
+
+var approvedDeveloperTools = {
+    "ar": true,
+    "clang": true,
+    "clang++": true,
+    "cmake": true,
+    "codesign": true,
+    "gcc": true,
+    "g++": true,
+    "git": true,
+    "ld": true,
+    "lipo": true,
+    "make": true,
+    "ninja": true,
+    "otool": true,
+    "pkg-config": true,
+    "qmake": true,
+    "security": true,
+    "swift": true,
+    "swiftc": true,
+    "xcodebuild": true,
+    "xcrun": true
+};
+
+/**
+ * Resolve a developer tool to the absolute path required by MCPStudio.process().
+ * The allowlist mirrors the Launch Agent V1 developer-tools policy.
+ */
+function resolveDeveloperTool(value, parameterName, preferredPaths) {
+    var label = parameterName || "executable";
+    var validation = validateExecutable(value, label);
+    var executable;
+    var name;
+    var candidates;
+    var roots;
+    var i;
+
+    if (!validation.ok) {
+        return validation;
+    }
+
+    executable = validation.value;
+    name = executable.substring(executable.lastIndexOf("/") + 1);
+    if (!approvedDeveloperTools[name]) {
+        return {
+            ok: false,
+            message: label + " is not allowed by the Launch Agent V1 developer-tools policy"
+        };
+    }
+
+    if (executable.indexOf("/") >= 0) {
+        validation = validateFilePath(executable, label, { absolute: true });
+        if (!validation.ok) {
+            return validation;
+        }
+        if (!MCPStudio.fileExists(validation.value)) {
+            return { ok: false, message: label + " not found: " + validation.value };
+        }
+        return { ok: true, value: validation.value };
+    }
+
+    candidates = Array.isArray(preferredPaths) ? preferredPaths.slice() : [];
+    roots = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"];
+    for (i = 0; i < roots.length; i += 1) {
+        candidates.push(joinPath(roots[i], name));
+    }
+
+    for (i = 0; i < candidates.length; i += 1) {
+        if (typeof candidates[i] === "string" &&
+            candidates[i].charAt(0) === "/" &&
+            MCPStudio.fileExists(candidates[i])) {
+            return { ok: true, value: candidates[i] };
+        }
+    }
+
+    return { ok: false, message: label + " not found: " + executable };
+}
+
+function splitArgumentString(value, parameterName) {
+    var validation = validateShellFragment(value, parameterName);
+
+    if (!validation.ok) {
+        return validation;
+    }
+    if (!validation.value) {
+        return { ok: true, value: [] };
+    }
+    return { ok: true, value: validation.value.split(/\s+/) };
+}
+
+/**
+ * Execute one approved developer tool without invoking a command shell.
+ */
+function executeProcess(executable, parameters) {
+    var args = Array.isArray(parameters) ? parameters : [];
+    var i;
+    var succeeded;
+
+    if (typeof MCPStudio.process !== "function") {
+        return {
+            success: false,
+            stdout: [],
+            stderr: ["MCPStudio.process is unavailable in this scripting host"]
+        };
+    }
+
+    for (i = 0; i < args.length; i += 1) {
+        if (typeof args[i] !== "string") {
+            return {
+                success: false,
+                stdout: [],
+                stderr: ["Process arguments must be strings"]
+            };
+        }
+    }
+
+    try {
+        succeeded = MCPStudio.process(executable, args, "stdOut", "stdErr");
+        return {
+            success: succeeded === true,
+            stdout: getStandardOutput().slice(),
+            stderr: getErrorOutput().slice()
+        };
+    } catch (error) {
+        return {
+            success: false,
+            stdout: [],
+            stderr: [error && error.message ? error.message : String(error)]
+        };
+    }
+}
+
+function createProcessOutput() {
+    return { stdout: [], stderr: [] };
+}
+
+function appendProcessRun(output, label, run) {
+    var target = output || createProcessOutput();
+    var heading = label ? "=== " + label + " ===" : "";
+
+    if (heading) {
+        target.stdout.push(heading);
+    }
+    if (run && Array.isArray(run.stdout)) {
+        target.stdout = target.stdout.concat(run.stdout);
+    }
+    if (run && Array.isArray(run.stderr) && run.stderr.length > 0) {
+        if (heading) {
+            target.stderr.push(heading);
+        }
+        target.stderr = target.stderr.concat(run.stderr);
+    }
+    return target;
 }
 
 function appendStandardOutput(message) {
@@ -348,10 +502,10 @@ function formatProcessOutput(successMessage, errorMessage, succeeded, output, er
     return text;
 }
 
-function setProcessResult(succeeded, successMessage, errorMessage, metadata) {
+function setProcessResult(succeeded, successMessage, errorMessage, metadata, processOutput, processErrors) {
     var resultMetadata = copyMetadata(metadata);
-    var output = limitOutput(getStandardOutput());
-    var errors = limitOutput(getErrorOutput());
+    var output = limitOutput(Array.isArray(processOutput) ? processOutput : getStandardOutput());
+    var errors = limitOutput(Array.isArray(processErrors) ? processErrors : getErrorOutput());
 
     resultMetadata.stdout = output;
     resultMetadata.stderr = errors;
@@ -365,7 +519,7 @@ function setProcessResult(succeeded, successMessage, errorMessage, metadata) {
 }
 
 /**
- * Return process stdOut after shell() or process() call
+ * Return process stdOut after a process() call
  * @returns {Array<string>} Array of stdout messages
  */
 function getOutput() {
@@ -373,7 +527,7 @@ function getOutput() {
 }
 
 /**
- * Return process stdOut after shell() or process() call
+ * Return process stdOut after a process() call
  * @returns {Array<string>} Array of stdout messages
  */
 function getStandardOutput() {
@@ -385,7 +539,7 @@ function getStandardOutput() {
 }
 
 /**
- * Return process stdErr after shell() or process() call
+ * Return process stdErr after a process() call
  * @returns {Array<string>} Array of stderr messages
  */
 function getErrorOutput() {
@@ -417,6 +571,11 @@ module.exports = {
     quoteShellArgument,
     validateShellFragment,
     validateExecutable,
+    resolveDeveloperTool,
+    splitArgumentString,
+    executeProcess,
+    createProcessOutput,
+    appendProcessRun,
     appendStandardOutput,
     limitOutput,
     limitText,

@@ -62,11 +62,11 @@ Depending on the handler, MCP Studio supplies functions such as:
 - `MCPStudio.fileExists`, `readFile`, `saveFile`, `deleteFile`
 - `MCPStudio.createDirectory`, `listDirectory`
 - `MCPStudio.getDocumentsPath`, `getTempPath`
-- `MCPStudio.shell` and/or `MCPStudio.process`
+- `MCPStudio.process`
 - `MCPStudio.httpRequest`
 - `MCPStudio.setToolResult`
 
-Build/process helpers also read injected `stdOut` and `stdErr` arrays through `sharedFunctions.js`. Scripts that use these values will fail in plain Node.js unless a test harness provides compatible globals.
+Build/process helpers also read injected `stdOut` and `stdErr` arrays through `sharedFunctions.js`. External tools are launched directly with an absolute executable path and an argument array; command interpreters, pipelines, redirections, substitutions, and script strings are not supported. Scripts that use these values will fail in plain Node.js unless a test harness provides compatible globals.
 
 ## Shared result helpers
 
@@ -116,9 +116,10 @@ return shared.error('The operation failed');
 | `validateDirectoryPath(...)` | Named wrapper around `validatePath` |
 | `normalizePath(path)` | Normalizes separators and `.` segments; returns `null` for parent traversal |
 | `joinPath(base, child)` | Joins two path components without resolving the filesystem |
-| `quoteShellArgument(value)` | Single-quotes one shell argument |
 | `validateExecutable(value, name)` | Accepts a safe executable name or validated path |
-| `validateShellFragment(value, name)` | Rejects non-string and multiline option fragments |
+| `resolveDeveloperTool(value, name, preferredPaths)` | Resolves an approved developer tool to the absolute path required by the V1 process policy |
+| `splitArgumentString(value, name)` | Converts a restricted, whitespace-separated legacy option string to an argument array |
+| `executeProcess(executable, args)` | Calls `MCPStudio.process` and captures the injected output arrays |
 | `limitText(value, max)` / `limitOutput(lines, max)` | Bounds content returned to the assistant |
 | `setProcessResult(...)` | Produces a consistent process result from injected stdout/stderr |
 | `ensureDirectory(path)` | Creates a missing directory through the host |
@@ -159,13 +160,13 @@ The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/
 | `clangMake` | `makeFile` | — |
 | `cmakeBuild` | `projectDir` | `projectTarget=app`, `buildType=Debug`, `cmakeFlags`, `cmakeArgs`, `verbose=false` |
 | `qmakeBuild` | `projectDir` | `projectTarget`, `projectFile`, `buildType=Debug`, `qmakeArgs`, `makeArgs`, `verbose=false` |
-| `shellCall` | `command` | `parameters=[]`, `shell=/bin/bash` |
+| `shellCall` | `command` | `parameters=[]`; compatibility entry point that launches one approved developer tool directly |
 | `checkWithGcc` | — | `arch`, `verbose=false` |
 | `gccSettings` | — | `compiler=gcc`, `verbose=false` |
 | `getGccInfo` | — | `compiler=gcc` |
-| `skillExecute` | `content` (aliases: `script`, `shellScript`) | `operation=skillExecute` |
+| `skillExecute` | `command` | `parameters=[]`, `operation=skillExecute`; launches one approved developer tool directly |
 
-`clangCompile` writes an object file next to the source. `cmakeBuild` uses `cmake --build` and honors `projectTarget`; `qmakeBuild` resolves qmake from `QTDIR` or `PATH` instead of assuming a fixed Qt version. `cmakeFlags`, `cmakeArgs`, `qmakeArgs`, and `makeArgs` remain privileged option strings; multiline values and shell metacharacters are rejected, but the options can still materially alter a build.
+`clangCompile` writes an object file next to the source. `cmakeBuild` uses `cmake --build` and honors `projectTarget`; `qmakeBuild` resolves qmake from standard tool locations. `cmakeFlags`, `cmakeArgs`, `qmakeArgs`, and `makeArgs` remain privileged, whitespace-separated compatibility fields; quoting and command metacharacters are rejected, and each token is passed directly as one process argument.
 
 ### HTTP tools
 
@@ -217,12 +218,12 @@ Then import the module and add its name to `HANDLERS` in `Scripts/tool_entry.js`
 
 ## Security and sandbox behavior
 
-- Treat `shellCall`, `skillExecute`, build flags, URLs, and output paths as privileged input.
+- Treat `shellCall`, `skillExecute`, build arguments, URLs, and output paths as privileged input.
 - Validate exact paths before destructive writes or deletion.
 - Do not assume path validation grants access; macOS sandbox and security-scoped resource rules still apply.
 - Do not store credentials in tool JSON files or log authorization headers.
 - Response text, directory entries, and process output are bounded by the shared helpers; retain those limits in new handlers to prevent context and memory exhaustion.
-- Prefer argument arrays and `quoteShellArgument` when constructing shell commands.
+- Launch only approved developer tools through `MCPStudio.process` and pass every argument as a separate array item.
 
 ## Related documentation
 

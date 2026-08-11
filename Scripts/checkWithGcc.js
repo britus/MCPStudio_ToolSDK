@@ -1,175 +1,169 @@
 // ===================================================================
 // Handler Function: checkWithGcc
-// Determines GCC compiler settings and configuration
-// Fixed version - detects GCC installation and settings
+// Direct process-based GCC toolchain and capability inspection.
 // ===================================================================
 
-// Import shared functions
 const shared = require('sharedFunctions');
 
-function taskLog(message) {
-    shared.appendStandardOutput(message);
+function filterOutput(run, pattern, fallback) {
+    var lines;
+    if (!run || !Array.isArray(run.stdout)) {
+        return run;
+    }
+    lines = run.stdout.filter(function(line) { return pattern.test(line); });
+    run.stdout = lines.length > 0 ? lines : [fallback];
+    return run;
 }
 
-/**
- * Check and determine GCC compiler settings and configuration
- * @param {Object} params - Command parameters
- * @param {string} [params.arch=""] - Target architecture (x86_64, arm64, etc.)
- * @param {boolean} [params.verbose=false] - Show verbose output during detection
- */
+function appendFlagProbe(output, executable, label, language, flag) {
+    var run = shared.executeProcess(executable, [
+        flag,
+        "-fsyntax-only",
+        "-x", language,
+        "/dev/null"
+    ]);
+    run.stdout.unshift(flag + (run.success ? " supported" : " not available"));
+    shared.appendProcessRun(output, label, run);
+}
+
 function checkWithGcc(params) {
     params = params || {};
+
     var arch = params.arch || "";
     var compilerPath = params.compilerPath || "";
-    var verbose = (params.verbose === true);
-    var compilerPathValidation;
-    
-    taskLog("=== GCC Compiler Detection Task ===");
-    taskLog("Architecture: " + arch);
-    taskLog("Verbose: " + verbose);
+    var verbose = params.verbose === true;
+    var pathValidation;
+    var gccRequest = "gcc";
+    var gxxRequest = "g++";
+    var arRequest = "ar";
+    var gccValidation;
+    var gxxValidation;
+    var arValidation;
+    var output = shared.createProcessOutput();
+    var versionRun;
+    var run;
 
+    if (typeof arch !== "string" || /[\0\r\n]/.test(arch)) {
+        return shared.setErrorResult("arch must be a single-line string", {
+            operation: "checkWithGcc"
+        });
+    }
     if (compilerPath) {
-        compilerPathValidation = shared.validateDirectoryPath(
+        pathValidation = shared.validateDirectoryPath(
             compilerPath,
             "compilerPath",
             { absolute: true }
         );
-        if (!compilerPathValidation.ok) {
-            return shared.setErrorResult(compilerPathValidation.message, {
-                operation: "checkWithGcc"
-            });
+        if (!pathValidation.ok) {
+            return shared.setErrorResult(pathValidation.message, { operation: "checkWithGcc" });
         }
-        compilerPath = compilerPathValidation.value;
+        compilerPath = pathValidation.value;
         if (!MCPStudio.fileExists(compilerPath)) {
             return shared.setErrorResult("Compiler path not found: " + compilerPath, {
                 operation: "checkWithGcc",
                 path: compilerPath
             });
         }
+        gccRequest = shared.joinPath(compilerPath, "gcc");
+        gxxRequest = shared.joinPath(compilerPath, "g++");
+        arRequest = shared.joinPath(compilerPath, "ar");
     }
 
-    taskLog("[Script] GCC compiler will be resolved from " + (compilerPath || "PATH"));
-
-    // Build shell script for comprehensive GCC detection
-    var shellScript = '#!/bin/bash\n';
-    var success = false;
-    
-    // Get notified
-    shellScript += 'set -euo pipefail\n';
-    if (verbose) {
-        shellScript += 'set -x\n';
+    gccValidation = shared.resolveDeveloperTool(gccRequest, "gcc", ["/usr/bin/gcc"]);
+    if (!gccValidation.ok) {
+        return shared.setErrorResult(gccValidation.message, {
+            operation: "checkWithGcc",
+            path: compilerPath || "PATH"
+        });
     }
-    if (compilerPath) {
-        shellScript += 'export PATH=' + shared.quoteShellArgument(compilerPath) + ':"${PATH}"\n';
+    gxxValidation = shared.resolveDeveloperTool(gxxRequest, "g++", ["/usr/bin/g++"]);
+    arValidation = shared.resolveDeveloperTool(arRequest, "ar", ["/usr/bin/ar"]);
+
+    output.stdout.push("=== Compiler Location ===", gccValidation.value);
+    versionRun = shared.executeProcess(gccValidation.value, ["--version"]);
+    shared.appendProcessRun(output, "GCC Version Information", versionRun);
+    if (!versionRun.success) {
+        return shared.setProcessResult(false, "", "GCC detection failed.", {
+            path: compilerPath || gccValidation.value,
+            arch: arch,
+            operation: "checkWithGcc"
+        }, output.stdout, output.stderr);
     }
-    shellScript += 'if ! command -v gcc >/dev/null 2>&1; then echo "gcc not found in PATH" >&2; exit 1; fi\n';
-    shellScript += 'which gcc 2>&1\n';
 
-    // Basic version check
-    shellScript += 'echo "=== GCC Version Information ==="\n';
-    shellScript += 'gcc --version 2>&1 || true\n\n';
+    if (gxxValidation.ok) {
+        run = shared.executeProcess(gxxValidation.value, ["--version"]);
+        shared.appendProcessRun(output, "G++ Version Information", run);
+    } else {
+        output.stdout.push("=== G++ Version Information ===", gxxValidation.message);
+    }
+    if (arValidation.ok) {
+        run = shared.executeProcess(arValidation.value, ["--version"]);
+        shared.appendProcessRun(output, "Archive Utility", run);
+    } else {
+        output.stdout.push("=== Archive Utility ===", arValidation.message);
+    }
 
-    // Check for g++ (C++ compiler)
-    shellScript += 'echo "=== G++ Version Information ==="\n';
-    shellScript += 'g++ --version 2>&1 || echo "G++ not found"\n\n';
+    run = shared.executeProcess(gccValidation.value, ["-dM", "-E", "-x", "c", "/dev/null"]);
+    filterOutput(run, /_GNU_SOURCE|__STDC_VERSION__/i, "C language macros not detected");
+    shared.appendProcessRun(output, "C Compiler Language Detection", run);
 
-    // Check for gcc-ar (archive utility)
-    shellScript += 'echo "=== GCC Archive Utility ==="\n';
-    shellScript += 'gcc-ar --version 2>&1 || echo "gcc-ar not found"\n\n';
+    if (gxxValidation.ok) {
+        run = shared.executeProcess(gxxValidation.value, ["-dM", "-E", "-x", "c++", "/dev/null"]);
+        filterOutput(run, /_GLIBCXX|__cplusplus/i, "C++ language macros not detected");
+        shared.appendProcessRun(output, "C++ Compiler Language Detection", run);
+    }
 
-    // Check for gcc-nm (name utility)
-    shellScript += 'echo "=== GCC Name Utility ==="\n';
-    shellScript += 'gcc-nm --version 2>&1 || echo "gcc-nm not found"\n\n';
-
-    // C compiler flags detection
-    shellScript += 'echo "=== C Compiler Flags Detection ==="\n';
-    shellScript += 'echo "Checking for -std=c99 support:"\n';
-    shellScript += 'gcc -dM -E -x c /dev/null | grep -i _GNU_SOURCE || echo "No _GNU_SOURCE defined"\n\n';
-
-    shellScript += 'echo "Checking for -std=c11 support:"\n';
-    shellScript += 'gcc -dM -E -x c /dev/null 2>&1 | grep -i __STDC_VERSION__ || echo "C11 not detected"\n\n';
-
-    // C++ compiler flags detection
-    shellScript += 'echo "=== C++ Compiler Flags Detection ==="\n';
-    shellScript += 'echo "Checking for -std=c++98 support:"\n';
-    shellScript += 'g++ -dM -E -x c++ /dev/null | grep -i _GLIBCXX || echo "No GLIBCXX detected"\n\n';
-
-    shellScript += 'echo "Checking for -std=c++11 support:"\n';
-    shellScript += 'g++ -dM -E -x c++ /dev/null 2>&1 | grep -i __cplusplus || echo "C++11 not detected"\n\n';
-
-    // Check architecture detection
-    shellScript += 'echo "=== Architecture Detection ==="\n';
-    shellScript += 'uname -m\n';
-    shellScript += 'arch\n\n';
-
-    // Check for cross-compilation support (if arch specified)
     if (arch.length > 0) {
-        shellScript += 'echo "=== Cross-Compilation Support ==="\n';
-        shellScript += 'gcc -print-multi-lib 2>&1 || echo "No multi-lib configuration"\n\n';
-        
-        // Check for target-specific flags
-        shellScript += 'echo "Checking target architecture:"\n';
-        shellScript += 'gcc -dumpmachine 2>&1 || true\n\n';
+        run = shared.executeProcess(gccValidation.value, ["-print-multi-lib"]);
+        shared.appendProcessRun(output, "Cross-Compilation Support for " + arch, run);
+    }
+    run = shared.executeProcess(gccValidation.value, ["-dumpmachine"]);
+    shared.appendProcessRun(output, "Target Architecture", run);
+    run = shared.executeProcess(gccValidation.value, ["-print-file-name=include"]);
+    shared.appendProcessRun(output, "Include Path", run);
+    run = shared.executeProcess(gccValidation.value, ["-print-search-dirs"]);
+    shared.appendProcessRun(output, "Library Search Paths", run);
+    run = shared.executeProcess(gccValidation.value, ["-Wl,--version"]);
+    if (run.stdout.length > 5) {
+        run.stdout = run.stdout.slice(0, 5);
+    }
+    shared.appendProcessRun(output, "Linker Information", run);
+
+    appendFlagProbe(output, gccValidation.value, "LTO Support", "c", "-flto");
+    appendFlagProbe(output, gccValidation.value, "PIE Support", "c", "-fPIE");
+    appendFlagProbe(output, gccValidation.value, "Stack Protector", "c", "-fstack-protector-strong");
+    appendFlagProbe(output, gccValidation.value, "ASLR Compatibility", "c", "-fstack-protector-all");
+
+    run = shared.executeProcess(gccValidation.value, ["-dumpversion"]);
+    shared.appendProcessRun(output, "Compiler Version", run);
+    run = shared.executeProcess(gccValidation.value, ["--target-help"]);
+    if (run.stdout.length > 20) {
+        run.stdout = run.stdout.slice(0, 20);
+    }
+    shared.appendProcessRun(output, "Native Target Options", run);
+
+    output.stdout.push("=== GCC Detection Summary ===");
+    output.stdout.push("Compiler: " + gccValidation.value);
+    output.stdout.push("Version: " + (versionRun.stdout[0] || "unknown"));
+    output.stdout.push("C++ Compiler: " + (gxxValidation.ok ? gxxValidation.value : "not found"));
+    if (verbose) {
+        output.stdout.push("Execution mode: direct MCPStudio.process argument arrays");
     }
 
-    // Include paths detection
-    shellScript += 'echo "=== Include Paths Detection ==="\n';
-    shellScript += 'gcc -print-file-name=include 2>&1 || echo "Cannot determine include path"\n\n';
-
-    // Library paths detection
-    shellScript += 'echo "=== Library Paths Detection ==="\n';
-    shellScript += 'gcc -print-search-dirs 2>&1 || echo "Cannot determine library search dirs"\n\n';
-
-    // Linker flags detection
-    shellScript += 'echo "=== Linker Flags Detection ==="\n';
-    shellScript += 'gcc -Wl,--version 2>&1 | head -5 || true\n\n';
-
-    // Check for LTO (Link-Time Optimization) support
-    shellScript += 'echo "=== LTO Support Check ==="\n';
-    shellScript += 'gcc -flto -c /dev/null -o /dev/null 2>&1 && echo "LTO supported" || echo "LTO not supported or failed"\n\n';
-
-    // Check for PIE (Position Independent Executable) support
-    shellScript += 'echo "=== PIE Support Check ==="\n';
-    shellScript += 'gcc -fPIE -c /dev/null -o /dev/null 2>&1 && echo "PIE supported" || echo "PIE not supported or failed"\n\n';
-
-    // Check for FORTIFY_SOURCE support
-    shellScript += 'echo "=== Security Hardening Flags ==="\n';
-    shellScript += 'gcc -Wl,-fstack-protector-strong -c /dev/null -o /dev/null 2>&1 && echo "Stack protector supported" || echo "Stack protector not available"\n\n';
-
-    // Check for ASLR support
-    shellScript += 'echo "=== ASLR Support Check ==="\n';
-    shellScript += 'gcc -fstack-protector-all -c /dev/null -o /dev/null 2>&1 && echo "ASLR compatible" || echo "ASLR not available"\n\n';
-
-    // Print GCC build ID if available
-    shellScript += 'echo "=== GCC Build ID ==="\n';
-    shellScript += 'gcc --version 2>&1 | grep -i "build id" || echo "Build ID not available"\n\n';
-
-    // Check for native target detection
-    shellScript += 'echo "=== Native Target Detection ==="\n';
-    shellScript += 'gcc -dumpmachine\n';
-    shellScript += 'gcc -dumpversion\n';
-    shellScript += 'gcc --target-help 2>&1 | head -20 || true\n\n';
-
-    // Summary section
-    shellScript += 'echo "=== GCC Detection Summary ==="\n';
-    shellScript += 'echo "Compiler: $(which gcc)";\n';
-    shellScript += 'echo "Version: $(gcc --version 2>&1 | head -1)";\n';
-    shellScript += 'echo "C++ Compiler: $(which g++)";\n';
-    shellScript += 'echo "C++ Version: $(g++ --version 2>&1 | head -1 || echo "Not found")";\n';
-
-    taskLog("[Script] Running GCC detection script...");
-    
-    success = MCPStudio.shell(shellScript);
-    
     return shared.setProcessResult(
-        success,
+        true,
         "GCC detection completed successfully.",
         "GCC detection failed.",
         {
-            path: compilerPath || "PATH",
+            path: compilerPath || gccValidation.value,
             arch: arch,
+            gccExecutable: gccValidation.value,
+            gxxExecutable: gxxValidation.ok ? gxxValidation.value : "",
+            verbose: verbose,
             operation: "checkWithGcc"
-        }
+        },
+        output.stdout,
+        output.stderr
     );
 }
 

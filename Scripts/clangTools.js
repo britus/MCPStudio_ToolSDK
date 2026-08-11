@@ -1,176 +1,157 @@
 // ===================================================================
 // Handler Function: clangTools
+// Direct process-based Clang and Make helpers.
 // ===================================================================
 
-// Import shared functions
 const shared = require('sharedFunctions');
 
-/**
- * Checks C/C++ source file syntax using clang -fsyntax-only
- * @param {Object} params - Command parameters
- * @param {string} params.sourceFile - Path to the source file to check (required)
- * @returns {null|null} Returns null after setting tool result with syntax check status
- */
+function resolveTool(name, operation) {
+    var resolved = shared.resolveDeveloperTool(name, name, ["/usr/bin/" + name]);
+    if (!resolved.ok) {
+        shared.setErrorResult(resolved.message, { operation: operation });
+        return null;
+    }
+    return resolved.value;
+}
+
+function directoryName(path) {
+    var index = path.lastIndexOf("/");
+    return index >= 0 ? (path.substring(0, index) || "/") : ".";
+}
+
+function baseName(path) {
+    return path.substring(path.lastIndexOf("/") + 1);
+}
+
 function clangCheckSyntax(params) {
     params = params || {};
-    var pathValidation = shared.validateFilePath(params.sourceFile || "", "sourceFile");
+    var validation = shared.validateFilePath(params.sourceFile || "", "sourceFile");
     var sourceFile;
+    var executable;
+    var run;
 
-    if (!pathValidation.ok) {
-        return shared.setErrorResult(pathValidation.message, {
-            operation: "clangCheckSyntax"
-        });
+    if (!validation.ok) {
+        return shared.setErrorResult(validation.message, { operation: "clangCheckSyntax" });
     }
-
-    sourceFile = pathValidation.value;
-    
-    console.log("clang: Check syntax: " + sourceFile);
-    
+    sourceFile = validation.value;
     if (!MCPStudio.fileExists(sourceFile)) {
         return shared.setErrorResult("File not found: " + sourceFile, {
             operation: "clangCheckSyntax",
             fileName: sourceFile
         });
     }
-    
-    var shellScript = '#!/bin/bash\n';
-    shellScript += 'set -euo pipefail\n';
-    shellScript += 'SOURCE_FILE=' + shared.quoteShellArgument(sourceFile) + '\n';
-    shellScript += 'FILE_DIR=$(dirname "${SOURCE_FILE}")\n';
-    shellScript += 'cd "${FILE_DIR}" || exit 1\n';
-    shellScript += 'clang -fsyntax-only "$(basename "${SOURCE_FILE}")"\n';
 
-    var success = MCPStudio.shell(shellScript);
-    if (!success) {
-        return shared.setProcessResult(false, "", "Syntax check failed.", {
-            fileName: sourceFile,
-            operation: "clangCheckSyntax"
-        });
+    executable = resolveTool("clang", "clangCheckSyntax");
+    if (!executable) {
+        return null;
     }
-    
-    // Set result using MCPStudio bridge
-    return shared.setProcessResult(true, "Syntax check succeeded.", "", {
-        fileName: sourceFile,
-        operation: "clangCheckSyntax"
-    });
+    run = shared.executeProcess(executable, ["-fsyntax-only", sourceFile]);
+
+    return shared.setProcessResult(
+        run.success,
+        "Syntax check succeeded.",
+        "Syntax check failed.",
+        {
+            fileName: sourceFile,
+            executable: executable,
+            operation: "clangCheckSyntax"
+        },
+        run.stdout,
+        run.stderr
+    );
 }
 
-/**
- * Compiles a C/C++ source file using clang compiler
- * @param {Object} params - Command parameters
- * @param {string} params.sourceFile - Path to the source file to compile (required)
- * @returns {null|null} Returns null after setting tool result with compilation status
- */
 function clangCompile(params) {
     params = params || {};
-    var pathValidation = shared.validateFilePath(params.sourceFile || "", "sourceFile");
+    var validation = shared.validateFilePath(params.sourceFile || "", "sourceFile");
     var sourceFile;
     var fileName;
     var extensionIndex;
     var outputName;
     var outputFile;
+    var executable;
+    var run;
 
-    if (!pathValidation.ok) {
-        return shared.setErrorResult(pathValidation.message, {
-            operation: "clangCompile"
-        });
+    if (!validation.ok) {
+        return shared.setErrorResult(validation.message, { operation: "clangCompile" });
     }
-
-    sourceFile = pathValidation.value;
-    fileName = sourceFile.substring(sourceFile.lastIndexOf("/") + 1);
-    extensionIndex = fileName.lastIndexOf(".");
-    outputName = (extensionIndex > 0 ? fileName.substring(0, extensionIndex) : fileName) + ".o";
-    outputFile = sourceFile.substring(0, sourceFile.length - fileName.length) + outputName;
-    
-    console.log("clang: Compile file: " + sourceFile);
-    
+    sourceFile = validation.value;
     if (!MCPStudio.fileExists(sourceFile)) {
         return shared.setErrorResult("File not found: " + sourceFile, {
             operation: "clangCompile",
             fileName: sourceFile
         });
     }
-    
-    var shellScript = '#!/bin/bash\n';
-    shellScript += 'set -euo pipefail\n';
-    shellScript += 'SOURCE_FILE=' + shared.quoteShellArgument(sourceFile) + '\n';
-    shellScript += 'OUTPUT_FILE=' + shared.quoteShellArgument(outputName) + '\n';
-    shellScript += 'FILE_DIR=$(dirname "${SOURCE_FILE}")\n';
-    shellScript += 'cd "${FILE_DIR}" || exit 1\n';
-    shellScript += 'clang -c "$(basename "${SOURCE_FILE}")" -o "${OUTPUT_FILE}"\n';
 
-    var success = MCPStudio.shell(shellScript);
-    if (!success) {
-        return shared.setProcessResult(false, "", "Compilation failed.", {
+    fileName = baseName(sourceFile);
+    extensionIndex = fileName.lastIndexOf(".");
+    outputName = (extensionIndex > 0 ? fileName.substring(0, extensionIndex) : fileName) + ".o";
+    outputFile = shared.joinPath(directoryName(sourceFile), outputName);
+    executable = resolveTool("clang", "clangCompile");
+    if (!executable) {
+        return null;
+    }
+    run = shared.executeProcess(executable, ["-c", sourceFile, "-o", outputFile]);
+
+    return shared.setProcessResult(
+        run.success,
+        "Compilation succeeded.",
+        "Compilation failed.",
+        {
             fileName: sourceFile,
             outputFile: outputFile,
+            executable: executable,
             operation: "clangCompile"
-        });
-    }
-    
-    // Set result using MCPStudio bridge
-    return shared.setProcessResult(true, "Compilation succeeded.", "", {
-        fileName: sourceFile,
-        outputFile: outputFile,
-        operation: "clangCompile"
-    });
+        },
+        run.stdout,
+        run.stderr
+    );
 }
 
-/**
- * Builds a project using Unix make with the specified Makefile
- * @param {Object} params - Command parameters
- * @param {string} params.makeFile - Path to the Makefile to use (required)
- * @returns {null|null} Returns null after setting tool result with build status
- */
 function clangMake(params) {
     params = params || {};
-    console.log("clang: --[MAKE]----------------------\n" 
-                + JSON.stringify(params, null, 2));
-    
-    var pathValidation = shared.validateFilePath(params.makeFile || "", "makeFile");
-    var sourceFile;
+    var validation = shared.validateFilePath(params.makeFile || "", "makeFile");
+    var makeFile;
+    var executable;
+    var run;
 
-    if (!pathValidation.ok) {
-        return shared.setErrorResult(pathValidation.message, {
-            operation: "clangMake"
-        });
+    if (!validation.ok) {
+        return shared.setErrorResult(validation.message, { operation: "clangMake" });
     }
-
-    sourceFile = pathValidation.value;
-    
-    console.log("clang: Build with make file: " + sourceFile);
-    
-    if (!MCPStudio.fileExists(sourceFile)) {
-        return shared.setErrorResult("File not found: " + sourceFile, {
+    makeFile = validation.value;
+    if (!MCPStudio.fileExists(makeFile)) {
+        return shared.setErrorResult("File not found: " + makeFile, {
             operation: "clangMake",
-            fileName: sourceFile
+            fileName: makeFile
         });
     }
-    
-    var shellScript = '#!/bin/bash\n';
-    shellScript += 'set -euo pipefail\n';
-    shellScript += 'MAKE_FILE=' + shared.quoteShellArgument(sourceFile) + '\n';
-    shellScript += 'FILE_DIR=$(dirname "${MAKE_FILE}")\n';
-    shellScript += 'cd "${FILE_DIR}" || exit 1\n';
-    shellScript += 'make -j8 -f "$(basename "${MAKE_FILE}")"\n';
 
-    var success = MCPStudio.shell(shellScript);
-    if (!success) {
-        return shared.setProcessResult(false, "", "Build failed.", {
-            fileName: sourceFile,
-            operation: "clangMake"
-        });
+    executable = resolveTool("make", "clangMake");
+    if (!executable) {
+        return null;
     }
-    
-    // Set result using MCPStudio bridge
-    return shared.setProcessResult(true, "Build succeeded.", "", {
-        fileName: sourceFile,
-        operation: "clangMake"
-    });
+    run = shared.executeProcess(executable, [
+        "-C", directoryName(makeFile),
+        "-j8",
+        "-f", baseName(makeFile)
+    ]);
+
+    return shared.setProcessResult(
+        run.success,
+        "Build succeeded.",
+        "Build failed.",
+        {
+            fileName: makeFile,
+            executable: executable,
+            operation: "clangMake"
+        },
+        run.stdout,
+        run.stderr
+    );
 }
 
 module.exports = {
-	clangCheckSyntax,
+    clangCheckSyntax,
     clangCompile,
     clangMake,
 };

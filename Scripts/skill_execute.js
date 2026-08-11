@@ -1,39 +1,58 @@
 // ===================================================================
 // skill_execute.js
-// Executes shell script snippets supplied by MCP Studio skills.
+// Executes one approved developer tool for an authorized MCP Studio Skill.
 // ===================================================================
 
 const shared = require('sharedFunctions');
 
-function taskLog(message) {
-    shared.appendStandardOutput(message);
-}
-
 function skillExecute(params) {
     params = params || {};
 
-    var content = params.content || params.script || params.shellScript || "";
+    var command = params.command || "";
+    var parameters = params.parameters || [];
     var operation = params.operation || "skillExecute";
+    var resolved;
+    var run;
+    var i;
 
-    if (!content || String(content).trim().length === 0) {
-        return shared.setErrorResult("Missing required parameter: content", {
+    if (typeof command !== "string" || command.trim().length === 0) {
+        return shared.setErrorResult("Missing required parameter: command", {
             operation: operation
         });
     }
-
-    var shellScript = String(content);
-    
-    var success = MCPStudio.shell(shellScript);
-
-    if (success) {
-        taskLog("[Script] Command successful!");
+    if (!Array.isArray(parameters)) {
+        return shared.setErrorResult("parameters must be an array", {
+            operation: operation
+        });
     }
-    
+    for (i = 0; i < parameters.length; i += 1) {
+        if (typeof parameters[i] !== "string") {
+            return shared.setErrorResult("parameters must contain only strings", {
+                operation: operation
+            });
+        }
+    }
+
+    resolved = shared.resolveDeveloperTool(command.trim(), "command");
+    if (!resolved.ok) {
+        return shared.setErrorResult(resolved.message, {
+            operation: operation,
+            command: command
+        });
+    }
+
+    run = shared.executeProcess(resolved.value, parameters);
     return shared.setProcessResult(
-        success,
-        "Skill script executed successfully.",
-        "Skill script failed.",
-        { operation: operation }
+        run.success,
+        "Skill process executed successfully.",
+        "Skill process failed.",
+        {
+            operation: operation,
+            command: command,
+            executable: resolved.value
+        },
+        run.stdout,
+        run.stderr
     );
 }
 

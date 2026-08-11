@@ -58,11 +58,11 @@ When an envelope is used, the bundle unwraps `arguments`. `testHandler` has high
 | `clangMake` | yes | yes | `makeFile` |
 | `cmakeBuild` | yes | yes | `projectDir`, build options |
 | `qmakeBuild` | yes | yes | `projectDir`, QMake options |
-| `shellCall` | yes | yes | `command`, `parameters`, `shell` |
+| `shellCall` | yes | yes | `command`, `parameters` |
 | `checkWithGcc` | yes | yes | `arch`, `verbose` |
 | `gccSettings` | yes | yes | `compiler`, `verbose` |
 | `getGccInfo` | yes | yes | `compiler` |
-| `skillExecute` | yes | no | `content`, `operation` |
+| `skillExecute` | yes | no | `command`, `parameters`, `operation` |
 | `fetchData` | yes | yes | `url`, `headers`, `saveToFile` |
 | `postData` | yes | yes | `url`, `data`, `headers` |
 | `fetchJSON` | yes | yes | `url`, `headers`, transform/save options |
@@ -133,25 +133,25 @@ Optional parameters include `scheme`, `configuration` (default `Debug`), `platfo
 
 ### `cmakeBuild`
 
-Requires `projectDir`. Optional fields are `projectTarget` (default `app`), `buildType` (default `Debug`), `cmakeFlags`, `cmakeArgs`, and `verbose`. The JavaScript implementation expects the two extra-argument fields as single-line option strings, rejects shell metacharacters, and builds the requested target through `cmake --build`.
+Requires `projectDir`. Optional fields are `projectTarget` (default `app`), `buildType` (default `Debug`), `cmakeFlags`, `cmakeArgs`, and `verbose`. The JavaScript implementation converts the two restricted, whitespace-separated compatibility fields to process arguments and builds the requested target through `cmake --build`.
 
 ### `qmakeBuild`
 
-Requires `projectDir`. Optional fields are `projectTarget`, `projectFile`, `buildType`, `qmakeArgs`, `makeArgs`, and `verbose`. `projectFile` must be relative and defaults to `<projectTarget>.pro`. QMake is resolved from `QTDIR` or `PATH`; no Qt version is hard-coded.
+Requires `projectDir`. Optional fields are `projectTarget`, `projectFile`, `buildType`, `qmakeArgs`, `makeArgs`, and `verbose`. `projectFile` must be relative and defaults to `<projectTarget>.pro`. QMake is resolved from standard executable locations and is invoked directly with an argument array.
 
 ### `shellCall`
 
-Requires `command`. `parameters` is an array whose values are shell-quoted, and `shell` accepts `/bin/bash` (the default) or `/bin/sh`. The command itself remains an intentional shell fragment. This handler executes commands with the authority of its MCP Studio host, so expose it only in trusted configurations.
+Requires `command`, which must name a Launch Agent V1 approved developer tool or provide its absolute executable path. `parameters` is a verbatim string array. The handler does not start a command interpreter, so pipelines, redirections, substitutions, and script strings are unavailable. This remains a privileged execution surface and should be exposed only in trusted configurations.
 
 ### GCC inspection
 
 - `checkWithGcc`: discovers compiler/toolchain capabilities; accepts `arch` and `verbose`.
-- `gccSettings`: inspects one of `gcc`, `g++`, `ar`, or `nm`; accepts `compiler` and `verbose`.
+- `gccSettings`: inspects `gcc` or `g++`; accepts `compiler` and `verbose`.
 - `getGccInfo`: reports details for `compiler`, defaulting to `gcc`.
 
 ### `skillExecute`
 
-JavaScript-only handler for shell content supplied as `content`, `script`, or `shellScript`. `operation` defaults to `skillExecute`. It is a privileged execution surface and should be enabled only for trusted skill definitions.
+JavaScript-only compatibility handler that launches one approved developer tool from `command` with the verbatim `parameters` string array. `operation` defaults to `skillExecute`. It does not accept script content and should be enabled only for trusted skill definitions.
 
 ## HTTP handlers
 
