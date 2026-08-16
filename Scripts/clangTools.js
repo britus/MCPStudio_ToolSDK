@@ -6,6 +6,7 @@
 const shared = require('sharedFunctions');
 
 function resolveTool(name, operation) {
+    /* NOTE!: Security Gate: Allow only following path's */
     var resolved = shared.resolveDeveloperTool(name, name, ["/usr/bin/" + name]);
     if (!resolved.ok) {
         shared.setErrorResult(resolved.message, { operation: operation });

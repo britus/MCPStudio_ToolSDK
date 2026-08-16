@@ -116,37 +116,37 @@ function limitedContent(value, maxCharacters) {
  * @param {Object} params - Parameters object containing operation-specific parameters
  * @returns {string} JSON result or plain text
  */
-function httpTools(handlerName, params) {    
+function httpTools(handlerName, params) {
     try {
-       switch(handlerName) {
+        switch (handlerName) {
             case "fetchData":
                 return fetchData(params);
-            
+
             case "postData":
                 return postData(params);
-            
+
             case "fetchJSON":
                 return fetchJSON(params);
-            
+
             case "downloadFile":
                 return downloadFile(params);
-            
+
             case "apiRequest":
                 return apiRequest(params);
-            
+
             case "scrapeWebpage":
                 return scrapeWebpage(params);
-            
+
             case "checkStatus":
                 return checkStatus(params);
-            
+
             case "webhookCall":
                 return webhookCall(params);
-            
+
             default:
                 return shared.error("Unknown handler: " + handlerName);
         }
-    } catch(e) {
+    } catch (e) {
         console.error("[Script] Error: " + e.toString());
         return shared.error(e.message || e.toString());
     }
@@ -172,23 +172,23 @@ function fetchData(params) {
         return shared.error(urlValidation.message);
     }
     url = urlValidation.value;
-    
+
     console.log("Fetching data from: " + displayURL(url));
-    
+
     // Prepare headers
     var headers = copyHeaders(params.headers);
-    
+
     // Make GET request
     var response = request("GET", url, null, headers);
-    
+
     if (response.error) {
         return shared.error("HTTP request failed: " + response.error);
     }
-    
+
     if (response.statusCode >= 400) {
         return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
     }
-    
+
     // Optional: Save to file
     if (params.saveToFile) {
         var pathValidation = shared.validateFilePath(params.saveToFile, "saveToFile");
@@ -200,7 +200,7 @@ function fetchData(params) {
             return shared.error("Failed to save response: " + pathValidation.value);
         }
     }
-    
+
     var content = limitedContent(response.body);
     return shared.success({
         status: response.statusCode,
@@ -228,27 +228,27 @@ function postData(params) {
         return shared.error(urlValidation.message);
     }
     url = urlValidation.value;
-    
+
     console.log("[Script] Posting data to: " + displayURL(url));
-    
+
     // Convert data to JSON string if its an object
     var body = typeof data === 'string' ? data : JSON.stringify(data);
-    
+
     // Prepare headers
     var headers = copyHeaders(params.headers);
     if (!headers['Content-Type']) {
         headers['Content-Type'] = 'application/json';
     }
     var response = request("POST", url, body, headers);
-    
+
     if (response.error) {
         return shared.error("POST request failed: " + response.error);
     }
-    
+
     if (response.statusCode >= 400) {
         return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
     }
-    
+
     var responseContent = limitedContent(response.body);
     return shared.success({
         status: response.statusCode,
@@ -276,31 +276,31 @@ function fetchJSON(params) {
         return shared.error(urlValidation.message);
     }
     url = urlValidation.value;
-    
+
     console.log("[Script] Fetching JSON from: " + displayURL(url));
-    
+
     // Set Accept header for JSON
     var headers = copyHeaders(params.headers);
     headers['Accept'] = 'application/json';
     var response = request("GET", url, null, headers);
-    
+
     if (response.error) {
         return shared.error("Failed to fetch JSON: " + response.error);
     }
-    
+
     if (response.statusCode >= 400) {
         return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
     }
-    
+
     // Parse JSON response
     try {
         var jsonData = JSON.parse(response.body);
-        
+
         // Optional: Transform or filter data
         if (params.transform) {
             jsonData = applyTransform(jsonData, params.transform);
         }
-        
+
         // Optional: Save to file
         if (params.saveToFile) {
             var saveValidation = shared.validateFilePath(params.saveToFile, "saveToFile");
@@ -311,12 +311,12 @@ function fetchJSON(params) {
                 return shared.error("Failed to save JSON: " + saveValidation.value);
             }
         }
-        
+
         return shared.success({
             status: response.statusCode,
             data: jsonData
         }, { operation: "fetchJSON", url: url });
-    } catch(e) {
+    } catch (e) {
         return shared.error("Failed to process JSON response: " + (e.message || e.toString()));
     }
 }
@@ -337,7 +337,7 @@ function downloadFile(params) {
         return shared.error(urlValidation.message);
     }
     url = urlValidation.value;
-    
+
     if (!destination) {
         // Generate default destination in temp directory
         var filename = url.split('?')[0].split('/').pop() || 'download.txt';
@@ -350,23 +350,23 @@ function downloadFile(params) {
         return shared.error(destinationValidation.message);
     }
     destination = destinationValidation.value;
-    
+
     console.log("[Script] Downloading file from: " + displayURL(url));
     console.log("[Script] Destination: " + destination);
-    
+
     if (typeof MCPStudio.downloadFile !== "function") {
         return shared.error("This MCP Studio host does not provide the binary download bridge");
     }
 
     var succeeded = MCPStudio.downloadFile(url, destination);
-    
+
     if (!succeeded) {
         return shared.error("Failed to download file");
     }
-    
+
     // Get file info
     var exists = MCPStudio.fileExists(destination);
-    
+
     return shared.success({
         message: "File downloaded successfully",
         path: destination,
@@ -401,9 +401,9 @@ function apiRequest(params) {
     if (["GET", "POST", "PUT", "PATCH"].indexOf(method) < 0) {
         return shared.error("HTTP method must be GET, POST, PUT, or PATCH");
     }
-    
+
     console.log("[Script] Making " + method + " request to: " + displayURL(url));
-    
+
     // Prepare body
     var body = null;
     if (data !== undefined && data !== null &&
@@ -413,27 +413,27 @@ function apiRequest(params) {
             headers['Content-Type'] = 'application/json';
         }
     }
-    
+
     var response = request(method, url, body, headers);
-    
+
     if (response.error) {
         return shared.error("API request failed: " + response.error);
     }
     if (response.statusCode >= 400) {
         return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
     }
-    
+
     // Parse response if JSON
     var parsedBody = response.body;
     var contentType = response.headers['Content-Type'] || response.headers['content-type'] || "";
     if (contentType.indexOf('application/json') >= 0) {
         try {
             parsedBody = JSON.parse(response.body);
-        } catch(e) {
+        } catch (e) {
             console.warn("Failed to parse JSON response");
         }
     }
-    
+
     var apiContent = typeof parsedBody === "string" ? limitedContent(parsedBody) : null;
     return shared.success({
         status: response.statusCode,
@@ -442,10 +442,10 @@ function apiRequest(params) {
         body: apiContent ? apiContent.content : parsedBody,
         bodyLength: apiContent ? apiContent.originalLength : undefined,
         truncated: apiContent ? apiContent.truncated : false
-    }, { 
-        operation: "apiRequest", 
-        method: method, 
-        url: url 
+    }, {
+        operation: "apiRequest",
+        method: method,
+        url: url
     });
 }
 
@@ -469,25 +469,25 @@ function scrapeWebpage(params) {
     if (!selectors || typeof selectors !== "object" || Array.isArray(selectors)) {
         return shared.error("selectors must be an object");
     }
-    
+
     console.log("[Script] Scraping webpage: " + displayURL(url));
-    
+
     // Fetch HTML
     var headers = {
         'User-Agent': 'Mozilla/5.0 (compatible; MCPStudio/1.0)'
     };
     var response = request("GET", url, null, headers);
-    
+
     if (response.error) {
         return shared.error("Failed to fetch webpage: " + response.error);
     }
-    
+
     if (response.statusCode >= 400) {
         return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
     }
-    
+
     var html = String(response.body);
-    
+
     // Basic text extraction (simple pattern matching)
     var extracted = {
         title: extractTitle(html),
@@ -495,7 +495,7 @@ function scrapeWebpage(params) {
         links: extractLinks(html),
         images: extractImages(html)
     };
-    
+
     // Apply custom selectors if provided
     for (var key in selectors) {
         if (Object.prototype.hasOwnProperty.call(selectors, key)) {
@@ -503,7 +503,7 @@ function scrapeWebpage(params) {
             extracted[key] = extractPattern(html, pattern);
         }
     }
-    
+
     // Optional: Save HTML to file
     if (params.saveHTML) {
         var saveValidation = shared.validateFilePath(params.saveHTML, "saveHTML");
@@ -514,10 +514,10 @@ function scrapeWebpage(params) {
             return shared.error("Failed to save HTML: " + saveValidation.value);
         }
     }
-    
+
     return shared.success(extracted, {
-        operation: "scrapeWebpage", 
-        url: url 
+        operation: "scrapeWebpage",
+        url: url
     });
 }
 
@@ -529,19 +529,19 @@ function scrapeWebpage(params) {
  */
 function checkStatus(params) {
     var urls = params.urls || [];
-    
+
     if (!Array.isArray(urls) || urls.length === 0) {
         return shared.error("URLs array is required");
     }
     if (urls.length > 50) {
         return shared.error("At most 50 URLs can be checked per call");
     }
-    
+
     console.log("[Script] Checking status of " + urls.length + " URLs");
-    
+
     var results = [];
-    
-    urls.forEach(function(url) {
+
+    urls.forEach(function (url) {
         var validation = validateURL(url);
         var response;
 
@@ -561,7 +561,7 @@ function checkStatus(params) {
         } catch (e) {
             response = { statusCode: 0, statusText: "Request failed", error: e.message || String(e) };
         }
-        
+
         results.push({
             url: url,
             status: response.statusCode || 0,
@@ -570,13 +570,13 @@ function checkStatus(params) {
             online: !response.error && response.statusCode >= 200 && response.statusCode < 400
         });
     });
-    
+
     var summary = {
         total: results.length,
-        online: results.filter(function(r) { return r.online; }).length,
-        offline: results.filter(function(r) { return !r.online; }).length
+        online: results.filter(function (r) { return r.online; }).length,
+        offline: results.filter(function (r) { return !r.online; }).length
     };
-    
+
     return shared.success({
         summary: summary,
         results: results
@@ -606,26 +606,26 @@ function webhookCall(params) {
         return shared.error("Webhook method must be a string");
     }
     method = method.toUpperCase();
-    
+
     console.log("[Script] Calling webhook: " + displayURL(url));
-    
+
     var body = JSON.stringify(payload);
     var headers = copyHeaders(params.headers);
     headers['Content-Type'] = 'application/json';
-    
+
     if (method !== 'POST' && method !== 'PUT') {
         return shared.error("Webhook method must be POST or PUT");
     }
 
     var response = request(method, url, body, headers);
-    
+
     if (response.error) {
         return shared.error("Webhook call failed: " + response.error);
     }
     if (response.statusCode >= 400) {
         return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
     }
-    
+
     var webhookContent = limitedContent(response.body);
     return shared.success({
         status: response.statusCode,
@@ -633,9 +633,9 @@ function webhookCall(params) {
         response: webhookContent.content,
         responseLength: webhookContent.originalLength,
         truncated: webhookContent.truncated
-    }, { 
-        operation: "webhookCall", 
-        url: url 
+    }, {
+        operation: "webhookCall",
+        url: url
     });
 }
 
@@ -666,7 +666,7 @@ function applyTransform(data, transform) {
     // Declarative filtering avoids evaluating caller-supplied JavaScript in the
     // privileged scripting context. Example: {filter: {status: "active"}}.
     if (transform.filter && Array.isArray(data)) {
-        data = data.filter(function(item) {
+        data = data.filter(function (item) {
             var key;
             if (!item || typeof item !== "object") {
                 return false;
@@ -683,9 +683,9 @@ function applyTransform(data, transform) {
 
     // Declarative mapping selects named properties from each array item.
     if (transform.map && Array.isArray(data)) {
-        data = data.map(function(item) {
+        data = data.map(function (item) {
             var mapped = {};
-            transform.map.forEach(function(key) {
+            transform.map.forEach(function (key) {
                 if (item && typeof item === "object" && item[key] !== undefined) {
                     mapped[key] = item[key];
                 }
@@ -696,14 +696,14 @@ function applyTransform(data, transform) {
 
     if (transform.extract && data && typeof data === 'object' && !Array.isArray(data)) {
         var result = {};
-        transform.extract.forEach(function(key) {
+        transform.extract.forEach(function (key) {
             if (data[key] !== undefined) {
                 result[key] = data[key];
             }
         });
         return result;
     }
-    
+
     return data;
 }
 
@@ -726,13 +726,13 @@ function extractText(html) {
     // Remove scripts and styles
     var text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
     text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-    
+
     // Remove HTML tags
     text = text.replace(/<[^>]+>/g, ' ');
-    
+
     // Clean up whitespace
     text = text.replace(/\s+/g, ' ').trim();
-    
+
     // Limit length
     return text.substring(0, 1000);
 }
@@ -746,11 +746,11 @@ function extractLinks(html) {
     var links = [];
     var regex = /<a[^>]+href=["']([^"']+)["'][^>]*>/gi;
     var match;
-    
+
     while ((match = regex.exec(html)) !== null && links.length < 50) {
         links.push(match[1]);
     }
-    
+
     return links;
 }
 
@@ -763,11 +763,11 @@ function extractImages(html) {
     var images = [];
     var regex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
     var match;
-    
+
     while ((match = regex.exec(html)) !== null && images.length < 20) {
         images.push(match[1]);
     }
-    
+
     return images;
 }
 
@@ -785,21 +785,21 @@ function extractPattern(html, pattern) {
         var regex = new RegExp(pattern, 'gi');
         var matches = [];
         var match;
-        
+
         while ((match = regex.exec(html)) !== null && matches.length < 100) {
             matches.push(match[1] || match[0]);
             if (match[0] === '') {
                 regex.lastIndex += 1;
             }
         }
-        
+
         return matches;
-    } catch(e) {
+    } catch (e) {
         console.error("[Script] Invalid pattern: " + pattern);
         return [];
     }
 }
 
 module.exports = {
-	httpTools
+    httpTools
 };

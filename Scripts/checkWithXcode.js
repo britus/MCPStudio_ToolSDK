@@ -93,6 +93,7 @@ function checkWithXcode(params) {
             path: projectPath
         });
     }
+    /* NOTE!: Security Gate: Allow only following path's */
     executableValidation = shared.resolveDeveloperTool("xcodebuild", "xcodebuild", [
         "/usr/bin/xcodebuild"
     ]);

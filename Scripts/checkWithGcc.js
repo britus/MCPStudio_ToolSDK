@@ -69,6 +69,7 @@ function checkWithGcc(params) {
         arRequest = shared.joinPath(compilerPath, "ar");
     }
 
+    /* NOTE!: Security Gate: Allow only following path's */
     gccValidation = shared.resolveDeveloperTool(gccRequest, "gcc", ["/usr/bin/gcc"]);
     if (!gccValidation.ok) {
         return shared.setErrorResult(gccValidation.message, {

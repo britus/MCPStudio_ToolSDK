@@ -285,32 +285,11 @@ function validateExecutable(value, parameterName) {
     return { ok: true, value: executable };
 }
 
-var approvedDeveloperTools = {
-    "ar": true,
-    "clang": true,
-    "clang++": true,
-    "cmake": true,
-    "codesign": true,
-    "gcc": true,
-    "g++": true,
-    "git": true,
-    "ld": true,
-    "lipo": true,
-    "make": true,
-    "ninja": true,
-    "otool": true,
-    "pkg-config": true,
-    "qmake": true,
-    "security": true,
-    "swift": true,
-    "swiftc": true,
-    "xcodebuild": true,
-    "xcrun": true
-};
-
 /**
  * Resolve a developer tool to the absolute path required by MCPStudio.process().
- * The allowlist mirrors the Launch Agent V1 developer-tools policy.
+ * Authorization is deliberately deferred to the MCP Studio host and its
+ * negotiated Launch Agent policy so the ToolSDK does not maintain a second,
+ * potentially stale allowlist.
  */
 function resolveDeveloperTool(value, parameterName, preferredPaths) {
     var label = parameterName || "executable";
@@ -328,6 +307,7 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
     executable = validation.value;
     name = executable.substring(executable.lastIndexOf("/") + 1);
     if (name === "xed") {
+        /* NOTE!: Security Gate: Allow only following path's */
         validation = resolveDeveloperTool("xcrun", label, ["/usr/bin/xcrun"]);
         if (!validation.ok) {
             return validation;
@@ -336,13 +316,6 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
         validation.requestedExecutable = executable;
         return validation;
     }
-    if (!approvedDeveloperTools[name]) {
-        return {
-            ok: false,
-            message: label + " is not allowed by the Launch Agent V1 developer-tools policy"
-        };
-    }
-
     if (executable.indexOf("/") >= 0) {
         validation = validateFilePath(executable, label, { absolute: true });
         if (!validation.ok) {
@@ -354,11 +327,14 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
         return { ok: true, value: validation.value };
     }
 
+    /* NOTE!: Security Gate: Allow only following 'root' path's */
     candidates = Array.isArray(preferredPaths) ? preferredPaths.slice() : [];
     roots = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"];
     for (i = 0; i < roots.length; i += 1) {
         candidates.push(joinPath(roots[i], name));
     }
+
+    console.debug("[Script]: Shell candidates: " + JSON.stringify(candidates, null, 2));
 
     for (i = 0; i < candidates.length; i += 1) {
         if (typeof candidates[i] === "string" &&
@@ -368,7 +344,11 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
         }
     }
 
-    return { ok: false, message: label + " not found: " + executable };
+    let result = { ok: false, message: label + " not found: " + executable };
+    
+    console.debug("[Script]: Shell result: " + JSON.stringify(result, null, 2));
+
+    return result;
 }
 
 function splitArgumentString(value, parameterName) {

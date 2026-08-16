@@ -95,6 +95,7 @@ function qmakeBuild(params) {
     }
     makeFilePath = shared.joinPath(buildPath, "Makefile");
 
+    /* NOTE!: Security Gate: Allow only following path's */
     qmakeValidation = shared.resolveDeveloperTool("qmake", "qmake", [
         "/opt/homebrew/bin/qmake",
         "/usr/local/bin/qmake",

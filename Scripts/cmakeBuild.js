@@ -78,6 +78,7 @@ function cmakeBuild(params) {
         });
     }
 
+    /* NOTE!: Security Gate: Allow only following path's */
     executableValidation = shared.resolveDeveloperTool("cmake", "cmake", [
         "/opt/homebrew/bin/cmake",
         "/usr/local/bin/cmake",

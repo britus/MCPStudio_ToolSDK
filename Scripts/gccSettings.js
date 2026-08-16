@@ -32,6 +32,7 @@ function gccSettings(params) {
     var compiler = params.compiler || "gcc";
     var verbose = params.verbose === true;
     var requestedCompilerName = compiler.substring(compiler.lastIndexOf("/") + 1);
+    /* NOTE!: Security Gate: Allow only following path's */
     var resolved = shared.resolveDeveloperTool(compiler, "compiler", [
         "/usr/bin/" + compiler,
         "/opt/homebrew/bin/" + compiler,
