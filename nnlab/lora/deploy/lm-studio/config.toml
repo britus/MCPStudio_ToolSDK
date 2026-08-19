@@ -1,0 +1,24 @@
+# Legacy standalone LM Studio deployment example. The active lifecycle uses
+# config/mcpstudio-v2.toml for prepare, train, verify, merge, and deploy.
+#
+# Paths are resolved relative to the project root unless they are absolute.
+
+[model]
+id = "models/google/gemma-4-26b-a4b"
+revision = "main"
+trust_remote_code = false
+local_files_only = true
+
+[deployment]
+# MLX adapter selected for local deployment.
+adapter = "artifacts/finetune_lora"
+
+# Identifiers used inside LM Studio. The model name automatically gets the
+# eofnnlab- prefix for the concrete model directory.
+model_name = "finetune_lora"
+publisher = "eofnnlab"
+hub_owner = "eofnnlab"
+
+# Default LM Studio data directory. Override with --lmstudio-root or by setting
+# LMSTUDIO_ROOT when running install.sh.
+lmstudio_root = "~/.lmstudio"

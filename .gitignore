@@ -5,6 +5,14 @@
 # EoF MCP Studio ToolSDK Packager
 .toolsdk.package.chksum
 
+#nnlab
+**/artifacts/
+**/data/
+**/eval/
+**/models/
+**/__pycache__/
+training-*.txt
+
 # not this
 config/MultiAgents/border crossing research.json
 config/Prompts/coding_refactoring_short.json

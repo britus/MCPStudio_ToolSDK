@@ -1,0 +1,24 @@
+{
+  "allowedToolNames" : [
+    "rag_query",
+    "finetune_prepare_documents",
+    "finetune_train_adapter"
+  ],
+  "description" : "Train, inspect and prepare MLX LoRA adapters with a smoke-test-first workflow and reproducible artifacts.",
+  "name" : "finetune_adapter_training",
+  "promptTemplate" : "Training objective: {{training_goal}}\nUser-provided domain context: {{domain_context}}\nExplicit document sources: {{document_sources}}",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Fine-tune Adapter Training\n\nUse this skill for the configured offline MLX LoRA project. A plain-language training objective is sufficient.\n\n## Executable pipeline\n\n1. Use `rag_query` to locate exact local source documents for every requested subject, unless the operator supplied explicit paths. Preserve exact file URIs\/paths; never infer paths from titles. Missing subject coverage is FAIL.\n2. Run `finetune_prepare_documents` for the complete selected batch. This must generate fresh train and validation JSONL files plus the manifest with exact source coverage and non-zero record counts. Preparation `success=false` is FAIL and stops training.\n3. Run `finetune_train_adapter` with `smokeTest=true`, `requirePreparedDataset=true`, and the expected smoke output directory. Tool `success=true` is PASS; `success=false`, missing artifact, non-finite loss, or missing dataset counts is FAIL.\n4. Only on smoke PASS, run full `finetune_train_adapter` with `requirePreparedDataset=true` and the expected full output directory.\n5. Never merge, verify, install or update from this training skill.\n6. Report selected sources, JSONL\/manifest counts, smoke PASS or FAIL, full-training result or stop reason, and artifact path. Model quality remains unverified until a separate held-out verification passes.\n\n## Project constraints\n\n- Work offline with the configured local base model.\n- Treat the user's objective and optional domain context as authoritative.\n- Never reuse stale processed data and never use verification prompts as training examples.",
+  "toolScopeMode" : "restricted",
+  "triggerPhrases" : [
+    "Train model adapter",
+    "Continue LoRA training",
+    "Train domain adapter",
+    "Prepare training documents",
+    "Training smoke test"
+  ],
+  "visibilityScope" : "chat"
+}

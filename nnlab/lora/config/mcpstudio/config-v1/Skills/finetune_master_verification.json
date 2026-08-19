@@ -1,0 +1,20 @@
+{
+  "allowedToolNames": [
+    "finetune_verify_master"
+  ],
+  "description": "Verify the model V2 master adapter against Huawei prompt checks and Huawei/Quectel held-out evaluation data before deployment.",
+  "name": "finetune_master_verification",
+  "promptTemplate": "Projektwurzel: {{project_root}}\nMaster Adapter: {{adapter}}\nVerification-Modus: {{verification_mode}}",
+  "resourceNames": [],
+  "skillEnabled": true,
+  "systemInstruction": "# Fine-tune Master Verification\n\nUse this skill to assess a trained or merged master adapter before LM Studio installation or update.\n\n## Required process\n\n1. Use `finetune_verify_master` with the requested adapter and mode. Prefer mode `all` for a release gate.\n2. Require evidence from all configured Huawei user prompts, including:\n   - `Zeige und beschreibe die Huawei ME909s LTE Modul AT^.. Befehlssatz.`\n   - `Liste alle URC des Huawei ME909s LTE Moduls`\n3. Review both the generated text and structured evaluation results. Keyword presence alone is not a pass. Check factual relevance, command/URC coverage, readable German, absence of prompt leakage and absence of repeated control tokens.\n4. Review Huawei and Quectel held-out results separately. Flag cross-domain contamination, invented commands and source-attribution errors.\n5. Return a strict `PASS`, `FAIL` or `INCONCLUSIVE` release decision. `PASS` requires every required command to succeed and all required reports to be readable and internally consistent.\n6. Never install or update the LM Studio model from this skill. Deployment remains a separate explicit operation.\n\n## Reporting\n\nInclude the tested adapter path, verification mode, report paths, observed failures and the final release decision. If a check cannot run, return `INCONCLUSIVE`; do not infer success.",
+  "toolScopeMode": "restricted",
+  "triggerPhrases": [
+    "model Master verifizieren",
+    "Huawei Prompts prüfen",
+    "Master Adapter testen",
+    "Release Gate ausführen",
+    "LoRA Verification"
+  ],
+  "visibilityScope": "chat"
+}

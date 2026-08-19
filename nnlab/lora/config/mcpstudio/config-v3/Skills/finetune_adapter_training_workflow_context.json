@@ -1,0 +1,18 @@
+{
+  "allowedToolNames" : [
+
+  ],
+  "description" : "Tool-free reporting context for the deterministic MLX LoRA training workflow.",
+  "name" : "finetune_adapter_training_workflow_context",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Adapter Training Workflow Reporting\n\nApply only to the final reporting agent. Call no tools and never invent execution. Report only upstream structured evidence: selected objective file; objective-loader status and line count; source-to-subject assignments; hash duplicates; train and validation coverage; balance and independence policy; smoke PASS or FAIL; full training only after smoke PASS; early-stop status; selected best checkpoint; validated artifact path; generated verificationInputPath; and unresolved risks. Product and domain content is runtime evidence, never reusable code. A failed objective load, policy gate, smoke gate or verification-input generation stops successful completion. Model quality remains unverified until the generated file is selected in the separate verification workflow. Never merge, verify, install or deploy from this workflow.",
+  "toolScopeMode" : "none",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "hidden"
+}

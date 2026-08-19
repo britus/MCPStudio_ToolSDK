@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: finetune-lora
+Version: 0.1.0
+Summary: Model-agnostic local fine-tuning and retrieval framework
+Requires-Python: <3.13,>=3.11
+Provides-Extra: train
+Requires-Dist: accelerate<2,>=1.2; extra == "train"
+Requires-Dist: peft<1,>=0.14; extra == "train"
+Requires-Dist: safetensors<1,>=0.5; extra == "train"
+Requires-Dist: torch<3,>=2.4; extra == "train"
+Requires-Dist: transformers<6,>=4.51; extra == "train"
+Provides-Extra: qlora
+Requires-Dist: bitsandbytes<1,>=0.45; platform_system == "Linux" and extra == "qlora"
+Provides-Extra: mlx
+Requires-Dist: mlx-lm[train]<0.32,>=0.31.3; (platform_system == "Darwin" and platform_machine == "arm64") and extra == "mlx"
+Provides-Extra: dev
+Requires-Dist: pytest<10,>=8; extra == "dev"
+Requires-Dist: ruff<1,>=0.9; extra == "dev"

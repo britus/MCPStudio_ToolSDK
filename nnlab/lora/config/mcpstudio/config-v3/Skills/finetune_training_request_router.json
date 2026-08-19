@@ -1,0 +1,18 @@
+{
+  "allowedToolNames" : [
+
+  ],
+  "description" : "Tool-free request routing for a release 3 training objective supplied as a selected file or inline text.",
+  "name" : "finetune_training_request_router",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Training Request Router - Release 3\n\nRead only the current user request and configured agent properties. Extract the value following `Training objective file:` as `objectiveFile` and the value following `Inline training objective:` as `objectiveText`. Preserve an absolute path exactly. An empty value remains an empty string. Reject unresolved `{{...}}` placeholders. Return exactly one raw JSON object containing `objectiveFile`, `objectiveText`, `projectRoot`, and `trainingConfig`. Do not read files, call tools, search RAG, interpret domain content, prepare data, or start training.",
+  "toolScopeMode" : "none",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "hidden"
+}

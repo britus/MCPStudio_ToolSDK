@@ -1,0 +1,105 @@
+[metadata]
+name = "finetune"
+method = "lora"
+release = 3
+
+[model]
+id = "models/google/gemma-4-26b-a4b"
+revision = "main"
+trust_remote_code = false
+local_files_only = true
+
+[data]
+train_file = "data/processed/finetune_lora/train.jsonl"
+validation_file = "data/processed/finetune_lora/validation.jsonl"
+manifest_file = "data/processed/finetune_lora/manifest.json"
+index_file = "data/processed/finetune_lora/code_index.sqlite3"
+max_seq_length = 2048
+chunk_lines = 140
+overlap_lines = 20
+max_file_bytes = 1000000
+validation_ratio = 0.10
+seed = 42
+document_type = "user-provided technical documentation"
+
+[dataset_policy]
+max_source_fraction = 0.50
+max_subject_imbalance = 2.0
+coverage_failure_mode = "error"
+
+[training]
+backend = "auto"
+output_dir = "artifacts/finetune_lora_candidate"
+epochs = 2.0
+learning_rate = 0.00002
+train_batch_size = 1
+eval_batch_size = 1
+gradient_accumulation_steps = 8
+warmup_ratio = 0.03
+weight_decay = 0.01
+logging_steps = 5
+save_total_limit = 2
+gradient_checkpointing = true
+qlora = false
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.0
+target_modules = [
+  "q_proj",
+  "k_proj",
+  "v_proj",
+  "o_proj",
+  "gate_proj",
+  "up_proj",
+  "down_proj",
+]
+mlx_data_dir = "data/processed/finetune_lora/mlx"
+mlx_iterations = 400
+mlx_num_layers = 8
+mlx_save_every = 50
+mlx_eval_batches = 20
+
+[checkpoint_policy]
+metric = "validation_loss"
+evaluation_interval = 50
+early_stopping = true
+patience = 3
+min_delta = 0.001
+restore_best = true
+
+[retrieval]
+top_k = 6
+max_context_chars = 18000
+
+[inference]
+backend = "mlx"
+base_url = "http://localhost:1234/v1"
+api_key = "lm-studio"
+model = "google/gemma-4-26b-a4b"
+temperature = 0.15
+max_new_tokens = 1024
+max_total_new_tokens = 4096
+
+[verification]
+prompts_file = "eval/eval-prompts.jsonl"
+adapter = "artifacts/finetune_lora_merged"
+output_file = "artifacts/finetune_verification.json"
+
+[verification_input]
+output_root = "data/verifications"
+acceptance_criteria = "Execute every held-out prompt and review every generated answer for factual relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage and repeated control tokens. Process success or keyword matches alone are insufficient for PASS."
+
+[merge]
+master = "artifacts/finetune_lora"
+adapters = ["artifacts/finetune_lora_candidate"]
+weights = ["0.5", "0.5"]
+output = "artifacts/finetune_lora_merged"
+in_place = false
+force = false
+
+[deployment]
+adapter = "artifacts/finetune_lora_candidate"
+model_name = "finetune_lora_candidate"
+publisher = "eofnnlab"
+hub_owner = "eofnnlab"
+lmstudio_root = "~/.lmstudio"

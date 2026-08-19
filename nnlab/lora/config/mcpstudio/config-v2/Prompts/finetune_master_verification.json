@@ -1,0 +1,32 @@
+{
+  "arguments" : [
+    {
+      "description" : "Project-relative adapter directory to verify.",
+      "name" : "adapter",
+      "required" : true
+    },
+    {
+      "description" : "User-provided subject-matter context containing the terminology, facts, constraints, and boundaries used to assess answers.",
+      "name" : "subject_context",
+      "required" : true
+    },
+    {
+      "description" : "Absolute root of the fine-tuning project.",
+      "name" : "project_root",
+      "required" : true
+    },
+    {
+      "description" : "Project-relative TOML containing verification inputs and output paths.",
+      "name" : "config_path",
+      "required" : true
+    },
+    {
+      "description" : "User-provided verification prompts with expected facts, coverage requirements, or other acceptance criteria.",
+      "name" : "verification_prompts",
+      "required" : true
+    }
+  ],
+  "description" : "Verify a model adapter against user-provided subject-matter context and held-out prompts, then produce an evidence-based release gate decision.",
+  "name" : "finetune_master_verification",
+  "template" : "Use the `finetune_master_verification` skill and, when executed as a workflow, the `finetune_master_verification_workflow`.\n\nProject root: `{{project_root}}`\nConfiguration: `{{config_path}}`\nAdapter under verification: `{{adapter}}`\n\nUser-provided subject-matter context:\n{{subject_context}}\n\nUser-provided held-out prompts and acceptance criteria:\n{{verification_prompts}}\n\nTreat the supplied context, prompts, and acceptance criteria as authoritative. Do not inject named examples, assumed specialist knowledge, or unstated requirements. Confirm that the verification input is sufficiently concrete before running checks; if required context or expected behavior is missing, return INCONCLUSIVE and list what the user must provide.\n\nEvaluate every supplied prompt semantically. Check factual correctness against the supplied context, required coverage, unsupported claims, cross-context contamination, prompt leakage, and repeated control-token patterns. Do not issue PASS based only on successful process execution, keyword presence, or aggregate scores. Evaluate every configured held-out suite separately.\n\nReturn an auditable report containing tested paths, report files, per-prompt findings, evaluation findings, errors, and exactly one release decision: PASS, FAIL, or INCONCLUSIVE. Installation or update requires a separate explicit request."
+}

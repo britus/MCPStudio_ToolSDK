@@ -1,0 +1,82 @@
+[model]
+id = "models/google/gemma-4-26b-a4b"
+revision = "main"
+trust_remote_code = false
+local_files_only = true
+
+[data]
+train_file = "data/processed/finetune_lora_legacy/train.jsonl"
+validation_file = "data/processed/finetune_lora_legacy/validation.jsonl"
+manifest_file = "data/processed/finetune_lora_legacy/manifest.json"
+index_file = "data/processed/finetune_lora_legacy/code_index.sqlite3"
+max_seq_length = 2048
+chunk_lines = 140
+overlap_lines = 20
+max_file_bytes = 1000000
+validation_ratio = 0.10
+seed = 42
+document_type = "user-provided technical domain documentation"
+
+[training]
+backend = "auto"
+output_dir = "artifacts/finetune_lora"
+epochs = 2.0
+learning_rate = 0.00002
+train_batch_size = 1
+eval_batch_size = 1
+gradient_accumulation_steps = 8
+warmup_ratio = 0.03
+weight_decay = 0.01
+logging_steps = 5
+save_total_limit = 2
+gradient_checkpointing = true
+qlora = false
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.0
+target_modules = [
+  "q_proj",
+  "k_proj",
+  "v_proj",
+  "o_proj",
+  "gate_proj",
+  "up_proj",
+  "down_proj",
+]
+mlx_data_dir = "data/processed/finetune_lora_legacy/mlx"
+mlx_iterations = 400
+mlx_num_layers = 8
+mlx_save_every = 50
+mlx_eval_batches = 20
+
+[retrieval]
+top_k = 6
+max_context_chars = 18000
+
+[inference]
+backend = "mlx"
+base_url = "http://localhost:1234/v1"
+api_key = "lm-studio"
+model = "google/gemma-4-26b-a4b"
+temperature = 0.15
+max_new_tokens = 1024
+
+[verification]
+prompts_file = "eval/eval-prompts.jsonl"
+adapter = "artifacts/finetune_lora"
+output_file = "artifacts/finetune_verification.json"
+
+[merge]
+master = "artifacts/finetune_lora"
+adapters = []
+weights = []
+output = "artifacts/finetune_lora_merged"
+in_place = false
+force = false
+
+[deployment]
+adapter = "artifacts/finetune_lora"
+model_name = "finetune_lora"
+publisher = "eofnnlab"
+hub_owner = "eofnnlab"
+lmstudio_root = "~/.lmstudio"

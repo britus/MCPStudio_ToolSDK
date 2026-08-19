@@ -1,0 +1,65 @@
+[model]
+id = "models/google/gemma-4-26b-a4b"
+revision = "main"
+trust_remote_code = false
+local_files_only = true
+
+[data]
+train_file = "data/processed/finetune_lora_default/train.jsonl"
+validation_file = "data/processed/finetune_lora_default/validation.jsonl"
+manifest_file = "data/processed/finetune_lora_default/manifest.json"
+index_file = "data/processed/finetune_lora_default/code_index.sqlite3"
+max_seq_length = 2048
+chunk_lines = 140
+overlap_lines = 20
+max_file_bytes = 1000000
+validation_ratio = 0.10
+seed = 42
+
+[training]
+# "auto" detects MLX quantization versus Transformers/Safetensors.
+backend = "auto"
+output_dir = "artifacts/finetune_lora"
+epochs = 2.0
+learning_rate = 0.00002
+train_batch_size = 1
+eval_batch_size = 1
+gradient_accumulation_steps = 8
+warmup_ratio = 0.03
+weight_decay = 0.01
+logging_steps = 5
+save_total_limit = 2
+gradient_checkpointing = true
+qlora = false
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.0
+target_modules = [
+  "q_proj",
+  "k_proj",
+  "v_proj",
+  "o_proj",
+  "gate_proj",
+  "up_proj",
+  "down_proj",
+]
+
+# Recall-oriented MLX defaults for the local 26B-A4B 4-bit model and 48 GB unified memory.
+mlx_data_dir = "data/processed/finetune_lora_default/mlx"
+mlx_iterations = 400
+mlx_num_layers = 8
+mlx_save_every = 50
+mlx_eval_batches = 20
+
+[retrieval]
+top_k = 6
+max_context_chars = 18000
+
+[inference]
+backend = "lmstudio"
+base_url = "http://localhost:1234/v1"
+api_key = "sk-lm-cvAeqIun:xc08bKhBF6oiO63Qhk1M"
+model = "google/gemma-4-26b-a4b"
+temperature = 0.15
+max_new_tokens = 1024
+max_total_new_tokens = 4096

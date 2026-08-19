@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "executableRoots": [
+    "${TOOLSDK}/nnlab/lora/scripts",
+    "${TOOLSDK}/nnlab/lora/deploy/lm-studio"
+  ],
+  "commands": [
+    {
+      "name": "extract_pdfs.sh",
+      "enabled": true,
+      "match": "exact"
+    },
+    {
+      "name": "prepare_docs.sh",
+      "enabled": true,
+      "match": "exact"
+    },
+    {
+      "name": "train.sh",
+      "enabled": true,
+      "match": "exact"
+    },
+    {
+      "name": "smoke_train.sh",
+      "enabled": true,
+      "match": "exact"
+    },
+    {
+      "name": "verify_master.sh",
+      "enabled": true,
+      "match": "exact"
+    },
+    {
+      "name": "merge_adapters.sh",
+      "enabled": true,
+      "match": "exact"
+    },
+    {
+      "name": "install.sh",
+      "enabled": true,
+      "match": "exact"
+    }
+  ]
+}

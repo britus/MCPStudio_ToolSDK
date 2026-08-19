@@ -1,0 +1,27 @@
+{
+  "arguments" : [
+    {
+      "description" : "Optional exact local file paths or file:\/\/ URIs. Leave empty to discover documents from RAG.",
+      "name" : "document_sources",
+      "required" : false
+    },
+    {
+      "description" : "User-provided subject-matter context, including terminology, source constraints, expected behavior, and explicit exclusions.",
+      "name" : "domain_context",
+      "required" : false
+    },
+    {
+      "description" : "Project-relative TOML training configuration.",
+      "name" : "training_config",
+      "required" : true
+    },
+    {
+      "description" : "Plain-language description of the knowledge or documents to retrieve from RAG and train.",
+      "name" : "training_goal",
+      "required" : true
+    }
+  ],
+  "description" : "Train the configured model adapter from a simple objective: retrieve matching RAG documents, generate fresh JSONL data, run smoke, and continue only on PASS.",
+  "name" : "finetune_training_cycle",
+  "template" : "Use the workflow `finetune_adapter_training_workflow`.\n\nProject root: `${CHAT_PROJECT_DIR}`\nTraining configuration: `{{training_config}}`\nTraining objective: {{training_goal}}\n\nUser-provided subject-matter context (optional):\n{{domain_context}}\n\nExplicit local document paths or file:\/\/ URIs (optional):\n{{document_sources}}\n\nFind every requested subject in RAG unless an explicit source was supplied. Prepare the selected documents as one isolated batch, generate fresh train and validation JSONL files plus the manifest, and run the smoke test. Smoke PASS continues to full training; smoke FAIL stops the workflow. Do not merge, verify, install or deploy. Return the selected sources, JSONL\/manifest counts, smoke PASS or FAIL, full-training result or stop reason, and artifact path."
+}

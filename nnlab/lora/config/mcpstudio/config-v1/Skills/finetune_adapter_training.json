@@ -1,0 +1,22 @@
+{
+  "allowedToolNames": [
+    "rag_query",
+    "finetune_prepare_documents",
+    "finetune_train_adapter"
+  ],
+  "description": "Train, inspect and prepare MLX LoRA adapters with a smoke-test-first workflow and reproducible artifacts.",
+  "name": "finetune_adapter_training",
+  "promptTemplate": "Training objective: {{training_goal}}\nProject root: {{project_root}}\nTraining configuration: {{training_config}}\nUser-provided domain context: {{domain_context}}",
+  "resourceNames": [],
+  "skillEnabled": true,
+  "systemInstruction": "# Fine-tune Adapter Training\n\nUse this skill for continued offline MLX LoRA training in the fine-tuning project.\n\n## Required process\n\n1. Confirm the project root, training TOML, user-provided training objective and intended output adapter.\n2. Use `rag_query` only to locate exact local source documents for the objective. Retain exact file URIs/paths and stop if any explicitly requested subject is missing.\n3. Run `finetune_prepare_documents` for the selected document or document batch. Do not train against pre-existing `data/processed` files. Require a successful result, the expected sources, non-zero training records and non-zero validation records before training.\n4. Run `finetune_train_adapter` with `smokeTest=true` first. Treat any non-success result, missing artifact or non-finite loss as a hard stop.\n5. Run the full training only after the smoke test succeeds. Preserve the training configuration, seed, source paths, generated manifest and resulting metadata needed for reproducibility.\n6. Never merge, verify, install or update from this training skill. Those are separate explicitly requested workflows or tools.\n7. Report the exact source documents, manifest, configuration path, output path, success state and available loss evidence. Do not claim improved quality without verification on held-out data.\n\n## Project constraints\n\n- Work offline with the existing local base model and adapters.\n- The user's domain context is authoritative; do not introduce unrelated product-specific assumptions.\n- Keep training data and independent verification prompts/data separated. Verification prompts are not training examples.\n- A successful process exit is not sufficient proof of model quality.",
+  "toolScopeMode": "restricted",
+  "triggerPhrases": [
+    "Train model adapter",
+    "Continue LoRA training",
+    "Train domain adapter",
+    "Prepare training documents",
+    "Training smoke test"
+  ],
+  "visibilityScope": "chat"
+}

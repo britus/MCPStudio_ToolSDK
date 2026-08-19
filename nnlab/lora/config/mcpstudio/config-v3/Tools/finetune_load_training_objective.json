@@ -1,0 +1,88 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-08-18T00:00:00.000Z",
+    "priority" : 0.99
+  },
+  "description" : "Load and validate a user-selected UTF-8 training-objective file before document discovery. File content remains runtime data.",
+  "execHandler" : "finetuneLoadTrainingObjective",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "objectiveFile" : {
+        "description" : "Optional absolute path selected in the Prompt Picker. Supported extensions are .txt and .md.",
+        "name" : "objectiveFile",
+        "type" : "string"
+      },
+      "objectiveText" : {
+        "description" : "Optional inline objective used only when no objective file was selected.",
+        "name" : "objectiveText",
+        "type" : "string"
+      },
+      "projectRoot" : {
+        "description" : "Absolute project root used for the controlled workflow invocation.",
+        "name" : "projectRoot",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "projectRoot"
+    ],
+    "type" : "object"
+  },
+  "name" : "finetune_load_training_objective",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Failure details when the objective cannot be loaded.",
+        "name" : "error",
+        "type" : "string"
+      },
+      "objectiveCharacters" : {
+        "description" : "Number of characters in the validated objective.",
+        "name" : "objectiveCharacters",
+        "type" : "integer"
+      },
+      "objectiveFile" : {
+        "description" : "Validated absolute source path when file mode was used.",
+        "name" : "objectiveFile",
+        "type" : "string"
+      },
+      "objectiveLines" : {
+        "description" : "Number of lines in the validated objective.",
+        "name" : "objectiveLines",
+        "type" : "integer"
+      },
+      "objectiveSourceMode" : {
+        "description" : "Whether the objective came from file or inline input.",
+        "name" : "objectiveSourceMode",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Executed objective-loading operation.",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Whether a non-empty supported objective was loaded.",
+        "name" : "success",
+        "type" : "boolean"
+      },
+      "trainingGoal" : {
+        "description" : "Validated objective content passed to the discovery agent.",
+        "name" : "trainingGoal",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio\/config-v3\/Scripts\/finetune_tools.js",
+  "toolType" : "ScriptTool"
+}

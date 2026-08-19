@@ -1,0 +1,410 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Use the validated `trainingGoal` supplied by Load Training Objective as the complete runtime objective. Extract every required subject, resolve exact local source documents, and then compute coverage from the subjects assigned to retained sources. Prefer explicit sources in the objective; call rag_query with focused subject-and-source queries for each uncovered requirement and use no other tool. For provider portability call rag_query with its required query string only; never pass a Boolean as top_k and never guess a collection name. Preserve exact absolute file:\/\/ URIs or filesystem paths returned by results. Classify explicitly best-effort source requests as optional. Missing or rejected optional sources are warnings when other retained sources evidence every required subject; mandatory-source failures remain blockers. Never retain a source whose identity, variant or revision evidence conflicts with the objective, even when it is optional; rejected sources cannot contribute coverage. Output exactly one raw JSON object with approved, sourcePlan, coveredSubjects, missingSubjects, blockers and warnings. Each source must contain path, non-empty subjects and evidence as one non-empty string, never an array. coveredSubjects must equal the union of source subjects; missingSubjects must equal requiredSubjects minus that union. approved may be true only when missingSubjects and blockers are empty; warnings may be non-empty. Never use the objective file itself as an authoritative technical source unless explicitly requested. No Markdown or surrounding prose.",
+      "llmProviderID" : "activeSession",
+      "logLevel" : "debug",
+      "maxTurns" : 8,
+      "name" : "Training Document Finder",
+      "positionX" : 490.921875,
+      "positionY" : 82.21875,
+      "properties" : [
+        {
+          "description" : "Required retrieval behavior.",
+          "key" : "discoveryPolicy",
+          "required" : true,
+          "value" : "exact-local-paths; all requested subjects required; no inferred paths",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Validated objective content supplied by the deterministic loader.",
+          "key" : "trainingGoal",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+        "finetune_training_document_discovery"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Load exactly one selected UTF-8 objective file, or use inline objective text only when no file path was supplied. Validate extension, readability, non-empty content and size. Return the content as trainingGoal without interpreting it.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Load Training Objective",
+      "positionX" : 405,
+      "positionY" : 82,
+      "properties" : [
+        {
+          "description" : "Absolute file path extracted from the resolved Prompt Picker request.",
+          "key" : "objectiveFile",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional inline fallback extracted from the resolved request.",
+          "key" : "objectiveText",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : "finetune_load_training_objective"
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Materialize every selected document. Extract each PDF to text, copy readable text sources into an isolated batch, then run the configured prepare_docs batch exactly once. Return the real process result and manifest counts.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Prepare Training Documents",
+      "positionX" : 915.44140625,
+      "positionY" : 83.60546875,
+      "properties" : [
+        {
+          "description" : "Project-relative training TOML whose dataset files are rebuilt.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "config\/mcpstudio-v3.toml",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Generic source-to-subject JSON contract returned by the finder.",
+          "key" : "sourcePlan",
+          "required" : true,
+          "value" : "{}",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Absolute fine-tuning project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Parent directory for isolated per-run materialized batches.",
+          "key" : "textOutputDir",
+          "required" : true,
+          "value" : "data\/prepared_docs",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : "finetune_prepare_documents"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Route the resolved request into the deterministic objective-loader stage. Extract the absolute value after `Training objective file:` and the optional value after `Inline training objective:`. Return exactly one raw JSON object with objectiveFile, objectiveText, projectRoot and trainingConfig. Do not read the file, interpret its domain content, query RAG or start training.",
+      "llmProviderID" : "activeSession",
+      "logLevel" : "debug",
+      "maxTurns" : 2,
+      "name" : "Training Coordinator",
+      "positionX" : 117.47265625,
+      "positionY" : 84.75390625,
+      "properties" : [
+        {
+          "description" : "Absolute project root passed to project tools.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Training TOML to audit and execute.",
+          "key" : "trainingConfig",
+          "required" : true,
+          "value" : "config\/mcpstudio-v3.toml",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "skillNames" : [
+        "finetune_training_request_router"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Run the configured conservative smoke training exactly once after document preparation returns success=true. The tool result is the executable PASS\/FAIL gate for full training.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Smoke Training Runner",
+      "positionX" : 916.3515625,
+      "positionY" : 311.83203125,
+      "properties" : [
+        {
+          "description" : "Project-relative training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "config\/mcpstudio-v3.toml",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Smoke artifact directory that must contain adapters.safetensors.",
+          "key" : "expectedOutputDir",
+          "required" : true,
+          "value" : "artifacts\/finetune_lora_candidate_smoke",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute fine-tuning project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Require non-zero prepared train and validation records.",
+          "key" : "requirePreparedDataset",
+          "required" : true,
+          "value" : "true",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Force a one-iteration smoke training.",
+          "key" : "smokeTest",
+          "required" : true,
+          "value" : "true",
+          "valueType" : "boolean"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : "finetune_train_adapter"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Report the deterministic pipeline result concisely. Include selected sources and subject assignments, discovery warnings and blockers, deduplicated inputs, train and validation coverage, balancing status, smoke PASS or FAIL, early-stop and best-checkpoint details, full-training result or stop reason, artifact path, generated verificationInputPath and unresolved risks. Never turn a warning into a blocker. Never call tools and never claim merge, verification or installation occurred.",
+      "llmProviderID" : "activeSession",
+      "logLevel" : "debug",
+      "maxTurns" : 2,
+      "name" : "Training Result Synthesizer",
+      "positionX" : 303.25390625,
+      "positionY" : 423.8671875,
+      "properties" : [
+        {
+          "description" : "Final training report format.",
+          "key" : "outputFormat",
+          "required" : true,
+          "value" : "markdown",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "synthesizer",
+      "skillNames" : [
+        "finetune_adapter_training_workflow_context"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Run the full configured training exactly once and only when the smoke tool's executable gate returns success=true. Pass the validated objective file so the training command creates a reusable verification_input.json. Return the real process result, artifact validation, verification input path, stdout and stderr.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Full Training Runner",
+      "positionX" : 916.73828125,
+      "positionY" : 543.5703125,
+      "properties" : [
+        {
+          "description" : "Project-relative training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "config\/mcpstudio-v3.toml",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Full-training artifact directory that must contain adapters.safetensors.",
+          "key" : "expectedOutputDir",
+          "required" : true,
+          "value" : "artifacts\/finetune_lora_candidate",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Validated absolute objective path used to generate verification_input.json.",
+          "key" : "objectiveFile",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute fine-tuning project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Require non-zero prepared train and validation records.",
+          "key" : "requirePreparedDataset",
+          "required" : true,
+          "value" : "true",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Run the complete TOML configuration.",
+          "key" : "smokeTest",
+          "required" : true,
+          "value" : "false",
+          "valueType" : "boolean"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : "finetune_train_adapter"
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Load the selected objective after request routing.",
+      "kind" : "delegation",
+      "label" : "Load selected objective",
+      "sharedStateKeys" : "objectiveFile,objectiveText,projectRoot",
+      "source" : "Training Coordinator",
+      "target" : "Load Training Objective"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Start document discovery only when objective loading returns success=true.",
+      "kind" : "artifactFlow",
+      "label" : "Discover sources for validated objective",
+      "sharedStateKeys" : "trainingGoal,objectiveFile",
+      "source" : "Load Training Objective",
+      "target" : "Training Document Finder"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Execute only when document discovery returns approved=true.",
+      "kind" : "artifactFlow",
+      "label" : "Prepare selected documents",
+      "sharedStateKeys" : "sourcePlan",
+      "source" : "Training Document Finder",
+      "target" : "Prepare Training Documents"
+    },
+    {
+      "artifactPolicy" : "pass-summary",
+      "condition" : "Preserve the operator objective and completion criteria in the final report.",
+      "kind" : "delegation",
+      "label" : "Provide objective",
+      "sharedStateKeys" : "projectRoot,trainingConfig",
+      "source" : "Training Coordinator",
+      "target" : "Training Result Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report objective loading success, failure or skip reason.",
+      "kind" : "artifactFlow",
+      "label" : "Report objective loading",
+      "sharedStateKeys" : "objectiveLoadResult",
+      "source" : "Load Training Objective",
+      "target" : "Training Result Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report JSONL and manifest preparation success, failure or skip reason.",
+      "kind" : "artifactFlow",
+      "label" : "Report document preparation",
+      "sharedStateKeys" : "preparationResult",
+      "source" : "Prepare Training Documents",
+      "target" : "Training Result Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report document discovery success, rejection or skip reason.",
+      "kind" : "artifactFlow",
+      "label" : "Report document selection",
+      "sharedStateKeys" : "documentFinding",
+      "source" : "Training Document Finder",
+      "target" : "Training Result Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report smoke PASS, FAIL or skip reason.",
+      "kind" : "artifactFlow",
+      "label" : "Report smoke gate",
+      "sharedStateKeys" : "smokeResult",
+      "source" : "Smoke Training Runner",
+      "target" : "Training Result Synthesizer"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Execute full training only when smoke training returns success=true.",
+      "kind" : "artifactFlow",
+      "label" : "Run full training on smoke PASS",
+      "sharedStateKeys" : "smokeResult",
+      "source" : "Smoke Training Runner",
+      "target" : "Full Training Runner"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Supply the validated objective path for verification-input generation.",
+      "kind" : "artifactFlow",
+      "label" : "Generate verification input from objective",
+      "sharedStateKeys" : "objectiveFile",
+      "source" : "Load Training Objective",
+      "target" : "Full Training Runner"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Execute only when document preparation returns success=true.",
+      "kind" : "artifactFlow",
+      "label" : "Run smoke test",
+      "sharedStateKeys" : "preparationResult",
+      "source" : "Prepare Training Documents",
+      "target" : "Smoke Training Runner"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always summarize the actual full-training result or diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Summarize training",
+      "sharedStateKeys" : "fullTrainingResult",
+      "source" : "Full Training Runner",
+      "target" : "Training Result Synthesizer"
+    }
+  ],
+  "goal" : "Map objective-aligned sources to generic subjects, deterministically build a balanced and independently covered dataset, then run a smoke-test-first local LoRA training cycle with best-checkpoint selection.",
+  "name" : "finetune_adapter_training_workflow",
+  "pattern" : "pipeline",
+  "summary" : "Accepts a selected objective file, builds balanced held-out datasets, starts full training only after deterministic gates pass, and emits a reusable verification_input.json for the downstream workflow.",
+  "systemInstruction" : "Treat this as a strict executable pipeline: request routing -> objective file loading -> semantic source-to-subject mapping -> materialization -> content-hash deduplication -> deterministic balancing and non-overlapping validation coverage -> smoke test -> full training with validation-based checkpoint policy -> verification-input generation. A Prompt Picker file selection is an absolute path and must be read only by finetune_load_training_objective. The finder receives validated content, not an unresolved path, and may use only rag_query through its assigned skill. Product and domain facts remain runtime data. Python and shell tools make all repeatable dataset, metric, early-stop, checkpoint and verification-input decisions. Never merge, verify, install or deploy from this workflow."
+}

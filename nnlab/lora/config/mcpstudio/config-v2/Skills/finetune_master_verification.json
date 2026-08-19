@@ -1,0 +1,22 @@
+{
+  "allowedToolNames" : [
+    "finetune_verify_master"
+  ],
+  "description" : "Verify a configured model adapter against user-provided held-out prompts and acceptance criteria before deployment.",
+  "name" : "finetune_master_verification",
+  "promptTemplate" : "Project root: {{project_root}}\nConfiguration: {{config_path}}\nAdapter: {{adapter}}\nSubject-matter context: {{subject_context}}\nVerification prompts and acceptance criteria: {{verification_prompts}}",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Fine-tune Adapter Verification\n\nUse this skill to assess a trained or merged adapter before LM Studio installation or update.\n\n## Required process\n\n1. Require a concrete project TOML, adapter path, held-out prompt suite, user-provided subject-matter context and acceptance criteria. Missing required context makes the result `INCONCLUSIVE`.\n2. Run `finetune_verify_master` exactly once with the configured inputs. Preserve the real report path, stdout and stderr.\n3. Review every generated answer and structured result against the supplied context and criteria. Successful process execution or keyword presence alone is not a pass. Check factual relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage and repeated control-token patterns.\n4. Keep held-out verification material separate from training data and evaluate every configured suite independently.\n5. Return a strict `PASS`, `FAIL` or `INCONCLUSIVE` release decision. `PASS` requires successful execution, readable reports and satisfaction of every required acceptance criterion.\n6. Never install or update the LM Studio model from this skill. Deployment remains a separate explicit operation.\n\n## Reporting\n\nInclude the configuration and adapter paths, report paths, per-suite findings, observed failures and the final release decision. If a check cannot run, return `INCONCLUSIVE`; do not infer success.",
+  "toolScopeMode" : "restricted",
+  "triggerPhrases" : [
+    "Verify model adapter",
+    "Check held-out prompts",
+    "Test master adapter",
+    "Run release gate",
+    "LoRA verification"
+  ],
+  "visibilityScope" : "chat"
+}

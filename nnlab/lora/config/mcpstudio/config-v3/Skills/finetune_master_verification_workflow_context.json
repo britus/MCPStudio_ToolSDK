@@ -1,0 +1,18 @@
+{
+  "allowedToolNames" : [
+
+  ],
+  "description" : "Tool-free execution context for readiness inspection, evidence review and release reporting in the model verification-merge workflow.",
+  "name" : "finetune_master_verification_workflow_context",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Fine-tune Verification Merge Workflow Context\n\nApply these rules only to LLM instruction agents inside the controlled workflow. One dedicated MCP Tool agent loads and validates verification_input.json; separate Tool agents perform merge and verification. Never simulate their output.\n\n## Shared workflow rules\n\n- The request router extracts only verificationConfig and projectRoot. It never reads the file.\n- Treat the successful loader output as the only authority for project TOML, merge inputs, weights, candidate output, held-out prompt file, report path, subject context and acceptance criteria.\n- The readiness inspector returns raw JSON with top-level Boolean `ready` and explicit missing prerequisites.\n- Verification consumes the adapter returned by the successful merge tool, never a pre-merge path.\n- Treat loader, merge or verification failure, missing reports, unreadable evidence or incomplete prompt coverage as FAIL or INCONCLUSIVE, never PASS.\n- Review every held-out case for relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage and repeated control tokens.\n- The evidence reviewer returns raw JSON with top-level `decision` equal to `PASS`, `FAIL` or `INCONCLUSIVE` plus findings.\n- LLM agents do not invoke tools. A PASS applies only to the verified merged candidate and authorizes only a later separately requested deployment.",
+  "toolScopeMode" : "none",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "hidden"
+}

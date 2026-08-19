@@ -1,0 +1,18 @@
+{
+  "allowedToolNames" : [
+
+  ],
+  "description" : "Tool-free reporting context for the deterministic MLX LoRA training workflow.",
+  "name" : "finetune_adapter_training_workflow_context",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Fine-tune Adapter Training Workflow Context\n\nApply this context only to the final reporting agent. Do not call `load_skill`, RAG, workflow, filesystem, shell, preparation, training, merge, verification, installation or any other tool. Never generate executable code or claim that an operation ran without a real upstream MCP Tool result.\n\nReport the pipeline exactly as executed: selected RAG sources; preparation success and train\/validation JSONL plus manifest counts; smoke PASS when structured `success=true` or FAIL otherwise; full training result only when smoke passed; and the validated artifact path. A failed or skipped preparation\/smoke stage means full training stopped. Never infer success from prose or historical artifacts. Preserve the configured local model, TOML, seed and source paths. Model quality remains unverified until a separate held-out verification passes. Never merge, verify, install or deploy from this workflow.",
+  "toolScopeMode" : "none",
+  "triggerPhrases" : [
+
+  ],
+  "visibilityScope" : "hidden"
+}

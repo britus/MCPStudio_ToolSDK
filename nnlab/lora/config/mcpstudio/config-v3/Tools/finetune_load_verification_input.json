@@ -1,0 +1,59 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-08-18T00:00:00.000Z",
+    "priority" : 0.99
+  },
+  "description" : "Load and validate one user-selected verification_input.json before candidate merge and verification.",
+  "execHandler" : "finetuneLoadVerificationInput",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "projectRoot" : {
+        "description" : "Absolute active fine-tuning project root.",
+        "name" : "projectRoot",
+        "type" : "string"
+      },
+      "verificationConfig" : {
+        "description" : "Absolute verification_input.json path selected in the Prompt Picker.",
+        "name" : "verificationConfig",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "projectRoot",
+      "verificationConfig"
+    ],
+    "type" : "object"
+  },
+  "name" : "finetune_load_verification_input",
+  "outputSchema" : {
+    "properties" : {
+      "acceptanceCriteria" : { "description" : "Semantic release criteria loaded from the selected input.", "name" : "acceptanceCriteria", "type" : "string" },
+      "adapters" : { "description" : "Validated additional adapter directories.", "items" : { "type" : "string" }, "name" : "adapters", "type" : "array" },
+      "configPath" : { "description" : "Validated project-relative lifecycle TOML.", "name" : "configPath", "type" : "string" },
+      "error" : { "description" : "Failure details when the input cannot be loaded or validated.", "name" : "error", "type" : "string" },
+      "force" : { "description" : "Whether replacement of an existing merge candidate is explicitly allowed.", "name" : "force", "type" : "boolean" },
+      "master" : { "description" : "Validated master adapter directory.", "name" : "master", "type" : "string" },
+      "operation" : { "description" : "Executed verification-input operation.", "name" : "operation", "type" : "string" },
+      "output" : { "description" : "Validated new merge candidate directory.", "name" : "output", "type" : "string" },
+      "outputFile" : { "description" : "Validated verification report destination.", "name" : "outputFile", "type" : "string" },
+      "projectRoot" : { "description" : "Validated active fine-tuning project root.", "name" : "projectRoot", "type" : "string" },
+      "promptsFile" : { "description" : "Validated held-out JSONL prompt file.", "name" : "promptsFile", "type" : "string" },
+      "subjectContext" : { "description" : "Runtime subject context loaded from the training objective.", "name" : "subjectContext", "type" : "string" },
+      "success" : { "description" : "Whether the selected verification input passed validation.", "name" : "success", "type" : "boolean" },
+      "verificationConfig" : { "description" : "Validated absolute verification_input.json path.", "name" : "verificationConfig", "type" : "string" },
+      "weights" : { "description" : "Validated merge weights with the master first.", "items" : { "type" : "string" }, "name" : "weights", "type" : "array" }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "${CHAT_PROJECT_DIR}/config/mcpstudio/config-v3/Scripts/finetune_tools.js",
+  "toolType" : "ScriptTool"
+}

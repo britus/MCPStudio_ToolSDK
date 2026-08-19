@@ -1,0 +1,64 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-08-17T00:00:00.000Z",
+    "priority" : 0.95
+  },
+  "description" : "Fuse and install the verified master adapter as a new offline model in the local LM Studio instance. Existing target names are never overwritten.",
+  "execHandler" : "finetuneLmStudioInstall",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "configPath" : {
+        "description" : "Project-relative TOML containing model, training and deployment settings.",
+        "name" : "configPath",
+        "type" : "string"
+      },
+      "dryRun" : {
+        "description" : "Validate and print all paths without writing to LM Studio.",
+        "name" : "dryRun",
+        "type" : "boolean"
+      },
+      "projectRoot" : {
+        "description" : "Absolute fine-tuning project root.",
+        "name" : "projectRoot",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "projectRoot",
+      "configPath"
+    ],
+    "type" : "object"
+  },
+  "name" : "finetune_lmstudio_install",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Failure details when unsuccessful.",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Executed installation operation.",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Whether installation completed successfully.",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio\/config-v3\/Scripts\/finetune_tools.js",
+  "toolType" : "ScriptTool"
+}

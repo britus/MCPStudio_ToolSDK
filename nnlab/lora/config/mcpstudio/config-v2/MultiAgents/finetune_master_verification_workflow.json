@@ -1,0 +1,237 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate the release verification of an existing master adapter. Require an artifact-readiness inspection, one real verification tool run and an independent evidence review. Do not install or update LM Studio in this workflow.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 8,
+      "modelName" : "",
+      "name" : "Verification Coordinator",
+      "positionX" : 340,
+      "positionY" : 70,
+      "properties" : [
+        {
+          "description" : "Master adapter under verification.",
+          "key" : "adapter",
+          "required" : true,
+          "value" : "artifacts\/finetune_lora",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Unified lifecycle TOML containing verification settings.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "config\/mcpstudio-v2.toml",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute project root passed to project tools.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Inspect the verification request and supplied artifact context. Confirm that the adapter path, local base-model expectation, held-out prompt suite, user-provided subject-matter context and acceptance criteria are identified. Return exactly one JSON object with ready=true or ready=false and explicit missing prerequisites. Do not generate model answers yourself.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 5,
+      "modelName" : "",
+      "name" : "Verification Readiness Inspector",
+      "positionX" : 340,
+      "positionY" : 255,
+      "properties" : [
+        {
+          "description" : "Required verification inputs.",
+          "key" : "requiredInputs",
+          "required" : true,
+          "value" : "adapter,prompt-suite,subject-context,acceptance-criteria",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Run the configured master verification against the real local base model and adapter. Preserve stdout, stderr and all report paths. Do not summarize away failures.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Master Verification Runner",
+      "positionX" : 340,
+      "positionY" : 440,
+      "properties" : [
+        {
+          "description" : "Project-relative adapter directory.",
+          "key" : "adapter",
+          "required" : true,
+          "value" : "artifacts\/finetune_lora",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Unified lifecycle TOML containing verification defaults.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "config\/mcpstudio-v2.toml",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute fine-tuning project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : "finetune_verify_master"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Independently review the real verification output against the user-provided subject-matter context and acceptance criteria. Review every held-out case separately for factual relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage, repeated control tokens and missing evidence. Return decision=PASS only when all required execution and content checks pass; otherwise return FAIL or INCONCLUSIVE with evidence.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 7,
+      "modelName" : "",
+      "name" : "Verification Evidence Reviewer",
+      "positionX" : 340,
+      "positionY" : 625,
+      "properties" : [
+        {
+          "description" : "Allowed release decisions.",
+          "key" : "decisionValues",
+          "required" : true,
+          "value" : "PASS,FAIL,INCONCLUSIVE",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Mandatory review dimensions.",
+          "key" : "reviewStandard",
+          "required" : true,
+          "value" : "factual-relevance,required-coverage,no-unsupported-claims,no-cross-context-contamination,no-prompt-leakage,no-control-token-loops",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "reviewer",
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Produce the final operator-facing verification report from the objective, readiness result, tool output and independent review. Lead with exactly one release decision: PASS, FAIL or INCONCLUSIVE. List tested paths, report files, per-suite findings and blockers. A PASS only authorizes a later separately requested install\/update; it does not perform deployment.",
+      "llmProviderID" : "none",
+      "logLevel" : "info",
+      "maxTurns" : 5,
+      "modelName" : "",
+      "name" : "Release Gate Synthesizer",
+      "positionX" : 340,
+      "positionY" : 810,
+      "properties" : [
+        {
+          "description" : "Deployment behavior of this workflow.",
+          "key" : "deploymentPolicy",
+          "required" : true,
+          "value" : "report-only; explicit separate deployment required",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Final gate report format.",
+          "key" : "outputFormat",
+          "required" : true,
+          "value" : "markdown",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "synthesizer",
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Inspect artifact and suite readiness before model execution.",
+      "kind" : "delegation",
+      "label" : "Inspect readiness",
+      "sharedStateKeys" : "projectRoot,adapter,configPath",
+      "source" : "Verification Coordinator",
+      "target" : "Verification Readiness Inspector"
+    },
+    {
+      "artifactPolicy" : "pass-summary",
+      "condition" : "Include readiness assumptions and missing prerequisites.",
+      "kind" : "artifactFlow",
+      "label" : "Provide readiness result",
+      "sharedStateKeys" : "readinessResult",
+      "source" : "Verification Readiness Inspector",
+      "target" : "Release Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "pass-summary",
+      "condition" : "Preserve tested adapter and requested scope in the final report.",
+      "kind" : "delegation",
+      "label" : "Provide verification scope",
+      "sharedStateKeys" : "adapter,configPath",
+      "source" : "Verification Coordinator",
+      "target" : "Release Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "pass-all",
+      "condition" : "Synthesize the independent decision and its evidence.",
+      "kind" : "artifactFlow",
+      "label" : "Publish gate decision",
+      "sharedStateKeys" : "verificationDecision,reviewFindings,reportPaths",
+      "source" : "Verification Evidence Reviewer",
+      "target" : "Release Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Review real results and diagnostics whether the tool succeeds or fails.",
+      "kind" : "review",
+      "label" : "Review evidence",
+      "sharedStateKeys" : "verificationResult,reportPaths",
+      "source" : "Master Verification Runner",
+      "target" : "Verification Evidence Reviewer"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Execute only when readiness inspection returns ready=true.",
+      "kind" : "artifactFlow",
+      "label" : "Run verification",
+      "sharedStateKeys" : "readinessResult,adapter,configPath",
+      "source" : "Verification Readiness Inspector",
+      "target" : "Master Verification Runner"
+    }
+  ],
+  "goal" : "Verify the configured model adapter against a user-provided held-out prompt suite and acceptance criteria, then return a strict evidence-backed release gate decision without deploying.",
+  "name" : "finetune_master_verification_workflow",
+  "pattern" : "pipeline",
+  "summary" : "Checks verification readiness, runs the local master adapter tests and independently reviews evidence before returning PASS, FAIL or INCONCLUSIVE.",
+  "systemInstruction" : "Use the existing local base model and selected adapter. Never fabricate model output or infer a pass from process exit alone. Installation and update remain separate explicit operations."
+}

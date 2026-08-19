@@ -1,0 +1,25 @@
+{
+  "allowedToolNames" : [
+    "rag_query",
+    "finetune_load_training_objective",
+    "finetune_prepare_documents",
+    "finetune_train_adapter"
+  ],
+  "description" : "Train, inspect and prepare MLX LoRA adapters with a smoke-test-first workflow and reproducible artifacts.",
+  "name" : "finetune_adapter_training",
+  "promptTemplate" : "Training objective file: {{training_objective_file}}\nInline training objective: {{training_goal}}\nUser-provided domain context: {{domain_context}}\nExplicit document sources: {{document_sources}}",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Adapter Training - Release 3\n\nTreat product and domain knowledge as runtime data only. Reusable code and configuration remain generic.\n\n## Executable pipeline\n\n1. Load the exact selected objective file before retrieval. A file path by itself is never objective content.\n2. Use `rag_query` only when exact authoritative sources were not supplied. Produce a complete source plan; missing required coverage is FAIL.\n3. Run `finetune_prepare_documents` once. Require hash deduplication, deterministic balancing, non-overlapping validation, policyPass=true and non-zero train and validation records.\n4. Run `finetune_train_adapter` with smokeTest=true. Any process failure, missing artifact, non-finite metric or missing dataset count is FAIL.\n5. Only on smoke PASS, run full training with the validated objectiveFile. Python applies checkpoint policy, restores the best checkpoint and creates data/verifications/<run>/verification_input.json.\n6. Never merge, verify, install or update from this skill. Report the objective source, policy gate, smoke result, checkpoint, artifact path and verificationInputPath.\n\nNever reuse stale processed data and never use verification prompts as training examples.",
+  "toolScopeMode" : "restricted",
+  "triggerPhrases" : [
+    "Train model adapter",
+    "Continue LoRA training",
+    "Train domain adapter",
+    "Prepare training documents",
+    "Training smoke test"
+  ],
+  "visibilityScope" : "chat"
+}

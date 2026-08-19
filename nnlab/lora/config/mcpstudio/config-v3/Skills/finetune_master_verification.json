@@ -1,0 +1,24 @@
+{
+  "allowedToolNames" : [
+    "finetune_load_verification_input",
+    "finetune_merge_adapters",
+    "finetune_verify_master"
+  ],
+  "description" : "Load one generated verification_input.json, create a reversible merged model candidate and verify that exact output before deployment.",
+  "name" : "finetune_master_verification",
+  "promptTemplate" : "Project root: ${CHAT_PROJECT_DIR}\nVerification config (absolute): {{verification_config}}",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "# Fine-tune Verification Merge\n\nUse this skill with one absolute verification_input.json generated after training. Product and domain details remain runtime data inside that file.\n\n## Required process\n\n1. Run `finetune_load_verification_input` exactly once with the active project root and selected absolute verification config. Missing or invalid file content makes the result `INCONCLUSIVE`.\n2. Use only the validated loader output. Run `finetune_merge_adapters` exactly once with `inPlace=false` and preserve its adapter path and merge report.\n3. Only after merge success, run `finetune_verify_master` exactly once using the adapter returned by the merge tool. Never verify a pre-merge path.\n4. Review every generated answer against the loaded subject context and criteria. Process success or keyword presence alone is not a pass.\n5. Return `PASS` only when loading and merge succeeded, the exact merged output was verified, every prompt ran and every semantic criterion passed. Otherwise return `FAIL` or `INCONCLUSIVE`.\n6. Never install or update LM Studio from this skill.\n\n## Reporting\n\nInclude the selected verification config, merge inputs, candidate path, merge report, verification report, per-prompt findings and exactly one final decision.",
+  "toolScopeMode" : "restricted",
+  "triggerPhrases" : [
+    "Verify model adapter",
+    "Check held-out prompts",
+    "Test master adapter",
+    "Run release gate",
+    "LoRA verification"
+  ],
+  "visibilityScope" : "chat"
+}

@@ -1,0 +1,137 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-08-17T00:00:00.000Z",
+    "priority" : 0.95
+  },
+  "description" : "Run a full or smoke-test MLX LoRA training cycle for the local fine-tuning project using a repository TOML configuration.",
+  "execHandler" : "finetuneTrainAdapter",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "configPath" : {
+        "description" : "Project-relative TOML containing data and training settings.",
+        "name" : "configPath",
+        "type" : "string"
+      },
+      "expectedOutputDir" : {
+        "description" : "Optional project-relative output directory whose adapters.safetensors must exist after the process.",
+        "name" : "expectedOutputDir",
+        "type" : "string"
+      },
+      "objectiveFile" : {
+        "description" : "Optional validated absolute training-objective path used to generate verification_input.json after a full run.",
+        "name" : "objectiveFile",
+        "type" : "string"
+      },
+      "projectRoot" : {
+        "description" : "Absolute fine-tuning project root. Defaults to this repository.",
+        "name" : "projectRoot",
+        "type" : "string"
+      },
+      "requirePreparedDataset" : {
+        "description" : "Require the training process to confirm non-zero prepared train and validation records.",
+        "name" : "requirePreparedDataset",
+        "type" : "boolean"
+      },
+      "smokeTest" : {
+        "description" : "Run one conservative smoke-training iteration instead of the full configured training.",
+        "name" : "smokeTest",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "projectRoot",
+      "configPath"
+    ],
+    "type" : "object"
+  },
+  "name" : "finetune_train_adapter",
+  "outputSchema" : {
+    "properties" : {
+      "artifactPath" : {
+        "description" : "Validated adapter artifact path when expectedOutputDir was supplied.",
+        "name" : "artifactPath",
+        "type" : "string"
+      },
+      "artifactPresent" : {
+        "description" : "Whether the expected adapter artifact exists.",
+        "name" : "artifactPresent",
+        "type" : "boolean"
+      },
+      "error" : {
+        "description" : "Failure details when unsuccessful.",
+        "name" : "error",
+        "type" : "string"
+      },
+      "finiteMetrics" : {
+        "description" : "Whether reported training and validation losses are finite.",
+        "name" : "finiteMetrics",
+        "type" : "boolean"
+      },
+      "bestCheckpoint" : {
+        "description" : "Checkpoint selected by the configured validation metric.",
+        "name" : "bestCheckpoint",
+        "type" : "string"
+      },
+      "bestIteration" : {
+        "description" : "Validation iteration associated with the selected checkpoint.",
+        "name" : "bestIteration",
+        "type" : "integer"
+      },
+      "bestValidationLoss" : {
+        "description" : "Lowest finite held-out validation loss observed.",
+        "name" : "bestValidationLoss",
+        "type" : "number"
+      },
+      "earlyStopped" : {
+        "description" : "Whether configured validation patience stopped training early.",
+        "name" : "earlyStopped",
+        "type" : "boolean"
+      },
+      "operation" : {
+        "description" : "Executed training operation.",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Whether training completed and all requested dataset, finite-loss and artifact validations passed.",
+        "name" : "success",
+        "type" : "boolean"
+      },
+      "trainRecords" : {
+        "description" : "Prepared training records confirmed by the training process.",
+        "name" : "trainRecords",
+        "type" : "integer"
+      },
+      "validationErrors" : {
+        "description" : "Executable validation failures.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "validationErrors",
+        "type" : "array"
+      },
+      "validationRecords" : {
+        "description" : "Prepared validation records confirmed by the training process.",
+        "name" : "validationRecords",
+        "type" : "integer"
+      },
+      "verificationInputPath" : {
+        "description" : "Generated project-relative verification_input.json path after full training.",
+        "name" : "verificationInputPath",
+        "type" : "string"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio\/config-v3\/Scripts\/finetune_tools.js",
+  "toolType" : "ScriptTool"
+}

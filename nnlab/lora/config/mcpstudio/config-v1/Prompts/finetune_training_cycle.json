@@ -1,0 +1,32 @@
+{
+  "arguments": [
+    {
+      "description": "Absolute root of the fine-tuning project.",
+      "name": "project_root",
+      "required": true
+    },
+    {
+      "description": "Project-relative TOML training configuration.",
+      "name": "training_config",
+      "required": true
+    },
+    {
+      "description": "Concise purpose and expected domain of the new adapter.",
+      "name": "training_goal",
+      "required": true
+    },
+    {
+      "description": "User-provided domain and product context, including terminology, source constraints, expected behavior, and explicit exclusions.",
+      "name": "domain_context",
+      "required": true
+    },
+    {
+      "description": "Optional exact local file paths or file:// URIs. Leave empty to discover documents from RAG.",
+      "name": "document_sources",
+      "required": false
+    }
+  ],
+  "description": "Run a reproducible smoke-test-first LoRA training cycle and prepare the result for independent verification.",
+  "name": "finetune_training_cycle",
+  "template": "Use the `finetune_adapter_training` skill and, when executed as a workflow, the `finetune_adapter_training_workflow`.\n\nProject root: `{{project_root}}`\nTraining configuration: `{{training_config}}`\nTraining objective: `{{training_goal}}`\n\nUser-provided domain context:\n{{domain_context}}\n\nExplicit document sources (optional; exact local paths or file:// URIs):\n{{document_sources}}\n\nTreat the supplied objective and domain context as authoritative. Do not introduce product names, terminology, facts, or exclusions that the user did not provide. Use explicit document sources when supplied; otherwise use `rag_query` to locate exact local source documents. Stop if any explicitly requested subject is missing.\n\nBefore any smoke or full training, run the document-preparation stage to materialize PDF/text sources and rebuild the configured train, validation and manifest outputs from that exact batch. Require source alignment and non-zero training and validation records. Never reuse a stale processed dataset.\n\nRun a smoke test first and start full training only after the smoke test succeeds. Merging, verification, and installation are separate approval steps and must not be performed implicitly.\n\nReturn a concise report containing the selected source documents, generated manifest and record counts, configuration used, interpreted domain and objective, smoke-test result, full-training result, produced adapter path, available loss and reproducibility metadata, unresolved risks, and the recommended independent verification step."
+}

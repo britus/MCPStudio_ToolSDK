@@ -1,0 +1,21 @@
+
+[dev]
+pytest<10,>=8
+ruff<1,>=0.9
+
+[mlx]
+
+[mlx:platform_system == "Darwin" and platform_machine == "arm64"]
+mlx-lm[train]<0.32,>=0.31.3
+
+[qlora]
+
+[qlora:platform_system == "Linux"]
+bitsandbytes<1,>=0.45
+
+[train]
+accelerate<2,>=1.2
+peft<1,>=0.14
+safetensors<1,>=0.5
+torch<3,>=2.4
+transformers<6,>=4.51

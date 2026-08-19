@@ -1,0 +1,95 @@
+{
+  "annotations" : {
+    "audience" : [
+      "user",
+      "assistant"
+    ],
+    "lastModified" : "2026-08-17T00:00:00.000Z",
+    "priority" : 0.95
+  },
+  "description" : "Merge compatible local MLX LoRA adapters by exact rank concatenation using the project TOML and optional per-run overrides.",
+  "execHandler" : "finetuneMergeAdapters",
+  "execMethod" : "toolEntry",
+  "inputSchema" : {
+    "properties" : {
+      "configPath" : {
+        "description" : "Project-relative TOML containing merge defaults.",
+        "name" : "configPath",
+        "type" : "string"
+      },
+      "adapters" : {
+        "description" : "Project-relative adapter directories to merge into the master.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "adapters",
+        "type" : "array"
+      },
+      "force" : {
+        "description" : "Allow a non-empty candidate output directory to be replaced.",
+        "name" : "force",
+        "type" : "boolean"
+      },
+      "inPlace" : {
+        "description" : "Publish the merge into the master directory. Use only after candidate verification.",
+        "name" : "inPlace",
+        "type" : "boolean"
+      },
+      "master" : {
+        "description" : "Project-relative compatible seed adapter or provenance-backed merged V2 master.",
+        "name" : "master",
+        "type" : "string"
+      },
+      "output" : {
+        "description" : "Project-relative candidate output directory when inPlace is false.",
+        "name" : "output",
+        "type" : "string"
+      },
+      "projectRoot" : {
+        "description" : "Absolute fine-tuning project root.",
+        "name" : "projectRoot",
+        "type" : "string"
+      },
+      "weights" : {
+        "description" : "String weights, master first. Values override the merge configuration.",
+        "items" : {
+          "type" : "string"
+        },
+        "name" : "weights",
+        "type" : "array"
+      }
+    },
+    "required" : [
+      "projectRoot",
+      "configPath"
+    ],
+    "type" : "object"
+  },
+  "name" : "finetune_merge_adapters",
+  "outputSchema" : {
+    "properties" : {
+      "error" : {
+        "description" : "Failure details when unsuccessful.",
+        "name" : "error",
+        "type" : "string"
+      },
+      "operation" : {
+        "description" : "Executed merge operation.",
+        "name" : "operation",
+        "type" : "string"
+      },
+      "success" : {
+        "description" : "Whether merging completed successfully.",
+        "name" : "success",
+        "type" : "boolean"
+      }
+    },
+    "required" : [
+      "success"
+    ],
+    "type" : "object"
+  },
+  "pluginName" : "",
+  "scriptName" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio\/config-v2\/Scripts\/finetune_tools.js",
+  "toolType" : "ScriptTool"
+}
