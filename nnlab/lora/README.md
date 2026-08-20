@@ -1,271 +1,431 @@
-# Fine-tune Framework
+# Local LoRA Training and Retrieval Framework
 
-Dieses Verzeichnis enthält eine lokale, modellunabhängige Pipeline, mit der Sprachmodelle an
-eigene Source-Code-Projekte angepasst und zur Laufzeit mit aktuellem Projektkontext versorgt werden.
+This directory contains an offline-first framework for adapting a local language model to
+project-specific source code or technical documentation. It combines two complementary methods:
 
-Die Pipeline kombiniert zwei Verfahren:
+1. **LoRA/QLoRA training** learns recurring terminology, conventions, and structural patterns.
+2. **Local retrieval (RAG)** supplies current, query-specific source excerpts from a SQLite index.
 
-1. **LoRA/QLoRA-Training** lernt wiederkehrende Konventionen, Namen und Strukturen aus einem
-   Repository-Snapshot.
-2. **Lokale Retrieval-Suche (RAG)** holt bei jeder Frage die aktuell passenden Codeabschnitte
-   aus einem SQLite-Index. Das ist für exakte und häufig geänderte Implementierungen wichtiger
-   als das Training.
+A fine-tune is not a database of the current repository state. Use retrieval for exact and
+frequently changing implementation details; use training for stable behavior and domain patterns.
 
-Ein Fine-Tune ist kein verlässlicher Ersatz für den aktuellen Source Code. Es kann Verhalten und
-Muster anpassen, aber keine Datenbank mit garantiert korrektem Dateistand bilden. Der lokale Index
-spart trotzdem Kontext: Statt vieler ganzer Dateien werden nur wenige relevante Ausschnitte an das
-Modell übergeben.
+## Current v3 lifecycle
 
-## Voraussetzungen
+The current framework configuration is [`config/mcpstudio-v3.toml`](config/mcpstudio-v3.toml).
+The v3 lifecycle deliberately separates training, candidate creation, verification, and deployment:
 
-- Python 3.11 oder 3.12. Python 3.14 ist für die derzeit empfohlenen
-  PyTorch-macOS-Binaries noch zu neu.
-- Für RAG: ein bereits lokal in LM Studio geladenes GGUF-Modell
-- Für LoRA: ein lokales, trainierbares Transformers-/Safetensors-Modellverzeichnis
-- Apple Silicon: reguläres LoRA, ausreichend gemeinsamer Speicher
-- NVIDIA: reguläres LoRA oder QLoRA mit `bitsandbytes`
-- Für GGUF-Export: ein aktueller, gebauter `llama.cpp`-Checkout
+1. Load and validate one UTF-8 training objective (`.md` or `.txt`).
+2. Resolve the exact source documents required by that objective.
+3. Materialize the selected documents into an isolated per-run staging directory.
+4. Build fresh, content-hash-deduplicated training and validation datasets.
+5. Enforce source balance, required-subject coverage, and non-overlapping validation coverage.
+6. Run a one-iteration MLX smoke test.
+7. Run full training only after the smoke test passes. Validation-based checkpoint selection,
+   early stopping, and best-checkpoint restoration are controlled by the TOML configuration.
+8. Generate a reusable `data/verifications/run-*/verification_input.json` from the training
+   objective and trained adapter.
+9. In a separate verification run, merge into a new candidate directory and verify that exact
+   merged candidate against held-out prompts.
+10. Install or update the LM Studio model only after an explicit `PASS` decision.
 
-Es gibt keinen Hub-Login und keinen kostenpflichtigen API-Aufruf. Die Python-Bibliotheken werden
-einmalig über PyPI installiert; Modell, Quellcode, Index und Prompts bleiben danach lokal.
-`HF_HUB_OFFLINE`, `TRANSFORMERS_OFFLINE` und Telemetrie-Sperren werden von den Skripten gesetzt.
+The EoF MCP Studio workflows implement these gates automatically. The shell scripts and Makefile
+expose the same underlying operations for direct use.
 
-## Schnellstart: vollständig lokal mit LM Studio
+## Requirements
 
-```bash
-# Falls Homebrew aktuell nur Python 3.14 bereitstellt:
-brew install python@3.12
+- Python 3.11 or 3.12
+- A local Transformers/Safetensors or MLX model directory for training
+- Apple Silicon and sufficient unified memory for MLX LoRA/QLoRA training, or an NVIDIA/CUDA
+  system for Transformers LoRA/QLoRA
+- A locally loaded model and local server for LM Studio chat
+- A current, built `llama.cpp` checkout for GGUF export
 
-# Leichte Installation ohne Torch und ohne Trainingsbibliotheken
-FINETUNE_PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 \
-  ./scripts/setup.sh --rag-only
+A GGUF file loaded by LM Studio can be used for chat and RAG, but it cannot be trained directly.
+Training requires the original local model directory, including its configuration, tokenizer, and
+weight files.
 
-# Ein oder mehrere lokale Projekte indexieren
-./scripts/index.sh /pfad/projekt-a /pfad/projekt-b
+The scripts set `HF_HUB_OFFLINE`, `TRANSFORMERS_OFFLINE`, and telemetry opt-outs. Model weights,
+source material, datasets, prompts, and generated artifacts remain local. Initial Python dependency
+installation still downloads packages from PyPI.
 
-# In LM Studio vorher das lokale Modell und den Local Server starten
-./scripts/chat.sh --backend lmstudio
-./scripts/chat.sh --backend lmstudio \
-  --prompt "Wo wird die Datenbankverbindung erzeugt?"
-```
+## Setup
 
-Dieser Modus benötigt weder einen Hub noch ein trainierbares Basismodell. Der Client verwendet nur
-Python-Standardbibliotheken und sendet HTTP ausschließlich an die konfigurierte lokale
-LM-Studio-Adresse `http://localhost:1234/v1`.
-
-## Optional: lokales LoRA-/QLoRA-Training
-
-Eine quantisierte `.gguf`-Datei aus LM Studio kann nicht direkt trainiert werden. Dafür wird ein
-lokaler Safetensors-Modellordner benötigt, zum Beispiel:
-
-```text
-models/google/gemma-4-26b-a4b/
-├── config.json
-├── model-00001-of-00003.safetensors
-├── model.safetensors.index.json
-├── tokenizer.json
-├── tokenizer_config.json
-└── weitere vom Modell benötigte Dateien
-```
-
-Das vorhandene MLX-quantisierte Apple-Silicon-Modell wird anhand seines
-`quantization_config` automatisch erkannt und mit MLX-LM als QLoRA trainiert. Ein klassischer,
-nicht im MLX-Format quantisierter Safetensors-Checkpoint verwendet Transformers/PEFT.
+Run all commands from this directory:
 
 ```bash
-# Installiert MLX und Transformers/PEFT
-FINETUNE_PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 \
-  ./scripts/setup.sh --train
-
-# Nur Apple Silicon/MLX, ohne PyTorch-Trainingsbackend
-./scripts/setup.sh --mlx
-
-# Nur auf NVIDIA/CUDA: zusätzliche QLoRA-Abhängigkeit
-./scripts/setup.sh --cuda
-
-./scripts/prepare.sh /pfad/projekt-a /pfad/projekt-b
-
-# Verzeichnisse und einzelne Quelldateien können kombiniert werden
-./scripts/prepare.sh /pfad/projekt-a /pfad/Services.swift /pfad/tool.py
-./scripts/index.sh   /pfad/projekt-a /pfad/projekt-b
-./scripts/train.sh
-./scripts/evaluate_base.sh
-./scripts/evaluate.sh
+cd nnlab/lora
 ```
 
-Vor dem längeren MLX-Lauf prüft ein einzelner Trainingsschritt Modell, Datensatz,
-LoRA-Injektion und Backpropagation:
+The default setup is the Apple Silicon MLX environment:
 
 ```bash
-./scripts/smoke_train.sh
+make setup
+# Equivalent: ./scripts/setup.sh --mlx
 ```
 
-`./scripts/pipeline.sh /pfad/projekt-a ...` führt Prepare, Index und Training nacheinander aus.
-
-## Konfiguration
-
-Alle wichtigen Parameter stehen in [`config/default.toml`](config/default.toml). Für eigene
-Experimente sollte die Datei kopiert und die Kopie an `scripts/train.sh` übergeben werden:
+Other installation modes are:
 
 ```bash
-cp config/default.toml config/my-project.toml
-./scripts/train.sh config/my-project.toml
+make setup-rag    # local RAG/chat only
+make setup-train  # Transformers/PEFT plus MLX
+make setup-cuda   # Transformers/PEFT plus bitsandbytes
 ```
 
-Wichtige Werte:
-
-- `model.id`: lokaler Ordner des trainierbaren Basismodells
-- `model.local_files_only`: bleibt auf `true`; andere Werte werden abgelehnt
-- `data.max_seq_length`: maximales Speicherfenster pro Trainingssequenz; längere
-  Completions werden tokenbewusst bevorzugt an Absatz- oder Satzgrenzen aufgeteilt
-- `training.gradient_accumulation_steps`: effektive Batchgröße ohne zusätzlichen Peak-Speicher
-- `training.qlora`: nur unter CUDA auf `true` setzen
-- `training.output_dir`: Ziel des LoRA-Adapters
-- `retrieval.max_context_chars`: maximale Größe des aktuellen RAG-Kontexts
-- `inference.base_url`: ausschließlich der lokale Modellserver
-- `inference.max_total_new_tokens`: harte Obergrenze für eine vollständige Generation;
-  Verification-Ausgaben am Längenlimit gelten als abgeschnitten und bestehen nicht
-
-Bei Speicherproblemen zuerst `max_seq_length` auf 1024 reduzieren. Auf einem Mac ist QLoRA über
-`bitsandbytes` nicht der vorgesehene Weg; dort bleibt `qlora = false`.
-
-Das SDK verwirft bei einem kleinen `max_seq_length` keine Completion-Tokens. Es erzeugt
-stattdessen vollständige Folgesegmente mit begrenztem vorherigem Antwortkontext. Damit bleiben
-Training, Validation und MLX-Testdaten innerhalb desselben Speicherfensters, während der gesamte
-Quellinhalt erhalten bleibt.
-
-## Datensicherheit und Offline-Garantie
-
-Der Scanner berücksichtigt Git-Ignores in Git-Repositories und überspringt unter anderem:
-
-- `.env`, Schlüssel-, Zertifikats- und Credential-Dateien
-- Dateien mit erkennbaren Private Keys oder bekannten Tokenformaten
-- Binärdateien und nicht als UTF-8 lesbare Dateien
-- Build-, Vendor-, Cache-, Modell- und Dependency-Verzeichnisse
-- Dateien über `data.max_file_bytes`
-
-Die Liste ist ein Sicherheitsnetz, keine Garantie. Vor dem Training immer
-`data/processed/manifest.json` und stichprobenartig die JSONL-Dateien kontrollieren. Remote-Tracking
-ist deaktiviert, und alle Modelllader erhalten `local_files_only=True`.
-
-## Chat mit LM Studio oder EoF MCP Studio
-
-1. Lokale GGUF-Datei in LM Studio laden und den lokalen kompatiblen Server starten.
-2. `inference.base_url` und `inference.model` in der Konfiguration anpassen.
-3. Chat mit aktuellem Repository-Index starten:
+To select a specific supported Python interpreter:
 
 ```bash
-./scripts/chat.sh --backend lmstudio
-./scripts/chat.sh --backend lmstudio --prompt "Wo wird die Datenbankverbindung erzeugt?"
+FINETUNE_PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 make setup
 ```
 
-Das Nachrichtenformat ist OpenAI-kompatibel, aber es wird weder das OpenAI-Python-Paket noch ein
-OpenAI-Dienst verwendet. Jeder andere kompatible lokale Endpunkt kann ebenso verwendet werden.
-Für einen direkten Test des lokalen Safetensors-Modells plus Adapter:
+The setup script creates `.venv` and installs this package in editable mode. All other wrappers
+require that virtual environment.
+
+## Configuration
+
+Every framework command that depends on model, data, training, retrieval, verification, merge, or
+deployment settings requires an explicit `--config` argument. For a new experiment, copy the v3
+configuration and keep every lifecycle path internally consistent:
+
+```bash
+cp config/mcpstudio-v3.toml config/my-project.toml
+```
+
+Important sections include:
+
+- `model`: local base-model directory and offline loading policy
+- `data`: training, validation, manifest, MLX data, and retrieval-index paths
+- `dataset_policy`: source-balance and required-subject coverage gates
+- `training`: backend, adapter output, LoRA parameters, and MLX/Transformers settings
+- `checkpoint_policy`: validation interval, early stopping, and best-checkpoint behavior
+- `verification`: held-out prompts, adapter, and report defaults
+- `verification_input`: generated hand-off directory and acceptance criteria
+- `merge`: master adapter, new adapters, weights, and non-destructive output
+- `deployment`: adapter and LM Studio installation identity
+
+Relative paths are resolved from the `nnlab/lora` project root because every wrapper changes to
+that directory before launching Python. `model.local_files_only` must remain `true`.
+
+The generic [`config/default.toml`](config/default.toml) is useful for basic source-code experiments,
+but it does not define the full v3 verification, merge, and deployment lifecycle.
+
+## Direct shell usage
+
+Shell options are named and repeatable. Configuration files and input paths are not positional
+arguments.
+
+### Build a source-code dataset and retrieval index
+
+```bash
+CONFIG=config/my-project.toml
+
+./scripts/prepare.sh \
+  --config "$CONFIG" \
+  --input /absolute/path/project-a \
+  --input /absolute/path/Services.swift
+
+./scripts/index.sh \
+  --config "$CONFIG" \
+  build \
+  --project /absolute/path/project-a \
+  --project /absolute/path/project-b
+```
+
+`prepare.sh` accepts directories and individual source files. `index.sh` uses the `build`
+subcommand and repeats `--project` for every indexed input.
+
+For source-code training, prepare, index, and train can also be run as one command:
+
+```bash
+./scripts/pipeline.sh \
+  --config "$CONFIG" \
+  --input /absolute/path/project-a \
+  --input /absolute/path/project-b
+```
+
+### Build a documentation dataset
+
+Use `prepare_docs.sh` for already readable text documents or directories:
+
+```bash
+./scripts/prepare_docs.sh \
+  --config "$CONFIG" \
+  --input /absolute/path/manual.txt \
+  --input /absolute/path/documentation
+```
+
+PDF extraction is a separate operation:
+
+```bash
+./scripts/extract_pdfs.sh \
+  --source /absolute/path/manuals \
+  --output data/prepared_docs/manuals \
+  --manifest data/prepared_docs/manuals-manifest.json
+
+./scripts/prepare_docs.sh \
+  --config "$CONFIG" \
+  --input data/prepared_docs/manuals
+```
+
+The MCP Studio v3 workflow additionally creates a source-to-subject policy file and passes it with
+`--policy-file`. This enables deterministic coverage and balance gates that cannot be inferred from
+plain input paths alone.
+
+### Smoke test and full training
+
+```bash
+./scripts/smoke_train.sh --config "$CONFIG"
+
+./scripts/train.sh \
+  --config "$CONFIG" \
+  --objective-file /absolute/path/training-objective.md
+```
+
+`--objective-file` is used only for full training. After training succeeds, it creates a reusable
+`verification_input.json` containing the objective-derived verification context and exact merge and
+verification paths. It does not place the objective itself into the training dataset.
+
+To resume a supported training backend from a checkpoint:
+
+```bash
+./scripts/train.sh \
+  --config "$CONFIG" \
+  --resume-from-checkpoint /absolute/path/checkpoint
+```
+
+### Merge and verify
+
+With the v3 defaults, full training writes a candidate adapter and merge writes a separate merged
+adapter. The configured merge can be run with:
+
+```bash
+./scripts/merge_adapters.sh --config "$CONFIG"
+```
+
+Override merge inputs explicitly when reproducing a generated verification hand-off:
+
+```bash
+./scripts/merge_adapters.sh \
+  --config "$CONFIG" \
+  --master artifacts/finetune_lora \
+  --adapters artifacts/finetune_lora_candidate \
+  --weights 0.5 0.5 \
+  --output artifacts/finetune_lora_merged
+```
+
+The output must differ from all inputs. Existing non-empty output directories are rejected unless
+`--force` is explicitly supplied. `--in-place` is reserved for an intentional, recoverable master
+replacement.
+
+Run the configured held-out evaluation:
+
+```bash
+./scripts/evaluate_base.sh --config "$CONFIG"
+./scripts/evaluate.sh --config "$CONFIG"
+```
+
+Paths can be overridden without editing the TOML:
+
+```bash
+./scripts/verify_suite.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged \
+  --prompts eval/eval-prompts.jsonl \
+  --output artifacts/verification-report.json
+```
+
+Process success is not a model-quality decision. Review every generated answer for factual
+relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage, and
+repeated control tokens. The EoF MCP Studio verification workflow returns only `PASS`, `FAIL`, or
+`INCONCLUSIVE` and never deploys automatically.
+
+### Chat and local retrieval
+
+Start the local LM Studio server first, then run:
+
+```bash
+./scripts/chat.sh --config "$CONFIG" --backend lmstudio
+
+./scripts/chat.sh \
+  --config "$CONFIG" \
+  --backend lmstudio \
+  --prompt "Where is the database connection created?"
+```
+
+For direct local adapter inference:
 
 ```bash
 ./scripts/chat.sh \
-  --backend transformers \
-  --adapter artifacts/finetune_lora
+  --config "$CONFIG" \
+  --backend mlx \
+  --adapter artifacts/finetune_lora_candidate
 ```
 
-Der Adapter ist beim LM-Studio-Backend nicht automatisch aktiv. Dafür muss zuerst das
-zusammengeführte und exportierte Modell in LM Studio beziehungsweise dem lokalen Runtime geladen
-werden.
+Use `--no-rag` to disable retrieval for a chat or verification run.
 
-## MLX-Adapter als neues LM-Studio-Modell installieren
+## Makefile interface
 
-Der sichere Fuse-Wrapper installiert den Adapter als eigenständiges Modell. Das Basismodell wird
-nicht verändert. Neue Modelle erhalten immer den Prefix `eofnnlab-` und werden sowohl in der
-konkreten Modellablage als auch als lokales Hub-Modell registriert:
+The Makefile defaults to `config/mcpstudio-v3.toml`. Override it with `CONFIG=...` on any target:
 
 ```bash
-# Zeigt Basis, Adapter und Zielpfade, schreibt aber nichts
-./scripts/fuse_model.sh --dry-run
-
-# Fusioniert, validiert, installiert und registriert das Modell
-./scripts/fuse_model.sh
-
-# Optional einen eigenen Namen vergeben; der Prefix wird automatisch ergänzt
-./scripts/fuse_model.sh --name docs
+make train CONFIG=config/my-project.toml
 ```
 
-Standardmäßig liest der Wrapper die unveränderte Trainingsbasis aus
-`artifacts/finetune_lora/train_setup.json`. Dadurch wird verhindert, dass ein bereits
-fusioniertes Modell versehentlich ein zweites Mal als Basis verwendet wird. Eine andere Basis kann
-explizit angegeben werden:
+`INPUTS` is a whitespace-separated list. The Makefile converts every item into the repeatable flag
+expected by the target:
+
+- `prepare`, `prepare-docs`, and `pipeline`: one `--input` per item
+- `index`: one `--project` per item, after the required `build` subcommand
+
+Examples:
+
+```bash
+make prepare \
+  CONFIG=config/my-project.toml \
+  INPUTS='/absolute/path/project-a /absolute/path/Services.swift'
+
+make index \
+  CONFIG=config/my-project.toml \
+  INPUTS='/absolute/path/project-a /absolute/path/project-b'
+
+make pipeline \
+  CONFIG=config/my-project.toml \
+  INPUTS='/absolute/path/project-a /absolute/path/project-b'
+```
+
+Because Make splits `INPUTS` on whitespace, invoke the shell wrappers directly when an input path
+contains spaces.
+
+Target-specific `*_ARGS` variables are appended unchanged after the generated arguments. This is
+the supported way to pass optional script parameters through Make:
+
+```bash
+make train \
+  CONFIG=config/my-project.toml \
+  TRAIN_ARGS='--objective-file /absolute/path/training-objective.md'
+
+make chat \
+  CONFIG=config/my-project.toml \
+  CHAT_ARGS='--backend lmstudio --prompt "Summarize the adapter lifecycle"'
+
+make verify-suite \
+  CONFIG=config/my-project.toml \
+  VERIFY_ARGS='--adapter artifacts/finetune_lora_merged --prompts eval/eval-prompts.jsonl --output artifacts/verification-report.json'
+
+make fuse \
+  CONFIG=config/my-project.toml \
+  FUSE_ARGS='--adapter artifacts/finetune_lora_merged --dry-run'
+```
+
+Available pass-through variables are `PREPARE_ARGS`, `PREPARE_DOCS_ARGS`, `INDEX_ARGS`,
+`PIPELINE_ARGS`, `TRAIN_ARGS`, `CHAT_ARGS`, `EVALUATE_ARGS`, `VERIFY_ARGS`, `MERGE_ARGS`,
+`FUSE_ARGS`, `DEPLOY_ARGS`, and `EXPORT_ARGS`.
+
+## LM Studio deployment
+
+Fuse and validate the verified MLX adapter before publishing it into LM Studio:
 
 ```bash
 ./scripts/fuse_model.sh \
-  --base-model /absoluter/pfad/zum/unveraenderten-mlx-modell \
-  --adapter artifacts/finetune_lora \
-  --name carios-code-v2
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged \
+  --dry-run
+
+./scripts/fuse_model.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged
 ```
 
-Die Ausgabe liegt anschließend unter:
+The base model defaults to the pristine model recorded in the adapter's `train_setup.json`. A
+different pristine base can be supplied with `--base-model`. New model names receive the
+`eofnnlab-` prefix automatically.
 
-```text
-~/.lmstudio/models/eofnnlab/eofnnlab-<name>/
-~/.lmstudio/hub/models/eofnnlab/<name>/
-~/.lmstudio/.internal/user-concrete-model-default-config/eofnnlab/eofnnlab-<name>.json
-```
-
-Der Wrapper verweigert vorhandene Zielnamen, fusioniert zunächst in temporäre Verzeichnisse und
-veröffentlicht das Ergebnis erst nach erfolgreicher Prüfung aller Safetensors-Shards. Er übernimmt
-außerdem die vollständigen Konfigurations-, Prozessor- und kanonischen Chat-Template-Daten der
-Basis. Wenn `gemma-4-chat-template-fixed.jinja` in der Basis liegt, hat diese korrigierte Variante
-Vorrang vor dem originalen `chat_template.jinja` und dem in `tokenizer_config.json` eingebetteten
-Template; der Wrapper synchronisiert alle installierten Template-Quellen darauf. Falls
-`mlx_lm.fuse` unveränderte Vision- oder andere multimodale Tensoren auslässt, kopiert
-der Wrapper sie bytegenau in zusätzliche Safetensors-Shards und prüft anschließend, dass alle
-Basis-Tensoren vorhanden sind. Für Gemma-4-Modelle installiert er Prompt-Template und
-Reasoning-Parser gemeinsam als Modell-Default, damit LM Studio `<|channel>thought` und
-`<channel|>` im Chat nicht als normalen Antworttext anzeigt. Nach der Installation die
-LM-Studio-Modellliste aktualisieren beziehungsweise LM Studio neu starten.
-
-## GGUF-Export
+For the configured deployment wrapper, pass the exact adapter that received the verification
+`PASS`. This explicit override also prevents a stale `deployment.adapter` value from selecting an
+unverified training artifact:
 
 ```bash
-export LLAMA_CPP=/absoluter/pfad/zu/llama.cpp
-./scripts/export_gguf.sh artifacts/finetune_lora Q4_K_M
+./deploy/lm-studio/install.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged \
+  --dry-run
+./deploy/lm-studio/install.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged
+
+# Transactionally replace an existing installation after verification PASS:
+./deploy/lm-studio/install.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged \
+  --replace \
+  --dry-run
+./deploy/lm-studio/install.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora_merged \
+  --replace
 ```
 
-Das Skript führt den Adapter mit dem lokalen Basismodell zusammen, konvertiert nach F16-GGUF und
-quantisiert anschließend. Ergebnis: `models/finetune_lora_Q4_K_M.gguf`. Diese Datei kann in
-LM Studio importiert oder in einem llama.cpp-kompatiblen Runtime von EoF MCP Studio ausgewählt
-werden.
+The replacement path stages and validates the new model, backs up the existing model, hub entry,
+and defaults, swaps the installation, and rolls back on failure. See
+[`deploy/lm-studio/README.md`](deploy/lm-studio/README.md) for deployment details.
 
-## Evaluation
+## GGUF export
 
-Die Validierungsdateien werden per stabilem Datei-Hash ausgewählt. Chunks derselben Datei landen
-nicht gleichzeitig in Training und Validation. Verglichen werden mindestens:
-
-- `validation_loss`
-- `perplexity`
-- eigene Prompt-Checks
-
-Für Prompt-Checks:
+The GGUF wrapper uses Transformers/PEFT to merge an adapter into its Hugging Face base model. It is
+for adapters produced by the Transformers backend, not MLX adapter artifacts. GGUF export requires
+all output paths explicitly:
 
 ```bash
-cp eval/prompts.example.jsonl eval/prompts.jsonl
-# Erwartete Symbole/Textteile an das Projekt anpassen
-./scripts/evaluate.sh
+export LLAMA_CPP=/absolute/path/llama.cpp
+
+./scripts/export_gguf.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/transformers_lora \
+  --merged-dir artifacts/finetune_lora_hf_merged \
+  --f16-output models/finetune_lora_f16.gguf \
+  --output models/finetune_lora_Q4_K_M.gguf \
+  --quantization Q4_K_M
 ```
 
-Ein sinnvoller Erfolg ist nicht nur eine niedrigere Perplexität. Das Modell sollte in unbekannten
-Aufgaben weniger projektspezifische APIs erfinden und mit RAG präzisere Datei-/Symboltreffer liefern.
+The script merges the adapter into the local base model, converts it to F16 GGUF, and then runs the
+`llama.cpp` quantizer.
 
-## Entwicklung und Tests
+## EoF MCP Studio integration
+
+Importable v3 tools, skills, prompts, workflows, runtime permissions, and the shared ScriptTool
+dispatcher live under [`config/mcpstudio/config-v3`](config/mcpstudio/config-v3). Open this
+`nnlab/lora` directory as the EoF MCP Studio chat project so `${CHAT_PROJECT_DIR}` resolves to the
+correct project root.
+
+The v3 training workflow accepts a selected objective file, discovers or validates exact source
+documents, builds a fresh policy-gated dataset, runs smoke and full training, and emits the
+verification hand-off. The separate verification workflow loads that hand-off, creates a reversible
+merged candidate, verifies the exact returned candidate, and produces the release decision. Neither
+workflow deploys a model. Before using an MCP Studio install or update tool, set
+`deployment.adapter` to the exact merged adapter returned by the successful verification run.
+
+See [`config/README.md`](config/README.md) for import order, runtime allow-list setup, and workflow
+details.
+
+## Data safety
+
+The scanners honor Git ignores in Git repositories and skip common secrets, credentials, private
+keys, binary/non-UTF-8 files, build outputs, dependencies, model directories, caches, and files over
+`data.max_file_bytes`.
+
+These filters are a safety net, not a guarantee. Before training, inspect the configured manifest
+and sample both JSONL files. Never use held-out verification prompts as training data.
+
+## Tests
 
 ```bash
-./scripts/test.sh
+make test
+# Equivalent: ./scripts/test.sh
 ```
 
-Die Tests benötigen keinen Modell-Download. Sie prüfen Sicherheitsfilter, JSONL-Erzeugung und
-lokale Source-Code-Suche.
+The test suite runs Ruff and pytest without downloading a model.
 
-## Technische Referenzen
+## References
 
-- [Google: Gemma fine-tuning](https://ai.google.dev/gemma/docs/tune)
-- [PyTorch auf macOS](https://docs.pytorch.org/get-started/locally/)
+- [Google Gemma fine-tuning](https://ai.google.dev/gemma/docs/tune)
+- [PyTorch on macOS](https://docs.pytorch.org/get-started/locally/)
 - [llama.cpp](https://github.com/ggml-org/llama.cpp)
