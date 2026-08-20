@@ -1,6 +1,6 @@
 const shared = require('sharedFunctions');
 
-const DEFAULT_PROJECT_ROOT = '/Users/eofmc/temp/gemma_extension';
+const DEFAULT_PROJECT_ROOT = '<set project root directory here>';
 
 function parseParams(jsonParams) {
     if (!jsonParams) {
