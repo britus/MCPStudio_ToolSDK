@@ -400,7 +400,7 @@ The v3 training workflow accepts a selected objective file, discovers or validat
 documents, builds a fresh policy-gated dataset, runs smoke and full training, and emits the
 verification hand-off. The separate verification workflow loads that hand-off, creates a reversible
 merged candidate, verifies the exact returned candidate, and produces the release decision. Neither
-workflow deploys a model. Before using an MCP Studio install or update tool, set
+workflow deploys a model. Before using an EoF MCP Studio install or update tool, set
 `deployment.adapter` to the exact merged adapter returned by the successful verification run.
 
 See [`config/README.md`](config/README.md) for import order, runtime allow-list setup, and workflow
