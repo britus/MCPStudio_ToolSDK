@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from io import BytesIO
 from pathlib import Path
 from typing import Any
@@ -74,3 +75,35 @@ def test_extract_skips_empty_pdf(tmp_path: Path) -> None:
     assert len(extracted) == 0
     assert len(skipped) == 1
     assert "insufficient text" in skipped[0].reason
+
+
+def test_cli_fails_when_requested_pdf_produces_no_text(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from pypdf import PdfWriter
+
+    from finetune_lora.pdf_extract import main
+
+    pdf_path = tmp_path / "empty.pdf"
+    writer = PdfWriter()
+    writer.add_blank_page(width=612, height=792)
+    _write_pdf(writer, pdf_path)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "pdf_extract",
+            "--source",
+            str(pdf_path),
+            "--output",
+            str(tmp_path / "out"),
+        ],
+    )
+
+    with pytest.raises(SystemExit) as error:
+        main()
+
+    assert error.value.code == 1
+    captured = capsys.readouterr()
+    assert "skipped 1" in captured.out
+    assert "insufficient text extracted" in captured.err

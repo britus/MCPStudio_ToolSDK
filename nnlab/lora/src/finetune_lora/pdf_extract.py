@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -149,6 +150,8 @@ def main() -> None:
         f"Extracted {len(extracted)} PDFs to {Path(args.output_dir).resolve()}; "
         f"skipped {len(skipped)}."
     )
+    for item in skipped:
+        print(f"Skipped {item.relative_path}: {item.reason}", file=sys.stderr)
     if args.manifest:
         manifest_path = Path(args.manifest)
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,6 +163,8 @@ def main() -> None:
         }
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
         print(f"Wrote manifest to {manifest_path}")
+    if Path(args.source).expanduser().is_file() and not extracted:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

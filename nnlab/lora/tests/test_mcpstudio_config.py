@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RELEASE_CONFIG_ROOT = PROJECT_ROOT / "config" / "mcpstudio" / "config-v3"
@@ -240,3 +239,5 @@ def test_policy_contract_is_not_written_into_document_input_directory() -> None:
     assert "function evidenceText" in script
     assert "must be a non-empty string or array of strings" in script
     assert "return normalized.join('\\n')" in script
+    assert "PDF extraction produced no text file" in script
+    assert "MCPStudio.fileExists(extractedPath)" in script

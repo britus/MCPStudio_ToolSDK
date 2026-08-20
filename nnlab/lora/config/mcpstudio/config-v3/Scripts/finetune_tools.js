@@ -495,9 +495,28 @@ function prepareDocuments(params, sid) {
                     output.stderr
                 );
             }
-            materializedPaths.push(
-                shared.joinPath(documentDir, withoutExtension(pathBaseName(source)) + '.txt')
+            const extractedPath = shared.joinPath(
+                documentDir,
+                withoutExtension(pathBaseName(source)) + '.txt'
             );
+            if (!MCPStudio.fileExists(extractedPath)) {
+                return shared.setProcessResult(
+                    false,
+                    '',
+                    'Document preparation stopped because PDF extraction produced no text file.',
+                    {
+                        operation: 'finetunePrepareDocuments',
+                        projectRoot: root,
+                        documentPaths: sourcePaths,
+                        failedDocument: source,
+                        expectedTextPath: extractedPath,
+                        stagingDirectory: runRelativePath
+                    },
+                    output.stdout,
+                    output.stderr
+                );
+            }
+            materializedPaths.push(extractedPath);
             materializedPolicySources.push({
                 path: shared.joinPath(
                     numberedSegment(index),

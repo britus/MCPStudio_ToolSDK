@@ -197,8 +197,49 @@ def _blocked_split(
     chunks: list[CodeChunk], validation_ratio: float, seed: int
 ) -> tuple[list[CodeChunk], list[CodeChunk]]:
     """Create deterministic validation blocks without train/validation line overlap."""
-    if validation_ratio <= 0 or len(chunks) < 2:
+    if validation_ratio <= 0 or not chunks:
         return chunks, []
+    if len(chunks) == 1:
+        chunk = chunks[0]
+        lines = chunk.content.splitlines()
+        if len(lines) < 2:
+            return chunks, []
+
+        # A document shorter than chunk_lines would otherwise have no validation
+        # data at all. Split its only chunk at a line boundary, keeping the two
+        # sides strictly independent. Prefer enough validation lines to support a
+        # continuation record, without consuming the entire training side.
+        validation_lines = min(
+            len(lines) - 1,
+            max(8, round(len(lines) * validation_ratio)),
+        )
+        validation_at_start = bool(
+            hashlib.sha256(
+                f"{seed}:{chunk.project}:{chunk.path}:single-chunk".encode()
+            ).digest()[0]
+            & 1
+        )
+        boundary = validation_lines if validation_at_start else len(lines) - validation_lines
+        first = CodeChunk(
+            project=chunk.project,
+            path=chunk.path,
+            start_line=chunk.start_line,
+            end_line=chunk.start_line + boundary - 1,
+            content="\n".join(lines[:boundary]),
+            source_sha256=chunk.source_sha256,
+        )
+        second = CodeChunk(
+            project=chunk.project,
+            path=chunk.path,
+            start_line=chunk.start_line + boundary,
+            end_line=chunk.start_line + len(lines) - 1,
+            content="\n".join(lines[boundary:]),
+            source_sha256=chunk.source_sha256,
+        )
+        if validation_at_start:
+            return [second], [first]
+        return [first], [second]
+
     target = max(1, round(len(chunks) * validation_ratio))
     ordered = sorted(
         chunks,

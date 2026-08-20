@@ -159,6 +159,51 @@ def test_policy_builds_balanced_non_overlapping_subject_splits(tmp_path: Path) -
             )
 
 
+def test_policy_splits_short_document_into_independent_records(tmp_path: Path) -> None:
+    doc_dir = tmp_path / "runtime-sources"
+    doc_dir.mkdir()
+    (doc_dir / "short.txt").write_text(
+        "".join(f"short line {index}\n" for index in range(54)),
+        encoding="utf-8",
+    )
+
+    train_path = tmp_path / "train.jsonl"
+    validation_path = tmp_path / "validation.jsonl"
+    manifest = prepare_documents(
+        [doc_dir],
+        train_path,
+        validation_path,
+        tmp_path / "manifest.json",
+        chunk_lines=140,
+        overlap_lines=20,
+        max_file_bytes=1_000_000,
+        validation_ratio=0.1,
+        seed=42,
+        policy={
+            "requiredSubjects": ["short-subject"],
+            "sources": [{"path": "short.txt", "subjects": ["short-subject"]}],
+        },
+    )
+
+    assert manifest["dataset_policy"]["status"] == "pass"
+    assert manifest["dataset_policy"]["missing_train_subjects"] == []
+    assert manifest["dataset_policy"]["missing_validation_subjects"] == []
+    train = [json.loads(line) for line in train_path.read_text().splitlines()]
+    validation = [
+        json.loads(line) for line in validation_path.read_text().splitlines()
+    ]
+    assert train
+    assert validation
+    assert all(
+        train_record["metadata"]["end_line"]
+        < validation_record["metadata"]["start_line"]
+        or validation_record["metadata"]["end_line"]
+        < train_record["metadata"]["start_line"]
+        for train_record in train
+        for validation_record in validation
+    )
+
+
 def test_policy_deduplicates_equal_content_by_hash(tmp_path: Path) -> None:
     doc_dir = tmp_path / "runtime-sources"
     doc_dir.mkdir()
