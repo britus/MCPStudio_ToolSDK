@@ -80,6 +80,19 @@ FINETUNE_PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 make setup
 The setup script creates `.venv` and installs this package in editable mode. All other wrappers
 require that virtual environment.
 
+## Minimal Gemma 4 Patch in the mlx runtime
+
+To complete a training with the Gemma 4 Model, apply this little patch in
+nnlab/lora/.venv/lib/python3.12/site-packages/mlx_lm/models/gemma4_text.py
+```text
+        top_k_indices = mx.argpartition(
+            expert_scores, kth=-self.config.top_k_experts, axis=-1
+        )
+        top_k_indices = top_k_indices[..., -self.config.top_k_experts :]
+->PATCH Line 138:
+        top_k_indices = mx.stop_gradient(top_k_indices)
+```
+
 ## Configuration
 
 Every framework command that depends on model, data, training, retrieval, verification, merge, or
