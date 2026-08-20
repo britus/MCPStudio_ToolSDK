@@ -1,21 +1,21 @@
 
 [dev]
-pytest<10,>=8
-ruff<1,>=0.9
+pytest>=8
+ruff>=0.8
+
+[docs]
+pypdf>=5
 
 [mlx]
-
-[mlx:platform_system == "Darwin" and platform_machine == "arm64"]
-mlx-lm[train]<0.32,>=0.31.3
+mlx>=0.22
+mlx-lm>=0.21
+transformers>=4.48
 
 [qlora]
-
-[qlora:platform_system == "Linux"]
-bitsandbytes<1,>=0.45
+bitsandbytes>=0.45
 
 [train]
-accelerate<2,>=1.2
-peft<1,>=0.14
-safetensors<1,>=0.5
-torch<3,>=2.4
-transformers<6,>=4.51
+accelerate>=1.2
+peft>=0.14
+torch>=2.5
+transformers>=4.48

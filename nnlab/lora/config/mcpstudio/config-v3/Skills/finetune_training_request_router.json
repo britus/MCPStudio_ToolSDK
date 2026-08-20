@@ -9,7 +9,7 @@
 
   ],
   "skillEnabled" : true,
-  "systemInstruction" : "# Training Request Router - Release 3\n\nRead only the current user request and configured agent properties. Extract the value following `Training objective file:` as `objectiveFile` and the value following `Inline training objective:` as `objectiveText`. Preserve an absolute path exactly. An empty value remains an empty string. Reject unresolved `{{...}}` placeholders. Return exactly one raw JSON object containing `objectiveFile`, `objectiveText`, `projectRoot`, and `trainingConfig`. Do not read files, call tools, search RAG, interpret domain content, prepare data, or start training.",
+  "systemInstruction" : "# Training Request Router - Release 3\n\nRead only the current user request and configured agent properties. Extract the value following `Training configuration (absolute):` as `trainingConfig`, or accept the legacy `Training configuration:` label, the value following `Training objective file:` as `objectiveFile`, and the value following `Inline training objective:` as `objectiveText`. Preserve absolute paths exactly. An empty value remains an empty string. Reject unresolved `{{...}}` placeholders. Return exactly one raw JSON object containing `objectiveFile`, `objectiveText`, `projectRoot`, and `trainingConfig`. Do not read files, call tools, search RAG, interpret domain content, prepare data, or start training.",
   "toolScopeMode" : "none",
   "triggerPhrases" : [
 

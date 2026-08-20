@@ -13,7 +13,7 @@
   "inputSchema" : {
     "properties" : {
       "configPath" : {
-        "description" : "Project-relative TOML containing data and training settings.",
+        "description" : "Absolute or project-relative TOML containing data and training settings. The runtime normalizes it to an absolute path.",
         "name" : "configPath",
         "type" : "string"
       },

@@ -77,6 +77,22 @@ function relativePath(value, fallback, label) {
     return validation.value;
 }
 
+function projectConfigPath(value, root, fallback) {
+    const selected = value || fallback;
+    if (typeof selected !== 'string' || !selected.trim()) {
+        throw new Error('configPath must be a non-empty TOML file path');
+    }
+    const normalized = selected.trim();
+    const absolute = normalized.charAt(0) === '/' || normalized.indexOf('file://') === 0
+        ? normalized
+        : shared.joinPath(root, relativePath(normalized, '', 'configPath'));
+    const configPath = absoluteDocumentPath(absolute, 'configPath');
+    if (pathExtension(configPath) !== '.toml') {
+        throw new Error('configPath must be a TOML file');
+    }
+    return configPath;
+}
+
 function stringArray(value, fallback, label) {
     const selected = value === undefined ? fallback : value;
     if (!Array.isArray(selected) || !selected.every(function (item) {
@@ -420,10 +436,10 @@ function loadVerificationInput(params) {
 
 function prepareDocuments(params, sid) {
     const root = projectRoot(params);
-    const configPath = relativePath(
+    const configPath = projectConfigPath(
         params.configPath,
-        'config/mcpstudio-v3.toml',
-        'configPath'
+        root,
+        'config/mcpstudio-v3.toml'
     );
     const stagingRoot = relativePath(
         params.textOutputDir,
@@ -609,10 +625,10 @@ function runScript(root, scriptRelativePath, args, operation) {
 
 function trainAdapter(params) {
     const root = projectRoot(params);
-    const configPath = relativePath(
+    const configPath = projectConfigPath(
         params.configPath,
-        'config/mcpstudio-v3.toml',
-        'configPath'
+        root,
+        'config/mcpstudio-v3.toml'
     );
     const smokeTest = params.smokeTest === true;
     const operation = smokeTest ? 'finetuneTrainSmokeTest' : 'finetuneTrainAdapter';

@@ -67,9 +67,11 @@ entries. Exact matching is intentionally used for every command.
 ## Training workflow
 
 `finetune_adapter_training_workflow` defaults to the non-destructive
-`config/mcpstudio-v3.toml`, which writes to `artifacts/finetune_lora_candidate`.
-Before a run, set both ToolRunner `configPath` properties and the coordinator 
-`trainingConfig` to the same project-relative TOML. The workflow:
+`${CHAT_PROJECT_DIR}/config/mcpstudio-v3.toml`, which writes to
+`artifacts/finetune_lora_candidate`. Before a run, set both ToolRunner
+`configPath` properties and the coordinator `trainingConfig` to the same
+absolute TOML. Relative training-tool inputs remain supported and are normalized
+to an absolute path before execution. The workflow:
 
 1. audits the requested configuration and objective without executing tools;
 2. resolves exact local source files from explicit paths or `rag_query` and

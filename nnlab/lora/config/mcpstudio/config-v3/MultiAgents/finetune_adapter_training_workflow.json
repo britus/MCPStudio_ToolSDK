@@ -2,10 +2,10 @@
   "agents" : [
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Use the validated `trainingGoal` supplied by Load Training Objective as the complete runtime objective. Extract every required subject, resolve exact local source documents, and then compute coverage from the subjects assigned to retained sources. Prefer explicit sources in the objective; call rag_query with focused subject-and-source queries for each uncovered requirement and use no other tool. For provider portability call rag_query with its required query string only; never pass a Boolean as top_k and never guess a collection name. Preserve exact absolute file:\/\/ URIs or filesystem paths returned by results. Classify explicitly best-effort source requests as optional. Missing or rejected optional sources are warnings when other retained sources evidence every required subject; mandatory-source failures remain blockers. Never retain a source whose identity, variant or revision evidence conflicts with the objective, even when it is optional; rejected sources cannot contribute coverage. Output exactly one raw JSON object with approved, sourcePlan, coveredSubjects, missingSubjects, blockers and warnings. Each source must contain path, non-empty subjects and evidence as one non-empty string, never an array. coveredSubjects must equal the union of source subjects; missingSubjects must equal requiredSubjects minus that union. approved may be true only when missingSubjects and blockers are empty; warnings may be non-empty. Never use the objective file itself as an authoritative technical source unless explicitly requested. No Markdown or surrounding prose.",
+      "instruction" : "Use the validated `trainingGoal` supplied by Load Training Objective as the complete runtime objective. Extract separate required and conditional subject lists, resolve exact local source documents, and compute required coverage from the required subjects assigned to retained sources. Never promote a conditional subject to required. Prefer explicit sources in the objective; call rag_query with focused subject-and-source queries for each uncovered required subject and use no other tool. Batch independent rag_query calls in the same response whenever possible and reserve the final turn for the required JSON result. For provider portability call rag_query with its required query string only; never pass a Boolean as top_k and never guess a collection name. Preserve exact absolute file:\/\/ URIs or filesystem paths returned by results. Classify explicitly best-effort or conditional source requests as non-blocking. Missing or rejected optional and conditional sources are warnings when other retained sources evidence every required subject; mandatory-source failures remain blockers. Never retain a source whose identity, variant or revision evidence conflicts with the objective, even when it is optional; rejected sources cannot contribute required coverage. RAG snippets cannot prove that a PDF lacks visual material, so unresolved conditional schematics are warnings rather than blockers. A negative interface boundary can be supported by authoritative sources that document the selected module interface; do not require unrelated positive-interface documents. Output exactly one raw JSON object with approved, sourcePlan, coveredSubjects, missingSubjects, conditionalSubjects, coveredConditionalSubjects, unresolvedConditionalSubjects, blockers and warnings. sourcePlan.requiredSubjects and every source subject assignment passed to preparation must contain required subjects only. Each source must contain path, non-empty subjects and evidence as one non-empty string, never an array. coveredSubjects must equal the union of source subjects; missingSubjects must equal requiredSubjects minus that union and must exclude conditional subjects. approved may be true only when missingSubjects and blockers are empty; unresolved conditional subjects and warnings may be non-empty. Never use the objective file itself as an authoritative technical source unless explicitly requested. No Markdown or surrounding prose.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
-      "maxTurns" : 8,
+      "maxTurns" : 24,
       "name" : "Training Document Finder",
       "positionX" : 490.921875,
       "positionY" : 82.21875,
@@ -14,7 +14,7 @@
           "description" : "Required retrieval behavior.",
           "key" : "discoveryPolicy",
           "required" : true,
-          "value" : "exact-local-paths; all requested subjects required; no inferred paths",
+          "value" : "exact-local-paths; required subjects gate approval; conditional subjects warn; no inferred paths",
           "valueType" : "string"
         },
         {
@@ -84,10 +84,10 @@
       "positionY" : 83.60546875,
       "properties" : [
         {
-          "description" : "Project-relative training TOML whose dataset files are rebuilt.",
+          "description" : "Absolute training TOML whose dataset files are rebuilt.",
           "key" : "configPath",
           "required" : true,
-          "value" : "config\/mcpstudio-v3.toml",
+          "value" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio-v3.toml",
           "valueType" : "string"
         },
         {
@@ -121,7 +121,7 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Route the resolved request into the deterministic objective-loader stage. Extract the absolute value after `Training objective file:` and the optional value after `Inline training objective:`. Return exactly one raw JSON object with objectiveFile, objectiveText, projectRoot and trainingConfig. Do not read the file, interpret its domain content, query RAG or start training.",
+      "instruction" : "Route the resolved request into the deterministic objective-loader stage. Extract the absolute training config after `Training configuration (absolute):`, or after the legacy `Training configuration:` label, the absolute value after `Training objective file:`, and the optional value after `Inline training objective:`. Return exactly one raw JSON object with objectiveFile, objectiveText, projectRoot and trainingConfig. Do not read either file, interpret domain content, query RAG or start training.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 2,
@@ -137,10 +137,10 @@
           "valueType" : "string"
         },
         {
-          "description" : "Training TOML to audit and execute.",
+          "description" : "Absolute training TOML to execute.",
           "key" : "trainingConfig",
           "required" : true,
-          "value" : "config\/mcpstudio-v3.toml",
+          "value" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio-v3.toml",
           "valueType" : "string"
         }
       ],
@@ -163,10 +163,10 @@
       "positionY" : 311.83203125,
       "properties" : [
         {
-          "description" : "Project-relative training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
+          "description" : "Absolute training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
           "key" : "configPath",
           "required" : true,
-          "value" : "config\/mcpstudio-v3.toml",
+          "value" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio-v3.toml",
           "valueType" : "string"
         },
         {
@@ -242,10 +242,10 @@
       "positionY" : 543.5703125,
       "properties" : [
         {
-          "description" : "Project-relative training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
+          "description" : "Absolute training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
           "key" : "configPath",
           "required" : true,
-          "value" : "config\/mcpstudio-v3.toml",
+          "value" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio-v3.toml",
           "valueType" : "string"
         },
         {

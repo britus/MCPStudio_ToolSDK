@@ -1,18 +1,294 @@
 Metadata-Version: 2.4
 Name: finetune-lora
-Version: 0.1.0
-Summary: Model-agnostic local fine-tuning and retrieval framework
+Version: 3.0.0
+Summary: Generic local LoRA/QLoRA training and retrieval framework
 Requires-Python: <3.13,>=3.11
-Provides-Extra: train
-Requires-Dist: accelerate<2,>=1.2; extra == "train"
-Requires-Dist: peft<1,>=0.14; extra == "train"
-Requires-Dist: safetensors<1,>=0.5; extra == "train"
-Requires-Dist: torch<3,>=2.4; extra == "train"
-Requires-Dist: transformers<6,>=4.51; extra == "train"
-Provides-Extra: qlora
-Requires-Dist: bitsandbytes<1,>=0.45; platform_system == "Linux" and extra == "qlora"
-Provides-Extra: mlx
-Requires-Dist: mlx-lm[train]<0.32,>=0.31.3; (platform_system == "Darwin" and platform_machine == "arm64") and extra == "mlx"
+Description-Content-Type: text/markdown
 Provides-Extra: dev
-Requires-Dist: pytest<10,>=8; extra == "dev"
-Requires-Dist: ruff<1,>=0.9; extra == "dev"
+Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: ruff>=0.8; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: pypdf>=5; extra == "docs"
+Provides-Extra: train
+Requires-Dist: accelerate>=1.2; extra == "train"
+Requires-Dist: peft>=0.14; extra == "train"
+Requires-Dist: torch>=2.5; extra == "train"
+Requires-Dist: transformers>=4.48; extra == "train"
+Provides-Extra: mlx
+Requires-Dist: mlx>=0.22; extra == "mlx"
+Requires-Dist: mlx-lm>=0.21; extra == "mlx"
+Requires-Dist: transformers>=4.48; extra == "mlx"
+Provides-Extra: qlora
+Requires-Dist: bitsandbytes>=0.45; extra == "qlora"
+
+# Fine-tune Framework
+
+Dieses Verzeichnis enthält eine lokale, modellunabhängige Pipeline, mit der Sprachmodelle an
+eigene Source-Code-Projekte angepasst und zur Laufzeit mit aktuellem Projektkontext versorgt werden.
+
+Die Pipeline kombiniert zwei Verfahren:
+
+1. **LoRA/QLoRA-Training** lernt wiederkehrende Konventionen, Namen und Strukturen aus einem
+   Repository-Snapshot.
+2. **Lokale Retrieval-Suche (RAG)** holt bei jeder Frage die aktuell passenden Codeabschnitte
+   aus einem SQLite-Index. Das ist für exakte und häufig geänderte Implementierungen wichtiger
+   als das Training.
+
+Ein Fine-Tune ist kein verlässlicher Ersatz für den aktuellen Source Code. Es kann Verhalten und
+Muster anpassen, aber keine Datenbank mit garantiert korrektem Dateistand bilden. Der lokale Index
+spart trotzdem Kontext: Statt vieler ganzer Dateien werden nur wenige relevante Ausschnitte an das
+Modell übergeben.
+
+## Voraussetzungen
+
+- Python 3.11 oder 3.12. Python 3.14 ist für die derzeit empfohlenen
+  PyTorch-macOS-Binaries noch zu neu.
+- Für RAG: ein bereits lokal in LM Studio geladenes GGUF-Modell
+- Für LoRA: ein lokales, trainierbares Transformers-/Safetensors-Modellverzeichnis
+- Apple Silicon: reguläres LoRA, ausreichend gemeinsamer Speicher
+- NVIDIA: reguläres LoRA oder QLoRA mit `bitsandbytes`
+- Für GGUF-Export: ein aktueller, gebauter `llama.cpp`-Checkout
+
+Es gibt keinen Hub-Login und keinen kostenpflichtigen API-Aufruf. Die Python-Bibliotheken werden
+einmalig über PyPI installiert; Modell, Quellcode, Index und Prompts bleiben danach lokal.
+`HF_HUB_OFFLINE`, `TRANSFORMERS_OFFLINE` und Telemetrie-Sperren werden von den Skripten gesetzt.
+
+## Schnellstart: vollständig lokal mit LM Studio
+
+```bash
+# Falls Homebrew aktuell nur Python 3.14 bereitstellt:
+brew install python@3.12
+
+# Leichte Installation ohne Torch und ohne Trainingsbibliotheken
+FINETUNE_PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 \
+  ./scripts/setup.sh --rag-only
+
+# Ein oder mehrere lokale Projekte indexieren
+./scripts/index.sh /pfad/projekt-a /pfad/projekt-b
+
+# In LM Studio vorher das lokale Modell und den Local Server starten
+./scripts/chat.sh --backend lmstudio
+./scripts/chat.sh --backend lmstudio \
+  --prompt "Wo wird die Datenbankverbindung erzeugt?"
+```
+
+Dieser Modus benötigt weder einen Hub noch ein trainierbares Basismodell. Der Client verwendet nur
+Python-Standardbibliotheken und sendet HTTP ausschließlich an die konfigurierte lokale
+LM-Studio-Adresse `http://localhost:1234/v1`.
+
+## Optional: lokales LoRA-/QLoRA-Training
+
+Eine quantisierte `.gguf`-Datei aus LM Studio kann nicht direkt trainiert werden. Dafür wird ein
+lokaler Safetensors-Modellordner benötigt, zum Beispiel:
+
+```text
+models/google/gemma-4-26b-a4b/
+├── config.json
+├── model-00001-of-00003.safetensors
+├── model.safetensors.index.json
+├── tokenizer.json
+├── tokenizer_config.json
+└── weitere vom Modell benötigte Dateien
+```
+
+Das vorhandene MLX-quantisierte Apple-Silicon-Modell wird anhand seines
+`quantization_config` automatisch erkannt und mit MLX-LM als QLoRA trainiert. Ein klassischer,
+nicht im MLX-Format quantisierter Safetensors-Checkpoint verwendet Transformers/PEFT.
+
+```bash
+# Installiert MLX und Transformers/PEFT
+FINETUNE_PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 \
+  ./scripts/setup.sh --train
+
+# Nur Apple Silicon/MLX, ohne PyTorch-Trainingsbackend
+./scripts/setup.sh --mlx
+
+# Nur auf NVIDIA/CUDA: zusätzliche QLoRA-Abhängigkeit
+./scripts/setup.sh --cuda
+
+./scripts/prepare.sh /pfad/projekt-a /pfad/projekt-b
+
+# Verzeichnisse und einzelne Quelldateien können kombiniert werden
+./scripts/prepare.sh /pfad/projekt-a /pfad/Services.swift /pfad/tool.py
+./scripts/index.sh   /pfad/projekt-a /pfad/projekt-b
+./scripts/train.sh
+./scripts/evaluate_base.sh
+./scripts/evaluate.sh
+```
+
+Vor dem längeren MLX-Lauf prüft ein einzelner Trainingsschritt Modell, Datensatz,
+LoRA-Injektion und Backpropagation:
+
+```bash
+./scripts/smoke_train.sh
+```
+
+`./scripts/pipeline.sh /pfad/projekt-a ...` führt Prepare, Index und Training nacheinander aus.
+
+## Konfiguration
+
+Alle wichtigen Parameter stehen in [`config/default.toml`](config/default.toml). Für eigene
+Experimente sollte die Datei kopiert und die Kopie an `scripts/train.sh` übergeben werden:
+
+```bash
+cp config/default.toml config/my-project.toml
+./scripts/train.sh config/my-project.toml
+```
+
+Wichtige Werte:
+
+- `model.id`: lokaler Ordner des trainierbaren Basismodells
+- `model.local_files_only`: bleibt auf `true`; andere Werte werden abgelehnt
+- `data.max_seq_length`: maximales Speicherfenster pro Trainingssequenz; längere
+  Completions werden tokenbewusst bevorzugt an Absatz- oder Satzgrenzen aufgeteilt
+- `training.gradient_accumulation_steps`: effektive Batchgröße ohne zusätzlichen Peak-Speicher
+- `training.qlora`: nur unter CUDA auf `true` setzen
+- `training.output_dir`: Ziel des LoRA-Adapters
+- `retrieval.max_context_chars`: maximale Größe des aktuellen RAG-Kontexts
+- `inference.base_url`: ausschließlich der lokale Modellserver
+- `inference.max_total_new_tokens`: harte Obergrenze für eine vollständige Generation;
+  Verification-Ausgaben am Längenlimit gelten als abgeschnitten und bestehen nicht
+
+Bei Speicherproblemen zuerst `max_seq_length` auf 1024 reduzieren. Auf einem Mac ist QLoRA über
+`bitsandbytes` nicht der vorgesehene Weg; dort bleibt `qlora = false`.
+
+Das SDK verwirft bei einem kleinen `max_seq_length` keine Completion-Tokens. Es erzeugt
+stattdessen vollständige Folgesegmente mit begrenztem vorherigem Antwortkontext. Damit bleiben
+Training, Validation und MLX-Testdaten innerhalb desselben Speicherfensters, während der gesamte
+Quellinhalt erhalten bleibt.
+
+## Datensicherheit und Offline-Garantie
+
+Der Scanner berücksichtigt Git-Ignores in Git-Repositories und überspringt unter anderem:
+
+- `.env`, Schlüssel-, Zertifikats- und Credential-Dateien
+- Dateien mit erkennbaren Private Keys oder bekannten Tokenformaten
+- Binärdateien und nicht als UTF-8 lesbare Dateien
+- Build-, Vendor-, Cache-, Modell- und Dependency-Verzeichnisse
+- Dateien über `data.max_file_bytes`
+
+Die Liste ist ein Sicherheitsnetz, keine Garantie. Vor dem Training immer
+`data/processed/manifest.json` und stichprobenartig die JSONL-Dateien kontrollieren. Remote-Tracking
+ist deaktiviert, und alle Modelllader erhalten `local_files_only=True`.
+
+## Chat mit LM Studio oder EoF MCP Studio
+
+1. Lokale GGUF-Datei in LM Studio laden und den lokalen kompatiblen Server starten.
+2. `inference.base_url` und `inference.model` in der Konfiguration anpassen.
+3. Chat mit aktuellem Repository-Index starten:
+
+```bash
+./scripts/chat.sh --backend lmstudio
+./scripts/chat.sh --backend lmstudio --prompt "Wo wird die Datenbankverbindung erzeugt?"
+```
+
+Das Nachrichtenformat ist OpenAI-kompatibel, aber es wird weder das OpenAI-Python-Paket noch ein
+OpenAI-Dienst verwendet. Jeder andere kompatible lokale Endpunkt kann ebenso verwendet werden.
+Für einen direkten Test des lokalen Safetensors-Modells plus Adapter:
+
+```bash
+./scripts/chat.sh \
+  --backend transformers \
+  --adapter artifacts/finetune_lora
+```
+
+Der Adapter ist beim LM-Studio-Backend nicht automatisch aktiv. Dafür muss zuerst das
+zusammengeführte und exportierte Modell in LM Studio beziehungsweise dem lokalen Runtime geladen
+werden.
+
+## MLX-Adapter als neues LM-Studio-Modell installieren
+
+Der sichere Fuse-Wrapper installiert den Adapter als eigenständiges Modell. Das Basismodell wird
+nicht verändert. Neue Modelle erhalten immer den Prefix `eofnnlab-` und werden sowohl in der
+konkreten Modellablage als auch als lokales Hub-Modell registriert:
+
+```bash
+# Zeigt Basis, Adapter und Zielpfade, schreibt aber nichts
+./scripts/fuse_model.sh --dry-run
+
+# Fusioniert, validiert, installiert und registriert das Modell
+./scripts/fuse_model.sh
+
+# Optional einen eigenen Namen vergeben; der Prefix wird automatisch ergänzt
+./scripts/fuse_model.sh --name docs
+```
+
+Standardmäßig liest der Wrapper die unveränderte Trainingsbasis aus
+`artifacts/finetune_lora/train_setup.json`. Dadurch wird verhindert, dass ein bereits
+fusioniertes Modell versehentlich ein zweites Mal als Basis verwendet wird. Eine andere Basis kann
+explizit angegeben werden:
+
+```bash
+./scripts/fuse_model.sh \
+  --base-model /absoluter/pfad/zum/unveraenderten-mlx-modell \
+  --adapter artifacts/finetune_lora \
+  --name carios-code-v2
+```
+
+Die Ausgabe liegt anschließend unter:
+
+```text
+~/.lmstudio/models/eofnnlab/eofnnlab-<name>/
+~/.lmstudio/hub/models/eofnnlab/<name>/
+~/.lmstudio/.internal/user-concrete-model-default-config/eofnnlab/eofnnlab-<name>.json
+```
+
+Der Wrapper verweigert vorhandene Zielnamen, fusioniert zunächst in temporäre Verzeichnisse und
+veröffentlicht das Ergebnis erst nach erfolgreicher Prüfung aller Safetensors-Shards. Er übernimmt
+außerdem die vollständigen Konfigurations-, Prozessor- und kanonischen Chat-Template-Daten der
+Basis. Wenn `gemma-4-chat-template-fixed.jinja` in der Basis liegt, hat diese korrigierte Variante
+Vorrang vor dem originalen `chat_template.jinja` und dem in `tokenizer_config.json` eingebetteten
+Template; der Wrapper synchronisiert alle installierten Template-Quellen darauf. Falls
+`mlx_lm.fuse` unveränderte Vision- oder andere multimodale Tensoren auslässt, kopiert
+der Wrapper sie bytegenau in zusätzliche Safetensors-Shards und prüft anschließend, dass alle
+Basis-Tensoren vorhanden sind. Für Gemma-4-Modelle installiert er Prompt-Template und
+Reasoning-Parser gemeinsam als Modell-Default, damit LM Studio `<|channel>thought` und
+`<channel|>` im Chat nicht als normalen Antworttext anzeigt. Nach der Installation die
+LM-Studio-Modellliste aktualisieren beziehungsweise LM Studio neu starten.
+
+## GGUF-Export
+
+```bash
+export LLAMA_CPP=/absoluter/pfad/zu/llama.cpp
+./scripts/export_gguf.sh artifacts/finetune_lora Q4_K_M
+```
+
+Das Skript führt den Adapter mit dem lokalen Basismodell zusammen, konvertiert nach F16-GGUF und
+quantisiert anschließend. Ergebnis: `models/finetune_lora_Q4_K_M.gguf`. Diese Datei kann in
+LM Studio importiert oder in einem llama.cpp-kompatiblen Runtime von EoF MCP Studio ausgewählt
+werden.
+
+## Evaluation
+
+Die Validierungsdateien werden per stabilem Datei-Hash ausgewählt. Chunks derselben Datei landen
+nicht gleichzeitig in Training und Validation. Verglichen werden mindestens:
+
+- `validation_loss`
+- `perplexity`
+- eigene Prompt-Checks
+
+Für Prompt-Checks:
+
+```bash
+cp eval/prompts.example.jsonl eval/prompts.jsonl
+# Erwartete Symbole/Textteile an das Projekt anpassen
+./scripts/evaluate.sh
+```
+
+Ein sinnvoller Erfolg ist nicht nur eine niedrigere Perplexität. Das Modell sollte in unbekannten
+Aufgaben weniger projektspezifische APIs erfinden und mit RAG präzisere Datei-/Symboltreffer liefern.
+
+## Entwicklung und Tests
+
+```bash
+./scripts/test.sh
+```
+
+Die Tests benötigen keinen Modell-Download. Sie prüfen Sicherheitsfilter, JSONL-Erzeugung und
+lokale Source-Code-Suche.
+
+## Technische Referenzen
+
+- [Google: Gemma fine-tuning](https://ai.google.dev/gemma/docs/tune)
+- [PyTorch auf macOS](https://docs.pytorch.org/get-started/locally/)
+- [llama.cpp](https://github.com/ggml-org/llama.cpp)

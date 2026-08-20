@@ -1,8 +1,0 @@
-[console_scripts]
-finetune-chat = finetune_lora.chat:main
-finetune-evaluate = finetune_lora.evaluate:main
-finetune-fuse-lmstudio = finetune_lora.lmstudio_fuse:main
-finetune-index = finetune_lora.retrieval:main
-finetune-merge = finetune_lora.merge:main
-finetune-prepare = finetune_lora.prepare:main
-finetune-train = finetune_lora.train:main

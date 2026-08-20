@@ -13,7 +13,7 @@
   "inputSchema" : {
     "properties" : {
       "configPath" : {
-        "description" : "Project-relative training TOML whose data outputs are rebuilt.",
+        "description" : "Absolute or project-relative training TOML whose data outputs are rebuilt. The runtime normalizes it to an absolute path.",
         "name" : "configPath",
         "type" : "string"
       },
@@ -36,7 +36,7 @@
         "type" : "string"
       },
       "sourcePlan" : {
-        "description" : "Structured, generic contract containing requiredSubjects and fully covering sources with exact paths, subject labels and evidence. Evidence may be a non-empty string or a list of non-empty strings and is normalized deterministically.",
+        "description" : "Structured, generic contract containing mandatory requiredSubjects and fully covering sources with exact paths, required subject labels and evidence. Conditional discovery subjects are reported separately and never gate preparation. Evidence may be a non-empty string or a list of non-empty strings and is normalized deterministically.",
         "name" : "sourcePlan",
         "type" : "object"
       },

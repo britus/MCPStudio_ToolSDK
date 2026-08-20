@@ -137,6 +137,62 @@ def test_training_prompts_require_complete_workflow_input_forwarding() -> None:
         assert not template.startswith("Use the workflow")
 
 
+def test_training_workflow_uses_absolute_config_paths() -> None:
+    workflow = _training_workflow()
+    expected = "${CHAT_PROJECT_DIR}/config/mcpstudio-v3.toml"
+    config_values = []
+    for agent in workflow["agents"]:
+        for prop in agent.get("properties", []):
+            if prop["key"] in {"configPath", "trainingConfig"}:
+                config_values.append(prop["value"])
+
+    assert config_values
+    assert set(config_values) == {expected}
+
+    fixed_prompt = json.loads(
+        (
+            RELEASE_CONFIG_ROOT / "Prompts" / "finetune_training_cycle.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert all(
+        argument["name"] != "training_config"
+        for argument in fixed_prompt["arguments"]
+    )
+    assert f"Training configuration (absolute): `{expected}`" in fixed_prompt["template"]
+
+    configurable_prompt = json.loads(
+        (
+            RELEASE_CONFIG_ROOT
+            / "Prompts"
+            / "finetune_configurable_training_cycle.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert (
+        "Training configuration (absolute): `{{training_config}}`"
+        in configurable_prompt["template"]
+    )
+
+    script = (
+        RELEASE_CONFIG_ROOT / "Scripts" / "finetune_tools.js"
+    ).read_text(encoding="utf-8")
+    assert "function projectConfigPath" in script
+    assert "shared.joinPath(root, relativePath(normalized" in script
+    assert "const configPath = projectConfigPath(" in script
+
+
+def test_document_finder_reserves_enough_tool_rounds_for_final_json() -> None:
+    workflow = _training_workflow()
+    finder = next(
+        agent
+        for agent in workflow["agents"]
+        if agent["name"] == "Training Document Finder"
+    )
+
+    assert finder["maxTurns"] == 24
+    assert "Batch independent rag_query calls" in finder["instruction"]
+    assert "reserve the final turn" in finder["instruction"]
+
+
 def test_source_discovery_requires_consistent_complete_coverage() -> None:
     skill_path = (
         RELEASE_CONFIG_ROOT / "Skills" / "finetune_training_document_discovery.json"
@@ -154,6 +210,24 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
     assert "warnings array is compatible with approval" in instruction
     assert "Rejected sources must never appear" in instruction
     assert "never emit an evidence array" in instruction
+    assert "Never place a conditional subject in requiredSubjects" in instruction
+    assert "missingSubjects" in instruction
+    assert "must never contain conditional subjects" in instruction
+    assert "unresolvedConditionalSubjects" in instruction
+    assert "compatible with approval" in instruction
+    assert "RAG snippets cannot prove" in instruction
+    workflow = _training_workflow()
+    finder = next(
+        agent
+        for agent in workflow["agents"]
+        if agent["name"] == "Training Document Finder"
+    )
+    assert "Never promote a conditional subject to required" in finder["instruction"]
+    assert "conditional subjects warn" in next(
+        prop["value"]
+        for prop in finder["properties"]
+        if prop["key"] == "discoveryPolicy"
+    )
 
 
 def test_policy_contract_is_not_written_into_document_input_directory() -> None:
