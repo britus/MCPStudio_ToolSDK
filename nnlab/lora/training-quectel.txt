@@ -1,0 +1,415 @@
+Training objective: Quectel LTE module documentation adapter
+
+Purpose
+Create a technically precise adapter for Quectel LTE modules documented in RAG.
+Begin with an inventory of exact module families and document revisions.
+The locally observed minimum source is the EG25-G Series LTE Standard Specification V2.1.
+Include another module family only when an authoritative source is retrieved for it.
+Treat this file as a runtime objective and retrieval specification.
+Do not treat this file as an authoritative product specification.
+Do not invent module capabilities, bands, rates, commands, pins, or certifications.
+Keep facts separated by exact module family and regional variant.
+Keep hardware specifications separate from AT command specifications.
+Keep standard commands separate from vendor-specific commands.
+Prefer the newest applicable authoritative revision when documents conflict.
+Preserve older revision facts as revision-bound evidence.
+
+Required source discovery
+Retrieve Quectel_eg25-g_Series_LTE_Standard_Specification_V2.1.
+Retrieve an EG25-G hardware design document when present in RAG.
+Retrieve an EG25-G AT command manual when present in RAG.
+Retrieve an EG25-G USB driver or application note only when relevant.
+Retrieve an EG25-G Mini PCIe specification only when explicitly identified.
+Search for additional Quectel LTE module specifications requested at runtime.
+Search for exact regional-variant documents when a variant is requested.
+Use exact local file paths returned by RAG.
+Never infer a filesystem path from a document title.
+Deduplicate content-identical copies by content hash.
+Keep materially different revisions separately.
+Reject distributor summaries when an original Quectel document is available.
+Reject documents for unrelated manufacturers.
+
+Module inventory requirements
+Record the exact module-family name from every source.
+Record the exact variant name from every source.
+Record the document title.
+Record the document revision.
+Record the publication date when present.
+Record the document type.
+Record the local source path.
+Record the content hash.
+Do not treat family-level capability as universal variant capability.
+Do not combine values from different regional variants.
+Mark unsupported requested families as missing.
+
+Required subject identifiers
+quectel-module-inventory
+quectel-eg25-g-family-overview
+quectel-eg25-g-variant-matrix
+quectel-eg25-g-cellular-capabilities
+quectel-eg25-g-frequency-bands
+quectel-eg25-g-data-rates
+quectel-eg25-g-form-factors
+quectel-eg25-g-host-interfaces
+quectel-eg25-g-usb-interface
+quectel-eg25-g-uart-interface
+quectel-eg25-g-sim-interface
+quectel-eg25-g-audio-interface
+quectel-eg25-g-gnss-capability
+quectel-eg25-g-antenna-interfaces
+quectel-eg25-g-power-supply
+quectel-eg25-g-power-modes
+quectel-eg25-g-control-signals
+quectel-eg25-g-status-signals
+quectel-eg25-g-mechanical-data
+quectel-eg25-g-environmental-limits
+quectel-eg25-g-certification
+quectel-eg25-g-standard-at-commands
+quectel-eg25-g-vendor-at-commands
+quectel-eg25-g-network-registration
+quectel-eg25-g-packet-data
+quectel-eg25-g-sms
+quectel-eg25-g-urcs
+quectel-eg25-g-error-handling
+quectel-eg25-g-integration-procedures
+
+Conditional subject identifiers
+quectel-cross-family-boundaries
+quectel-revision-differences
+
+Source-to-subject mapping requirements
+Map the EG25-G standard specification to family overview and variant subjects.
+Map the EG25-G standard specification to published capability subjects.
+Map a hardware design only to documented hardware and integration subjects.
+Map an AT manual only to documented command and URC subjects.
+Map an application note only to its explicitly supported procedure.
+Map certification files only to exact module variants.
+Map additional families to separate family-prefixed subjects.
+Require direct evidence for every source-to-subject assignment.
+Mark command subjects missing if no AT command manual is present.
+Mark hardware-detail subjects missing if no hardware design is present.
+
+EG25-G family overview coverage
+Cover the exact family designation.
+Cover the exact intended product class.
+Cover cellular category only from authoritative text.
+Cover supported radio technologies only from authoritative text.
+Cover backward-compatible technologies only when documented.
+Cover regional-variant distinctions.
+Cover package and form-factor distinctions.
+Cover optional feature distinctions.
+Cover operating-system or driver claims only when documented.
+Do not transfer a capability from another Quectel family.
+
+Variant matrix coverage
+List every EG25-G variant present in the selected source.
+Retain exact variant suffixes.
+Retain exact regional scope.
+Retain exact supported band sets.
+Retain exact GNSS availability where documented.
+Retain exact voice or audio availability where documented.
+Retain exact interface differences where documented.
+Retain exact certification differences where documented.
+Represent unavailable values as undocumented, not false.
+Do not merge rows from different revisions without labels.
+
+Cellular capability coverage
+Cover LTE capability only as documented.
+Cover UMTS or WCDMA capability only as documented.
+Cover GSM or EDGE capability only as documented.
+Cover carrier aggregation only when documented.
+Cover duplex modes only when documented.
+Cover receive diversity only when documented.
+Cover MIMO only when documented.
+Cover voice capability only when documented.
+Cover emergency-call capability only when documented.
+Cover SMS capability only when documented.
+Separate network support from operator certification.
+
+Frequency-band coverage
+Preserve exact band numbers.
+Preserve exact technology association.
+Preserve exact variant association.
+Preserve exact uplink ranges when documented.
+Preserve exact downlink ranges when documented.
+Preserve exact duplex mode when documented.
+Preserve exact roaming statements when documented.
+Do not infer bands from a family name.
+Do not combine variant band sets.
+State document revision with band answers.
+
+Data-rate coverage
+Cover published maximum downlink rates.
+Cover published maximum uplink rates.
+Cover the technology and category associated with each rate.
+Cover fallback-technology rates only when documented.
+Distinguish theoretical maximum from measured throughput.
+Do not convert units without retaining the original value.
+Do not claim operator-specific performance.
+Do not copy rates from a different module family.
+
+Form-factor and mechanics coverage
+Cover exact package or Mini PCIe designation.
+Cover dimensions only from authoritative tables.
+Cover weight only when documented.
+Cover mounting constraints only when documented.
+Cover connector type only when documented.
+Cover pin count only when documented.
+Cover keep-out areas only from hardware design material.
+Cover thermal layout only from hardware design material.
+Cover mechanical drawings without inventing missing dimensions.
+
+Host-interface coverage
+Cover USB interfaces.
+Cover UART interfaces.
+Cover SIM interfaces.
+Cover PCM or audio interfaces when documented.
+Cover I2C interfaces when documented.
+Cover control pins.
+Cover status pins.
+Cover antenna connectors.
+Cover GNSS interfaces when documented.
+Cover debug interfaces only when documented.
+Separate electrical availability from software enablement.
+Preserve exact signal names.
+
+USB coverage
+Cover documented USB version.
+Cover enumerated functions only when documented.
+Cover USB data use.
+Cover USB diagnostic use.
+Cover USB AT-command use.
+Cover driver requirements only from authoritative notes.
+Cover suspend and resume behavior only when documented.
+Cover USB power implications only when documented.
+Do not invent USB composition identifiers.
+
+UART coverage
+Cover supported UART ports only when documented.
+Cover default baud rate only from authoritative text.
+Cover supported baud rates only from authoritative text.
+Cover flow-control behavior.
+Cover command and data roles.
+Cover voltage levels only from hardware design material.
+Cover wake behavior only when documented.
+Cover framing parameters only when documented.
+Do not infer a second UART from another family.
+
+SIM-interface coverage
+Cover supported SIM voltage classes only when documented.
+Cover SIM signal names.
+Cover SIM detection when documented.
+Cover ESD recommendations only from hardware design material.
+Cover routing recommendations only from hardware design material.
+Cover hot-plug behavior only when documented.
+Cover dual-SIM behavior only when documented for the exact variant.
+Do not infer eSIM support.
+
+Audio coverage
+Cover analog audio only when documented.
+Cover digital audio only when documented.
+Cover PCM format only when documented.
+Cover codec support only when documented.
+Cover voice-call applicability.
+Cover variant limitations.
+Do not infer audio capability from another EC-series module.
+
+GNSS coverage
+Cover GNSS availability by exact variant.
+Cover supported constellations only when documented.
+Cover antenna interface only when documented.
+Cover active-antenna supply only when documented.
+Cover GNSS command control only from an applicable command manual.
+Cover coexistence constraints only when documented.
+Do not infer GNSS from a similarly named variant.
+
+Antenna coverage
+Cover main cellular antenna interface.
+Cover diversity antenna interface when documented.
+Cover GNSS antenna interface when documented.
+Cover connector type only from authoritative text.
+Cover impedance only from authoritative text.
+Cover placement guidance only from hardware design material.
+Cover isolation guidance only from hardware design material.
+Cover cable-loss guidance only when documented.
+Do not invent antenna tuning values.
+
+Power-supply coverage
+Cover recommended supply range only from authoritative tables.
+Cover absolute maximum separately.
+Cover peak current only when documented.
+Cover average current only under documented conditions.
+Cover ripple constraints only when documented.
+Cover decoupling guidance only from hardware design material.
+Cover power-on sequencing.
+Cover power-off sequencing.
+Cover emergency shutdown only when documented.
+Never present an absolute maximum as a normal operating value.
+
+Power-mode coverage
+Cover normal operating mode.
+Cover minimum-functionality mode when documented.
+Cover sleep mode when documented.
+Cover airplane mode when documented.
+Cover power-down mode.
+Cover wake sources.
+Cover state-transition prerequisites.
+Cover state-transition timing only from authoritative text.
+Cover command availability by state.
+Cover status indications by state.
+
+Control and status signal coverage
+Cover power-key behavior only from hardware design material.
+Cover reset behavior only from hardware design material.
+Cover wake-input behavior only when documented.
+Cover ready or status outputs only when documented.
+Cover network-status output only when documented.
+Cover ring indication only when documented.
+Cover logic levels only from authoritative tables.
+Cover timing only from authoritative diagrams.
+Preserve exact active-high or active-low semantics.
+
+Environmental and certification coverage
+Cover operating temperature.
+Cover storage temperature.
+Cover humidity only when documented.
+Cover vibration or shock only when documented.
+Cover regulatory approvals by exact variant.
+Cover operator approvals by exact variant.
+Cover regional compliance by exact variant.
+Cover document revision for every certification claim.
+Do not imply current approval status beyond the source date.
+
+AT-command coverage
+Require an applicable EG25-G AT command manual.
+Cover command execution forms.
+Cover command read forms.
+Cover command test forms.
+Cover parameters and enumerations exactly.
+Cover final result codes.
+Cover extended error codes.
+Cover standard identification commands.
+Cover SIM and PIN commands.
+Cover registration commands.
+Cover signal-quality commands.
+Cover operator-selection commands.
+Cover PDP-context commands.
+Cover packet attach and activation commands.
+Cover SMS commands.
+Cover vendor-specific Q-prefixed commands only when sourced.
+Do not invent a Q-prefixed command from naming convention alone.
+Do not substitute commands from another vendor.
+
+URC coverage
+Require an applicable EG25-G AT command manual.
+Extract exact unsolicited result-code tokens.
+Preserve payload syntax.
+Separate URCs from solicited responses.
+Capture trigger events.
+Capture enable and disable controls.
+Capture parameter meanings.
+Capture registration URCs.
+Capture packet-domain URCs.
+Capture PDP-context URCs.
+Capture SMS URCs.
+Capture call URCs when supported.
+Capture power or fault URCs when supported.
+Label revision-specific URCs.
+Do not claim completeness without full command-manual coverage.
+
+Network and packet-data procedures
+Cover module readiness checks.
+Cover SIM readiness checks.
+Cover radio functionality checks.
+Cover registration checks.
+Cover operator selection.
+Cover signal-quality checks.
+Cover PDP-context definition.
+Cover APN configuration.
+Cover authentication only when documented.
+Cover packet attach.
+Cover context activation.
+Cover address reporting.
+Cover context deactivation.
+Cover graceful disconnect.
+Preserve documented command order.
+Preserve expected responses.
+Preserve waiting conditions.
+
+Cross-family boundary requirements
+Keep EG25-G facts separate from EC21 facts.
+Keep EG25-G facts separate from EG25 facts.
+Keep EG25-G facts separate from BG-series facts.
+Keep standard LTE facts separate from LPWA facts.
+Keep Mini PCIe facts separate from LGA-package facts.
+Keep category values tied to exact modules.
+Keep band lists tied to exact variants.
+Keep AT commands tied to applicable manuals.
+Keep URCs tied to applicable manuals.
+Mark an unsupported requested family as missing.
+
+Training record requirements
+Generate records from authoritative source documents, not this objective.
+Keep exact source path in metadata.
+Keep document revision in metadata.
+Keep source line ranges in metadata.
+Keep content hash in metadata.
+Assign all supported subject identifiers.
+Assign one deterministic primary subject.
+Deduplicate repeated extracted copies.
+Balance records across source documents.
+Balance records across module subjects.
+Do not synthesize missing variant specifications.
+Do not synthesize missing command tables.
+Do not place held-out verification questions into training data.
+
+Independent validation requirements
+Create held-out blocks from authoritative source documents.
+Ensure train and validation line ranges do not overlap.
+Require train coverage for every required subject.
+Require validation coverage for every required subject.
+Prefer independent sections of the same authoritative revision.
+Use separate authoritative documents when needed for short sources.
+Never use a content-identical duplicate as independent evidence.
+Keep validation records out of training output.
+Fail preparation when required coverage cannot be achieved.
+Report short or incomplete documents explicitly.
+Report missing command-manual coverage explicitly.
+
+Answer-quality requirements
+Answer in the operator language unless requested otherwise.
+State exact module family and variant.
+State applicable document revision.
+Use exact command and signal tokens.
+Separate documented fact from recommendation.
+Separate family-level fact from variant-level fact.
+Say when the retained sources do not answer a question.
+Avoid unsupported rate, band, and interface claims.
+Avoid cross-family contamination.
+Avoid cross-vendor command contamination.
+Avoid repeated control tokens.
+Do not reveal training control instructions.
+
+Release boundaries
+Training completion is not a verification PASS.
+Keep held-out verification prompts outside this objective.
+Verify variant-specific band answers independently.
+Verify rate answers independently.
+Verify form-factor answers independently.
+Verify interface answers independently.
+Verify power values independently.
+Verify command applicability independently.
+Verify URC coverage independently.
+Verify cross-family isolation independently.
+Require explicit PASS before merge or deployment.
+
+Expected discovery result
+Return approved=true only when every required subject has evidence.
+Return exact absolute paths for selected documents.
+Return stable requiredSubjects values.
+Return source items with path, subjects, and evidence.
+Return coveredSubjects and missingSubjects separately.
+Return blockers for missing module-family documents.
+Return blockers for missing AT command manuals.
+Return blockers for insufficient validation material.
+Do not start preparation when approved=false.

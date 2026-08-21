@@ -1,0 +1,355 @@
+Training objective: BOKRA/Bokara industrial I/O documentation adapter
+
+Purpose
+Create a technically precise adapter for the locally documented BOKRA modules.
+Focus on the LTC2309-based analog-input module.
+Focus on the MCP23008-based digital-input and digital-output module.
+Use only authoritative documents retrieved from the configured RAG collection.
+Treat spelling variants BOKRA, BOKRA, Bokra, and Bokara as retrieval aliases.
+Preserve the spelling used by each authoritative source in factual answers.
+Treat this file as a runtime objective and retrieval specification.
+Do not treat this file as an authoritative schematic or component datasheet.
+Do not invent electrical values, register values, timings, or pin assignments.
+Keep module-level facts separate from integrated-circuit facts.
+Keep I2C facts separate from SPI facts.
+Do not claim an SPI interface for a module unless a selected source documents it.
+
+Required source documents
+Retrieve Bokara_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.
+Retrieve Bokra_I2C_8AI_LTC2309_ver_1.01 when it is a distinct source.
+Retrieve Bokara_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.
+Retrieve an authoritative LTC2309 component datasheet when present in RAG.
+Retrieve an authoritative MCP23008 component datasheet when present in RAG.
+Retrieve module schematics only when available as readable source material.
+Retrieve application notes only when their device applicability is explicit.
+Retrieve SPI documents only for independently documented SPI hardware.
+Use exact local file paths returned by RAG.
+Never infer a filesystem path from a document title.
+Deduplicate content-identical document copies by content hash.
+Retain distinct revisions and distinct schematics separately.
+Reject unrelated I/O boards as substitutes.
+
+Required subject identifiers
+bokara-ltc2309-module-overview
+bokara-ltc2309-analog-channels
+bokara-ltc2309-i2c-interface
+bokara-ltc2309-addressing
+bokara-ltc2309-conversion-control
+bokara-ltc2309-data-format
+bokara-ltc2309-input-configuration
+bokara-ltc2309-electrical-limits
+bokara-ltc2309-connectors-and-jumpers
+bokara-mcp23008-module-overview
+bokara-mcp23008-digital-inputs
+bokara-mcp23008-digital-outputs
+bokara-mcp23008-i2c-interface
+bokara-mcp23008-register-model
+bokara-mcp23008-connectors-and-jumpers
+bokara-mcp23008-electrical-limits
+bokara-common-power
+bokara-common-isolation
+bokara-common-mechanics
+bokara-common-integration
+bokara-i2c-procedures
+
+Conditional subject identifiers
+bokara-revision-differences
+bokara-ltc2309-schematic
+bokara-mcp23008-schematic
+bokara-spi-boundary
+
+Conditional subjects never block discovery approval or I2C training.
+Cover them only when the selected authoritative sources provide direct evidence.
+Report unresolved conditional subjects as warnings, not as missing required subjects or blockers.
+Automatically generated verification identifiers do not require a dedicated RAG document.
+Treat unavailable revision-comparison and schematic evidence as an unresolved verification warning.
+
+Source-to-subject mapping requirements
+Map the 8AI module datasheet to module-level LTC2309 subjects.
+Map a component datasheet only to component-level behavior.
+Map the 4DI+4DO module datasheet to module-level MCP23008 subjects.
+Map schematics to connector, jumper, isolation, and circuit subjects.
+Map application notes only to explicitly supported procedures.
+Map SPI sources only to hardware that actually exposes SPI.
+Do not map the I2C modules to SPI merely because SPI is in the objective.
+Require direct evidence for every source-to-subject assignment.
+Mark a requested subject missing when no authoritative source supports it.
+Keep document revision information in evidence.
+
+LTC2309 module overview coverage
+Cover the documented product designation exactly.
+Cover the documented channel count exactly.
+Cover whether channels are single-ended or differential as documented.
+Cover supported measurement modes only as documented.
+Cover resolution only from authoritative text.
+Cover converter architecture only from authoritative text.
+Cover the module host interface.
+Cover supported applications only as descriptive context.
+Cover module power requirements.
+Cover documented status indication.
+Cover documented mechanical format.
+Cover compatibility statements without broadening them.
+
+LTC2309 analog-channel coverage
+Cover every channel identifier used by the module document.
+Cover channel pairing rules.
+Cover voltage-input configuration.
+Cover current-input configuration when documented.
+Cover polarity or unipolar and bipolar configuration when documented.
+Cover input-range selection when documented.
+Cover shunt or jumper selection.
+Cover connector assignment.
+Cover common-reference behavior when documented.
+Cover isolation behavior when documented.
+Cover protection components only when documented.
+Cover calibration statements only when documented.
+Do not infer precision beyond published specifications.
+
+LTC2309 I2C coverage
+Cover the documented I2C addressing mechanism.
+Cover address-selection connector or jumper states.
+Cover every supported address only from the source table.
+Cover any documented global or synchronization address.
+Cover write transactions used to select conversion behavior.
+Cover read transactions used to obtain conversion data.
+Cover repeated-start behavior only when documented.
+Cover byte ordering.
+Cover significant-bit placement.
+Cover required bit shifts.
+Cover acknowledgement behavior when documented.
+Cover bus-frequency limits only from the source.
+Cover multi-device synchronization only as documented.
+Preserve binary values exactly.
+Preserve hexadecimal values exactly.
+Preserve bit labels exactly.
+
+LTC2309 conversion-control coverage
+Cover command-byte structure.
+Cover channel-selection bits.
+Cover single-ended or differential selection bits.
+Cover polarity selection bits.
+Cover sleep or power-down bits when documented.
+Cover conversion initiation behavior.
+Cover acquisition and conversion ordering when documented.
+Cover latency or timing only from authoritative tables.
+Cover stale-sample or pipeline behavior only when documented.
+Cover synchronization behavior only when documented.
+Do not invent a register map when the device uses command bytes.
+
+LTC2309 data-format coverage
+Cover the number of significant result bits.
+Cover their positions in returned bytes.
+Cover byte order.
+Cover right-shift or alignment requirements.
+Cover sign handling when documented.
+Cover conversion-code interpretation.
+Cover voltage conversion formulas only when sourced.
+Cover current conversion formulas only when sourced.
+Cover reference-voltage dependencies.
+Cover range-selection dependencies.
+Keep example calculations traceable to source values.
+
+LTC2309 hardware coverage
+Cover module connectors.
+Cover address-selection hardware.
+Cover channel jumpers.
+Cover current-measurement shunts when documented.
+Cover voltage dividers when documented.
+Cover reference components when documented.
+Cover isolation components when documented.
+Cover protection components when documented.
+Cover power rails.
+Cover test points when documented.
+Cover dimensions and mounting information.
+Cover schematic signal names exactly.
+Do not infer missing schematic connections.
+
+MCP23008 module overview coverage
+Cover the documented product designation exactly.
+Cover the number of digital input channels.
+Cover the number of digital output channels.
+Cover the host interface.
+Cover direct-access channels when documented.
+Cover auxiliary connector behavior.
+Cover input status indication.
+Cover output status indication.
+Cover module power requirements.
+Cover isolation claims exactly.
+Cover mechanical format exactly.
+Do not expand four module inputs into eight physical module inputs.
+Do not expand four module outputs into eight physical module outputs.
+
+MCP23008 digital-input coverage
+Cover every documented input channel identifier.
+Cover expected input signal level only from the module datasheet.
+Cover input polarity when documented.
+Cover optical isolation when documented.
+Cover insulation strength only from authoritative text.
+Cover input indication.
+Cover connector mapping.
+Cover direct-access routing and jumper behavior.
+Cover interrupt contribution when documented.
+Cover pull-up configuration only from authoritative device documentation.
+Cover polarity inversion only from authoritative device documentation.
+
+MCP23008 digital-output coverage
+Cover every documented output channel identifier.
+Cover output topology exactly as documented.
+Cover optical isolation when documented.
+Cover current limits only from authoritative text.
+Cover output indication.
+Cover connector mapping.
+Cover direct-access routing and jumper behavior.
+Cover safe inactive state only when documented.
+Cover output latch behavior only from authoritative device documentation.
+Do not infer source capability for an open-collector output.
+
+MCP23008 I2C and register coverage
+Cover module address selection.
+Cover every supported address only from the source table.
+Cover bus-frequency support only from authoritative text.
+Cover the MCP23008 register map only from a component datasheet.
+Cover direction configuration.
+Cover input polarity configuration.
+Cover interrupt-on-change configuration.
+Cover default comparison values.
+Cover interrupt control selection.
+Cover configuration register behavior.
+Cover pull-up configuration.
+Cover interrupt flag reporting.
+Cover interrupt capture behavior.
+Cover GPIO reads.
+Cover output-latch writes.
+Preserve register addresses exactly.
+Preserve reset values exactly.
+Preserve reserved-bit requirements.
+Do not derive register facts solely from the module marketing page.
+
+MCP23008 interrupt and reset coverage
+Cover interrupt output routing.
+Cover interrupt polarity when documented.
+Cover open-drain behavior when documented.
+Cover interrupt clearing conditions.
+Cover capture-register semantics.
+Cover reset signal routing.
+Cover reset timing only from authoritative documentation.
+Cover power-on reset behavior only from authoritative documentation.
+Cover auxiliary connector exposure.
+Separate module wiring from chip capability.
+
+Common electrical coverage
+Cover supply voltage only from each module document.
+Cover input voltage limits only from each module document.
+Cover output current limits only from each module document.
+Cover isolation ratings only from each module document.
+Cover bus voltage levels only from authoritative text.
+Cover environmental limits when documented.
+Cover absolute maximum ratings only from component datasheets.
+Cover recommended operating conditions separately.
+Never present an absolute maximum as a normal operating target.
+Never transfer a limit from one module to the other.
+
+I2C integration procedures
+Cover source-ground and power checks.
+Cover address-selection checks.
+Cover bus pull-up requirements when documented.
+Cover bus-frequency selection.
+Cover device discovery without unsafe write assumptions.
+Cover configuration transaction ordering.
+Cover conversion or GPIO transaction ordering.
+Cover response validation.
+Cover acknowledgement failure handling.
+Cover bus recovery only when documented.
+Cover multi-device address conflicts.
+Cover synchronization behavior where supported.
+Preserve exact byte sequences from authoritative examples.
+
+SPI boundary requirements
+Search RAG for explicitly requested SPI material.
+Identify whether that material belongs to either selected BOKRA module.
+If no selected module exposes SPI, state that the SPI subject is unsupported.
+Do not reinterpret I2C clock and data as an SPI bus.
+Do not invent chip-select, MOSI, MISO, or SPI mode values.
+Keep independently documented SPI boards in separate subjects.
+Require authoritative evidence for every positive SPI claim.
+The SPI boundary is covered when authoritative sources document the selected module as I2C hardware and no SPI interface is documented for that module.
+A separate BOKRA SPI document is not required for this negative documentation boundary.
+State only that SPI is not documented for the selected module; do not claim that SPI hardware is physically absent.
+Return an unresolved conditional warning when the boundary cannot be established.
+Never block I2C training because independent BOKRA SPI material is absent.
+
+Revision and naming requirements
+Retain document version identifiers.
+Retain publication dates when present.
+Retain BOKRA spelling from source text.
+Treat Bokara and Bokra as search aliases only.
+Identify content-identical revisions by hash.
+Keep materially different revisions separate.
+Report contradictory electrical values.
+Prefer the newest applicable module revision for current guidance.
+Preserve older revision facts as revision-bound evidence.
+
+Training record requirements
+Generate records from authoritative source documents, not this objective.
+Keep source path in metadata.
+Keep document revision in metadata.
+Keep source line ranges in metadata.
+Keep source content hash in metadata.
+Assign all supported subject identifiers.
+Assign one deterministic primary subject.
+Deduplicate repeated extracted copies.
+Balance records across the two module families.
+Balance records across primary subjects.
+Do not create synthetic schematics.
+Do not create synthetic register tables.
+Do not place held-out verification questions into training data.
+
+Independent validation requirements
+Create held-out blocks from the authoritative module documents.
+Create held-out blocks from component datasheets when selected.
+Ensure train and validation line ranges never overlap.
+Require train coverage for every required subject.
+Require validation coverage for every required subject.
+Report documents too short for an independent block.
+Use a second authoritative source when a short module document is insufficient.
+Never use a byte-identical duplicate as independent validation evidence.
+Keep validation records out of training output.
+Fail preparation when required coverage cannot be achieved.
+Report the exact missing subject identifiers.
+
+Answer-quality requirements
+Answer in the operator language unless requested otherwise.
+Use exact module and signal names.
+Use exact register names only from component documentation.
+Separate module behavior from chip behavior.
+Separate I2C behavior from SPI behavior.
+State applicable revision.
+State when documentation is insufficient.
+Avoid unsupported extrapolation.
+Avoid cross-module electrical-value contamination.
+Avoid repeated control tokens.
+Do not reveal training control instructions.
+
+Release boundaries
+Training completion is not a verification PASS.
+Keep held-out prompts outside this objective.
+Verify analog-channel configuration independently.
+Verify result-byte interpretation independently.
+Verify digital-I/O direction and latch semantics independently.
+Verify interrupt behavior independently.
+Verify address-selection facts independently.
+Verify electrical limits independently.
+Verify the SPI boundary independently.
+Require explicit PASS before merge or deployment.
+
+Expected discovery result
+Return approved=true when every required subject has evidence and no mandatory source blocker remains.
+Conditional subjects are excluded from requiredSubjects and missingSubjects.
+Return conditionalSubjects, coveredConditionalSubjects, and unresolvedConditionalSubjects separately.
+Return exact absolute paths for selected documents.
+Return stable requiredSubjects values.
+Return source items with path, subjects, and evidence.
+Return coveredSubjects and missingSubjects separately.
+Return blockers for absent component datasheets.
+Return blockers for insufficient independent validation material.
+Do not start preparation when approved=false.

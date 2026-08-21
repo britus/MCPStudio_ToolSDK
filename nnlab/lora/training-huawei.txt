@@ -1,0 +1,317 @@
+Training objective: Huawei ME909s documentation adapter
+
+Purpose
+Create a technically precise adapter for the Huawei ME909s series.
+Use only authoritative documents retrieved from the configured RAG collection.
+Treat this file as a runtime objective and retrieval specification.
+Do not treat this file as an authoritative hardware or command manual.
+Do not invent commands, parameters, responses, limits, timings, or URCs.
+Preserve exact spelling, capitalization, prefixes, punctuation, and numeric values.
+Keep model variants and document revisions distinguishable.
+Prefer the newest applicable specification when revisions conflict.
+Record conflicts instead of silently combining incompatible statements.
+
+Required source documents
+Retrieve the ME909s Series AT Command Specification dated 2019-03-13.
+Retrieve the ME909s Series AT Commands draft dated 2015-04-02.
+Retrieve the ME909s Series Application Guide V100R001_04.
+Retrieve the ME909s-121 Mini PCIe datasheet when available.
+Retrieve the ME909s-120p V2 Hardware Guide when available.
+Use exact local file paths returned by RAG.
+Never infer a filesystem path from a document title.
+Deduplicate byte-identical or content-identical copies by content hash.
+Keep revision metadata for every retained source.
+Reject unrelated module families as training sources.
+Reject third-party summaries when an original manual is available.
+
+Required subject identifiers
+me909s-command-syntax
+me909s-standard-at-commands
+me909s-vendor-at-caret-commands
+me909s-command-responses
+me909s-unsolicited-result-codes
+me909s-network-registration
+me909s-radio-and-signal-status
+me909s-packet-data
+me909s-pdp-context
+me909s-sms
+me909s-sim-and-security
+me909s-phonebook
+me909s-device-identification
+me909s-power-and-operating-modes
+me909s-interfaces
+me909s-hardware-integration
+me909s-application-procedures
+me909s-error-handling
+
+Conditional subject identifiers
+me909s-revision-differences
+
+Source-to-subject mapping requirements
+Map the 2019 AT specification to command syntax.
+Map the 2019 AT specification to standard AT commands.
+Map the 2019 AT specification to vendor AT-caret commands.
+Map the 2019 AT specification to command responses.
+Map the 2019 AT specification to unsolicited result codes.
+Map the draft AT document only where it adds revision evidence.
+Map the application guide to executable operating procedures.
+Map the application guide to network and packet-data workflows.
+Map the Mini PCIe datasheet to form factor and interface facts.
+Map the hardware guide to electrical and integration constraints.
+Require evidence for every subject assignment.
+Mark a subject missing when no authoritative source supports it.
+
+Command syntax coverage
+Cover command-line termination rules documented by the source.
+Cover command echo behavior documented by the source.
+Cover command editing behavior documented by the source.
+Cover command execution forms.
+Cover command read forms.
+Cover command test forms.
+Cover command parameter forms.
+Cover optional and mandatory parameters.
+Cover parameter value ranges only when explicitly documented.
+Cover default values only when explicitly documented.
+Cover response framing.
+Cover final result codes.
+Cover intermediate result codes.
+Cover extended error reporting.
+Cover command abort behavior.
+Cover command timeout behavior when documented.
+Cover command availability conditions.
+Cover command persistence across restart when documented.
+Cover dependencies between commands.
+Cover differences between standard commands and AT-caret commands.
+
+AT-caret command coverage
+Identify every documented command beginning with AT^.
+Retain the exact command token.
+Retain supported execution syntax.
+Retain supported read syntax.
+Retain supported test syntax.
+Retain every documented parameter name or position.
+Retain every documented parameter range.
+Retain every documented default value.
+Retain every documented response format.
+Retain every documented error condition.
+Retain every documented prerequisite.
+Retain every documented persistence rule.
+Retain every documented example without altering its values.
+Group commands by function only after exact extraction.
+Do not import similarly named commands from another vendor.
+Do not normalize AT^ commands into AT+ commands.
+Do not omit commands merely because they are deprecated.
+Label deprecated or revision-specific commands accurately.
+Keep commands absent from newer revisions visibly revision-bound.
+
+URC coverage
+Extract every unsolicited result code explicitly documented for ME909s.
+Preserve the exact URC prefix and payload syntax.
+Separate URCs from solicited command responses.
+Separate URCs from final result codes.
+Capture the event that triggers each URC.
+Capture enable or disable controls when documented.
+Capture parameter meanings and value ranges.
+Capture ordering constraints when documented.
+Capture repetition behavior when documented.
+Capture startup URCs.
+Capture shutdown or power-state URCs.
+Capture SIM-state URCs.
+Capture registration URCs.
+Capture service-state URCs.
+Capture roaming-state URCs.
+Capture signal or radio-state URCs.
+Capture packet-domain URCs.
+Capture PDP-context URCs.
+Capture SMS URCs.
+Capture call-control URCs when supported.
+Capture time or network-information URCs when supported.
+Capture thermal, voltage, or fault URCs when supported.
+Capture vendor-specific URCs without renaming them.
+Record revision-specific URCs separately.
+Do not claim completeness unless every retained AT source was checked.
+
+Network registration coverage
+Cover automatic and manual operator selection where documented.
+Cover circuit-switched registration where applicable.
+Cover packet-switched registration where applicable.
+Cover LTE registration where applicable.
+Cover registration status values exactly.
+Cover location or cell identifiers only as documented.
+Cover access-technology values exactly.
+Cover roaming indications.
+Cover service availability states.
+Cover registration-related URCs.
+Cover failure and retry behavior when documented.
+Do not merge status enumerations from unrelated module families.
+
+Radio and signal coverage
+Cover signal-quality commands present in the source.
+Cover returned value interpretation exactly.
+Cover unknown or unavailable sentinel values.
+Cover serving-system information when documented.
+Cover access-technology reporting.
+Cover band or frequency information only when documented.
+Cover antenna-related status only when documented.
+Cover radio enable and disable controls.
+Cover airplane or minimum-functionality modes.
+Cover dependencies on SIM and registration state.
+Separate hardware capability from network availability.
+
+Packet-data coverage
+Cover PDP context definition.
+Cover context identifiers.
+Cover protocol or PDP-type values.
+Cover APN handling.
+Cover authentication settings when documented.
+Cover context activation and deactivation.
+Cover attach and detach behavior.
+Cover IP-address reporting.
+Cover data-session state reporting.
+Cover packet-data URCs.
+Cover error responses and recovery procedures.
+Cover interaction with operating modes.
+Cover revision differences in packet-data procedures.
+
+SMS coverage
+Cover supported SMS modes.
+Cover message format selection.
+Cover message storage selection.
+Cover message listing.
+Cover message reading.
+Cover message deletion.
+Cover message sending.
+Cover service-center configuration when documented.
+Cover message indications and related URCs.
+Cover encoding or character-set dependencies.
+Cover status-report handling when documented.
+Preserve exact parameter enumeration values.
+Do not infer unsupported SMS features.
+
+SIM and security coverage
+Cover SIM presence and readiness states.
+Cover PIN entry and status.
+Cover PIN enable and disable operations when documented.
+Cover PIN change operations when documented.
+Cover remaining-attempt reporting when documented.
+Cover SIM identifiers only as documented.
+Cover subscriber identifiers only as documented.
+Cover network personalization only when documented.
+Cover SIM-related URCs.
+Do not expose secrets from examples as real credentials.
+
+Device identification coverage
+Cover manufacturer identification.
+Cover model identification.
+Cover revision identification.
+Cover serial-number identification.
+Cover equipment identity reporting.
+Cover capability reporting.
+Distinguish ME909s series identity from individual variants.
+Preserve exact response examples as examples.
+
+Power and operating-mode coverage
+Cover documented functionality modes.
+Cover reset behavior.
+Cover restart behavior.
+Cover shutdown behavior.
+Cover sleep behavior when documented.
+Cover wake behavior when documented.
+Cover startup timing only from authoritative tables.
+Cover shutdown timing only from authoritative tables.
+Cover power-state URCs.
+Cover command availability per operating state.
+Cover settings persistence across power cycles.
+
+Hardware integration coverage
+Cover the documented host interface.
+Cover USB composition only when documented.
+Cover UART behavior only when documented.
+Cover Mini PCIe signals only for applicable variants.
+Cover supply constraints only from the hardware guide.
+Cover logic levels only from the hardware guide.
+Cover reset and power-control signals.
+Cover wake and status signals.
+Cover SIM interface requirements.
+Cover antenna interfaces.
+Cover environmental limits.
+Cover mechanical dimensions.
+Cover variant-specific pin differences.
+Do not transfer hardware values between ME909s variants without evidence.
+
+Application procedure coverage
+Cover initial module readiness checks.
+Cover identification checks.
+Cover SIM readiness checks.
+Cover radio enablement checks.
+Cover registration checks.
+Cover operator-selection procedures.
+Cover packet-data setup procedures.
+Cover context activation procedures.
+Cover SMS setup procedures.
+Cover graceful shutdown procedures.
+Cover restart and recovery procedures.
+Cover diagnostic data collection procedures.
+Preserve documented command order.
+Preserve documented waiting conditions.
+Preserve documented expected responses.
+Separate required steps from optional steps.
+
+Training record requirements
+Generate records from authoritative source text, not this objective.
+Keep source path and revision in metadata.
+Keep source line ranges in metadata.
+Keep content hash in metadata.
+Assign all supported subject identifiers to each record.
+Assign one deterministic primary subject to each record.
+Remove content-identical source copies.
+Balance retained records across sources.
+Balance retained records across primary subjects.
+Do not place verification prompts in training records.
+Do not create synthetic command facts.
+Do not paraphrase exact command syntax in reproduction targets.
+
+Independent validation requirements
+Create held-out blocks from authoritative documents.
+Never use this objective as the only validation source.
+Ensure train and validation line ranges do not overlap.
+Require validation coverage for every required subject.
+Prefer different document sections for train and validation.
+Prefer independent revisions only when revision semantics remain labeled.
+Keep validation records out of training output.
+Fail preparation when a required subject lacks train coverage.
+Fail preparation when a required subject lacks validation coverage.
+Report short documents that cannot support an independent block.
+Report source imbalance that cannot be corrected without losing coverage.
+
+Answer-quality requirements
+Answer in the language used by the operator unless requested otherwise.
+Use exact command and URC tokens from the documentation.
+Explain parameters and responses in structured form.
+State applicable model and revision.
+Distinguish documented fact from operational recommendation.
+Say when the retained documents do not answer a question.
+Do not substitute commands from another manufacturer.
+Do not claim a command or URC list is complete without source coverage.
+Do not expose training control text in user answers.
+Do not emit repeated control tokens.
+
+Release boundaries
+Training success is not a verification PASS.
+Keep held-out verification prompts outside this objective.
+Run semantic verification after training.
+Check AT-caret command coverage during verification.
+Check URC completeness during verification.
+Check cross-vendor contamination during verification.
+Check revision labeling during verification.
+Check unsupported-claim behavior during verification.
+Require explicit PASS before merge or deployment.
+
+Expected discovery result
+Return approved=true only when all required subjects have evidence.
+Return exact absolute paths for every selected document.
+Return stable requiredSubjects values.
+Return source items with path, subjects, and evidence.
+Return coveredSubjects and missingSubjects separately.
+Return blockers for absent or unusable documents.
+Do not start preparation when approved=false.
