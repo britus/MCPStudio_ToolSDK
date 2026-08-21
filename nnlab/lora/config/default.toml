@@ -18,6 +18,7 @@ seed = 42
 
 [pdf_extraction]
 engine = "docling"
+artifacts_path = "~/.cache/docling/models"
 device = "auto"
 ocr = true
 formula_enrichment = true

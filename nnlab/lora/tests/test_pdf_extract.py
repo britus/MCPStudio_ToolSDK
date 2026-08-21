@@ -205,6 +205,7 @@ document_timeout = 90
 
     assert settings_from_config(config) == PdfExtractionSettings(
         engine="docling",
+        artifacts_path="~/.cache/docling/models",
         device="cpu",
         enable_ocr=False,
         enable_formula_enrichment=False,

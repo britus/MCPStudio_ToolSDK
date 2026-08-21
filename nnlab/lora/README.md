@@ -32,19 +32,16 @@ The v3 lifecycle deliberately separates training, candidate creation, verificati
 The EoF MCP Studio workflows implement these gates automatically. The shell scripts and Makefile
 expose the same underlying operations for direct use.
 
-### Docling extraction PoC
+### Docling PDF extraction
 
-The production PDF extraction remains unchanged. To inspect layout-aware Docling output separately,
-run the isolated PoC with one or more PDF files or directories:
+PDF materialization uses Docling. It preserves headings, reading order, tables, page boundaries,
+formulas and references to separately extracted figures instead of flattening every page to plain
+text. The resulting Markdown is the only PDF-derived file admitted to the training dataset; image
+artifacts remain available beside it for inspection and provenance.
 
-```bash
-./scripts/docling_poc.sh /absolute/path/to/document.pdf
-```
-
-The command requires a fresh `data/prepared_docs/poc-docling-output` directory and publishes its
-results there only after every input succeeds. Each document directory contains Markdown, strict
-text, structured JSON, split-page HTML and referenced page/picture images. `manifest.json` records
-the source hashes, page and element counts, Docling version, settings, warnings and runtimes.
+Conversion is staged and published atomically. Existing output is rejected unless
+`--replace-output` explicitly requests a clean replacement. A machine-readable result reports the
+actual Markdown path, source hash, page and element counts, warnings and runtime to MCP Studio.
 
 ## Requirements
 
@@ -59,9 +56,10 @@ A GGUF file loaded by LM Studio can be used for chat and RAG, but it cannot be t
 Training requires the original local model directory, including its configuration, tokenizer, and
 weight files.
 
-The scripts set `HF_HUB_OFFLINE`, `TRANSFORMERS_OFFLINE`, and telemetry opt-outs. Model weights,
-source material, datasets, prompts, and generated artifacts remain local. Initial Python dependency
-installation still downloads packages from PyPI.
+The setup downloads the Docling layout, table, formula and OCR models into
+`~/.cache/docling/models`. Runtime scripts then set `HF_HUB_OFFLINE`, `TRANSFORMERS_OFFLINE`, and
+telemetry opt-outs. Model weights, source material, datasets, prompts, and generated artifacts
+remain local. Initial Python dependency and Docling model installation require network access.
 
 ## Setup
 
@@ -122,6 +120,7 @@ Important sections include:
 
 - `model`: local base-model directory and offline loading policy
 - `data`: training, validation, manifest, MLX data, and retrieval-index paths
+- `pdf_extraction`: Docling model cache, OCR, formula recognition, image scale and timeout
 - `dataset_policy`: source-balance and required-subject coverage gates
 - `training`: backend, adapter output, LoRA parameters, and MLX/Transformers settings
 - `checkpoint_policy`: validation interval, early stopping, and best-checkpoint behavior
@@ -186,10 +185,12 @@ Use `prepare_docs.sh` for already readable text documents or directories:
   --input /absolute/path/documentation
 ```
 
-PDF extraction is a separate operation:
+PDF extraction is a separate, layout-aware operation. Its output directory must initially be
+absent:
 
 ```bash
 ./scripts/extract_pdfs.sh \
+  --config "$CONFIG" \
   --source /absolute/path/manuals \
   --output data/prepared_docs/manuals \
   --manifest data/prepared_docs/manuals-manifest.json
@@ -198,6 +199,11 @@ PDF extraction is a separate operation:
   --config "$CONFIG" \
   --input data/prepared_docs/manuals
 ```
+
+The extraction manifest is optional. It records Docling settings and version, source hashes,
+Markdown and artifact paths, page and element counts, partial-conversion warnings, and runtimes.
+Use `--replace-output` only when intentionally rebuilding an existing manual extraction; the MCP
+Studio workflow always creates a fresh per-run directory.
 
 The MCP Studio v3 workflow additionally creates a source-to-subject policy file and passes it with
 `--policy-file`. This enables deterministic coverage and balance gates that cannot be inferred from

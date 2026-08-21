@@ -38,6 +38,7 @@ def test_v3_pdf_extraction_uses_structured_docling_defaults() -> None:
 
     assert config["pdf_extraction"] == {
         "engine": "docling",
+        "artifacts_path": "~/.cache/docling/models",
         "device": "auto",
         "ocr": True,
         "formula_enrichment": True,

@@ -26,6 +26,7 @@ document_type = "user-provided technical documentation"
 
 [pdf_extraction]
 engine = "docling"
+artifacts_path = "~/.cache/docling/models"
 device = "auto"
 ocr = true
 formula_enrichment = true

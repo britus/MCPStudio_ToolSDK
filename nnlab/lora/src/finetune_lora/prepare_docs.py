@@ -55,6 +55,8 @@ def _document_continuation_record(
     if len(lines) < 8:
         return None
     split = max(2, len(lines) // 3)
+    if Path(chunk.path).suffix.casefold() == ".md":
+        split = _markdown_continuation_split(lines, split)
     prefix = "\n".join(lines[:split])
     suffix = "\n".join(lines[split:])
     return {
@@ -208,6 +210,30 @@ def _markdown_fence_start(lines: list[str], index: int) -> int | None:
                 in_fence = True
                 start = position
     return start if in_fence else None
+
+
+def _markdown_continuation_split(lines: list[str], preferred: int) -> int:
+    """Move a prompt/completion boundary outside Markdown tables and fences."""
+    split = min(max(2, preferred), len(lines) - 1)
+    if _markdown_table_line(lines[split - 1]) and _markdown_table_line(lines[split]):
+        table_start = split
+        while table_start > 0 and _markdown_table_line(lines[table_start - 1]):
+            table_start -= 1
+        table_end = split
+        while table_end < len(lines) and _markdown_table_line(lines[table_end]):
+            table_end += 1
+        split = table_start if table_start >= 2 else table_end
+
+    fence_start = _markdown_fence_start(lines, split - 1)
+    if fence_start is not None:
+        fence_end = split
+        while fence_end < len(lines):
+            if lines[fence_end].lstrip().startswith("```"):
+                fence_end += 1
+                break
+            fence_end += 1
+        split = fence_start if fence_start >= 2 else fence_end
+    return min(max(2, split), len(lines) - 1)
 
 
 def _markdown_safe_end(lines: list[str], start: int, target: int) -> int:

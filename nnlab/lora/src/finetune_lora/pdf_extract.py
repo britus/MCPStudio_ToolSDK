@@ -24,6 +24,7 @@ SUPPORTED_STATUSES = {"success", "partial_success"}
 @dataclass(frozen=True)
 class PdfExtractionSettings:
     engine: str = "docling"
+    artifacts_path: str = "~/.cache/docling/models"
     device: str = "auto"
     enable_ocr: bool = True
     enable_formula_enrichment: bool = True
@@ -33,6 +34,8 @@ class PdfExtractionSettings:
     def validate(self) -> PdfExtractionSettings:
         if self.engine != "docling":
             raise ValueError("PDF extraction engine must be docling")
+        if not self.artifacts_path.strip():
+            raise ValueError("PDF extraction artifacts_path must not be empty")
         if self.device not in {"auto", "cpu", "mps", "cuda"}:
             raise ValueError("PDF extraction device must be auto, cpu, mps, or cuda")
         if self.image_scale <= 0:
@@ -135,6 +138,14 @@ def settings_from_config(config_path: str | Path | None) -> PdfExtractionSetting
     timeout = nested(config, "pdf_extraction", "document_timeout", 600.0)
     return PdfExtractionSettings(
         engine=str(nested(config, "pdf_extraction", "engine", "docling")),
+        artifacts_path=str(
+            nested(
+                config,
+                "pdf_extraction",
+                "artifacts_path",
+                "~/.cache/docling/models",
+            )
+        ),
         device=str(nested(config, "pdf_extraction", "device", "auto")),
         enable_ocr=bool(nested(config, "pdf_extraction", "ocr", True)),
         enable_formula_enrichment=bool(
@@ -165,7 +176,15 @@ def build_converter(settings: PdfExtractionSettings) -> Any:
     except ValueError as error:
         raise ValueError(f"Unsupported Docling accelerator: {settings.device}") from error
 
+    artifacts_path = Path(settings.artifacts_path).expanduser().resolve()
+    if not artifacts_path.is_dir():
+        raise FileNotFoundError(
+            f"Docling model artifacts are missing: {artifacts_path}. "
+            "Run scripts/setup.sh to prefetch the offline model set."
+        )
+
     options = PdfPipelineOptions(
+        artifacts_path=artifacts_path,
         accelerator_options=AcceleratorOptions(device=device),
         do_ocr=settings.enable_ocr,
         do_table_structure=True,
@@ -370,6 +389,7 @@ def main() -> None:
     configured = settings_from_config(args.config)
     settings = PdfExtractionSettings(
         engine=configured.engine,
+        artifacts_path=configured.artifacts_path,
         device=args.device or configured.device,
         enable_ocr=configured.enable_ocr if args.ocr is None else args.ocr,
         enable_formula_enrichment=(

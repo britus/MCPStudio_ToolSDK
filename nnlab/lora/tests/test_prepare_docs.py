@@ -8,6 +8,7 @@ import pytest
 
 from finetune_lora.prepare_docs import (
     _balance_training_records,
+    _document_continuation_record,
     chunk_document_source,
     prepare_documents,
 )
@@ -59,6 +60,20 @@ Closing paragraph three.
     ]
     assert fence_chunks
     assert all("check_ready();\n```" in content for content in fence_chunks)
+    for chunk in chunks:
+        continuation = _document_continuation_record(chunk, "test documentation")
+        if continuation is None:
+            continue
+        prompt = continuation["prompt"][1]["content"]
+        completion = continuation["completion"][0]["content"]
+        if "| CTRL |" in prompt:
+            assert "| STATUS | 1 | Fault |" in prompt
+        if "| CTRL |" in completion:
+            assert "| STATUS | 1 | Fault |" in completion
+        if "write_register" in prompt:
+            assert "check_ready();\n```" in prompt
+        if "write_register" in completion:
+            assert "check_ready();\n```" in completion
 
 
 def test_cli_cleans_configured_dataset_output_before_rebuild(

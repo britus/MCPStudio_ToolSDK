@@ -76,9 +76,9 @@ to an absolute path before execution. The workflow:
 1. audits the requested configuration and objective without executing tools;
 2. resolves exact local source files from explicit paths or `rag_query` and
    blocks when any requested subject is missing;
-3. runs `finetune_prepare_documents`, which extracts each selected PDF (or copies a
-   readable text document) into an isolated per-run batch and invokes
-   `scripts/prepare_docs.sh` once for that batch;
+3. runs `finetune_prepare_documents`, which converts each selected PDF to layout-aware Docling
+   Markdown with referenced figure artifacts (or copies a readable text document) in an isolated
+   per-run batch and invokes `scripts/prepare_docs.sh` once for that batch;
 4. checks the generated manifest, source alignment and non-zero training and
    validation record counts;
 5. runs a one-iteration smoke test only after the dataset gate passes;
@@ -99,7 +99,10 @@ Script Runtime allow-list. The example runtime file includes both exact command
 entries. It accepts one or more absolute paths or `file://` URIs. Every run gets
 its own `data/prepared_docs/run-*` staging directory, so an earlier extracted
 batch cannot silently enter a later dataset. The configured
-`data/processed/manifest.json` remains the authoritative gate artifact.
+`data/processed/manifest.json` remains the authoritative gate artifact. The extractor must return
+exactly one structured Docling result per selected PDF; the JavaScript bridge validates its actual
+Markdown path before adding that path to the generated dataset policy. Run `scripts/setup.sh` once
+with a training mode to prefetch the Docling models used by offline workflow execution.
 
 ## Verification workflow
 
