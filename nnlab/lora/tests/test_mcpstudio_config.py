@@ -86,7 +86,6 @@ def test_runtime_source_plan_uses_an_injectable_json_placeholder() -> None:
     assert source_plan["required"] is True
     assert source_plan["valueType"] == "json"
     assert source_plan["value"] == "{}"
-    assert "runtime content-policy" in source_plan["description"]
 
 
 def test_full_training_receives_objective_for_verification_input_generation() -> None:
@@ -129,10 +128,7 @@ def test_reporting_agent_has_a_tool_free_skill() -> None:
 
 
 def test_training_prompts_require_complete_workflow_input_forwarding() -> None:
-    prompt_paths = [
-        RELEASE_CONFIG_ROOT / "Prompts" / "finetune_training_cycle.json",
-        RELEASE_CONFIG_ROOT / "Prompts" / "finetune_configurable_training_cycle.json",
-    ]
+    prompt_paths = [RELEASE_CONFIG_ROOT / "Prompts" / "finetune_training_cycle.json"]
 
     for prompt_path in prompt_paths:
         prompt = json.loads(prompt_path.read_text(encoding="utf-8"))
@@ -142,8 +138,11 @@ def test_training_prompts_require_complete_workflow_input_forwarding() -> None:
         assert "<workflow_input>" in template
         assert "</workflow_input>" in template
         assert "Training objective file: {{training_objective_file}}" in template
-        assert "Inline training objective: {{training_goal}}" in template
         assert not template.startswith("Use the workflow")
+
+    assert not (
+        RELEASE_CONFIG_ROOT / "Prompts" / "finetune_configurable_training_cycle.json"
+    ).exists()
 
 
 def test_training_workflow_uses_absolute_config_paths() -> None:
@@ -168,18 +167,6 @@ def test_training_workflow_uses_absolute_config_paths() -> None:
         for argument in fixed_prompt["arguments"]
     )
     assert f"Training configuration (absolute): `{expected}`" in fixed_prompt["template"]
-
-    configurable_prompt = json.loads(
-        (
-            RELEASE_CONFIG_ROOT
-            / "Prompts"
-            / "finetune_configurable_training_cycle.json"
-        ).read_text(encoding="utf-8")
-    )
-    assert (
-        "Training configuration (absolute): `{{training_config}}`"
-        in configurable_prompt["template"]
-    )
 
     script = (
         RELEASE_CONFIG_ROOT / "Scripts" / "finetune_tools.js"
@@ -208,7 +195,6 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
     )
     skill = json.loads(skill_path.read_text(encoding="utf-8"))
     instruction = skill["systemInstruction"]
-    prompt_template = skill["promptTemplate"]
 
     assert "requiredSubjects minus coveredSubjects" in instruction
     assert "Never return approved=true" in instruction
@@ -228,14 +214,6 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
     assert "RAG snippets cannot prove" in instruction
     assert "generated list or heading" in instruction
     assert "absence is then a warning, not a blocker" in instruction
-    assert set(skill["allowedToolNames"]) == {"rag_query", "read_file"}
-    assert "sourcePlan.contentScope" in instruction
-    assert "contentAssessment" in instruction
-    assert "mixed-filtered" in instruction
-    assert "exclude-section" in instruction
-    assert "never use a word blacklist" in instruction
-    assert "contentAssessment" in prompt_template
-    assert "ambiguous" in prompt_template
     workflow = _training_workflow()
     finder = next(
         agent
@@ -249,9 +227,6 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
         for prop in finder["properties"]
         if prop["key"] == "discoveryPolicy"
     )
-    assert "sourcePlan.contentScope" in finder["instruction"]
-    assert "contentRules" in finder["instruction"]
-    assert "read_file only" in finder["instruction"]
 
 
 def test_policy_contract_is_not_written_into_document_input_directory() -> None:
@@ -266,10 +241,3 @@ def test_policy_contract_is_not_written_into_document_input_directory() -> None:
     assert "return normalized.join('\\n')" in script
     assert "PDF extraction produced no text file" in script
     assert "MCPStudio.fileExists(extractedPath)" in script
-    assert "function contentScope" in script
-    assert "function contentAssessment" in script
-    assert "function contentRules" in script
-    assert "format: 2" in script
-    assert "contentScope: plan.contentScope" in script
-    assert "contentAssessment: plan ? plan.sources[index].contentAssessment" in script
-    assert "contentRules: plan ? plan.sources[index].contentRules" in script

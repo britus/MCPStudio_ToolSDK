@@ -123,122 +123,10 @@ function evidenceText(value, label) {
     return normalized.join('\n');
 }
 
-function contentScope(value) {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
-        throw new Error('sourcePlan.contentScope must be a JSON object');
-    }
-    const targets = stringArray(
-        value.targets,
-        [],
-        'sourcePlan.contentScope.targets'
-    ).map(function (item) { return item.trim(); }).filter(Boolean);
-    if (targets.length === 0) {
-        throw new Error('sourcePlan.contentScope.targets must contain at least one target');
-    }
-    return {
-        targets: targets,
-        boundaries: stringArray(
-            value.boundaries,
-            [],
-            'sourcePlan.contentScope.boundaries'
-        ).map(function (item) { return item.trim(); }).filter(Boolean),
-        exclusions: stringArray(
-            value.exclusions,
-            [],
-            'sourcePlan.contentScope.exclusions'
-        ).map(function (item) { return item.trim(); }).filter(Boolean)
-    };
-}
-
-function requiredText(value, label) {
-    if (typeof value !== 'string' || !value.trim()) {
-        throw new Error(label + ' must be a non-empty string');
-    }
-    return value.trim();
-}
-
-function contentRules(value, label) {
-    if (value === undefined || value === null) {
-        return [];
-    }
-    if (!Array.isArray(value)) {
-        throw new Error(label + ' must be an array');
-    }
-    return value.map(function (rule, index) {
-        const ruleLabel = label + '[' + index + ']';
-        if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
-            throw new Error(ruleLabel + ' must be an object');
-        }
-        const action = requiredText(rule.action, ruleLabel + '.action');
-        if (action !== 'exclude-section') {
-            throw new Error(ruleLabel + ".action must be 'exclude-section'");
-        }
-        const origin = requiredText(rule.origin, ruleLabel + '.origin');
-        if (origin !== 'human-explicit' && origin !== 'machine-derived') {
-            throw new Error(
-                ruleLabel + ".origin must be 'human-explicit' or 'machine-derived'"
-            );
-        }
-        const startOccurrence = Number(rule.startOccurrence);
-        const endOccurrence = Number(rule.endOccurrence);
-        if (
-            rule.startOccurrence !== undefined &&
-            (!Number.isInteger(startOccurrence) || startOccurrence < 1)
-        ) {
-            throw new Error(ruleLabel + '.startOccurrence must be a positive integer');
-        }
-        if (
-            rule.endOccurrence !== undefined &&
-            (!Number.isInteger(endOccurrence) || endOccurrence < 1)
-        ) {
-            throw new Error(ruleLabel + '.endOccurrence must be a positive integer');
-        }
-        if (rule.caseSensitive !== undefined && typeof rule.caseSensitive !== 'boolean') {
-            throw new Error(ruleLabel + '.caseSensitive must be a Boolean');
-        }
-        const normalized = {
-            id: requiredText(rule.id, ruleLabel + '.id'),
-            action: action,
-            start: requiredText(rule.start, ruleLabel + '.start'),
-            end: requiredText(rule.end, ruleLabel + '.end'),
-            caseSensitive: Boolean(rule.caseSensitive),
-            origin: origin,
-            reason: requiredText(rule.reason, ruleLabel + '.reason'),
-            evidence: evidenceText(rule.evidence, ruleLabel + '.evidence')
-        };
-        if (rule.startOccurrence !== undefined) {
-            normalized.startOccurrence = startOccurrence;
-        }
-        if (rule.endOccurrence !== undefined) {
-            normalized.endOccurrence = endOccurrence;
-        }
-        return normalized;
-    });
-}
-
-function contentAssessment(value, label) {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
-        throw new Error(label + ' must be an object');
-    }
-    const classification = requiredText(value.classification, label + '.classification');
-    if (
-        classification !== 'target-only' &&
-        classification !== 'shared-target-applicable' &&
-        classification !== 'mixed-filtered'
-    ) {
-        throw new Error(label + '.classification is invalid');
-    }
-    return {
-        classification: classification,
-        evidence: evidenceText(value.evidence, label + '.evidence')
-    };
-}
-
 function sourcePlan(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
         throw new Error('sourcePlan must be a JSON object');
     }
-    const scope = contentScope(value.contentScope);
     const requiredSubjects = stringArray(
         value.requiredSubjects,
         [],
@@ -285,25 +173,10 @@ function sourcePlan(value) {
             item.evidence,
             'sourcePlan.sources[' + index + '].evidence'
         );
-        const assessment = contentAssessment(
-            item.contentAssessment,
-            'sourcePlan.sources[' + index + '].contentAssessment'
-        );
-        const rules = contentRules(
-            item.contentRules,
-            'sourcePlan.sources[' + index + '].contentRules'
-        );
-        if (assessment.classification === 'mixed-filtered' && rules.length === 0) {
-            throw new Error(
-                'sourcePlan.sources[' + index + '] is mixed-filtered but has no contentRules'
-            );
-        }
         return {
             path: absoluteDocumentPath(item.path, 'sourcePlan.sources[' + index + '].path'),
             subjects: subjects,
-            evidence: evidence,
-            contentAssessment: assessment,
-            contentRules: rules
+            evidence: evidence
         };
     });
     const missingSubjects = requiredSubjects.filter(function (subject) {
@@ -314,11 +187,7 @@ function sourcePlan(value) {
             'sourcePlan does not cover requiredSubjects: ' + missingSubjects.join(', ')
         );
     }
-    return {
-        requiredSubjects: requiredSubjects,
-        contentScope: scope,
-        sources: sources
-    };
+    return { requiredSubjects: requiredSubjects, sources: sources };
 }
 
 function absoluteDocumentPath(value, label) {
@@ -653,9 +522,7 @@ function prepareDocuments(params, sid) {
                     numberedSegment(index),
                     withoutExtension(pathBaseName(source)) + '.txt'
                 ),
-                subjects: plan ? plan.sources[index].subjects : [],
-                contentAssessment: plan ? plan.sources[index].contentAssessment : null,
-                contentRules: plan ? plan.sources[index].contentRules : []
+                subjects: plan ? plan.sources[index].subjects : []
             });
             continue;
         }
@@ -675,9 +542,7 @@ function prepareDocuments(params, sid) {
                 numberedSegment(index),
                 withoutExtension(pathBaseName(source)) + '.txt'
             ),
-            subjects: plan ? plan.sources[index].subjects : [],
-            contentAssessment: plan ? plan.sources[index].contentAssessment : null,
-            contentRules: plan ? plan.sources[index].contentRules : []
+            subjects: plan ? plan.sources[index].subjects : []
         });
         output.stdout.push('Materialized text document ' + source + ' as ' + target);
     }
@@ -689,9 +554,8 @@ function prepareDocuments(params, sid) {
         shared.joinPath(stagingRoot, runSegment + '-dataset-policy.json')
     );
     if (plan && MCPStudio.saveFile(policyPath, JSON.stringify({
-        format: 2,
+        format: 1,
         requiredSubjects: plan.requiredSubjects,
-        contentScope: plan.contentScope,
         sources: materializedPolicySources
     }, null, 2) + '\n') !== true) {
         return shared.error('Could not write the dataset policy contract');
