@@ -32,6 +32,20 @@ The v3 lifecycle deliberately separates training, candidate creation, verificati
 The EoF MCP Studio workflows implement these gates automatically. The shell scripts and Makefile
 expose the same underlying operations for direct use.
 
+### Docling extraction PoC
+
+The production PDF extraction remains unchanged. To inspect layout-aware Docling output separately,
+run the isolated PoC with one or more PDF files or directories:
+
+```bash
+./scripts/docling_poc.sh /absolute/path/to/document.pdf
+```
+
+The command requires a fresh `data/prepared_docs/poc-docling-output` directory and publishes its
+results there only after every input succeeds. Each document directory contains Markdown, strict
+text, structured JSON, split-page HTML and referenced page/picture images. `manifest.json` records
+the source hashes, page and element counts, Docling version, settings, warnings and runtimes.
+
 ## Requirements
 
 - Python 3.11 or 3.12
