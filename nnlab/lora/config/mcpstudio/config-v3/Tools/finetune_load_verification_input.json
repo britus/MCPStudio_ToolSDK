@@ -7,7 +7,7 @@
     "lastModified" : "2026-08-18T00:00:00.000Z",
     "priority" : 0.99
   },
-  "description" : "Load and validate one user-selected verification_input.json before candidate merge and verification.",
+  "description" : "Load and validate one user-selected verification_input.json before master bootstrap or candidate merge and verification.",
   "execHandler" : "finetuneLoadVerificationInput",
   "execMethod" : "toolEntry",
   "inputSchema" : {
@@ -34,6 +34,7 @@
     "properties" : {
       "acceptanceCriteria" : { "description" : "Semantic release criteria loaded from the selected input.", "name" : "acceptanceCriteria", "type" : "string" },
       "adapters" : { "description" : "Validated additional adapter directories.", "items" : { "type" : "string" }, "name" : "adapters", "type" : "array" },
+      "bootstrapRequired" : { "description" : "Whether the configured master is absent and must be seeded from the single trained adapter.", "name" : "bootstrapRequired", "type" : "boolean" },
       "configPath" : { "description" : "Validated project-relative lifecycle TOML.", "name" : "configPath", "type" : "string" },
       "error" : { "description" : "Failure details when the input cannot be loaded or validated.", "name" : "error", "type" : "string" },
       "force" : { "description" : "Whether replacement of an existing merge candidate is explicitly allowed.", "name" : "force", "type" : "boolean" },

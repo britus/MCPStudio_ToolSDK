@@ -5,7 +5,12 @@ from pathlib import Path
 
 import mlx.core as mx
 
-from finetune_lora.merge_adapters import merge_adapters, merge_tensors
+from finetune_lora.merge_adapters import (
+    bootstrap_master,
+    merge_adapters,
+    merge_tensors,
+    prepare_verification_candidate,
+)
 
 
 def _write_adapter(
@@ -58,6 +63,100 @@ def _dense_delta(lora_a: mx.array, lora_b: mx.array, scale: float) -> mx.array:
 def _expert_delta(lora_a: mx.array, lora_b: mx.array, scale: float) -> mx.array:
     """Reference LoRASwitchLinear.fuse delta: scale * lora_b @ lora_a."""
     return scale * lora_b @ lora_a
+
+
+class BootstrapMasterTests(unittest.TestCase):
+    def test_bootstraps_missing_master_without_scaling_the_adapter(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate"
+            candidate.mkdir()
+            weights = b"trained-adapter-weights"
+            (candidate / "adapters.safetensors").write_bytes(weights)
+            (candidate / "adapter_config.json").write_text(
+                json.dumps(
+                    {
+                        "adapter_path": str(candidate),
+                        "fine_tune_type": "lora",
+                        "num_layers": 8,
+                        "lora_parameters": {"rank": 16, "scale": 2.0},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (candidate / "train_setup.json").write_text(
+                json.dumps({"model": "/base/model"}), encoding="utf-8"
+            )
+            master = root / "master"
+
+            report = bootstrap_master(master, candidate, [0.5, 0.5])
+
+            self.assertEqual((master / "adapters.safetensors").read_bytes(), weights)
+            master_config = json.loads((master / "adapter_config.json").read_text())
+            self.assertEqual(master_config["adapter_path"], str(master.resolve()))
+            self.assertTrue((master / "train_setup.json").is_file())
+            self.assertEqual(report["method"], "master-bootstrap")
+            self.assertEqual(report["weights"], [1.0])
+            self.assertEqual(report["requested_weights"], [0.5, 0.5])
+            self.assertEqual(report["merged_sha256"], report["sources_sha256"][str(candidate.resolve())])
+            self.assertEqual(
+                json.loads((master / "merge_report.json").read_text()), report
+            )
+
+    def test_refuses_to_overwrite_an_incomplete_master(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate"
+            candidate.mkdir()
+            (candidate / "adapters.safetensors").write_bytes(b"candidate")
+            (candidate / "adapter_config.json").write_text(
+                json.dumps(
+                    {
+                        "fine_tune_type": "lora",
+                        "num_layers": 1,
+                        "lora_parameters": {"rank": 2, "scale": 1.0},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            master = root / "master"
+            master.mkdir()
+            (master / "adapters.safetensors").write_bytes(b"partial")
+
+            with self.assertRaisesRegex(FileExistsError, "not a complete adapter"):
+                bootstrap_master(master, candidate)
+
+            self.assertEqual((master / "adapters.safetensors").read_bytes(), b"partial")
+
+    def test_reuses_matching_bootstrap_on_verification_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate"
+            candidate.mkdir()
+            (candidate / "adapters.safetensors").write_bytes(b"candidate")
+            (candidate / "adapter_config.json").write_text(
+                json.dumps(
+                    {
+                        "fine_tune_type": "lora",
+                        "num_layers": 1,
+                        "lora_parameters": {"rank": 2, "scale": 1.0},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            master = root / "master"
+            first = prepare_verification_candidate(
+                master, [candidate], [0.5, 0.5], root / "merged"
+            )
+            second = prepare_verification_candidate(
+                master, [candidate], [0.5, 0.5], root / "merged"
+            )
+
+            self.assertEqual(first["method"], "master-bootstrap")
+            self.assertNotIn("reused", first)
+            self.assertTrue(second["reused"])
+            self.assertEqual(second["merged_sha256"], first["merged_sha256"])
+            self.assertFalse((root / "merged").exists())
 
 
 class MergeAdaptersTests(unittest.TestCase):

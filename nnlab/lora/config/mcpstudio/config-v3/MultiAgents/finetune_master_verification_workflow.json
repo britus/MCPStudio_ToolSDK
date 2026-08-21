@@ -38,7 +38,7 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Inspect the validated verification input. Require non-empty projectRoot, configPath, promptsFile, outputFile, subjectContext, acceptanceCriteria, master, at least one adapter and output. Require weights to be empty or contain exactly one value for the master plus one per adapter. Require output to differ from every input. Return exactly one raw JSON object with ready (Boolean) and missingPrerequisites (array of strings). Do not call tools.",
+      "instruction" : "Inspect the validated verification input. Require non-empty projectRoot, configPath, promptsFile, outputFile, subjectContext, acceptanceCriteria, master, at least one adapter and output. Require weights to be empty or contain exactly one value for the master plus one per adapter. Require output to differ from every input. When bootstrapRequired=true, require exactly one trained adapter; the deterministic merge tool will seed the absent master from it without scaling. Return exactly one raw JSON object with ready (Boolean) and missingPrerequisites (array of strings). Do not call tools.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 3,
@@ -53,7 +53,7 @@
     },
     {
       "executionMode" : "mcpTool",
-      "instruction" : "Create a new merge candidate from the validated file inputs. Never merge in place. Preserve the structured output path, merge report and diagnostics.",
+      "instruction" : "Prepare the verification candidate from the validated file inputs. If the master is absent, atomically bootstrap it from the single trained adapter without scaling; otherwise create a new non-in-place merge candidate. Preserve the exact returned adapter path, provenance report and diagnostics.",
       "llmProviderID" : "none",
       "logLevel" : "debug",
       "maxTurns" : 1,
@@ -100,7 +100,7 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Review the real merged-candidate verification output against subjectContext and acceptanceCriteria from the validated file. Inspect every held-out case. Return exactly one raw JSON object with decision (PASS, FAIL or INCONCLUSIVE), findings (array) and reportPaths (array). Process success or keyword matches alone are insufficient. Never call tools.",
+      "instruction" : "Review the real merged-candidate verification output against subjectContext and acceptanceCriteria from the validated file. Apply explicit runtime rules for documented variants, contradictory sources, tolerated cross-documentation and uncertainty before classifying cross-context contamination. Mixed terminology alone is not a failure when the runtime context permits it. Still reject invented identifiers, values or transport-specific behavior unsupported by the permitted sources. Inspect every held-out case. Return exactly one raw JSON object with decision (PASS, FAIL or INCONCLUSIVE), findings (array) and reportPaths (array). Process success or keyword matches alone are insufficient. Never call tools.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 5,
@@ -145,9 +145,9 @@
     { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Always report verification.", "kind" : "artifactFlow", "label" : "Report verification", "sharedStateKeys" : "verificationResult,reportPath", "source" : "Merged Candidate Verification Runner", "target" : "Verification Merge Gate Synthesizer" },
     { "artifactPolicy" : "pass-all", "condition" : "Publish the independent decision.", "kind" : "artifactFlow", "label" : "Publish decision", "sharedStateKeys" : "decision,findings,reportPaths", "source" : "Merged Candidate Evidence Reviewer", "target" : "Verification Merge Gate Synthesizer" }
   ],
-  "goal" : "Load one generated verification_input.json, create a reversible merged adapter candidate, verify that exact candidate and return an evidence-backed release decision without deploying.",
+  "goal" : "Load one generated verification_input.json, bootstrap an absent master or create a reversible merged candidate, verify that exact returned adapter and return an evidence-backed release decision without deploying.",
   "name" : "finetune_master_verification_workflow",
   "pattern" : "pipeline",
-  "summary" : "Uses one selected verification config file to drive a non-in-place merge, exact-candidate verification and independent PASS, FAIL or INCONCLUSIVE review.",
-  "systemInstruction" : "Treat product and domain details only as runtime data loaded by finetune_load_verification_input. The merge writes a new candidate directory. Verify only the adapter returned by the merge tool. Never infer PASS from process success and never install or update LM Studio."
+  "summary" : "Uses one selected verification config file to bootstrap a missing master or drive a non-in-place merge, then verifies the exact returned adapter and independently reviews it.",
+  "systemInstruction" : "Treat product and domain details only as runtime data loaded by finetune_load_verification_input. A completely absent master is atomically seeded from the single trained adapter; an existing master produces a new merge candidate directory. Verify only the adapter returned by the merge tool. Never infer PASS from process success and never install or update LM Studio."
 }

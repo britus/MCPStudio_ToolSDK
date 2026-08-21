@@ -187,8 +187,13 @@ def test_tool_bridge_loads_validated_input_and_emits_merge_handoff() -> None:
     assert "payload.schemaVersion !== 1" in script
     assert "projectRoot does not match the active chat project" in script
     assert "normalizedDirectoryIdentity(payloadRoot.value)" in script
+    assert "const bootstrapRequired = !masterWeightsPresent" in script
+    assert "master is incomplete" in script
     assert "finetuneLoadVerificationInput: loadVerificationInput" in script
     assert "FINETUNE_RESULT_JSON=" in merge_module
+    assert '"method": "master-bootstrap"' in merge_module
+    assert "report = prepare_verification_candidate(" in merge_module
+    assert "matching_bootstrap = _matching_bootstrap" in merge_module
     assert "adapterPresent" in script
     assert "reportPresent" in script
 
@@ -206,6 +211,37 @@ def test_loader_tool_satisfies_swift_schema_property_decoder() -> None:
             assert isinstance(prop.get("type"), str), key
             assert isinstance(prop.get("description"), str), key
             assert prop["description"].strip(), key
+    assert tool["outputSchema"]["properties"]["bootstrapRequired"]["type"] == "boolean"
+
+
+def test_workflow_explicitly_supports_first_master_bootstrap() -> None:
+    workflow = _workflow()
+    readiness = _agent(workflow, "Verification Merge Readiness Inspector")
+    candidate_runner = _agent(workflow, "Candidate Merge Runner")
+
+    assert "bootstrapRequired=true" in readiness["instruction"]
+    assert "exactly one trained adapter" in readiness["instruction"]
+    assert "atomically bootstrap" in candidate_runner["instruction"]
+    assert "without scaling" in candidate_runner["instruction"]
+    assert "completely absent master" in workflow["systemInstruction"]
+
+
+def test_evidence_review_applies_runtime_variant_tolerance_before_contamination() -> None:
+    workflow = _workflow()
+    reviewer = _agent(workflow, "Merged Candidate Evidence Reviewer")
+    context = json.loads(
+        (
+            CONFIG_ROOT
+            / "Skills"
+            / "finetune_master_verification_workflow_context.json"
+        ).read_text(encoding="utf-8")
+    )["systemInstruction"]
+
+    assert "documented variants" in reviewer["instruction"]
+    assert "Mixed terminology alone is not a failure" in reviewer["instruction"]
+    assert "invented identifiers" in reviewer["instruction"]
+    assert "subjectContext permits it" in context
+    assert "Runtime tolerance never excuses invented" in context
 
 
 def test_verification_prompt_has_only_one_file_parameter() -> None:

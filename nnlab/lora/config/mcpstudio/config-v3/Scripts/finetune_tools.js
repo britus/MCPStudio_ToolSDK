@@ -379,10 +379,23 @@ function loadVerificationInput(params) {
     if (subjectContext.length > 262144 || acceptanceCriteria.length > 32768) {
         return shared.error('Verification context or acceptance criteria exceeds the limit');
     }
-    const master = optionalProjectAdapterPath(payload.master, root, 'master');
+    const master = optionalRelativePath(payload.master, 'master');
     if (!master) {
         return shared.error('master is required');
     }
+    const masterWeightsPresent = MCPStudio.fileExists(
+        resolveProjectPath(root, master + '/adapters.safetensors')
+    );
+    const masterConfigPresent = MCPStudio.fileExists(
+        resolveProjectPath(root, master + '/adapter_config.json')
+    );
+    if (masterWeightsPresent !== masterConfigPresent) {
+        return shared.error(
+            'master is incomplete; adapters.safetensors and adapter_config.json ' +
+            'must either both exist or both be absent'
+        );
+    }
+    const bootstrapRequired = !masterWeightsPresent;
     const adapters = stringArray(payload.adapters, [], 'adapters').map(function (item) {
         const adapter = optionalProjectAdapterPath(item, root, 'adapter');
         if (!adapter) {
@@ -424,6 +437,7 @@ function loadVerificationInput(params) {
             subjectContext: subjectContext,
             acceptanceCriteria: acceptanceCriteria,
             master: master,
+            bootstrapRequired: bootstrapRequired,
             adapters: adapters,
             weights: weights,
             output: output,

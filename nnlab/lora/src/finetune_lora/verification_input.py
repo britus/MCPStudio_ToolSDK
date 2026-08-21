@@ -12,7 +12,11 @@ SCHEMA_VERSION = 1
 DEFAULT_ACCEPTANCE_CRITERIA = (
     "Execute every held-out prompt and review every generated answer for factual "
     "relevance, required coverage, unsupported claims, cross-context contamination, "
-    "prompt leakage and repeated control tokens. Process success or keyword matches "
+    "prompt leakage and repeated control tokens. Apply explicit variant, source-conflict, "
+    "cross-documentation and uncertainty tolerances from the runtime subject context "
+    "before classifying contamination; mixed terminology alone is not a failure when "
+    "that context permits it. Such tolerance never excuses invented identifiers, values "
+    "or unsupported transport-specific behavior. Process success or keyword matches "
     "alone are insufficient for PASS."
 )
 DEFAULT_PROMPT_SYSTEM_MESSAGE = (

@@ -103,10 +103,14 @@ batch cannot silently enter a later dataset. The configured
 
 ## Verification workflow
 
-`finetune_master_verification_workflow` defaults to `artifacts/finetune_lora`
-and mode `all`. It verifies the required automatically generated prompts and runs
-the held-out evaluations. The final decision is restricted to `PASS`, `FAIL` or
-`INCONCLUSIVE`. It intentionally does not deploy the adapter.
+`finetune_master_verification_workflow` loads the run-specific verification input. When
+`artifacts/finetune_lora` is completely absent, the candidate-preparation tool atomically
+bootstraps it from the single trained adapter without scaling and emits a provenance report.
+When the master already exists, the same tool creates the configured non-in-place merge candidate.
+Retrying the same hand-off reuses an unchanged, hash-matching bootstrap rather than duplicating its
+LoRA contribution. The workflow verifies exactly the returned adapter against the generated
+held-out prompts. A partial master is rejected and never overwritten. The final decision is restricted to `PASS`,
+`FAIL` or `INCONCLUSIVE`; the workflow intentionally does not deploy the adapter.
 
 Its LLM coordinator, readiness inspector, evidence reviewer and synthesizer use
 the hidden `finetune_master_verification_workflow_context` skill. That skill has
@@ -144,7 +148,7 @@ the local LM Studio model `eofnnlab/finetune_lora`.
 A successful training or merge process is not proof of model quality. The expected
 release order is:
 
-`training -> candidate merge -> verification PASS -> dry-run update -> update`
+`training -> master bootstrap or candidate merge -> verification PASS -> dry-run update -> update`
 
 Do not bind the install or update tools into the training or verification workflows;
 deployment remains an explicit operator action.

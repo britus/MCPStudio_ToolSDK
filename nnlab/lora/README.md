@@ -24,8 +24,9 @@ The v3 lifecycle deliberately separates training, candidate creation, verificati
    early stopping, and best-checkpoint restoration are controlled by the TOML configuration.
 8. Generate a reusable `data/verifications/run-*/verification_input.json` plus a run-specific
    held-out prompt suite from the training objective and trained adapter.
-9. In a separate verification run, merge into a new candidate directory and verify that exact
-   merged candidate against held-out prompts.
+9. In a separate verification run, atomically bootstrap a completely absent master from the first
+   trained adapter, or merge an existing master into a new candidate directory. Verify exactly the
+   adapter returned by that preparation step against held-out prompts.
 10. Install or update the LM Studio model only after an explicit `PASS` decision.
 
 The EoF MCP Studio workflows implement these gates automatically. The shell scripts and Makefile
@@ -220,8 +221,12 @@ To resume a supported training backend from a checkpoint:
 
 ### Merge and verify
 
-With the v3 defaults, full training writes a candidate adapter and merge writes a separate merged
-adapter. The configured merge can be run with:
+With the v3 defaults, full training writes a candidate adapter. If the configured master is absent,
+the first merge command copies that one candidate atomically and at full weight into the master,
+records `method: master-bootstrap`, and returns the master for verification. A partial master is
+never overwritten. Retrying the same verification input reuses the hash-matching bootstrap instead
+of merging the same adapter twice. Once a different trained adapter is supplied, merge writes a
+separate merged adapter. The configured operation can be run with:
 
 ```bash
 ./scripts/merge_adapters.sh --config "$CONFIG"

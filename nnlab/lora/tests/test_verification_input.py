@@ -112,6 +112,10 @@ output = "merged"
         run_name="run-focuses",
     )
     payload = json.loads(output.read_text(encoding="utf-8"))
+    assert "variant" in payload["acceptanceCriteria"]
+    assert "mixed terminology alone is not a failure" in payload[
+        "acceptanceCriteria"
+    ]
     prompts_path = tmp_path / payload["promptsFile"]
     prompts = [
         json.loads(line)
@@ -239,3 +243,20 @@ output = "merged"
         run_name="run-equal",
     )
     assert json.loads(output.read_text(encoding="utf-8"))["weights"] == ["1", "1"]
+
+
+def test_bokara_variant_policy_is_runtime_data_not_release_code() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    objective = (project_root / "training-bokara.txt").read_text(encoding="utf-8")
+    release_root = project_root / "config/mcpstudio/config-v3"
+    release_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in release_root.rglob("*.json")
+    )
+    release_text += (project_root / "src/finetune_lora/verification_input.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "MCP23008 (I2C) and MCP23S08 (SPI)" in objective
+    assert "documentation-quality warning" in objective
+    assert "does not reinterpret the LTC2309 interface" in objective
+    assert "MCP23S08" not in release_text

@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import uuid
 from pathlib import Path
 from typing import Any
@@ -46,6 +47,90 @@ def _validate_adapter_dir(adapter: Path) -> None:
     if not (adapter / ADAPTER_WEIGHTS).is_file():
         raise FileNotFoundError(f"Adapter weights missing: {adapter / ADAPTER_WEIGHTS}")
     _load_adapter_config(adapter)
+
+
+def bootstrap_master(
+    master: str | Path,
+    adapter: str | Path,
+    requested_weights: list[float] | None = None,
+) -> dict[str, Any]:
+    """Atomically seed a missing master from one complete trained adapter."""
+    master_path = resolve_path(master)
+    adapter_path = resolve_path(adapter)
+    _validate_adapter_dir(adapter_path)
+    if master_path == adapter_path:
+        raise ValueError("Bootstrap master must differ from the trained adapter")
+
+    if master_path.exists():
+        if not master_path.is_dir():
+            raise FileExistsError(f"Bootstrap master path is not a directory: {master_path}")
+        if any(master_path.iterdir()):
+            raise FileExistsError(
+                "Bootstrap master already exists but is not a complete adapter: "
+                f"{master_path}"
+            )
+        master_path.rmdir()
+
+    adapter_config = _load_adapter_config(adapter_path)
+    parameters = _lora_parameters(adapter_config, adapter_path)
+    source_hash = _sha256(adapter_path / ADAPTER_WEIGHTS)
+    master_path.parent.mkdir(parents=True, exist_ok=True)
+    staging = master_path.with_name(f".{master_path.name}.bootstrap-{uuid.uuid4().hex}")
+    try:
+        shutil.copytree(adapter_path, staging)
+        staged_config = _load_adapter_config(staging)
+        staged_config["adapter_path"] = str(master_path)
+        (staging / ADAPTER_CONFIG).write_text(
+            json.dumps(staged_config, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        report = {
+            "method": "master-bootstrap",
+            "master": str(master_path),
+            "adapters": [str(adapter_path)],
+            "weights": [1.0],
+            "requested_weights": requested_weights or [],
+            "base_rank": int(parameters.get("rank", 0)),
+            "merged_rank": int(parameters.get("rank", 0)),
+            "scale": float(parameters.get("scale", 0.0)),
+            "num_layers": int(adapter_config.get("num_layers", 0)),
+            "output": str(master_path),
+            "sources_sha256": {str(adapter_path): source_hash},
+            "merged_sha256": source_hash,
+        }
+        (staging / MERGE_REPORT).write_text(
+            json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        _validate_adapter_dir(staging)
+        os.replace(staging, master_path)
+    except BaseException:
+        if staging.exists():
+            shutil.rmtree(staging)
+        raise
+    return report
+
+
+def _matching_bootstrap(master: Path, adapter: Path) -> dict[str, Any] | None:
+    """Return trusted bootstrap provenance when a retry supplies the same adapter."""
+    report_path = master / MERGE_REPORT
+    if not report_path.is_file():
+        return None
+    try:
+        report = _json_file(report_path)
+        source_hashes = report.get("sources_sha256")
+        if (
+            report.get("method") != "master-bootstrap"
+            or report.get("master") != str(master)
+            or report.get("adapters") != [str(adapter)]
+            or not isinstance(source_hashes, dict)
+            or report.get("merged_sha256") != _sha256(master / ADAPTER_WEIGHTS)
+            or source_hashes.get(str(adapter)) != _sha256(adapter / ADAPTER_WEIGHTS)
+        ):
+            return None
+    except (OSError, TypeError, ValueError):
+        return None
+    return {**report, "reused": True}
 
 
 def _lora_parameters(config: dict[str, Any], adapter: Path) -> dict[str, Any]:
@@ -494,14 +579,54 @@ def merge_adapters(
     return report
 
 
+def prepare_verification_candidate(
+    master: str | Path,
+    adapters: list[str | Path],
+    weights: list[float] | None,
+    output: str | Path | None,
+    in_place: bool = False,
+    force: bool = False,
+) -> dict[str, Any]:
+    """Bootstrap, reuse, or merge the exact adapter that verification must consume."""
+    master_path = resolve_path(master)
+    adapter_paths = [resolve_path(adapter) for adapter in adapters]
+    master_ready = (
+        (master_path / ADAPTER_WEIGHTS).is_file()
+        and (master_path / ADAPTER_CONFIG).is_file()
+    )
+    if not master_ready:
+        if len(adapter_paths) != 1:
+            raise ValueError(
+                "Bootstrapping a missing master requires exactly one trained adapter"
+            )
+        return bootstrap_master(master_path, adapter_paths[0], weights)
+
+    _validate_adapter_dir(master_path)
+    if len(adapter_paths) == 1:
+        _validate_adapter_dir(adapter_paths[0])
+        matching_bootstrap = _matching_bootstrap(master_path, adapter_paths[0])
+        if matching_bootstrap is not None:
+            return matching_bootstrap
+
+    return merge_adapters(
+        master=master_path,
+        adapters=adapter_paths,
+        weights=weights,
+        output=output,
+        in_place=in_place,
+        force=force,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Merge MLX LoRA adapters into the master adapter by concatenating "
-            "the LoRA factors along the rank axis. The merged adapter reproduces "
-            "the weighted sum of all input adapters. When the master is an "
-            "existing provenance-backed merge, compatible trailing components "
-            "are refreshed without re-adding previous components."
+            "Bootstrap a completely absent master from one trained MLX LoRA adapter, "
+            "or merge adapters into an existing master by concatenating the LoRA "
+            "factors along the rank axis. The merged adapter reproduces the weighted "
+            "sum of all input adapters. When the master is an existing provenance-backed "
+            "merge, compatible trailing components are refreshed without re-adding "
+            "previous components."
         )
     )
     parser.add_argument(
@@ -571,7 +696,7 @@ def main() -> None:
         raise ValueError("Merge master is missing; pass --master or set merge.master")
     if not adapters:
         raise ValueError("Merge adapters are missing; pass --adapters or set merge.adapters")
-    report = merge_adapters(
+    report = prepare_verification_candidate(
         master=master,
         adapters=adapters,
         weights=weights,
@@ -580,7 +705,12 @@ def main() -> None:
         force=force,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))
-    print(f"\nMerged adapter written to {report['output']}")
+    if report.get("reused") is True:
+        print(f"\nExisting master bootstrap reused at {report['output']}")
+    elif report["method"] == "master-bootstrap":
+        print(f"\nMaster adapter bootstrapped at {report['output']}")
+    else:
+        print(f"\nMerged adapter written to {report['output']}")
     output_path = Path(report["output"]).resolve()
     try:
         adapter_path = str(output_path.relative_to(Path.cwd().resolve()))

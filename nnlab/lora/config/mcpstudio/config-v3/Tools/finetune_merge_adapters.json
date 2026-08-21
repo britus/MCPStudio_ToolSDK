@@ -7,7 +7,7 @@
     "lastModified" : "2026-08-17T00:00:00.000Z",
     "priority" : 0.95
   },
-  "description" : "Merge compatible local MLX LoRA adapters by exact rank concatenation using the project TOML and optional per-run overrides.",
+  "description" : "Bootstrap a missing master from one trained adapter, or merge compatible local MLX LoRA adapters by exact rank concatenation.",
   "execHandler" : "finetuneMergeAdapters",
   "execMethod" : "toolEntry",
   "inputSchema" : {
@@ -36,7 +36,7 @@
         "type" : "boolean"
       },
       "master" : {
-        "description" : "Project-relative compatible seed adapter or provenance-backed merged V2 master.",
+        "description" : "Project-relative master. When fully absent, it is atomically bootstrapped from the single trained adapter without weight scaling.",
         "name" : "master",
         "type" : "string"
       },
@@ -86,6 +86,11 @@
       "mergeReportPath" : {
         "description" : "Structured merge provenance report for the candidate.",
         "name" : "mergeReportPath",
+        "type" : "string"
+      },
+      "method" : {
+        "description" : "Preparation method: master-bootstrap, lora-rank-concatenation or lora-component-refresh.",
+        "name" : "method",
         "type" : "string"
       },
       "mergedSha256" : {
