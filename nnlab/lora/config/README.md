@@ -74,12 +74,14 @@ absolute TOML. Relative training-tool inputs remain supported and are normalized
 to an absolute path before execution. The workflow:
 
 1. audits the requested configuration and objective without executing tools;
-2. resolves exact local source files from explicit paths or `rag_query` and
-   blocks when any requested subject is missing;
+2. resolves exact local source files from explicit paths or `rag_query`, derives
+   a runtime content scope from the objective, classifies retained sources and
+   blocks when a required subject or required filter boundary is unresolved;
 3. runs `finetune_prepare_documents`, which extracts each selected PDF (or copies a
-   readable text document) into an isolated per-run batch and invokes
-   `scripts/prepare_docs.sh` once for that batch;
-4. checks the generated manifest, source alignment and non-zero training and
+   readable text document) into an isolated per-run batch, persists the generated
+   content rules and invokes `scripts/prepare_docs.sh` once for that batch;
+4. applies deterministic section exclusions before chunking and checks the
+   generated manifest, filter audit, source alignment and non-zero training and
    validation record counts;
 5. runs a one-iteration smoke test only after the dataset gate passes;
 6. independently gates and runs the full training;
@@ -91,7 +93,9 @@ It intentionally does not merge or install an adapter.
 Its LLM coordinator, auditor, dataset reviewer, smoke reviewer and synthesizer use the hidden
 `finetune_adapter_training_workflow_context` skill. That skill has `toolScopeMode`
 `none`. `Training Document Finder` uses the separate hidden
-`finetune_training_document_discovery` skill restricted to `rag_query`. Only the
+`finetune_training_document_discovery` skill restricted to `rag_query` and
+`read_file`. The latter is used only to assess selected local source content and
+derive stable rule anchors. Only the
 configured Prepare, Smoke and Full MCP Tool agents execute project scripts.
 
 The prepare tool requires both `extract_pdfs.sh` and `prepare_docs.sh` in the
@@ -100,6 +104,9 @@ entries. It accepts one or more absolute paths or `file://` URIs. Every run gets
 its own `data/prepared_docs/run-*` staging directory, so an earlier extracted
 batch cannot silently enter a later dataset. The configured
 `data/processed/manifest.json` remains the authoritative gate artifact.
+Domain-specific targets and exclusions are stored only in the generated
+`run-*-dataset-policy.json`. Reusable scripts and workflow configuration contain
+only the generic policy schema and deterministic filtering engine.
 
 ## Verification workflow
 

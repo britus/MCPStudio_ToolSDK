@@ -13,7 +13,7 @@ from typing import Any
 from .config import load_config, nested, resolve_path
 from .output_cleanup import reset_generated_directory
 from .prepare import CodeChunk, chunk_source
-from .scanner import scan_project
+from .scanner import SourceFile, scan_project
 
 
 def _document_reproduction_record(
@@ -125,13 +125,52 @@ def _validate_policy(value: Any) -> dict[str, Any]:
     ):
         raise ValueError("requiredSubjects must be a non-empty array of strings")
     required_subjects = {item.strip() for item in required}
+    policy_format = value.get("format", 1)
+    if not isinstance(policy_format, int) or isinstance(policy_format, bool):
+        raise TypeError("format must be an integer")
+    content_scope = value.get("contentScope")
+    if policy_format >= 2 and not isinstance(content_scope, dict):
+        raise ValueError("contentScope must be an object for dataset policy format 2")
+    if content_scope is not None:
+        if not isinstance(content_scope, dict):
+            raise TypeError("contentScope must be an object")
+        for key in ("targets", "boundaries", "exclusions"):
+            items = content_scope.get(key, [])
+            if not isinstance(items, list) or not all(
+                isinstance(item, str) and item.strip() for item in items
+            ):
+                raise ValueError(f"contentScope.{key} must be an array of non-empty strings")
+        if policy_format >= 2 and not content_scope.get("targets"):
+            raise ValueError("contentScope.targets must contain at least one target")
     sources = value.get("sources", [])
     if not isinstance(sources, list) or not sources:
         raise ValueError("sources must be a non-empty array")
     covered_subjects: set[str] = set()
+    rule_ids: set[str] = set()
     for index, source in enumerate(sources):
         if not isinstance(source, dict) or not isinstance(source.get("path"), str):
             raise TypeError(f"sources[{index}].path must be a string")
+        assessment = source.get("contentAssessment")
+        if policy_format >= 2 and not isinstance(assessment, dict):
+            raise ValueError(f"sources[{index}].contentAssessment must be an object")
+        if assessment is not None:
+            if not isinstance(assessment, dict):
+                raise TypeError(f"sources[{index}].contentAssessment must be an object")
+            if assessment.get("classification") not in {
+                "target-only",
+                "shared-target-applicable",
+                "mixed-filtered",
+            }:
+                raise ValueError(
+                    f"sources[{index}].contentAssessment.classification is invalid"
+                )
+            if (
+                not isinstance(assessment.get("evidence"), str)
+                or not assessment["evidence"].strip()
+            ):
+                raise ValueError(
+                    f"sources[{index}].contentAssessment.evidence must be a non-empty string"
+                )
         subjects = source.get("subjects", [])
         if not isinstance(subjects, list) or not subjects or not all(
             isinstance(item, str) and item.strip() for item in subjects
@@ -147,6 +186,43 @@ def _validate_policy(value: Any) -> dict[str, Any]:
                 f"requiredSubjects: {', '.join(sorted(unknown_subjects))}"
             )
         covered_subjects.update(normalized_subjects)
+        rules = source.get("contentRules", [])
+        if not isinstance(rules, list):
+            raise TypeError(f"sources[{index}].contentRules must be an array")
+        for rule_index, rule in enumerate(rules):
+            label = f"sources[{index}].contentRules[{rule_index}]"
+            if not isinstance(rule, dict):
+                raise TypeError(f"{label} must be an object")
+            for key in ("id", "start", "end", "reason", "evidence"):
+                if not isinstance(rule.get(key), str) or not rule[key].strip():
+                    raise ValueError(f"{label}.{key} must be a non-empty string")
+            if rule["id"] in rule_ids:
+                raise ValueError(f"Duplicate content rule id: {rule['id']}")
+            rule_ids.add(rule["id"])
+            if rule.get("action") != "exclude-section":
+                raise ValueError(f"{label}.action must be 'exclude-section'")
+            if rule.get("origin") not in {"human-explicit", "machine-derived"}:
+                raise ValueError(
+                    f"{label}.origin must be 'human-explicit' or 'machine-derived'"
+                )
+            for key in ("startOccurrence", "endOccurrence"):
+                occurrence = rule.get(key, 1)
+                if (
+                    not isinstance(occurrence, int)
+                    or isinstance(occurrence, bool)
+                    or occurrence < 1
+                ):
+                    raise ValueError(f"{label}.{key} must be a positive integer")
+            if not isinstance(rule.get("caseSensitive", False), bool):
+                raise TypeError(f"{label}.caseSensitive must be a Boolean")
+        if (
+            assessment is not None
+            and assessment.get("classification") == "mixed-filtered"
+            and not rules
+        ):
+            raise ValueError(
+                f"sources[{index}] is mixed-filtered but has no contentRules"
+            )
     missing_subjects = required_subjects - covered_subjects
     if missing_subjects:
         raise ValueError(
@@ -171,6 +247,132 @@ def _policy_source_map(policy: dict[str, Any] | None) -> dict[str, list[str]]:
         key = Path(item["path"]).as_posix().lstrip("./")
         result[key] = sorted({value.strip() for value in item["subjects"] if value.strip()})
     return result
+
+
+def _policy_rule_map(policy: dict[str, Any] | None) -> dict[str, list[dict[str, Any]]]:
+    if not policy:
+        return {}
+    result: dict[str, list[dict[str, Any]]] = {}
+    for item in policy["sources"]:
+        key = Path(item["path"]).as_posix().lstrip("./")
+        result[key] = list(item.get("contentRules", []))
+    return result
+
+
+def _matching_line(
+    lines: list[str],
+    anchor: str,
+    occurrence: int | None,
+    *,
+    start_at: int,
+    case_sensitive: bool,
+    label: str,
+) -> int:
+    needle = anchor if case_sensitive else anchor.casefold()
+    matches = []
+    for index in range(start_at, len(lines)):
+        haystack = lines[index] if case_sensitive else lines[index].casefold()
+        if needle in haystack:
+            matches.append(index)
+    if occurrence is None:
+        if not matches:
+            raise ValueError(f"Content rule {label} anchor not found: {anchor}")
+        if len(matches) != 1:
+            raise ValueError(
+                f"Content rule {label} anchor is ambiguous ({len(matches)} matches): "
+                f"{anchor}"
+            )
+        return matches[0]
+    if len(matches) < occurrence:
+        raise ValueError(
+            f"Content rule {label} anchor not found at occurrence {occurrence}: {anchor}"
+        )
+    return matches[occurrence - 1]
+
+
+def _content_filtered_chunks(
+    source: SourceFile,
+    rules: list[dict[str, Any]],
+    chunk_lines: int,
+    overlap_lines: int,
+) -> tuple[list[CodeChunk], list[dict[str, Any]], int]:
+    if not rules:
+        return list(chunk_source(source, chunk_lines, overlap_lines)), [], 0
+    if chunk_lines < 2:
+        raise ValueError("chunk_lines must be at least 2")
+    if overlap_lines < 0 or overlap_lines >= chunk_lines:
+        raise ValueError("overlap_lines must be >= 0 and smaller than chunk_lines")
+
+    lines = source.text.splitlines(keepends=True)
+    excluded: set[int] = set()
+    report: list[dict[str, Any]] = []
+    for rule in rules:
+        case_sensitive = bool(rule.get("caseSensitive", False))
+        start = _matching_line(
+            lines,
+            rule["start"],
+            rule.get("startOccurrence"),
+            start_at=0,
+            case_sensitive=case_sensitive,
+            label=f"{rule['id']} start",
+        )
+        end = _matching_line(
+            lines,
+            rule["end"],
+            rule.get("endOccurrence"),
+            start_at=start + 1,
+            case_sensitive=case_sensitive,
+            label=f"{rule['id']} end",
+        )
+        if end <= start:
+            raise ValueError(f"Content rule {rule['id']} has an empty or reversed section")
+        rule_lines = set(range(start, end))
+        excluded.update(rule_lines)
+        report.append(
+            {
+                "id": rule["id"],
+                "action": rule["action"],
+                "origin": rule["origin"],
+                "reason": rule["reason"],
+                "evidence": rule["evidence"],
+                "start_line": start + 1,
+                "end_line": end,
+                "excluded_lines": len(rule_lines),
+            }
+        )
+
+    if lines and len(excluded) >= len(lines):
+        raise ValueError(f"Content rules exclude the complete source: {source.relative_path}")
+
+    chunks: list[CodeChunk] = []
+    block_start = 0
+    while block_start < len(lines):
+        while block_start < len(lines) and block_start in excluded:
+            block_start += 1
+        if block_start >= len(lines):
+            break
+        block_end = block_start
+        while block_end < len(lines) and block_end not in excluded:
+            block_end += 1
+        step = chunk_lines - overlap_lines
+        for offset in range(block_start, block_end, step):
+            selected = lines[offset : min(offset + chunk_lines, block_end)]
+            content = "".join(selected).rstrip()
+            if content.strip():
+                chunks.append(
+                    CodeChunk(
+                        project=source.project,
+                        path=source.relative_path,
+                        start_line=offset + 1,
+                        end_line=offset + len(selected),
+                        content=content,
+                        source_sha256=source.sha256,
+                    )
+                )
+            if offset + chunk_lines >= block_end:
+                break
+        block_start = block_end
+    return chunks, report, len(excluded)
 
 
 def _records_for_chunk(
@@ -425,10 +627,13 @@ def prepare_documents(
     validation_records: list[dict[str, Any]] = []
     manifest_projects: list[dict[str, Any]] = []
     policy_sources = _policy_source_map(policy)
+    policy_rules = _policy_rule_map(policy)
     seen_hashes: dict[str, str] = {}
     duplicate_files: list[dict[str, str]] = []
     observed_policy_paths: set[str] = set()
     unmapped_files: list[str] = []
+    content_filter_report: list[dict[str, Any]] = []
+    excluded_line_count = 0
 
     for project_path in projects:
         sources, skipped = scan_project(project_path, max_file_bytes=max_file_bytes)
@@ -446,10 +651,14 @@ def prepare_documents(
         project_train = 0
         project_validation = 0
         subjects_by_hash: dict[str, set[str]] = defaultdict(set)
+        rules_by_hash: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for source in sources:
             subjects_by_hash[source.sha256].update(
                 policy_sources.get(source.relative_path, [])
             )
+            for rule in policy_rules.get(source.relative_path, []):
+                if rule not in rules_by_hash[source.sha256]:
+                    rules_by_hash[source.sha256].append(rule)
         records_by_path: dict[str, list[dict[str, Any]]] = {}
         validation_by_path: dict[str, list[dict[str, Any]]] = {}
         for source in sources:
@@ -466,7 +675,15 @@ def prepare_documents(
                 continue
             seen_hashes[source.sha256] = source_key
             subjects = sorted(subjects_by_hash[source.sha256])
-            chunks = list(chunk_source(source, chunk_lines, overlap_lines))
+            chunks, source_filter_report, source_excluded_lines = _content_filtered_chunks(
+                source,
+                rules_by_hash[source.sha256],
+                chunk_lines,
+                overlap_lines,
+            )
+            for item in source_filter_report:
+                content_filter_report.append({"source": source_key, **item})
+            excluded_line_count += source_excluded_lines
             if policy:
                 train_chunks, validation_chunks = _blocked_split(
                     chunks, validation_ratio, seed
@@ -655,6 +872,21 @@ def prepare_documents(
             "actual_subject_imbalance": actual_subject_imbalance,
             "source_balance_pass": source_balance_pass,
             "subject_balance_pass": subject_balance_pass,
+            "content_scope": policy.get("contentScope", {}) if policy else {},
+            "content_assessments": [
+                {
+                    "source": item["path"],
+                    **item["contentAssessment"],
+                    "rule_ids": [rule["id"] for rule in item.get("contentRules", [])],
+                }
+                for item in policy.get("sources", [])
+                if item.get("contentAssessment")
+            ]
+            if policy
+            else [],
+            "content_filtering_enabled": any(policy_rules.values()),
+            "content_filter_rules_applied": content_filter_report,
+            "excluded_line_count": excluded_line_count,
         },
         "settings": {
             "chunk_lines": chunk_lines,
