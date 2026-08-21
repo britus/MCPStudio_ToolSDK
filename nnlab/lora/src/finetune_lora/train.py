@@ -10,6 +10,7 @@ from typing import Any
 from .config import load_config, model_source, nested, resolve_path
 from .dataset import CompletionCollator, CompletionDataset
 from .modeling import detect_model_backend, load_model, load_tokenizer
+from .output_cleanup import reset_generated_directory
 
 
 def _training_arguments(values: dict[str, Any], has_validation: bool, runtime: Any) -> Any:
@@ -88,7 +89,11 @@ def _train_transformers(config_path: str, resume_from_checkpoint: str | None = N
         else None
     )
     output_dir = resolve_path(nested(config, "training", "output_dir"))
-    output_dir.mkdir(parents=True, exist_ok=True)
+    clean_output_dir = bool(nested(config, "training", "clean_output_dir", True))
+    if clean_output_dir and not resume_from_checkpoint:
+        output_dir = reset_generated_directory(output_dir)
+    else:
+        output_dir.mkdir(parents=True, exist_ok=True)
     values = {
         "output_dir": str(output_dir),
         "epochs": float(nested(config, "training", "epochs", 2.0)),

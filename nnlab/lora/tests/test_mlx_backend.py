@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from finetune_lora.mlx_backend import (
     _mlx_prompt_checks,
+    _prompt_pass_rate,
     _restore_best_checkpoint,
     prepare_mlx_data,
     synchronize_training_chat_template,
@@ -16,6 +17,20 @@ from finetune_lora.modeling import detect_model_backend
 
 
 class MlxBackendTests(unittest.TestCase):
+    def test_unscored_semantic_checks_do_not_report_an_artificial_pass(self) -> None:
+        checks = [{"passed": None, "scored": False}]
+
+        self.assertIsNone(_prompt_pass_rate(checks))
+
+    def test_pass_rate_uses_only_deterministically_scored_checks(self) -> None:
+        checks = [
+            {"passed": None, "scored": False},
+            {"passed": True, "scored": True},
+            {"passed": False, "scored": True},
+        ]
+
+        self.assertEqual(_prompt_pass_rate(checks), 0.5)
+
     def test_synchronizes_preferred_training_chat_template(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             model = Path(directory)

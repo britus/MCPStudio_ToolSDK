@@ -762,6 +762,9 @@ function verifyMaster(params) {
     const reportPresent = reportPath
         ? MCPStudio.fileExists(resolveProjectPath(root, reportPath))
         : false;
+    const promptPassRate = result && typeof result.promptPassRate === 'number'
+        ? result.promptPassRate
+        : undefined;
     return shared.setProcessResult(
         run.success && result !== null && reportPresent,
         'finetuneVerifyMaster completed and produced a verification report.',
@@ -774,7 +777,7 @@ function verifyMaster(params) {
             promptsFile: promptsFile || '',
             reportPath: reportPath,
             promptCount: result && result.promptCount || 0,
-            promptPassRate: result && result.promptPassRate
+            promptPassRate: promptPassRate
         },
         run.stdout,
         run.stderr

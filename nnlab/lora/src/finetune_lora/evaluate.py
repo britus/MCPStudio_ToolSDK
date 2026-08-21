@@ -65,7 +65,8 @@ def _prompt_checks(
         truncated = finish_reason == "length"
         required = item.get("must_contain", [])
         forbidden = item.get("must_not_contain", [])
-        passed = not truncated and all(
+        scored = bool(required or forbidden)
+        passed = scored and not truncated and all(
             value in generated for value in required
         ) and all(
             value not in generated for value in forbidden
@@ -73,7 +74,8 @@ def _prompt_checks(
         checks.append(
             {
                 "id": item.get("id", f"check-{len(checks) + 1}"),
-                "passed": passed,
+                "passed": passed if scored else None,
+                "scored": scored,
                 "must_contain": required,
                 "must_not_contain": forbidden,
                 "output": generated,
@@ -163,10 +165,15 @@ def _evaluate_transformers(
         "perplexity": math.exp(min(loss, 20)),
         "predicted_tokens": predicted_tokens,
         "prompt_checks": checks,
-        "prompt_pass_rate": (
-            sum(check["passed"] for check in checks) / len(checks) if checks else None
-        ),
+        "prompt_pass_rate": _prompt_pass_rate(checks),
     }
+
+
+def _prompt_pass_rate(checks: list[dict[str, Any]]) -> float | None:
+    scored = [check for check in checks if check.get("scored") is True]
+    if not scored:
+        return None
+    return sum(check.get("passed") is True for check in scored) / len(scored)
 
 
 def evaluate(config_path: str, adapter: str | None, prompts: str | None) -> dict[str, Any]:

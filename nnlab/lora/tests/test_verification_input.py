@@ -48,13 +48,164 @@ acceptance_criteria = "Review all runtime cases independently."
     assert payload["schemaVersion"] == 1
     assert payload["projectRoot"] == str(tmp_path)
     assert payload["configPath"] == "config.toml"
+    assert payload["promptsFile"] == "data/verifications/run-test/eval-prompts.jsonl"
+    assert payload["outputFile"] == "artifacts/verification-run-test.json"
     assert payload["subjectContext"] == "Runtime subject and source constraints."
     assert payload["acceptanceCriteria"] == "Review all runtime cases independently."
     assert payload["master"] == "artifacts/master"
     assert payload["adapters"] == ["artifacts/candidate"]
     assert payload["weights"] == ["0.25", "0.75"]
-    assert payload["output"] == "artifacts/merged"
+    assert payload["output"] == "artifacts/merged-run-test"
     assert payload["force"] is False
+    assert payload["trainingRun"]["promptSource"] == "generated"
+    assert payload["trainingRun"]["promptCount"] == 1
+    prompt_lines = (
+        tmp_path / "data/verifications/run-test/eval-prompts.jsonl"
+    ).read_text(encoding="utf-8").splitlines()
+    assert len(prompt_lines) == 1
+    generated_prompt = json.loads(prompt_lines[0])
+    assert generated_prompt["id"] == "training-objective-the-documented-scope-key-technical-behavior-and-limitations"
+    assert generated_prompt["must_contain"] == []
+    assert generated_prompt["must_not_contain"] == []
+    assert "training objective" in generated_prompt["prompt"][0]["content"]
+    assert "training objective" in generated_prompt["prompt"][1]["content"]
+
+
+def test_generates_prompts_from_release_boundaries(tmp_path: Path) -> None:
+    adapter = tmp_path / "candidate"
+    adapter.mkdir()
+    (adapter / "adapters.safetensors").write_bytes(b"weights")
+    (adapter / "adapter_config.json").write_text("{}", encoding="utf-8")
+    objective = tmp_path / "training-radio.txt"
+    objective.write_text(
+        """Training objective: radio documentation
+Focus on the Radio-X transceiver.
+
+Release boundaries
+Training completion is not a verification PASS.
+Verify address selection independently.
+Check unsupported-claim behavior during verification.
+Require explicit PASS before merge.
+
+Expected discovery result
+Return approved=true when sources are available.
+""",
+        encoding="utf-8",
+    )
+    config = tmp_path / "config.toml"
+    config.write_text(
+        """
+[verification]
+output_file = "verification.json"
+[merge]
+master = "master"
+output = "merged"
+""".strip(),
+        encoding="utf-8",
+    )
+
+    output = create_verification_input(
+        config,
+        adapter,
+        objective,
+        project_root=tmp_path,
+        run_name="run-focuses",
+    )
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    prompts_path = tmp_path / payload["promptsFile"]
+    prompts = [
+        json.loads(line)
+        for line in prompts_path.read_text(encoding="utf-8").splitlines()
+    ]
+
+    assert [item["verification_focus"] for item in prompts] == [
+        "address selection",
+        "unsupported-claim behavior",
+    ]
+    assert all(
+        "radio documentation" in message["content"]
+        for item in prompts
+        for message in item["prompt"]
+    )
+    assert all(
+        "Radio-X transceiver" in message["content"]
+        for item in prompts
+        for message in item["prompt"]
+    )
+    assert payload["trainingRun"]["promptCount"] == 2
+
+
+def test_can_keep_configured_shared_output_paths(tmp_path: Path) -> None:
+    adapter = tmp_path / "candidate"
+    adapter.mkdir()
+    (adapter / "adapters.safetensors").write_bytes(b"weights")
+    (adapter / "adapter_config.json").write_text("{}", encoding="utf-8")
+    objective = tmp_path / "objective.md"
+    objective.write_text("Runtime context", encoding="utf-8")
+    config = tmp_path / "config.toml"
+    config.write_text(
+        """
+[verification]
+output_file = "verification.json"
+[merge]
+master = "master"
+output = "merged"
+[verification_input]
+run_scoped_outputs = false
+""".strip(),
+        encoding="utf-8",
+    )
+
+    output = create_verification_input(
+        config,
+        adapter,
+        objective,
+        project_root=tmp_path,
+        run_name="run-shared",
+    )
+    payload = json.loads(output.read_text(encoding="utf-8"))
+
+    assert payload["output"] == "merged"
+    assert payload["outputFile"] == "verification.json"
+
+
+def test_uses_configured_prompts_when_generation_is_disabled(tmp_path: Path) -> None:
+    adapter = tmp_path / "candidate"
+    adapter.mkdir()
+    (adapter / "adapters.safetensors").write_bytes(b"weights")
+    (adapter / "adapter_config.json").write_text("{}", encoding="utf-8")
+    objective = tmp_path / "objective.md"
+    objective.write_text("Runtime context", encoding="utf-8")
+    prompts = tmp_path / "eval/manual.jsonl"
+    prompts.parent.mkdir()
+    prompts.write_text('{"id":"manual","prompt":[{"role":"user","content":"Test"}]}\n')
+    config = tmp_path / "config.toml"
+    config.write_text(
+        """
+[verification]
+prompts_file = "eval/manual.jsonl"
+output_file = "verification.json"
+[merge]
+master = "master"
+output = "merged"
+[verification_input]
+auto_generate_prompts = false
+""".strip(),
+        encoding="utf-8",
+    )
+
+    output = create_verification_input(
+        config,
+        adapter,
+        objective,
+        project_root=tmp_path,
+        run_name="run-manual",
+    )
+    payload = json.loads(output.read_text(encoding="utf-8"))
+
+    assert payload["promptsFile"] == "eval/manual.jsonl"
+    assert payload["trainingRun"]["promptSource"] == "configured"
+    assert payload["trainingRun"]["promptCount"] == 1
 
 
 def test_uses_equal_weights_when_configured_count_does_not_match(

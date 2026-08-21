@@ -22,8 +22,8 @@ The v3 lifecycle deliberately separates training, candidate creation, verificati
 6. Run a one-iteration MLX smoke test.
 7. Run full training only after the smoke test passes. Validation-based checkpoint selection,
    early stopping, and best-checkpoint restoration are controlled by the TOML configuration.
-8. Generate a reusable `data/verifications/run-*/verification_input.json` from the training
-   objective and trained adapter.
+8. Generate a reusable `data/verifications/run-*/verification_input.json` plus a run-specific
+   held-out prompt suite from the training objective and trained adapter.
 9. In a separate verification run, merge into a new candidate directory and verify that exact
    merged candidate against held-out prompts.
 10. Install or update the LM Studio model only after an explicit `PASS` decision.
@@ -118,6 +118,11 @@ Important sections include:
 Relative paths are resolved from the `nnlab/lora` project root because every wrapper changes to
 that directory before launching Python. `model.local_files_only` must remain `true`.
 
+The v3 configuration cleans `data.output_dir` before rebuilding a dataset and cleans the selected
+Smoke or Candidate `training.output_dir` before a new, non-resumed training run. Cleanup is limited
+to nested project directories and refuses project roots, top-level directories, symbolic links, and
+directories containing a selected input. Resume runs preserve their existing checkpoint directory.
+
 The generic [`config/default.toml`](config/default.toml) is useful for basic source-code experiments,
 but it does not define the full v3 verification, merge, and deployment lifecycle.
 
@@ -195,7 +200,15 @@ plain input paths alone.
 
 `--objective-file` is used only for full training. After training succeeds, it creates a reusable
 `verification_input.json` containing the objective-derived verification context and exact merge and
-verification paths. It does not place the objective itself into the training dataset.
+verification paths. By default, `verification_input.auto_generate_prompts = true` also creates a
+run-specific `eval-prompts.jsonl` from the objective's `Release boundaries`. Set the option to
+`false` to require the manually curated `verification.prompts_file` instead. Generated prompts are
+useful for workflow tests, but a release decision should eventually use human-reviewed prompts.
+Generated prompts carry the objective's named training scope but have no mechanical keyword score;
+their answers require the workflow's semantic evidence review. Merge and report outputs also receive
+the run name by default, so repeated verification runs never overwrite an earlier candidate or
+report. Set `verification_input.run_scoped_outputs = false` only when shared output paths are
+intentional. The objective itself is never placed into the training dataset.
 
 To resume a supported training backend from a checkpoint:
 

@@ -173,6 +173,8 @@ def _strip_reasoning(text: str) -> str:
     incomplete = re.search(r"<\|channel>thought", stripped)
     if incomplete:
         stripped = stripped[: incomplete.start()]
+    stripped = re.sub(r"<\|channel>[a-z_]+", "", stripped, flags=re.IGNORECASE)
+    stripped = stripped.replace("<channel|>", "").replace("<|think|>", "")
     return stripped.strip()
 
 

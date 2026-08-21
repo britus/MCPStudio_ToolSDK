@@ -20,6 +20,12 @@ class ChatReasoningTests(unittest.TestCase):
         text = "<|channel>thought\nreasoning\n<channel|>\n\nAnswer\n\n"
         self.assertEqual(_strip_reasoning(text), "Answer")
 
+    def test_strips_orphaned_channel_tokens(self) -> None:
+        self.assertEqual(_strip_reasoning("<channel|>Final answer"), "Final answer")
+
+    def test_strips_named_channel_tokens_from_answer(self) -> None:
+        self.assertEqual(_strip_reasoning("<|channel>final\nAnswer"), "Answer")
+
 
 if __name__ == "__main__":
     unittest.main()

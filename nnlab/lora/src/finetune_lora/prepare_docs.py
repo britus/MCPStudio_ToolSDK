@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import load_config, nested, resolve_path
+from .output_cleanup import reset_generated_directory
 from .prepare import CodeChunk, chunk_source
 from .scanner import scan_project
 
@@ -709,6 +710,21 @@ def main() -> None:
     )
     manifest_path = resolve_path(args.manifest_file or nested(config, "data", "manifest_file"))
     policy = _load_policy(args.policy_file)
+    clean_output_dir = bool(nested(config, "data", "clean_output_dir", True))
+    configured_output_dir = nested(config, "data", "output_dir", None)
+    if clean_output_dir and configured_output_dir:
+        output_dir = resolve_path(configured_output_dir)
+        for generated_path in (train_path, validation_path, manifest_path):
+            try:
+                generated_path.relative_to(output_dir)
+            except ValueError as error:
+                raise ValueError(
+                    f"Configured dataset output is outside data.output_dir: {generated_path}"
+                ) from error
+        reset_generated_directory(
+            output_dir,
+            protected_paths=args.project,
+        )
     manifest = prepare_documents(
         args.project,
         train_path,

@@ -1,11 +1,67 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
-from finetune_lora.prepare_docs import _balance_training_records, prepare_documents
+from finetune_lora.prepare_docs import (
+    _balance_training_records,
+    prepare_documents,
+)
+from finetune_lora.prepare_docs import main as prepare_documents_main
+
+
+def test_cli_cleans_configured_dataset_output_before_rebuild(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    docs = tmp_path / "runtime-sources"
+    docs.mkdir()
+    (docs / "manual.txt").write_text(
+        "".join(f"documented line {index}\n" for index in range(30)),
+        encoding="utf-8",
+    )
+    output = tmp_path / "data" / "processed" / "training"
+    output.mkdir(parents=True)
+    (output / "stale-record.jsonl").write_text("stale", encoding="utf-8")
+    config = tmp_path / "config.toml"
+    config.write_text(
+        """
+[data]
+output_dir = "data/processed/training"
+clean_output_dir = true
+train_file = "data/processed/training/train.jsonl"
+validation_file = "data/processed/training/validation.jsonl"
+manifest_file = "data/processed/training/manifest.json"
+chunk_lines = 10
+overlap_lines = 0
+max_file_bytes = 1000000
+validation_ratio = 0.1
+seed = 42
+""".strip(),
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "prepare-docs",
+            "--config",
+            str(config),
+            "--project",
+            str(docs),
+        ],
+    )
+
+    prepare_documents_main()
+
+    assert not (output / "stale-record.jsonl").exists()
+    assert (output / "train.jsonl").is_file()
+    assert (output / "validation.jsonl").is_file()
+    assert (output / "manifest.json").is_file()
 
 
 def test_prepare_uses_document_type_in_prompts(tmp_path: Path) -> None:

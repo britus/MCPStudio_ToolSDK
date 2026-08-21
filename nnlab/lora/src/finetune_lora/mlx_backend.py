@@ -11,9 +11,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .chat import _strip_reasoning
 from .config import load_config, model_source, nested, resolve_path
 from .dataset import fold_system_messages, read_jsonl, split_record
 from .modeling import load_tokenizer
+from .output_cleanup import reset_generated_directory
 
 PREFERRED_CHAT_TEMPLATE = "gemma-4-chat-template-fixed.jinja"
 
@@ -216,7 +218,11 @@ def train_mlx(
     output_dir = resolve_path(nested(config, "training", "output_dir"))
     if smoke_test:
         output_dir = output_dir.with_name(output_dir.name + "_smoke")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    clean_output_dir = bool(nested(config, "training", "clean_output_dir", True))
+    if clean_output_dir and not resume_adapter_file:
+        output_dir = reset_generated_directory(output_dir)
+    else:
+        output_dir.mkdir(parents=True, exist_ok=True)
     max_seq_length = (
         min(int(nested(config, "data", "max_seq_length", 2048)), 1200)
         if smoke_test
@@ -372,22 +378,6 @@ def train_mlx(
 
 
 
-def _strip_reasoning(text: str) -> str:
-    """Remove Gemma-4 thinking channel blocks from generated text.
-
-    Strips complete blocks and trailing incomplete reasoning blocks so that
-    truncated generations still return only the final channel content.
-    """
-    pattern = re.compile(r"<\|channel>thought.*?<channel\|>", re.DOTALL)
-    stripped = pattern.sub("", text)
-    # If generation was cut off inside a thinking block, drop everything from
-    # the opening tag onwards.
-    incomplete = re.search(r"<\|channel>thought", stripped)
-    if incomplete:
-        stripped = stripped[: incomplete.start()]
-    return stripped.strip()
-
-
 def _mlx_prompt_checks(
     model: Any,
     tokenizer: Any,
@@ -429,7 +419,8 @@ def _mlx_prompt_checks(
         truncated = finish_reason != "stop"
         required = item.get("must_contain", [])
         forbidden = item.get("must_not_contain", [])
-        passed = not truncated and all(
+        scored = bool(required or forbidden)
+        passed = scored and not truncated and all(
             value in generated for value in required
         ) and all(
             value not in generated for value in forbidden
@@ -437,7 +428,8 @@ def _mlx_prompt_checks(
         checks.append(
             {
                 "id": item.get("id", f"check-{len(checks) + 1}"),
-                "passed": passed,
+                "passed": passed if scored else None,
+                "scored": scored,
                 "must_contain": required,
                 "must_not_contain": forbidden,
                 "output": generated,
@@ -525,7 +517,12 @@ def evaluate_mlx(
         "perplexity": float(match.group(2)) if match else None,
         "test_batches": int(nested(config, "training", "mlx_eval_batches", 20)),
         "prompt_checks": checks,
-        "prompt_pass_rate": (
-            sum(check["passed"] for check in checks) / len(checks) if checks else None
-        ),
+        "prompt_pass_rate": _prompt_pass_rate(checks),
     }
+
+
+def _prompt_pass_rate(checks: list[dict[str, Any]]) -> float | None:
+    scored = [check for check in checks if check.get("scored") is True]
+    if not scored:
+        return None
+    return sum(check.get("passed") is True for check in scored) / len(scored)

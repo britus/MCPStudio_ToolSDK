@@ -10,6 +10,8 @@ trust_remote_code = false
 local_files_only = true
 
 [data]
+output_dir = "data/processed/finetune_lora"
+clean_output_dir = true
 train_file = "data/processed/finetune_lora/train.jsonl"
 validation_file = "data/processed/finetune_lora/validation.jsonl"
 manifest_file = "data/processed/finetune_lora/manifest.json"
@@ -30,6 +32,7 @@ coverage_failure_mode = "error"
 [training]
 backend = "auto"
 output_dir = "artifacts/finetune_lora_candidate"
+clean_output_dir = true
 epochs = 2.0
 learning_rate = 0.00002
 train_batch_size = 1
@@ -87,6 +90,8 @@ output_file = "artifacts/finetune_verification.json"
 
 [verification_input]
 output_root = "data/verifications"
+auto_generate_prompts = true
+run_scoped_outputs = true
 acceptance_criteria = "Execute every held-out prompt and review every generated answer for factual relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage and repeated control tokens. Process success or keyword matches alone are insufficient for PASS."
 
 [merge]

@@ -23,6 +23,15 @@ def test_release_metadata_is_explicit_and_not_part_of_object_names() -> None:
     assert all("_v3" not in path.name for path in RELEASE_CONFIG_ROOT.rglob("*.json"))
 
 
+def test_v3_training_outputs_are_cleaned_before_fresh_runs() -> None:
+    with (PROJECT_ROOT / "config" / "mcpstudio-v3.toml").open("rb") as handle:
+        config = tomllib.load(handle)
+
+    assert config["data"]["output_dir"] == "data/processed/finetune_lora"
+    assert config["data"]["clean_output_dir"] is True
+    assert config["training"]["clean_output_dir"] is True
+
+
 def test_training_request_router_is_an_executed_llm_agent() -> None:
     workflow = _training_workflow()
     router = next(
@@ -215,6 +224,8 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
     assert "unresolvedConditionalSubjects" in instruction
     assert "compatible with approval" in instruction
     assert "RAG snippets cannot prove" in instruction
+    assert "generated list or heading" in instruction
+    assert "absence is then a warning, not a blocker" in instruction
     workflow = _training_workflow()
     finder = next(
         agent
@@ -222,7 +233,8 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
         if agent["name"] == "Training Document Finder"
     )
     assert "Never promote a conditional subject to required" in finder["instruction"]
-    assert "conditional subjects warn" in next(
+    assert "generated list or heading alone is not such intent" in finder["instruction"]
+    assert "generated verification and conditional subjects warn" in next(
         prop["value"]
         for prop in finder["properties"]
         if prop["key"] == "discoveryPolicy"
