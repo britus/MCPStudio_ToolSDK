@@ -11,6 +11,7 @@
 **/eval/
 **/models/
 **/__pycache__/
+**/*.egg-info/
 .venv/
 
 **/.ruff_cache/

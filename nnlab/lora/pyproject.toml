@@ -15,8 +15,7 @@ dev = [
   "ruff>=0.8",
 ]
 docs = [
-  "docling>=2.121,<3",
-  "pypdf>=5",
+  "docling>=2.121,<2.122",
 ]
 train = [
   "accelerate>=1.2",
