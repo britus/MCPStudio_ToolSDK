@@ -11,8 +11,13 @@ Treat this file as a runtime objective and retrieval specification.
 Do not treat this file as an authoritative schematic or component datasheet.
 Do not invent electrical values, register values, timings, or pin assignments.
 Keep module-level facts separate from integrated-circuit facts.
-Keep I2C facts separate from SPI facts.
-Do not claim an SPI interface for a module unless a selected source documents it.
+Keep transport-specific I2C facts separate from transport-specific SPI facts.
+Treat MCP23008 (I2C) and MCP23S08 (SPI) as interface variants of the same MCP23X08 device family.
+Accept cross-documentation between those variants for shared GPIO and register behavior.
+Do not reject a Bokara source solely because its device suffix and documented bus are inconsistent.
+Treat such a suffix/interface mismatch as documentation ambiguity and preserve the source wording.
+Do not transfer I2C addressing, SPI opcodes, bus wiring, or transport timing between variants.
+This variant tolerance does not reinterpret the LTC2309 interface or any unrelated device family.
 
 Required source documents
 Retrieve Bokara_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.
@@ -22,7 +27,7 @@ Retrieve an authoritative LTC2309 component datasheet when present in RAG.
 Retrieve an authoritative MCP23008 component datasheet when present in RAG.
 Retrieve module schematics only when available as readable source material.
 Retrieve application notes only when their device applicability is explicit.
-Retrieve SPI documents only for independently documented SPI hardware.
+Retrieve SPI documents for independently documented SPI hardware and MCP23S08 family-variant context.
 Use exact local file paths returned by RAG.
 Never infer a filesystem path from a document title.
 Deduplicate content-identical document copies by content hash.
@@ -70,8 +75,10 @@ Map a component datasheet only to component-level behavior.
 Map the 4DI+4DO module datasheet to module-level MCP23008 subjects.
 Map schematics to connector, jumper, isolation, and circuit subjects.
 Map application notes only to explicitly supported procedures.
-Map SPI sources only to hardware that actually exposes SPI.
-Do not map the I2C modules to SPI merely because SPI is in the objective.
+Map transport-neutral MCP23X08 register and GPIO behavior across MCP23008/MCP23S08 variants when
+the selected sources show that the behavior is shared.
+Map I2C addressing and SPI protocol details only to the variant that exposes that transport.
+Do not map the LTC2309 module to SPI merely because SPI appears in cross-documentation.
 Require direct evidence for every source-to-subject assignment.
 Mark a requested subject missing when no authoritative source supports it.
 Keep document revision information in evidence.
@@ -267,14 +274,21 @@ Preserve exact byte sequences from authoritative examples.
 SPI boundary requirements
 Search RAG for explicitly requested SPI material.
 Identify whether that material belongs to either selected BOKRA module.
-If no selected module exposes SPI, state that the SPI subject is unsupported.
+Accept MCP23S08 SPI material as family-variant context for an MCP23008-labelled Bokara module.
+Accept a Bokara module document that mixes MCP23008/MCP23S08 naming or I2C/SPI terminology.
+Do not fail verification solely because an answer follows the interface stated by such a Bokara
+source even when the part-number suffix normally identifies the sibling interface variant.
+Treat the naming/interface conflict as a documentation-quality warning, not cross-contamination.
+Require qualification when a statement depends on I2C addressing or SPI framing rather than on
+transport-neutral GPIO/register behavior.
 Do not reinterpret I2C clock and data as an SPI bus.
 Do not invent chip-select, MOSI, MISO, or SPI mode values.
 Keep independently documented SPI boards in separate subjects.
-Require authoritative evidence for every positive SPI claim.
-The SPI boundary is covered when authoritative sources document the selected module as I2C hardware and no SPI interface is documented for that module.
-A separate BOKRA SPI document is not required for this negative documentation boundary.
-State only that SPI is not documented for the selected module; do not claim that SPI hardware is physically absent.
+Accept positive SPI claims supported by a selected Bokara module source or an applicable MCP23S08
+variant source, while retaining the applicable source name and variant.
+The interface boundary is covered when the answer distinguishes shared family behavior from
+transport-specific behavior and reports contradictory Bokara naming without inventing a resolution.
+Do not extend MCP23X08 variant tolerance to the LTC2309 module.
 Return an unresolved conditional warning when the boundary cannot be established.
 Never block I2C training because independent BOKRA SPI material is absent.
 
@@ -322,7 +336,9 @@ Answer in the operator language unless requested otherwise.
 Use exact module and signal names.
 Use exact register names only from component documentation.
 Separate module behavior from chip behavior.
-Separate I2C behavior from SPI behavior.
+Separate transport-specific I2C behavior from transport-specific SPI behavior.
+Allow documented MCP23008/MCP23S08 cross-references for shared family behavior.
+Report inconsistent Bokara suffix/interface naming as ambiguity rather than automatically rejecting it.
 State applicable revision.
 State when documentation is insufficient.
 Avoid unsupported extrapolation.
@@ -339,7 +355,7 @@ Verify digital-I/O direction and latch semantics independently.
 Verify interrupt behavior independently.
 Verify address-selection facts independently.
 Verify electrical limits independently.
-Verify the SPI boundary independently.
+Verify I2C/SPI family-variant and documentation-conflict handling independently.
 Require explicit PASS before merge or deployment.
 
 Expected discovery result
