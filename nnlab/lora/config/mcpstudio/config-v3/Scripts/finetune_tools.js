@@ -480,6 +480,7 @@ function prepareDocuments(params, sid) {
     const output = shared.createProcessOutput();
     const materializedPaths = [];
     const materializedPolicySources = [];
+    const extractionReports = [];
 
     for (let index = 0; index < sourcePaths.length; index += 1) {
         const source = sourcePaths[index];
@@ -491,7 +492,7 @@ function prepareDocuments(params, sid) {
             }
             const extraction = shared.executeProcess(
                 extractScript.value,
-                ['--source', source, '--output', documentDir]
+                ['--source', source, '--output', documentDir, '--config', configPath]
             );
             shared.appendProcessRun(output, 'Extract ' + pathBaseName(source), extraction);
             if (!extraction.success) {
@@ -509,21 +510,59 @@ function prepareDocuments(params, sid) {
                     output.stderr
                 );
             }
-            const extractedPath = shared.joinPath(
-                documentDir,
-                withoutExtension(pathBaseName(source)) + '.txt'
-            );
-            if (!MCPStudio.fileExists(extractedPath)) {
+            const extractionResult = structuredResult(extraction);
+            const extractedDocuments = extractionResult &&
+                extractionResult.engine === 'docling' &&
+                Array.isArray(extractionResult.documents)
+                ? extractionResult.documents
+                : [];
+            if (extractedDocuments.length !== 1) {
                 return shared.setProcessResult(
                     false,
                     '',
-                    'Document preparation stopped because PDF extraction produced no text file.',
+                    'Document preparation stopped because Docling did not report exactly one document.',
                     {
                         operation: 'finetunePrepareDocuments',
                         projectRoot: root,
                         documentPaths: sourcePaths,
                         failedDocument: source,
-                        expectedTextPath: extractedPath,
+                        extractionResult: extractionResult,
+                        stagingDirectory: runRelativePath
+                    },
+                    output.stdout,
+                    output.stderr
+                );
+            }
+            const extractedDocument = extractedDocuments[0];
+            const extractedPath = typeof extractedDocument.materialized_path === 'string'
+                ? extractedDocument.materialized_path
+                : '';
+            const extractedRelativePath =
+                typeof extractedDocument.output_relative_path === 'string' &&
+                extractedDocument.output_relative_path.trim()
+                ? relativePath(
+                    extractedDocument.output_relative_path,
+                    '',
+                    'Docling output_relative_path'
+                )
+                : '';
+            const expectedExtractedPath = extractedRelativePath
+                ? shared.joinPath(documentDir, extractedRelativePath)
+                : '';
+            if (!extractedPath || pathExtension(extractedPath) !== '.md' ||
+                extractedPath !== expectedExtractedPath ||
+                !MCPStudio.fileExists(extractedPath)) {
+                return shared.setProcessResult(
+                    false,
+                    '',
+                    'Document preparation stopped because Docling produced no valid Markdown file.',
+                    {
+                        operation: 'finetunePrepareDocuments',
+                        projectRoot: root,
+                        documentPaths: sourcePaths,
+                        failedDocument: source,
+                        reportedDocument: extractedDocument,
+                        expectedMarkdownPath: expectedExtractedPath,
                         stagingDirectory: runRelativePath
                     },
                     output.stdout,
@@ -534,10 +573,11 @@ function prepareDocuments(params, sid) {
             materializedPolicySources.push({
                 path: shared.joinPath(
                     numberedSegment(index),
-                    withoutExtension(pathBaseName(source)) + '.txt'
+                    extractedRelativePath
                 ),
                 subjects: plan ? plan.sources[index].subjects : []
             });
+            extractionReports.push(extractedDocument);
             continue;
         }
 
@@ -617,6 +657,7 @@ function prepareDocuments(params, sid) {
             policyPath: plan ? policyPath : '',
             documentPaths: sourcePaths,
             materializedPaths: materializedPaths,
+            extractionReports: extractionReports,
             includedFiles: includedFiles,
             sourceCoverage: sourceCoverage,
             policyPass: policyPass,

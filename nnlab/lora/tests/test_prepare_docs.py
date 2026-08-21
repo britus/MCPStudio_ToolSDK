@@ -8,9 +8,57 @@ import pytest
 
 from finetune_lora.prepare_docs import (
     _balance_training_records,
+    chunk_document_source,
     prepare_documents,
 )
 from finetune_lora.prepare_docs import main as prepare_documents_main
+from finetune_lora.scanner import SourceFile
+
+
+def test_markdown_chunks_never_split_tables_or_fenced_blocks(tmp_path: Path) -> None:
+    text = """# Register reference
+Intro line one.
+Intro line two.
+
+| Register | Bit | Meaning |
+|---|---|---|
+| CTRL | 0 | Enable |
+| CTRL | 1 | Reset |
+| STATUS | 0 | Ready |
+| STATUS | 1 | Fault |
+
+## Example
+```c
+write_register(CTRL, ENABLE);
+read_register(STATUS);
+check_ready();
+```
+
+Closing paragraph one.
+Closing paragraph two.
+Closing paragraph three.
+"""
+    path = tmp_path / "manual.md"
+    source = SourceFile(
+        project="docs",
+        root=tmp_path,
+        path=path,
+        relative_path="manual.md",
+        text=text,
+        sha256="fixture",
+    )
+
+    chunks = list(chunk_document_source(source, chunk_lines=8, overlap_lines=2))
+
+    assert len(chunks) >= 2
+    table_chunks = [chunk.content for chunk in chunks if "| CTRL |" in chunk.content]
+    assert table_chunks
+    assert all("| STATUS | 1 | Fault |" in content for content in table_chunks)
+    fence_chunks = [
+        chunk.content for chunk in chunks if "write_register" in chunk.content
+    ]
+    assert fence_chunks
+    assert all("check_ready();\n```" in content for content in fence_chunks)
 
 
 def test_cli_cleans_configured_dataset_output_before_rebuild(
@@ -202,7 +250,9 @@ def test_policy_builds_balanced_non_overlapping_subject_splits(tmp_path: Path) -
     assert manifest["dataset_policy"]["missing_validation_subjects"] == []
 
     train = [json.loads(line) for line in train_path.read_text().splitlines()]
-    validation = [json.loads(line) for line in validation_path.read_text().splitlines()]
+    validation = [
+        json.loads(line) for line in validation_path.read_text().splitlines()
+    ]
     for train_record in train:
         for validation_record in validation:
             train_meta = train_record["metadata"]
@@ -245,9 +295,7 @@ def test_policy_splits_short_document_into_independent_records(tmp_path: Path) -
     assert manifest["dataset_policy"]["missing_train_subjects"] == []
     assert manifest["dataset_policy"]["missing_validation_subjects"] == []
     train = [json.loads(line) for line in train_path.read_text().splitlines()]
-    validation = [
-        json.loads(line) for line in validation_path.read_text().splitlines()
-    ]
+    validation = [json.loads(line) for line in validation_path.read_text().splitlines()]
     assert train
     assert validation
     assert all(

@@ -10,7 +10,7 @@ for ARG in "$@"; do
 done
 
 if [[ "${HAS_SOURCE}" != true || "${HAS_OUTPUT}" != true ]]; then
-  echo "Usage: scripts/extract_pdfs.sh --source PATH --output PATH [--manifest PATH]" >&2
+  echo "Usage: scripts/extract_pdfs.sh --source PATH --output PATH [--config PATH] [--manifest PATH]" >&2
   exit 2
 fi
 

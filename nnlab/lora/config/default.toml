@@ -16,6 +16,14 @@ max_file_bytes = 1000000
 validation_ratio = 0.10
 seed = 42
 
+[pdf_extraction]
+engine = "docling"
+device = "auto"
+ocr = true
+formula_enrichment = true
+image_scale = 2.0
+document_timeout = 600
+
 [training]
 # "auto" detects MLX quantization versus Transformers/Safetensors.
 backend = "auto"

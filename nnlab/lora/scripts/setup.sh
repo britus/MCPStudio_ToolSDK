@@ -72,6 +72,12 @@ echo "Using ${PYTHON_BIN} (Python ${SELECTED_VERSION})"
 "${VENV_DIR}/bin/python" -m pip install --upgrade pip
 "${VENV_DIR}/bin/python" -m pip install -e "${PROJECT_ROOT}[${EXTRAS}]"
 
+if [[ ",${EXTRAS}," == *",docs,"* ]]; then
+  echo "Prefetching Docling layout, table, formula, and OCR models for offline runs..."
+  "${VENV_DIR}/bin/docling-tools" models download \
+    layout tableformer code_formula rapidocr
+fi
+
 echo
 echo "Environment ready for ${MODE}."
 echo "No model hub login is used. Runtime model access is forced offline."

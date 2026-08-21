@@ -23,6 +23,7 @@ SUPPORTED_STATUSES = {"success", "partial_success"}
 
 @dataclass(frozen=True)
 class PdfExtractionSettings:
+    engine: str = "docling"
     device: str = "auto"
     enable_ocr: bool = True
     enable_formula_enrichment: bool = True
@@ -30,6 +31,8 @@ class PdfExtractionSettings:
     document_timeout: float | None = 600.0
 
     def validate(self) -> PdfExtractionSettings:
+        if self.engine != "docling":
+            raise ValueError("PDF extraction engine must be docling")
         if self.device not in {"auto", "cpu", "mps", "cuda"}:
             raise ValueError("PDF extraction device must be auto, cpu, mps, or cuda")
         if self.image_scale <= 0:
@@ -131,6 +134,7 @@ def settings_from_config(config_path: str | Path | None) -> PdfExtractionSetting
     config = load_config(config_path)
     timeout = nested(config, "pdf_extraction", "document_timeout", 600.0)
     return PdfExtractionSettings(
+        engine=str(nested(config, "pdf_extraction", "engine", "docling")),
         device=str(nested(config, "pdf_extraction", "device", "auto")),
         enable_ocr=bool(nested(config, "pdf_extraction", "ocr", True)),
         enable_formula_enrichment=bool(
@@ -365,6 +369,7 @@ def main() -> None:
     args = build_parser().parse_args()
     configured = settings_from_config(args.config)
     settings = PdfExtractionSettings(
+        engine=configured.engine,
         device=args.device or configured.device,
         enable_ocr=configured.enable_ocr if args.ocr is None else args.ocr,
         enable_formula_enrichment=(

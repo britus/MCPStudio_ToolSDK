@@ -32,6 +32,20 @@ def test_v3_training_outputs_are_cleaned_before_fresh_runs() -> None:
     assert config["training"]["clean_output_dir"] is True
 
 
+def test_v3_pdf_extraction_uses_structured_docling_defaults() -> None:
+    with (PROJECT_ROOT / "config" / "mcpstudio-v3.toml").open("rb") as handle:
+        config = tomllib.load(handle)
+
+    assert config["pdf_extraction"] == {
+        "engine": "docling",
+        "device": "auto",
+        "ocr": True,
+        "formula_enrichment": True,
+        "image_scale": 2.0,
+        "document_timeout": 600,
+    }
+
+
 def test_training_request_router_is_an_executed_llm_agent() -> None:
     workflow = _training_workflow()
     router = next(
@@ -239,5 +253,12 @@ def test_policy_contract_is_not_written_into_document_input_directory() -> None:
     assert "function evidenceText" in script
     assert "must be a non-empty string or array of strings" in script
     assert "return normalized.join('\\n')" in script
-    assert "PDF extraction produced no text file" in script
+    assert "extractionResult.engine === 'docling'" in script
+    assert "extractedDocument.materialized_path" in script
+    assert "extractedDocument.output_relative_path" in script
+    assert "Docling produced no valid Markdown file" in script
+    assert (
+        "['--source', source, '--output', documentDir, '--config', configPath]"
+        in script
+    )
     assert "MCPStudio.fileExists(extractedPath)" in script

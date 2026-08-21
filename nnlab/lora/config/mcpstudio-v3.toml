@@ -24,6 +24,14 @@ validation_ratio = 0.10
 seed = 42
 document_type = "user-provided technical documentation"
 
+[pdf_extraction]
+engine = "docling"
+device = "auto"
+ocr = true
+formula_enrichment = true
+image_scale = 2.0
+document_timeout = 600
+
 [dataset_policy]
 max_source_fraction = 0.50
 max_subject_imbalance = 2.0

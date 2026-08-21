@@ -6,6 +6,7 @@ import json
 import math
 import random
 from collections import Counter, defaultdict
+from collections.abc import Iterator
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,7 @@ from typing import Any
 from .config import load_config, nested, resolve_path
 from .output_cleanup import reset_generated_directory
 from .prepare import CodeChunk, chunk_source
-from .scanner import scan_project
+from .scanner import SourceFile, scan_project
 
 
 def _document_reproduction_record(
@@ -188,6 +189,100 @@ def _records_for_chunk(
         record["metadata"]["primary_subject"] = primary
         record["metadata"]["source_key"] = f"{chunk.project}/{chunk.path}"
     return records
+
+
+def _markdown_table_line(line: str) -> bool:
+    stripped = line.strip()
+    return stripped.startswith("|") and stripped.endswith("|")
+
+
+def _markdown_fence_start(lines: list[str], index: int) -> int | None:
+    in_fence = False
+    start: int | None = None
+    for position, line in enumerate(lines[: index + 1]):
+        if line.lstrip().startswith("```"):
+            if in_fence:
+                in_fence = False
+                start = None
+            else:
+                in_fence = True
+                start = position
+    return start if in_fence else None
+
+
+def _markdown_safe_end(lines: list[str], start: int, target: int) -> int:
+    if target >= len(lines):
+        return len(lines)
+
+    if _markdown_table_line(lines[target - 1]) and _markdown_table_line(lines[target]):
+        end = target
+        while end < len(lines) and _markdown_table_line(lines[end]):
+            end += 1
+        return end
+
+    fence_start = _markdown_fence_start(lines, target - 1)
+    if fence_start is not None and fence_start >= start:
+        end = target
+        while end < len(lines):
+            if lines[end].lstrip().startswith("```"):
+                return end + 1
+            end += 1
+        return len(lines)
+
+    search_floor = max(start + 1, target - max(12, (target - start) // 3))
+    for boundary in range(target, search_floor - 1, -1):
+        if lines[boundary].lstrip().startswith("#") or not lines[boundary - 1].strip():
+            return boundary
+    return target
+
+
+def _markdown_overlap_start(
+    lines: list[str], start: int, end: int, overlap: int
+) -> int:
+    desired = max(start + 1, end - overlap)
+    if desired >= end:
+        return end
+    if _markdown_table_line(lines[desired]):
+        while desired > start and _markdown_table_line(lines[desired - 1]):
+            desired -= 1
+    fence_start = _markdown_fence_start(lines, desired)
+    if fence_start is not None:
+        desired = fence_start
+    return desired if desired > start else end
+
+
+def chunk_document_source(
+    source: SourceFile,
+    chunk_lines: int,
+    overlap_lines: int,
+) -> Iterator[CodeChunk]:
+    """Chunk Markdown at safe boundaries without splitting tables or fenced blocks."""
+    if source.path.suffix.casefold() != ".md":
+        yield from chunk_source(source, chunk_lines, overlap_lines)
+        return
+    if chunk_lines < 2:
+        raise ValueError("chunk_lines must be at least 2")
+    if overlap_lines < 0 or overlap_lines >= chunk_lines:
+        raise ValueError("overlap_lines must be >= 0 and smaller than chunk_lines")
+
+    lines = source.text.splitlines(keepends=True)
+    start = 0
+    while start < len(lines):
+        target = min(start + chunk_lines, len(lines))
+        end = _markdown_safe_end(lines, start, target)
+        content = "".join(lines[start:end]).rstrip()
+        if content.strip():
+            yield CodeChunk(
+                project=source.project,
+                path=source.relative_path,
+                start_line=start + 1,
+                end_line=end,
+                content=content,
+                source_sha256=source.sha256,
+            )
+        if end >= len(lines):
+            break
+        start = _markdown_overlap_start(lines, start, end, overlap_lines)
 
 
 def _overlaps(left: CodeChunk, right: CodeChunk) -> bool:
@@ -466,7 +561,7 @@ def prepare_documents(
                 continue
             seen_hashes[source.sha256] = source_key
             subjects = sorted(subjects_by_hash[source.sha256])
-            chunks = list(chunk_source(source, chunk_lines, overlap_lines))
+            chunks = list(chunk_document_source(source, chunk_lines, overlap_lines))
             if policy:
                 train_chunks, validation_chunks = _blocked_split(
                     chunks, validation_ratio, seed

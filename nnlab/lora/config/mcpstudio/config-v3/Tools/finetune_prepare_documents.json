@@ -7,7 +7,7 @@
     "lastModified" : "2026-08-17T00:00:00.000Z",
     "priority" : 0.98
   },
-  "description" : "Materialize selected PDF or text documents into an isolated batch and rebuild the configured model training and validation datasets before training.",
+  "description" : "Materialize selected PDFs as Docling Markdown with tables, hierarchy, formulas and figure references, or copy text documents, then rebuild the configured model training and validation datasets in an isolated batch.",
   "execHandler" : "finetunePrepareDocuments",
   "execMethod" : "toolEntry",
   "inputSchema" : {
@@ -41,7 +41,7 @@
         "type" : "object"
       },
       "textOutputDir" : {
-        "description" : "Project-relative parent directory for isolated per-run text batches.",
+        "description" : "Project-relative parent directory for isolated per-run prepared-document batches.",
         "name" : "textOutputDir",
         "type" : "string"
       }
@@ -75,13 +75,21 @@
         "name" : "includedFiles",
         "type" : "integer"
       },
+      "extractionReports" : {
+        "description" : "Per-PDF Docling provenance, page, element, warning and runtime details.",
+        "items" : {
+          "type" : "object"
+        },
+        "name" : "extractionReports",
+        "type" : "array"
+      },
       "manifestPath" : {
         "description" : "Generated project-relative dataset manifest.",
         "name" : "manifestPath",
         "type" : "string"
       },
       "materializedPaths" : {
-        "description" : "Text files produced or copied for dataset preparation.",
+        "description" : "Docling Markdown files produced from PDFs or text files copied for dataset preparation.",
         "items" : {
           "type" : "string"
         },

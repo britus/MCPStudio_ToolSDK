@@ -204,6 +204,7 @@ document_timeout = 90
     )
 
     assert settings_from_config(config) == PdfExtractionSettings(
+        engine="docling",
         device="cpu",
         enable_ocr=False,
         enable_formula_enrichment=False,
