@@ -215,7 +215,7 @@ def split_record(
             if cut <= start:
                 raise ValueError(
                     "The rendered prompt alone fills max_length; shorten the prompt or "
-                    "increase data.max_seq_length"
+                    f"increase data.max_seq_length | char_low={char_low} cut={cut} start={start}"
                 )
         segment_records.append(
             _record_with_completion(segment_base, content[start:cut])

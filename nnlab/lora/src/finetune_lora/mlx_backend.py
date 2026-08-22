@@ -224,9 +224,9 @@ def train_mlx(
     else:
         output_dir.mkdir(parents=True, exist_ok=True)
     max_seq_length = (
-        min(int(nested(config, "data", "max_seq_length", 4096)), 1200)
+        min(int(nested(config, "data", "max_seq_length", 16384)), 16384)
         if smoke_test
-        else int(nested(config, "data", "max_seq_length", 4096))
+        else int(nested(config, "data", "max_seq_length", 16384))
     )
     train_count, validation_count = prepare_mlx_data(
         train_path,
