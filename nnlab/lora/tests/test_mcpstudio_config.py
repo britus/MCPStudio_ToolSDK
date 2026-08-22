@@ -32,19 +32,27 @@ def test_v3_training_outputs_are_cleaned_before_fresh_runs() -> None:
     assert config["training"]["clean_output_dir"] is True
 
 
-def test_v3_pdf_extraction_uses_structured_docling_defaults() -> None:
+def test_v3_pdf_extraction_uses_cpu_for_docling_python_compatibility() -> None:
     with (PROJECT_ROOT / "config" / "mcpstudio-v3.toml").open("rb") as handle:
         config = tomllib.load(handle)
 
     assert config["pdf_extraction"] == {
         "engine": "docling",
         "artifacts_path": "~/.cache/docling/models",
-        "device": "auto",
+        "device": "cpu",
         "ocr": True,
         "formula_enrichment": True,
         "image_scale": 2.0,
         "document_timeout": 600,
     }
+
+
+def test_v3_verification_generation_is_deterministic_and_bounded() -> None:
+    with (PROJECT_ROOT / "config" / "mcpstudio-v3.toml").open("rb") as handle:
+        config = tomllib.load(handle)
+
+    assert config["verification"]["temperature"] == 0.0
+    assert config["verification"]["max_new_tokens"] == 4096
 
 
 def test_training_request_router_is_an_executed_llm_agent() -> None:
@@ -221,6 +229,8 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
     assert "warnings array is compatible with approval" in instruction
     assert "Rejected sources must never appear" in instruction
     assert "never emit an evidence array" in instruction
+    assert "`subjectEvidence`" in instruction
+    assert "Related Parts section" in instruction
     assert "Never place a conditional subject in requiredSubjects" in instruction
     assert "missingSubjects" in instruction
     assert "must never contain conditional subjects" in instruction
@@ -252,8 +262,11 @@ def test_policy_contract_is_not_written_into_document_input_directory() -> None:
     assert "shared.joinPath(runPath, 'dataset-policy.json')" not in script
     assert "sourcePlan does not cover requiredSubjects" in script
     assert "function evidenceText" in script
+    assert "function subjectEvidence" in script
     assert "must be a non-empty string or array of strings" in script
-    assert "return normalized.join('\\n')" in script
+    assert "return evidenceParts(value, label).join('\\n')" in script
+    assert "format: 2" in script
+    assert "subjectEvidence: plan ? plan.sources[index].subjectEvidence : {}" in script
     assert "extractionResult.engine === 'docling'" in script
     assert "extractedDocument.materialized_path" in script
     assert "extractedDocument.output_relative_path" in script
@@ -263,3 +276,17 @@ def test_policy_contract_is_not_written_into_document_input_directory() -> None:
         in script
     )
     assert "MCPStudio.fileExists(extractedPath)" in script
+
+
+def test_verification_workflow_preserves_unscored_prompt_rate() -> None:
+    workflow = json.loads(
+        (
+            RELEASE_CONFIG_ROOT
+            / "MultiAgents"
+            / "finetune_master_verification_workflow.json"
+        ).read_text(encoding="utf-8")
+    )
+    instructions = "\n".join(agent["instruction"] for agent in workflow["agents"])
+
+    assert "missing or null promptPassRate" in instructions
+    assert "never convert it to zero" in instructions

@@ -100,7 +100,7 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Review the real merged-candidate verification output against subjectContext and acceptanceCriteria from the validated file. Apply explicit runtime rules for documented variants, contradictory sources, tolerated cross-documentation and uncertainty before classifying cross-context contamination. Mixed terminology alone is not a failure when the runtime context permits it. Still reject invented identifiers, values or transport-specific behavior unsupported by the permitted sources. Inspect every held-out case. Return exactly one raw JSON object with decision (PASS, FAIL or INCONCLUSIVE), findings (array) and reportPaths (array). Process success or keyword matches alone are insufficient. Never call tools.",
+      "instruction" : "Review the real merged-candidate verification output against subjectContext and acceptanceCriteria from the validated file. Apply explicit runtime rules for documented variants, contradictory sources, tolerated cross-documentation and uncertainty before classifying cross-context contamination. Mixed terminology alone is not a failure when the runtime context permits it. Still reject invented identifiers, values or transport-specific behavior unsupported by the permitted sources. Inspect every held-out case. A missing or null promptPassRate means the checks were unscored: preserve that state as unscored, never convert it to zero, and require semantic review before any decision. Return exactly one raw JSON object with decision (PASS, FAIL or INCONCLUSIVE), findings (array) and reportPaths (array). Process success or keyword matches alone are insufficient. Never call tools.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 5,
@@ -115,7 +115,7 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Produce the final operator report. Lead with exactly one decision: PASS, FAIL or INCONCLUSIVE. Identify the selected verification config, merge inputs, merged candidate, merge report, verification report, prompt coverage, findings and blockers. Never claim installation or update occurred.",
+      "instruction" : "Produce the final operator report. Lead with exactly one decision: PASS, FAIL or INCONCLUSIVE. Identify the selected verification config, merge inputs, merged candidate, merge report, verification report, prompt coverage, findings and blockers. Preserve a missing or null promptPassRate as unscored; never report it as zero or as an automatic pass or failure. Never claim installation or update occurred.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 3,

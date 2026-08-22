@@ -8,6 +8,7 @@ PIPELINE_ARGS ?=
 TRAIN_ARGS ?=
 CHAT_ARGS ?=
 EVALUATE_ARGS ?=
+INFERENCE_TEST_ARGS ?=
 VERIFY_ARGS ?=
 MERGE_ARGS ?=
 FUSE_ARGS ?=
@@ -18,7 +19,7 @@ INPUT_FLAGS = $(foreach input,$(INPUTS),--input "$(input)")
 PROJECT_FLAGS = $(foreach input,$(INPUTS),--project "$(input)")
 
 .PHONY: setup setup-rag setup-train setup-cuda prepare prepare-docs index pipeline \
-	train smoke-train chat evaluate evaluate-base verify-suite merge-adapters fuse \
+	train smoke-train chat evaluate evaluate-base inference-test verify-suite merge-adapters fuse \
 	deploy-lmstudio export-gguf test
 
 setup:
@@ -63,6 +64,9 @@ evaluate:
 
 evaluate-base:
 	./scripts/evaluate_base.sh --config "$(CONFIG)" $(EVALUATE_ARGS)
+
+inference-test:
+	./scripts/inference_test.sh --config "$(CONFIG)" $(INFERENCE_TEST_ARGS)
 
 verify-suite:
 	./scripts/verify_suite.sh --config "$(CONFIG)" $(VERIFY_ARGS)

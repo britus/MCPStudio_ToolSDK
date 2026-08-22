@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import random
+import re
 from collections import Counter, defaultdict
 from collections.abc import Iterator
 from dataclasses import asdict
@@ -132,6 +133,9 @@ def _validate_policy(value: Any) -> dict[str, Any]:
     if not isinstance(sources, list) or not sources:
         raise ValueError("sources must be a non-empty array")
     covered_subjects: set[str] = set()
+    policy_format = value.get("format", 1)
+    if not isinstance(policy_format, int) or policy_format < 1:
+        raise ValueError("format must be a positive integer")
     for index, source in enumerate(sources):
         if not isinstance(source, dict) or not isinstance(source.get("path"), str):
             raise TypeError(f"sources[{index}].path must be a string")
@@ -150,6 +154,33 @@ def _validate_policy(value: Any) -> dict[str, Any]:
                 f"requiredSubjects: {', '.join(sorted(unknown_subjects))}"
             )
         covered_subjects.update(normalized_subjects)
+        if policy_format >= 2:
+            evidence = source.get("subjectEvidence")
+            if not isinstance(evidence, dict):
+                raise TypeError(
+                    f"sources[{index}].subjectEvidence must be an object"
+                )
+            missing_evidence = normalized_subjects - set(evidence)
+            unknown_evidence = set(evidence) - normalized_subjects
+            if missing_evidence or unknown_evidence:
+                details = []
+                if missing_evidence:
+                    details.append("missing " + ", ".join(sorted(missing_evidence)))
+                if unknown_evidence:
+                    details.append("unknown " + ", ".join(sorted(unknown_evidence)))
+                raise ValueError(
+                    f"sources[{index}].subjectEvidence keys must match subjects "
+                    f"({'; '.join(details)})"
+                )
+            for subject, markers in evidence.items():
+                selected = [markers] if isinstance(markers, str) else markers
+                if not isinstance(selected, list) or not selected or not all(
+                    isinstance(marker, str) and marker.strip() for marker in selected
+                ):
+                    raise ValueError(
+                        f"sources[{index}].subjectEvidence[{subject!r}] must be a "
+                        "non-empty string or array of strings"
+                    )
     missing_subjects = required_subjects - covered_subjects
     if missing_subjects:
         raise ValueError(
@@ -166,14 +197,66 @@ def _load_policy(path: str | Path | None) -> dict[str, Any] | None:
     return _validate_policy(value)
 
 
-def _policy_source_map(policy: dict[str, Any] | None) -> dict[str, list[str]]:
+def _policy_source_map(policy: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
     if not policy:
         return {}
-    result: dict[str, list[str]] = {}
+    result: dict[str, dict[str, Any]] = {}
+    evidence_bound = int(policy.get("format", 1)) >= 2
     for item in policy["sources"]:
         key = Path(item["path"]).as_posix().lstrip("./")
-        result[key] = sorted({value.strip() for value in item["subjects"] if value.strip()})
+        subjects = sorted(
+            {value.strip() for value in item["subjects"] if value.strip()}
+        )
+        subject_evidence: dict[str, list[str]] = {}
+        if evidence_bound:
+            for subject, markers in item["subjectEvidence"].items():
+                selected = [markers] if isinstance(markers, str) else markers
+                subject_evidence[subject] = [marker.strip() for marker in selected]
+        result[key] = {
+            "subjects": subjects,
+            "subject_evidence": subject_evidence,
+            "evidence_bound": evidence_bound,
+        }
     return result
+
+
+def _normalized_evidence_text(value: str) -> str:
+    return " ".join(re.findall(r"\w+", value.casefold()))
+
+
+def _subjects_for_chunk(chunk: CodeChunk, source_policy: dict[str, Any]) -> list[str]:
+    """Assign only subjects whose direct evidence occurs in this chunk."""
+    subjects = list(source_policy.get("subjects", []))
+    if not source_policy.get("evidence_bound"):
+        return subjects
+    content = _normalized_evidence_text(chunk.content)
+    evidence = source_policy.get("subject_evidence", {})
+    return sorted(
+        subject
+        for subject in subjects
+        if any(
+            marker_text and marker_text in content
+            for marker_text in (
+                _normalized_evidence_text(marker)
+                for marker in evidence.get(subject, [])
+            )
+        )
+    )
+
+
+_EXCLUDED_TRAINING_SECTIONS = {"related parts"}
+
+
+def _excluded_training_section(chunk: CodeChunk) -> str | None:
+    """Identify catalogue-style sections that describe other products, not the source."""
+    for line in chunk.content.splitlines():
+        match = re.match(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$", line)
+        if not match:
+            continue
+        heading = _normalized_evidence_text(match.group(1))
+        if heading in _EXCLUDED_TRAINING_SECTIONS:
+            return heading
+    return None
 
 
 def _records_for_chunk(
@@ -391,6 +474,72 @@ def _blocked_split(
     return (train, selected) if train else (chunks, [])
 
 
+def _evidence_blocked_split(
+    chunks: list[CodeChunk],
+    validation_ratio: float,
+    seed: int,
+    source_policy: dict[str, Any],
+) -> tuple[list[CodeChunk], list[CodeChunk]]:
+    """Cover evidenced subjects in validation while retaining independent train evidence."""
+    if validation_ratio <= 0 or len(chunks) < 2:
+        return _blocked_split(chunks, validation_ratio, seed)
+
+    subjects_by_chunk = {
+        id(chunk): set(_subjects_for_chunk(chunk, source_policy)) for chunk in chunks
+    }
+    available_subjects = set().union(*subjects_by_chunk.values())
+    target = max(1, round(len(chunks) * validation_ratio))
+    ordered = sorted(
+        chunks,
+        key=lambda chunk: hashlib.sha256(
+            f"{seed}:{chunk.project}:{chunk.path}:{chunk.start_line}".encode()
+        ).digest(),
+    )
+    selected: list[CodeChunk] = []
+
+    def remaining_after(proposed: list[CodeChunk]) -> list[CodeChunk]:
+        return [
+            chunk
+            for chunk in chunks
+            if chunk not in proposed
+            and not any(_overlaps(chunk, validation) for validation in proposed)
+        ]
+
+    def preserves_train_coverage(candidate: CodeChunk) -> bool:
+        remaining = remaining_after([*selected, candidate])
+        remaining_subjects = set().union(
+            *(subjects_by_chunk[id(chunk)] for chunk in remaining)
+        )
+        return bool(remaining) and remaining_subjects == available_subjects
+
+    validation_subjects: set[str] = set()
+    for subject in sorted(available_subjects):
+        if subject in validation_subjects:
+            continue
+        candidate = next(
+            (
+                chunk
+                for chunk in ordered
+                if chunk not in selected
+                and subject in subjects_by_chunk[id(chunk)]
+                and preserves_train_coverage(chunk)
+            ),
+            None,
+        )
+        if candidate is not None:
+            selected.append(candidate)
+            validation_subjects.update(subjects_by_chunk[id(candidate)])
+
+    for candidate in ordered:
+        if len(selected) >= target:
+            break
+        if candidate not in selected and preserves_train_coverage(candidate):
+            selected.append(candidate)
+
+    train = remaining_after(selected)
+    return (train, selected) if train else (chunks, [])
+
+
 def _deterministic_trim(
     records: list[dict[str, Any]], key: str, limit: int, seed: int
 ) -> list[dict[str, Any]]:
@@ -550,6 +699,8 @@ def prepare_documents(
     duplicate_files: list[dict[str, str]] = []
     observed_policy_paths: set[str] = set()
     unmapped_files: list[str] = []
+    excluded_training_chunks: list[dict[str, Any]] = []
+    unassigned_evidence_chunks: list[dict[str, Any]] = []
 
     for project_path in projects:
         sources, skipped = scan_project(project_path, max_file_bytes=max_file_bytes)
@@ -566,11 +717,25 @@ def prepare_documents(
         paths = [source.relative_path for source in sources]
         project_train = 0
         project_validation = 0
-        subjects_by_hash: dict[str, set[str]] = defaultdict(set)
+        policy_by_hash: dict[str, dict[str, Any]] = {}
         for source in sources:
-            subjects_by_hash[source.sha256].update(
-                policy_sources.get(source.relative_path, [])
+            source_policy = policy_sources.get(source.relative_path)
+            if not source_policy:
+                continue
+            combined = policy_by_hash.setdefault(
+                source.sha256,
+                {
+                    "subjects": set(),
+                    "subject_evidence": defaultdict(list),
+                    "evidence_bound": False,
+                },
             )
+            combined["subjects"].update(source_policy["subjects"])
+            combined["evidence_bound"] = (
+                combined["evidence_bound"] or source_policy["evidence_bound"]
+            )
+            for subject, markers in source_policy["subject_evidence"].items():
+                combined["subject_evidence"][subject].extend(markers)
         records_by_path: dict[str, list[dict[str, Any]]] = {}
         validation_by_path: dict[str, list[dict[str, Any]]] = {}
         for source in sources:
@@ -578,6 +743,9 @@ def prepare_documents(
             observed_policy_paths.add(source.relative_path)
             if policy and not policy_sources.get(source.relative_path):
                 unmapped_files.append(source_key)
+                records_by_path[source.relative_path] = []
+                validation_by_path[source.relative_path] = []
+                continue
             if source.sha256 in seen_hashes:
                 duplicate_files.append(
                     {"path": source_key, "duplicateOf": seen_hashes[source.sha256]}
@@ -586,34 +754,84 @@ def prepare_documents(
                 validation_by_path[source.relative_path] = []
                 continue
             seen_hashes[source.sha256] = source_key
-            subjects = sorted(subjects_by_hash[source.sha256])
-            chunks = list(chunk_document_source(source, chunk_lines, overlap_lines))
+            source_policy = policy_by_hash.get(
+                source.sha256,
+                {
+                    "subjects": set(),
+                    "subject_evidence": {},
+                    "evidence_bound": False,
+                },
+            )
+            source_policy["subjects"] = sorted(source_policy["subjects"])
+            chunks: list[CodeChunk] = []
+            for chunk in chunk_document_source(source, chunk_lines, overlap_lines):
+                excluded_heading = _excluded_training_section(chunk)
+                if excluded_heading:
+                    excluded_training_chunks.append(
+                        {
+                            "path": source_key,
+                            "start_line": chunk.start_line,
+                            "end_line": chunk.end_line,
+                            "reason": f"excluded section: {excluded_heading}",
+                        }
+                    )
+                    continue
+                if (
+                    policy
+                    and source_policy["evidence_bound"]
+                    and not _subjects_for_chunk(chunk, source_policy)
+                ):
+                    unassigned_evidence_chunks.append(
+                        {
+                            "path": source_key,
+                            "start_line": chunk.start_line,
+                            "end_line": chunk.end_line,
+                            "split": "excluded-before-split",
+                        }
+                    )
+                    continue
+                chunks.append(chunk)
+
+            def records_for(
+                selected_chunks: list[CodeChunk],
+                split_name: str,
+                chunk_policy: dict[str, Any] = source_policy,
+                current_source_key: str = source_key,
+                current_document_type: str = project_document_type,
+            ) -> list[dict[str, Any]]:
+                result: list[dict[str, Any]] = []
+                for chunk in selected_chunks:
+                    subjects = _subjects_for_chunk(chunk, chunk_policy)
+                    if policy and chunk_policy["evidence_bound"] and not subjects:
+                        unassigned_evidence_chunks.append(
+                            {
+                                "path": current_source_key,
+                                "start_line": chunk.start_line,
+                                "end_line": chunk.end_line,
+                                "split": split_name,
+                            }
+                        )
+                        continue
+                    result.extend(
+                        _records_for_chunk(chunk, current_document_type, subjects)
+                    )
+                return result
+
             if policy:
-                train_chunks, validation_chunks = _blocked_split(
-                    chunks, validation_ratio, seed
+                if source_policy["evidence_bound"]:
+                    train_chunks, validation_chunks = _evidence_blocked_split(
+                        chunks, validation_ratio, seed, source_policy
+                    )
+                else:
+                    train_chunks, validation_chunks = _blocked_split(
+                        chunks, validation_ratio, seed
+                    )
+                source_records = records_for(train_chunks, "train")
+                validation_by_path[source.relative_path] = records_for(
+                    validation_chunks, "validation"
                 )
-                source_records = [
-                    record
-                    for chunk in train_chunks
-                    for record in _records_for_chunk(
-                        chunk, project_document_type, subjects
-                    )
-                ]
-                validation_by_path[source.relative_path] = [
-                    record
-                    for chunk in validation_chunks
-                    for record in _records_for_chunk(
-                        chunk, project_document_type, subjects
-                    )
-                ]
             else:
-                source_records = [
-                    record
-                    for chunk in chunks
-                    for record in _records_for_chunk(
-                        chunk, project_document_type, subjects
-                    )
-                ]
+                source_records = records_for(chunks, "train")
                 validation_by_path[source.relative_path] = []
             records_by_path[source.relative_path] = source_records
 
@@ -765,6 +983,8 @@ def prepare_documents(
             "duplicate_files": duplicate_files,
             "unmapped_files": sorted(unmapped_files),
             "unused_policy_sources": unused_policy_sources,
+            "excluded_training_chunks": excluded_training_chunks,
+            "unassigned_evidence_chunks": unassigned_evidence_chunks,
             "non_overlapping_validation": policy is not None,
             "max_source_fraction": max_source_fraction,
             "max_subject_imbalance": max_subject_imbalance,

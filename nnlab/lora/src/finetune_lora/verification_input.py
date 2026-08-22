@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import re
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -134,6 +136,39 @@ def _write_generated_prompts(
     return len(records)
 
 
+def _configured_link_path(path_value: str, project_root: Path) -> Path:
+    selected = Path(path_value).expanduser()
+    if not selected.is_absolute():
+        selected = project_root / selected
+    return selected.parent.resolve() / selected.name
+
+
+def _replace_prompt_symlink(link_path: Path, prompt_path: Path) -> None:
+    """Atomically point the configured verification path at the latest prompt run."""
+    target = prompt_path.resolve(strict=True)
+    if link_path == target:
+        raise ValueError(
+            "verification.prompts_file must differ from the generated run prompt path"
+        )
+    if (link_path.exists() or link_path.is_symlink()) and not link_path.is_symlink():
+        raise FileExistsError(
+            "Automatic prompt generation will not replace a regular file: "
+            f"{link_path}"
+        )
+
+    link_path.parent.mkdir(parents=True, exist_ok=True)
+    relative_target = os.path.relpath(target, start=link_path.parent)
+    temporary_link = link_path.with_name(
+        f".{link_path.name}.{uuid.uuid4().hex}.tmp"
+    )
+    try:
+        temporary_link.symlink_to(relative_target)
+        os.replace(temporary_link, link_path)
+    finally:
+        if temporary_link.is_symlink():
+            temporary_link.unlink()
+
+
 def _run_scoped_output(path_value: str, run_name: str) -> str:
     path = Path(path_value)
     if path.suffix:
@@ -223,6 +258,11 @@ def create_verification_input(
         )
         prompts_file = _relative_to_project(prompt_path, root)
         prompt_source = "generated"
+        prompt_link = (
+            _configured_link_path(configured_prompts_file, root)
+            if configured_prompts_file
+            else None
+        )
     else:
         if not configured_prompts_file:
             raise ValueError(
@@ -241,6 +281,7 @@ def create_verification_input(
         if prompt_count < 1:
             raise ValueError(f"Verification prompts are empty: {prompt_path}")
         prompt_source = "configured"
+        prompt_link = None
 
     payload = {
         "schemaVersion": SCHEMA_VERSION,
@@ -267,10 +308,13 @@ def create_verification_input(
             "trainedAdapter": adapter_reference,
             "promptSource": prompt_source,
             "promptCount": prompt_count,
+            "promptLink": configured_prompts_file if prompt_link else None,
         },
     }
     output.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    if prompt_link:
+        _replace_prompt_symlink(prompt_link, prompt_path)
     return output

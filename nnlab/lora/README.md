@@ -207,7 +207,11 @@ Studio workflow always creates a fresh per-run directory.
 
 The MCP Studio v3 workflow additionally creates a source-to-subject policy file and passes it with
 `--policy-file`. This enables deterministic coverage and balance gates that cannot be inferred from
-plain input paths alone.
+plain input paths alone. Version 2 policies bind every subject to direct `subjectEvidence`; a chunk
+inherits only the subjects whose normalized evidence occurs in that chunk. Catalogue-style
+`Related Parts` chunks and chunks without matching subject evidence are excluded and reported in
+the dataset manifest. Provide multiple independent excerpts per subject when possible so both the
+training and non-overlapping validation split retain evidence.
 
 ### Smoke test and full training
 
@@ -225,6 +229,9 @@ verification paths. By default, `verification_input.auto_generate_prompts = true
 run-specific `eval-prompts.jsonl` from the objective's `Release boundaries`. Set the option to
 `false` to require the manually curated `verification.prompts_file` instead. Generated prompts are
 useful for workflow tests, but a release decision should eventually use human-reviewed prompts.
+When automatic generation is enabled and `verification.prompts_file` is configured, that configured
+path is atomically maintained as a relative symlink to the newest run-specific prompt file. A
+regular file at that path is never overwritten.
 Generated prompts carry the objective's named training scope but have no mechanical keyword score;
 their answers require the workflow's semantic evidence review. Merge and report outputs also receive
 the run name by default, so repeated verification runs never overwrite an earlier candidate or
@@ -284,10 +291,28 @@ Paths can be overridden without editing the TOML:
   --output artifacts/verification-report.json
 ```
 
+For inference diagnostics, run the same prompt JSONL while retaining both the raw model output and
+the reasoning-stripped answer in a separate JSON report:
+
+```bash
+./scripts/inference_test.sh \
+  --config "$CONFIG" \
+  --adapter artifacts/finetune_lora \
+  --prompts data/verifications/run-*/eval-prompts.jsonl \
+  --output artifacts/inference-test-report.json
+```
+
+Use `--prompt-id ID` to isolate one prompt, `--show-raw` to print reasoning-channel output, and
+`--temperature 0` or `--max-tokens N` for deterministic or bounded diagnostic runs. The JSON report
+always retains the raw output, rendered prompt, visible output, token count, finish reason and
+runtime for every selected prompt.
+
 Process success is not a model-quality decision. Review every generated answer for factual
 relevance, required coverage, unsupported claims, cross-context contamination, prompt leakage, and
 repeated control tokens. The EoF MCP Studio verification workflow returns only `PASS`, `FAIL`, or
-`INCONCLUSIVE` and never deploys automatically.
+`INCONCLUSIVE` and never deploys automatically. Verification generation uses its own deterministic,
+bounded `verification.temperature` and `verification.max_new_tokens` settings. A missing/null prompt
+pass rate means unscored semantic checks, not a zero score.
 
 ### Chat and local retrieval
 
@@ -362,13 +387,17 @@ make verify-suite \
   CONFIG=config/my-project.toml \
   VERIFY_ARGS='--adapter artifacts/finetune_lora_merged --prompts eval/eval-prompts.jsonl --output artifacts/verification-report.json'
 
+make inference-test \
+  CONFIG=config/my-project.toml \
+  INFERENCE_TEST_ARGS='--adapter artifacts/finetune_lora --prompts data/verifications/run-123/eval-prompts.jsonl --prompt-id example-id'
+
 make fuse \
   CONFIG=config/my-project.toml \
   FUSE_ARGS='--adapter artifacts/finetune_lora_merged --dry-run'
 ```
 
 Available pass-through variables are `PREPARE_ARGS`, `PREPARE_DOCS_ARGS`, `INDEX_ARGS`,
-`PIPELINE_ARGS`, `TRAIN_ARGS`, `CHAT_ARGS`, `EVALUATE_ARGS`, `VERIFY_ARGS`, `MERGE_ARGS`,
+`PIPELINE_ARGS`, `TRAIN_ARGS`, `CHAT_ARGS`, `EVALUATE_ARGS`, `INFERENCE_TEST_ARGS`, `VERIFY_ARGS`, `MERGE_ARGS`,
 `FUSE_ARGS`, `DEPLOY_ARGS`, and `EXPORT_ARGS`.
 
 ## LM Studio deployment

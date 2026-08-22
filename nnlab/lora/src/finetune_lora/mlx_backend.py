@@ -493,20 +493,16 @@ def evaluate_mlx(
         rf"Test loss\s+({number}),\s+Test ppl\s+({number})",
         result.stdout,
     )
+    verification_max_tokens, verification_temperature = (
+        _verification_generation_settings(config)
+    )
     checks = (
         _mlx_prompt_checks(
             model,
             tokenizer,
             resolve_path(prompts),
-            int(
-                nested(
-                    config,
-                    "inference",
-                    "max_total_new_tokens",
-                    nested(config, "inference", "max_new_tokens", 1024),
-                )
-            ),
-            float(nested(config, "inference", "temperature", 0.15)),
+            verification_max_tokens,
+            verification_temperature,
         )
         if prompts
         else []
@@ -520,6 +516,10 @@ def evaluate_mlx(
         "test_batches": int(nested(config, "training", "mlx_eval_batches", 20)),
         "prompt_checks": checks,
         "prompt_pass_rate": _prompt_pass_rate(checks),
+        "verification_generation": {
+            "max_new_tokens": verification_max_tokens,
+            "temperature": verification_temperature,
+        },
     }
 
 
@@ -528,3 +528,28 @@ def _prompt_pass_rate(checks: list[dict[str, Any]]) -> float | None:
     if not scored:
         return None
     return sum(check.get("passed") is True for check in scored) / len(scored)
+
+
+def _verification_generation_settings(config: dict[str, Any]) -> tuple[int, float]:
+    max_tokens = int(
+        nested(
+            config,
+            "verification",
+            "max_new_tokens",
+            nested(
+                config,
+                "inference",
+                "max_total_new_tokens",
+                nested(config, "inference", "max_new_tokens", 1024),
+            ),
+        )
+    )
+    temperature = float(
+        nested(
+            config,
+            "verification",
+            "temperature",
+            nested(config, "inference", "temperature", 0.0),
+        )
+    )
+    return max_tokens, temperature

@@ -10,6 +10,7 @@ from finetune_lora.mlx_backend import (
     _mlx_prompt_checks,
     _prompt_pass_rate,
     _restore_best_checkpoint,
+    _verification_generation_settings,
     prepare_mlx_data,
     synchronize_training_chat_template,
 )
@@ -17,6 +18,16 @@ from finetune_lora.modeling import detect_model_backend
 
 
 class MlxBackendTests(unittest.TestCase):
+    def test_verification_generation_overrides_general_inference_sampling(self) -> None:
+        settings = _verification_generation_settings(
+            {
+                "inference": {"temperature": 0.25, "max_total_new_tokens": 16384},
+                "verification": {"temperature": 0.0, "max_new_tokens": 4096},
+            }
+        )
+
+        self.assertEqual(settings, (4096, 0.0))
+
     def test_unscored_semantic_checks_do_not_report_an_artificial_pass(self) -> None:
         checks = [{"passed": None, "scored": False}]
 

@@ -103,7 +103,7 @@ function stringArray(value, fallback, label) {
     return selected;
 }
 
-function evidenceText(value, label) {
+function evidenceParts(value, label) {
     let parts;
     if (typeof value === 'string') {
         parts = [value];
@@ -120,7 +120,33 @@ function evidenceText(value, label) {
     if (normalized.length === 0) {
         throw new Error(label + ' must contain non-empty evidence');
     }
-    return normalized.join('\n');
+    return normalized;
+}
+
+function evidenceText(value, label) {
+    return evidenceParts(value, label).join('\n');
+}
+
+function subjectEvidence(value, subjects, label) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new Error(label + ' must be an object keyed by subject');
+    }
+    const result = {};
+    const subjectSet = {};
+    subjects.forEach(function (subject) { subjectSet[subject] = true; });
+    Object.keys(value).forEach(function (subject) {
+        if (!subjectSet[subject]) {
+            throw new Error(label + ' contains unknown subject: ' + subject);
+        }
+        result[subject] = evidenceParts(value[subject], label + '.' + subject);
+    });
+    const missing = subjects.filter(function (subject) {
+        return !Object.prototype.hasOwnProperty.call(result, subject);
+    });
+    if (missing.length > 0) {
+        throw new Error(label + ' is missing subjects: ' + missing.join(', '));
+    }
+    return result;
 }
 
 function sourcePlan(value) {
@@ -173,10 +199,16 @@ function sourcePlan(value) {
             item.evidence,
             'sourcePlan.sources[' + index + '].evidence'
         );
+        const perSubjectEvidence = subjectEvidence(
+            item.subjectEvidence,
+            subjects,
+            'sourcePlan.sources[' + index + '].subjectEvidence'
+        );
         return {
             path: absoluteDocumentPath(item.path, 'sourcePlan.sources[' + index + '].path'),
             subjects: subjects,
-            evidence: evidence
+            evidence: evidence,
+            subjectEvidence: perSubjectEvidence
         };
     });
     const missingSubjects = requiredSubjects.filter(function (subject) {
@@ -575,7 +607,8 @@ function prepareDocuments(params, sid) {
                     numberedSegment(index),
                     extractedRelativePath
                 ),
-                subjects: plan ? plan.sources[index].subjects : []
+                subjects: plan ? plan.sources[index].subjects : [],
+                subjectEvidence: plan ? plan.sources[index].subjectEvidence : {}
             });
             extractionReports.push(extractedDocument);
             continue;
@@ -596,7 +629,8 @@ function prepareDocuments(params, sid) {
                 numberedSegment(index),
                 withoutExtension(pathBaseName(source)) + '.txt'
             ),
-            subjects: plan ? plan.sources[index].subjects : []
+            subjects: plan ? plan.sources[index].subjects : [],
+            subjectEvidence: plan ? plan.sources[index].subjectEvidence : {}
         });
         output.stdout.push('Materialized text document ' + source + ' as ' + target);
     }
@@ -608,7 +642,7 @@ function prepareDocuments(params, sid) {
         shared.joinPath(stagingRoot, runSegment + '-dataset-policy.json')
     );
     if (plan && MCPStudio.saveFile(policyPath, JSON.stringify({
-        format: 1,
+        format: 2,
         requiredSubjects: plan.requiredSubjects,
         sources: materializedPolicySources
     }, null, 2) + '\n') !== true) {

@@ -6,9 +6,13 @@ from pathlib import Path
 
 import pytest
 
+from finetune_lora.prepare import CodeChunk
 from finetune_lora.prepare_docs import (
     _balance_training_records,
     _document_continuation_record,
+    _excluded_training_section,
+    _subjects_for_chunk,
+    _validate_policy,
     chunk_document_source,
     prepare_documents,
 )
@@ -278,6 +282,119 @@ def test_policy_builds_balanced_non_overlapping_subject_splits(tmp_path: Path) -
                 train_meta["end_line"] < validation_meta["start_line"]
                 or validation_meta["end_line"] < train_meta["start_line"]
             )
+
+
+def test_policy_v2_requires_subject_specific_evidence() -> None:
+    with pytest.raises(ValueError, match="subjectEvidence keys must match subjects"):
+        _validate_policy(
+            {
+                "format": 2,
+                "requiredSubjects": ["direction", "latch"],
+                "sources": [
+                    {
+                        "path": "manual.md",
+                        "subjects": ["direction", "latch"],
+                        "subjectEvidence": {"direction": ["IODIR"]},
+                    }
+                ],
+            }
+        )
+
+
+def test_policy_v2_assigns_only_subjects_evidenced_in_chunk() -> None:
+    chunk = CodeChunk(
+        project="docs",
+        path="manual.md",
+        start_line=1,
+        end_line=3,
+        content="The IODIR register controls pin direction. GPIO reads the port.",
+        source_sha256="fixture",
+    )
+    source_policy = {
+        "subjects": ["direction", "output-latch"],
+        "evidence_bound": True,
+        "subject_evidence": {
+            "direction": ["IODIR register controls pin direction"],
+            "output-latch": ["OLAT register provides access to the output latches"],
+        },
+    }
+
+    assert _subjects_for_chunk(chunk, source_policy) == ["direction"]
+
+
+def test_related_parts_chunk_is_excluded_from_training() -> None:
+    chunk = CodeChunk(
+        project="docs",
+        path="adc.md",
+        start_line=900,
+        end_line=950,
+        content="## Related Parts\n\n| Part | Interface |\n| LTC2308 | SPI |",
+        source_sha256="fixture",
+    )
+
+    assert _excluded_training_section(chunk) == "related parts"
+
+
+def test_policy_v2_builds_splits_from_evidenced_chunks_only(tmp_path: Path) -> None:
+    doc_dir = tmp_path / "runtime-sources"
+    doc_dir.mkdir()
+    chunks = [
+        ["IODIR controls pin direction", "d1", "d2", "d3"],
+        ["IODIR controls pin direction", "d4", "d5", "d6"],
+        ["OLAT provides access to output latches", "l1", "l2", "l3"],
+        ["OLAT provides access to output latches", "l4", "l5", "l6"],
+        ["Unrelated SPI product catalogue", "x1", "x2", "x3"],
+    ]
+    (doc_dir / "manual.txt").write_text(
+        "\n".join(line for chunk in chunks for line in chunk) + "\n",
+        encoding="utf-8",
+    )
+    train_path = tmp_path / "train.jsonl"
+    validation_path = tmp_path / "validation.jsonl"
+
+    manifest = prepare_documents(
+        [doc_dir],
+        train_path,
+        validation_path,
+        tmp_path / "manifest.json",
+        chunk_lines=4,
+        overlap_lines=0,
+        max_file_bytes=1_000_000,
+        validation_ratio=0.25,
+        seed=31,
+        policy={
+            "format": 2,
+            "requiredSubjects": ["direction", "output-latch"],
+            "sources": [
+                {
+                    "path": "manual.txt",
+                    "subjects": ["direction", "output-latch"],
+                    "subjectEvidence": {
+                        "direction": ["IODIR controls pin direction"],
+                        "output-latch": [
+                            "OLAT provides access to output latches"
+                        ],
+                    },
+                }
+            ],
+        },
+    )
+
+    assert manifest["dataset_policy"]["status"] == "pass"
+    assert manifest["dataset_policy"]["unassigned_evidence_chunks"]
+    records = [
+        json.loads(line)
+        for path in (train_path, validation_path)
+        for line in path.read_text(encoding="utf-8").splitlines()
+    ]
+    assert {record["metadata"]["primary_subject"] for record in records} == {
+        "direction",
+        "output-latch",
+    }
+    assert all(
+        "Unrelated SPI product catalogue" not in record["completion"][0]["content"]
+        for record in records
+    )
 
 
 def test_policy_splits_short_document_into_independent_records(tmp_path: Path) -> None:

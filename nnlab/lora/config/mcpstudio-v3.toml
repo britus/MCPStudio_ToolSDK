@@ -88,14 +88,16 @@ backend = "mlx"
 base_url = "http://localhost:1234/v1"
 api_key = "lm-studio"
 model = "google/gemma-4-26b-a4b"
-temperature = 0.15
-max_new_tokens = 1024
-max_total_new_tokens = 2048
+temperature = 0.0
+max_new_tokens = 4096
+max_total_new_tokens = 8192
 
 [verification]
 prompts_file = "eval/eval-prompts.jsonl"
 adapter = "artifacts/finetune_lora_merged"
 output_file = "artifacts/finetune_verification.json"
+temperature = 0.0
+max_new_tokens = 4096
 
 [verification_input]
 output_root = "data/verifications"
