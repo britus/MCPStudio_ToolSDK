@@ -1,11 +1,11 @@
-Training objective: BOKRA/Bokara industrial I/O documentation adapter
+Training objective: Bokra industrial I/O documentation adapter
 
 Purpose
 Create a technically precise adapter for the locally documented BOKRA modules.
 Focus on the LTC2309-based analog-input module.
 Focus on the MCP23008-based digital-input and digital-output module.
 Use only authoritative documents retrieved from the configured RAG collection.
-Treat spelling variants BOKRA, BOKRA, Bokra, and Bokara as retrieval aliases.
+Treat spelling variants Bokra and BOKRA as retrieval aliases.
 Preserve the spelling used by each authoritative source in factual answers.
 Treat this file as a runtime objective and retrieval specification.
 Do not treat this file as an authoritative schematic or component datasheet.
@@ -14,20 +14,20 @@ Keep module-level facts separate from integrated-circuit facts.
 Keep transport-specific I2C facts separate from transport-specific SPI facts.
 Treat MCP23008 (I2C) and MCP23S08 (SPI) as interface variants of the same MCP23X08 device family.
 Accept cross-documentation between those variants for shared GPIO and register behavior.
-Do not reject a Bokara source solely because its device suffix and documented bus are inconsistent.
+Do not reject a Bokra source solely because its device suffix and documented bus are inconsistent.
 Treat such a suffix/interface mismatch as documentation ambiguity and preserve the source wording.
 Do not transfer I2C addressing, SPI opcodes, bus wiring, or transport timing between variants.
 This variant tolerance does not reinterpret the LTC2309 interface or any unrelated device family.
 
 Required source documents
-Retrieve Bokara_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.
+Retrieve Bokra_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.
 Retrieve Bokra_I2C_8AI_LTC2309_ver_1.01 when it is a distinct source.
-Retrieve Bokara_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.
-Retrieve an authoritative LTC2309 component datasheet when present in RAG.
-Retrieve an authoritative MCP23008 component datasheet when present in RAG.
+Retrieve Bokra_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.
+Retrieve an authoritative I2C LTC2309 component datasheet when present in RAG.
+Retrieve an authoritative I2C MCP23008 / component datasheet when present in RAG.
 Retrieve module schematics only when available as readable source material.
 Retrieve application notes only when their device applicability is explicit.
-Retrieve SPI documents for independently documented SPI hardware and MCP23S08 family-variant context.
+Retrieve I2C/SPI documents for independently documented I2C/SPI hardware and MCP23008/MCP23S08 family-variant context.
 Use exact local file paths returned by RAG.
 Never infer a filesystem path from a document title.
 Deduplicate content-identical document copies by content hash.
@@ -35,33 +35,33 @@ Retain distinct revisions and distinct schematics separately.
 Reject unrelated I/O boards as substitutes.
 
 Required subject identifiers
-bokara-ltc2309-module-overview
-bokara-ltc2309-analog-channels
-bokara-ltc2309-i2c-interface
-bokara-ltc2309-addressing
-bokara-ltc2309-conversion-control
-bokara-ltc2309-data-format
-bokara-ltc2309-input-configuration
-bokara-ltc2309-electrical-limits
-bokara-ltc2309-connectors-and-jumpers
-bokara-mcp23008-module-overview
-bokara-mcp23008-digital-inputs
-bokara-mcp23008-digital-outputs
-bokara-mcp23008-i2c-interface
-bokara-mcp23008-register-model
-bokara-mcp23008-connectors-and-jumpers
-bokara-mcp23008-electrical-limits
-bokara-common-power
-bokara-common-isolation
-bokara-common-mechanics
-bokara-common-integration
-bokara-i2c-procedures
+bokra-ltc2309-module-overview
+bokra-ltc2309-analog-channels
+bokra-ltc2309-i2c-interface
+bokra-ltc2309-addressing
+bokra-ltc2309-conversion-control
+bokra-ltc2309-data-format
+bokra-ltc2309-input-configuration
+bokra-ltc2309-electrical-limits
+bokra-ltc2309-connectors-and-jumpers
+bokra-mcp23008-module-overview
+bokra-mcp23008-digital-inputs
+bokra-mcp23008-digital-outputs
+bokra-mcp23008-i2c-interface
+bokra-mcp23008-register-model
+bokra-mcp23008-connectors-and-jumpers
+bokra-mcp23008-electrical-limits
+bokra-common-power
+bokra-common-isolation
+bokra-common-mechanics
+bokra-common-integration
+bokra-i2c-procedures
 
 Conditional subject identifiers
-bokara-revision-differences
-bokara-ltc2309-schematic
-bokara-mcp23008-schematic
-bokara-spi-boundary
+bokra-revision-differences
+bokra-ltc2309-schematic
+bokra-mcp23008-schematic
+bokra-spi-boundary
 
 Conditional subjects never block discovery approval or I2C training.
 Cover them only when the selected authoritative sources provide direct evidence.
@@ -271,24 +271,24 @@ Cover multi-device address conflicts.
 Cover synchronization behavior where supported.
 Preserve exact byte sequences from authoritative examples.
 
-SPI boundary requirements
+SPI boundary optional
 Search RAG for explicitly requested SPI material.
 Identify whether that material belongs to either selected BOKRA module.
-Accept MCP23S08 SPI material as family-variant context for an MCP23008-labelled Bokara module.
-Accept a Bokara module document that mixes MCP23008/MCP23S08 naming or I2C/SPI terminology.
-Do not fail verification solely because an answer follows the interface stated by such a Bokara
+Accept MCP23S08 SPI material as family-variant context for an MCP23008-labelled Bokra module.
+Accept a Bokra module document that mixes MCP23008/MCP23S08 naming or I2C/SPI terminology.
+Do not fail verification solely because an answer follows the interface stated by such a Bokra
 source even when the part-number suffix normally identifies the sibling interface variant.
-Treat the naming/interface conflict as a documentation-quality warning, not cross-contamination.
+Treat the naming/interface conflict as a documentation-quality warning, NOT cross-contamination.
 Require qualification when a statement depends on I2C addressing or SPI framing rather than on
 transport-neutral GPIO/register behavior.
 Do not reinterpret I2C clock and data as an SPI bus.
 Do not invent chip-select, MOSI, MISO, or SPI mode values.
 Keep independently documented SPI boards in separate subjects.
-Accept positive SPI claims supported by a selected Bokara module source or an applicable MCP23S08
-variant source, while retaining the applicable source name and variant.
+Accept positive SPI claims supported by a selected Bokra module source or an applicable 
+MCP23S08 variant source, while retaining the applicable source name and variant.
 The interface boundary is covered when the answer distinguishes shared family behavior from
-transport-specific behavior and reports contradictory Bokara naming without inventing a resolution.
-Do not extend MCP23X08 variant tolerance to the LTC2309 module.
+transport-specific behavior and reports contradictory Bokra naming without inventing a resolution.
+May be extend MCP23X08 variant tolerance to the LTC2309 module.
 Return an unresolved conditional warning when the boundary cannot be established.
 Never block I2C training because independent BOKRA SPI material is absent.
 
@@ -296,7 +296,7 @@ Revision and naming requirements
 Retain document version identifiers.
 Retain publication dates when present.
 Retain BOKRA spelling from source text.
-Treat Bokara and Bokra as search aliases only.
+Treat Bokra and BOKRA as search aliases only.
 Identify content-identical revisions by hash.
 Keep materially different revisions separate.
 Report contradictory electrical values.
@@ -338,7 +338,7 @@ Use exact register names only from component documentation.
 Separate module behavior from chip behavior.
 Separate transport-specific I2C behavior from transport-specific SPI behavior.
 Allow documented MCP23008/MCP23S08 cross-references for shared family behavior.
-Report inconsistent Bokara suffix/interface naming as ambiguity rather than automatically rejecting it.
+Report inconsistent Bokra suffix/interface naming as ambiguity rather than automatically rejecting it.
 State applicable revision.
 State when documentation is insufficient.
 Avoid unsupported extrapolation.

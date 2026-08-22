@@ -146,7 +146,7 @@ def settings_from_config(config_path: str | Path | None) -> PdfExtractionSetting
                 "~/.cache/docling/models",
             )
         ),
-        device=str(nested(config, "pdf_extraction", "device", "auto")),
+        device=str(nested(config, "pdf_extraction", "device", "cpu")),
         enable_ocr=bool(nested(config, "pdf_extraction", "ocr", True)),
         enable_formula_enrichment=bool(
             nested(config, "pdf_extraction", "formula_enrichment", True)
