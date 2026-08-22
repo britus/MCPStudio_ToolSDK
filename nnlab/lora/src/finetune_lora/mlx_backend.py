@@ -224,9 +224,9 @@ def train_mlx(
     else:
         output_dir.mkdir(parents=True, exist_ok=True)
     max_seq_length = (
-        min(int(nested(config, "data", "max_seq_length", 16384)), 16384)
+        min(int(nested(config, "data", "max_seq_length", 8192)), 8192)
         if smoke_test
-        else int(nested(config, "data", "max_seq_length", 16384))
+        else int(nested(config, "data", "max_seq_length", 8192))
     )
     train_count, validation_count = prepare_mlx_data(
         train_path,
@@ -458,7 +458,7 @@ def evaluate_mlx(
         validation_path,
         data_dir,
         tokenizer=data_tokenizer,
-        max_length=int(nested(config, "data", "max_seq_length", 4096)),
+        max_length=int(nested(config, "data", "max_seq_length", 8192)),
     )
     adapter_path = str(resolve_path(adapter)) if adapter else ""
     model, tokenizer = load(str(model_path), adapter_path=adapter_path or None)
@@ -476,7 +476,7 @@ def evaluate_mlx(
         "--test-batches",
         str(int(nested(config, "training", "mlx_eval_batches", 20))),
         "--max-seq-length",
-        str(int(nested(config, "data", "max_seq_length", 4096))),
+        str(int(nested(config, "data", "max_seq_length", 8192))),
         "--mask-prompt",
     ]
     result = subprocess.run(

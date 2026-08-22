@@ -16,7 +16,7 @@ train_file = "data/processed/finetune_lora/train.jsonl"
 validation_file = "data/processed/finetune_lora/validation.jsonl"
 manifest_file = "data/processed/finetune_lora/manifest.json"
 index_file = "data/processed/finetune_lora/code_index.sqlite3"
-max_seq_length = 16384
+max_seq_length = 8192
 chunk_lines = 140
 overlap_lines = 20
 max_file_bytes = 1000000
@@ -89,8 +89,8 @@ base_url = "http://localhost:1234/v1"
 api_key = "lm-studio"
 model = "google/gemma-4-26b-a4b"
 temperature = 0.15
-max_new_tokens = 2048
-max_total_new_tokens = 4096
+max_new_tokens = 1024
+max_total_new_tokens = 2048
 
 [verification]
 prompts_file = "eval/eval-prompts.jsonl"

@@ -329,7 +329,7 @@ class LMStudioFuseTests(unittest.TestCase):
                             ]
                         },
                         "load": {
-                            "fields": [{"key": "llm.load.contextLength", "value": 8192}]
+                            "fields": [{"key": "llm.load.contextLength", "value": 4096}]
                         },
                         "userMetadata": {"keep": True},
                     }
@@ -344,7 +344,7 @@ class LMStudioFuseTests(unittest.TestCase):
 
             defaults = json.loads(plan.user_defaults_path.read_text())
             self.assertEqual(defaults["preset"], "custom-preset")
-            self.assertEqual(defaults["load"]["fields"][0]["value"], 8192)
+            self.assertEqual(defaults["load"]["fields"][0]["value"], 4096)
             self.assertEqual(defaults["userMetadata"], {"keep": True})
             self.assertEqual(
                 [field["key"] for field in defaults["operation"]["fields"]],
