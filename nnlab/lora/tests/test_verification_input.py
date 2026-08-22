@@ -335,5 +335,18 @@ def test_bokara_objective_generates_specific_transport_safe_prompts() -> None:
     assert any("no register map or BUSY signal" in focus for focus in focuses)
     assert any("rejecting every transfer of SPI behavior to LTC2309" in focus for focus in focuses)
     assert "subjectEvidence as an object whose keys exactly match subjects" in objective
+    assert "truncated description" in objective
+    assert "Document preparation must then extract the PDF" in objective
+    assert "Do not infer train/validation split viability" in objective
+    required_section = objective.split("Required subject identifiers", 1)[1].split(
+        "Conditional subject identifiers", 1
+    )[0]
+    conditional_section = objective.split("Conditional subject identifiers", 1)[1].split(
+        "Source-to-subject mapping requirements", 1
+    )[0]
+    assert "bokra-common-power" not in required_section
+    assert "bokra-common-mechanics" not in required_section
+    assert "bokra-common-power" in conditional_section
+    assert "bokra-common-mechanics" in conditional_section
     assert "Never extend MCP23X08 family-variant tolerance to the LTC2309" in objective
     assert "May be extend MCP23X08" not in objective

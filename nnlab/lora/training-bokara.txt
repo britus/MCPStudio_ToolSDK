@@ -58,9 +58,7 @@ bokra-mcp23008-register-model
 bokra-mcp23008-interrupt-and-reset
 bokra-mcp23008-connectors-and-jumpers
 bokra-mcp23008-electrical-limits
-bokra-common-power
 bokra-common-isolation
-bokra-common-mechanics
 bokra-common-integration
 bokra-i2c-procedures
 
@@ -69,6 +67,8 @@ bokra-revision-differences
 bokra-ltc2309-schematic
 bokra-mcp23008-schematic
 bokra-spi-boundary
+bokra-common-power
+bokra-common-mechanics
 
 Conditional subjects never block discovery approval or I2C training.
 Cover them only when the selected authoritative sources provide direct evidence.
@@ -97,8 +97,101 @@ when the source permits it, so both train and validation can retain direct evide
 Do not use a title, table of contents, Related Parts section, product catalogue, or filename alone
 as subject evidence.
 Mark a requested subject missing when no authoritative source supports it.
-Mark a requested subject missing when direct evidence cannot survive both independent splits.
+Do not infer train/validation split viability from the number or length of RAG reference snippets.
+Document preparation owns split viability after it extracts the selected source in full.
+At discovery time, mark a subject missing only when neither retrieved source evidence nor an
+authorized source-specific candidate anchor can assign it to an exactly identified source.
 Keep document revision information in evidence.
+
+Source-specific candidate evidence anchors
+The following strings are candidate matching anchors for the named required PDFs.
+They are not standalone technical authority and must never become training content by themselves.
+When RAG validates the exact local PDF identity but exposes only a truncated description, the
+Training Document Finder is explicitly authorized to copy these anchors into subjectEvidence for
+that exact source. It must not mark the subject missing merely because the RAG description ends
+before the relevant page. Document preparation must then extract the PDF and confirm each anchor
+against actual source text. A missing anchor at preparation time is a coverage failure.
+For every selected named PDF, merge all listed anchors for its required subjects into the source
+plan even when RAG already returned a shorter excerpt for that subject. Candidate anchors supplement
+retrieved excerpts so preparation can locate independent substantive chunks.
+
+For Bokra_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.pdf:
+- bokra-ltc2309-connectors-and-jumpers:
+  "Each BOKRA I2C 8AI LTC2309 channel has its corresponding shunt jumper."
+  "Power Supply - Via P6 Connector."
+  "The P2 connector is used to select external or internal voltage reference."
+  "Each channel of the BOKRA I2C 8AI LTC2309 has a corresponding bypass jumper (P7-P14)."
+- bokra-common-power:
+  "Input power: 5VDC."
+  "Power Supply - Via P6 Connector."
+- bokra-common-mechanics:
+  "The module size 65 x 56 mm."
+  "The format of the module corresponds to the popular format of the Raspberry Pi 3A+."
+- bokra-common-integration:
+  "Compatible with most types of microcontrollers"
+  "Communication with BOKRA I2C 8AI LTC2309 via I 2 C interface via an external P3 connector."
+
+For LTC2309_I2C_Datasheet.pdf:
+- bokra-ltc2309-i2c-interface:
+  "The LTC2309 communicates through a 2-wire I 2 C compatible serial interface."
+  "the device is ready to accept a read/write request"
+- bokra-ltc2309-conversion-control:
+  "The various modes of operation of the LTC2309 are programmed by a 6-bit D IN word."
+  "S/D O/S S1 S0 UNI SLP"
+  "A STOP command may then be issued after performing the read/write operation to trigger a new conversion."
+- bokra-ltc2309-data-format:
+  "The data output stream is 16 bits long"
+  "The first bit is the MSB and the 12th bit is the LSB of the conversion result."
+  "The remaining four bits are zero."
+- bokra-ltc2309-input-configuration:
+  "The analog input MUX is programmed by the S/D, O/S, S1 and S0 bits"
+  "S/D = SINGLE-ENDED/ DIFFERENTIAL BIT"
+  "UNI = UNIPOLAR/ BIPOLAR BIT"
+- bokra-i2c-procedures:
+  "Conversions are initiated by signaling a STOP condition"
+  "The device will not acknowledge (NACK) an external request until the conversion is finished."
+  "A write operation may follow the read operation by using a repeat START"
+
+For Bokra_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.pdf:
+- bokra-mcp23008-connectors-and-jumpers:
+  "The microcontroller has the ability to direct access four channels"
+  "Using the DIRECT connector, external signals DO2 are fed to the module"
+  "is determined on the corresponding jumpers."
+- bokra-mcp23008-interrupt-and-reset:
+  "Interrupt output signal from MCP23008"
+  "RST and INT signals of the MCP23008 are output to the AUX connector."
+- bokra-common-power:
+  "Power supply - 5 VDC."
+  "controlled via the I 2 C interface using the MCP23008 chip"
+- bokra-common-mechanics:
+  "The BOKRA I2C 4DI+4DO module size 65 x 56 mm."
+  "The format of the module corresponds to the popular format of the Raspberry Pi 3A+."
+- bokra-common-integration:
+  "compatible with most microcontrollers"
+  "the ability to direct access four channels"
+- bokra-common-isolation:
+  "All channels are individually galvanically isolated with an electrical insulation strength of 1.5 kV."
+  "1500VDC insulation breakdown strength for input and output signals"
+
+For MCP23008_I2C_and_MCP23S08_SPI_atasheet.pdf:
+- bokra-mcp23008-register-model:
+  "The MCP23X08 contains eleven registers that can be addressed through the serial interface block"
+  "Writing to the GPIO register actually causes a write to the OLAT."
+  "The OLAT register provides access to the output latches."
+- bokra-mcp23008-digital-outputs:
+  "Writing to the OLAT register forces the associated output drivers to drive to the level in OLAT."
+  "Pins configured as inputs turn off the associated output driver and put it in high-impedance."
+- bokra-mcp23008-i2c-interface:
+  "The I 2 C Write operation includes the control byte and register address sequence"
+  "eight bits of data from the master and an Acknowledge (ACK) from the MCP23008"
+- bokra-mcp23008-interrupt-and-reset:
+  "The INTCAP register captures the GPIO port value at the time the interrupt occurred."
+  "the interrupt is cleared via a read of INTCAP or GPIO"
+  "Writing to these registers will not affect the interrupt."
+- bokra-i2c-procedures:
+  "The I 2 C Write operation includes the control byte and register address sequence"
+  "The operation is ended with a STOP or RESTART condition being generated by the master."
+  "eight bits of data from the master and an Acknowledge (ACK) from the MCP23008"
 
 LTC2309 module overview coverage
 Cover the documented product designation exactly.

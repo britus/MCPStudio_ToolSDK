@@ -29,6 +29,8 @@ def test_v3_training_outputs_are_cleaned_before_fresh_runs() -> None:
 
     assert config["data"]["output_dir"] == "data/processed/finetune_lora"
     assert config["data"]["clean_output_dir"] is True
+    assert config["data"]["chunk_lines"] == 40
+    assert config["data"]["overlap_lines"] == 0
     assert config["training"]["clean_output_dir"] is True
 
 
@@ -248,6 +250,11 @@ def test_source_discovery_requires_consistent_complete_coverage() -> None:
     assert "Never promote a conditional subject to required" in finder["instruction"]
     assert "generated list or heading alone is not such intent" in finder["instruction"]
     assert "generated verification and conditional subjects warn" in next(
+        prop["value"]
+        for prop in finder["properties"]
+        if prop["key"] == "discoveryPolicy"
+    )
+    assert "truncated RAG references do not prove subject absence" in next(
         prop["value"]
         for prop in finder["properties"]
         if prop["key"] == "discoveryPolicy"

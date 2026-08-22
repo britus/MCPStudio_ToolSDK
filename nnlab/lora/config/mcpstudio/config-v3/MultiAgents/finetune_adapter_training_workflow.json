@@ -14,7 +14,7 @@
           "description" : "Required retrieval behavior.",
           "key" : "discoveryPolicy",
           "required" : true,
-          "value" : "exact-local-paths; explicit training subjects gate approval; generated verification and conditional subjects warn; no inferred paths",
+          "value" : "exact-local-paths; explicit training subjects gate approval; generated verification and conditional subjects warn; source-specific objective anchors are provisional until extraction; truncated RAG references do not prove subject absence; no inferred paths",
           "valueType" : "string"
         },
         {

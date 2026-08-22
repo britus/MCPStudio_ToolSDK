@@ -11,6 +11,7 @@ from finetune_lora.prepare_docs import (
     _balance_training_records,
     _document_continuation_record,
     _excluded_training_section,
+    _records_for_chunk,
     _subjects_for_chunk,
     _validate_policy,
     chunk_document_source,
@@ -320,6 +321,29 @@ def test_policy_v2_assigns_only_subjects_evidenced_in_chunk() -> None:
     }
 
     assert _subjects_for_chunk(chunk, source_policy) == ["direction"]
+
+
+def test_primary_subject_prefers_specific_subject_over_common_labels() -> None:
+    chunk = CodeChunk(
+        project="docs",
+        path="manual.md",
+        start_line=1,
+        end_line=2,
+        content="Module content",
+        source_sha256="fixture",
+    )
+
+    records = _records_for_chunk(
+        chunk,
+        "documentation",
+        ["bokra-common-integration", "bokra-ltc2309-module-overview"],
+    )
+
+    assert all(
+        record["metadata"]["primary_subject"]
+        == "bokra-ltc2309-module-overview"
+        for record in records
+    )
 
 
 def test_related_parts_chunk_is_excluded_from_training() -> None:

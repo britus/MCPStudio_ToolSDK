@@ -268,7 +268,14 @@ def _records_for_chunk(
     continuation = _document_continuation_record(chunk, document_type)
     if continuation:
         records.append(continuation)
-    primary = subjects[0] if subjects else "unclassified"
+    primary = next(
+        (
+            subject
+            for subject in subjects
+            if "-common-" not in subject and not subject.endswith("-procedures")
+        ),
+        subjects[0] if subjects else "unclassified",
+    )
     for record in records:
         record["metadata"]["subjects"] = subjects
         record["metadata"]["primary_subject"] = primary
