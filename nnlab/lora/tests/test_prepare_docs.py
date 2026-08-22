@@ -323,6 +323,26 @@ def test_policy_v2_assigns_only_subjects_evidenced_in_chunk() -> None:
     assert _subjects_for_chunk(chunk, source_policy) == ["direction"]
 
 
+def test_policy_v2_matches_common_pdf_identifier_spacing() -> None:
+    chunk = CodeChunk(
+        project="docs",
+        path="adc.md",
+        start_line=1,
+        end_line=2,
+        content="The L TC2309 communicates through an I 2 C interface.",
+        source_sha256="fixture",
+    )
+    source_policy = {
+        "subjects": ["i2c-interface"],
+        "evidence_bound": True,
+        "subject_evidence": {
+            "i2c-interface": ["The LTC2309 communicates through an I2C interface"],
+        },
+    }
+
+    assert _subjects_for_chunk(chunk, source_policy) == ["i2c-interface"]
+
+
 def test_primary_subject_prefers_specific_subject_over_common_labels() -> None:
     chunk = CodeChunk(
         project="docs",
@@ -419,6 +439,71 @@ def test_policy_v2_builds_splits_from_evidenced_chunks_only(tmp_path: Path) -> N
         "Unrelated SPI product catalogue" not in record["completion"][0]["content"]
         for record in records
     )
+
+
+def test_policy_v2_splits_evidence_globally_across_sources(tmp_path: Path) -> None:
+    doc_dir = tmp_path / "runtime-sources"
+    doc_dir.mkdir()
+    for name, suffix in (("source-a.txt", "one"), ("source-b.txt", "two")):
+        (doc_dir / name).write_text(
+            f"subject A evidence {suffix}\na1\na2\na3\n"
+            f"subject B evidence {suffix}\nb1\nb2\nb3\n",
+            encoding="utf-8",
+        )
+
+    manifest = prepare_documents(
+        [doc_dir],
+        tmp_path / "train.jsonl",
+        tmp_path / "validation.jsonl",
+        tmp_path / "manifest.json",
+        chunk_lines=4,
+        overlap_lines=0,
+        max_file_bytes=1_000_000,
+        validation_ratio=0.25,
+        seed=37,
+        policy={
+            "format": 2,
+            "requiredSubjects": ["subject-a", "subject-b"],
+            "sources": [
+                {
+                    "path": name,
+                    "subjects": ["subject-a", "subject-b"],
+                    "subjectEvidence": {
+                        "subject-a": [f"subject A evidence {suffix}"],
+                        "subject-b": [f"subject B evidence {suffix}"],
+                    },
+                }
+                for name, suffix in (
+                    ("source-a.txt", "one"),
+                    ("source-b.txt", "two"),
+                )
+            ],
+        },
+    )
+
+    report = manifest["dataset_policy"]
+    assert report["status"] == "pass"
+    assert report["missing_train_subjects"] == []
+    assert report["missing_validation_subjects"] == []
+
+    train = [
+        json.loads(line)
+        for line in (tmp_path / "train.jsonl").read_text().splitlines()
+    ]
+    validation = [
+        json.loads(line)
+        for line in (tmp_path / "validation.jsonl").read_text().splitlines()
+    ]
+    for train_record in train:
+        for validation_record in validation:
+            train_meta = train_record["metadata"]
+            validation_meta = validation_record["metadata"]
+            if train_meta["source_key"] != validation_meta["source_key"]:
+                continue
+            assert (
+                train_meta["end_line"] < validation_meta["start_line"]
+                or validation_meta["end_line"] < train_meta["start_line"]
+            )
 
 
 def test_policy_splits_short_document_into_independent_records(tmp_path: Path) -> None:

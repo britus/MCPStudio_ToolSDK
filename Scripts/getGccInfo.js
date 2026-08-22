@@ -11,7 +11,7 @@ function getGccInfo(params) {
     var compiler = params.compiler || "gcc";
     var compilerName = compiler.substring(compiler.lastIndexOf("/") + 1);
     /* NOTE!: Security Gate: Allow only following path's */
-    var resolved = shared.resolveDeveloperTool(compiler, "compiler", [
+    var resolved = shared.resolveTool(compiler, "compiler", [
         "/usr/bin/" + compiler,
         "/opt/homebrew/bin/" + compiler,
         "/usr/local/bin/" + compiler

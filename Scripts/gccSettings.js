@@ -10,7 +10,7 @@ function filteredRun(run, pattern, fallback) {
     if (!run || !Array.isArray(run.stdout)) {
         return run;
     }
-    filtered = run.stdout.filter(function(line) { return pattern.test(line); });
+    filtered = run.stdout.filter(function (line) { return pattern.test(line); });
     run.stdout = filtered.length > 0 ? filtered : [fallback];
     return run;
 }
@@ -33,7 +33,7 @@ function gccSettings(params) {
     var verbose = params.verbose === true;
     var requestedCompilerName = compiler.substring(compiler.lastIndexOf("/") + 1);
     /* NOTE!: Security Gate: Allow only following path's */
-    var resolved = shared.resolveDeveloperTool(compiler, "compiler", [
+    var resolved = shared.resolveTool(compiler, "compiler", [
         "/usr/bin/" + compiler,
         "/opt/homebrew/bin/" + compiler,
         "/usr/local/bin/" + compiler

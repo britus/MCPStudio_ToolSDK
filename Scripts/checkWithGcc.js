@@ -10,7 +10,7 @@ function filterOutput(run, pattern, fallback) {
     if (!run || !Array.isArray(run.stdout)) {
         return run;
     }
-    lines = run.stdout.filter(function(line) { return pattern.test(line); });
+    lines = run.stdout.filter(function (line) { return pattern.test(line); });
     run.stdout = lines.length > 0 ? lines : [fallback];
     return run;
 }
@@ -70,15 +70,15 @@ function checkWithGcc(params) {
     }
 
     /* NOTE!: Security Gate: Allow only following path's */
-    gccValidation = shared.resolveDeveloperTool(gccRequest, "gcc", ["/usr/bin/gcc"]);
+    gccValidation = shared.resolveTool(gccRequest, "gcc", ["/usr/bin/gcc"]);
     if (!gccValidation.ok) {
         return shared.setErrorResult(gccValidation.message, {
             operation: "checkWithGcc",
             path: compilerPath || "PATH"
         });
     }
-    gxxValidation = shared.resolveDeveloperTool(gxxRequest, "g++", ["/usr/bin/g++"]);
-    arValidation = shared.resolveDeveloperTool(arRequest, "ar", ["/usr/bin/ar"]);
+    gxxValidation = shared.resolveTool(gxxRequest, "g++", ["/usr/bin/g++"]);
+    arValidation = shared.resolveTool(arRequest, "ar", ["/usr/bin/ar"]);
 
     output.stdout.push("=== Compiler Location ===", gccValidation.value);
     versionRun = shared.executeProcess(gccValidation.value, ["--version"]);

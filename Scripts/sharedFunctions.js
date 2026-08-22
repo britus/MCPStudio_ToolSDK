@@ -85,7 +85,7 @@ function ensureDirectory(path) {
  * @returns {number} Word count
  */
 function countWords(text) {
-    return text.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+    return text.split(/\s+/).filter(function (w) { return w.length > 0; }).length;
 }
 
 /**
@@ -291,7 +291,7 @@ function validateExecutable(value, parameterName) {
  * negotiated Launch Agent policy so the ToolSDK does not maintain a second,
  * potentially stale allowlist.
  */
-function resolveDeveloperTool(value, parameterName, preferredPaths) {
+function resolveTool(value, parameterName, additionalPaths) {
     var label = parameterName || "executable";
     var validation = validateExecutable(value, label);
     var executable;
@@ -308,7 +308,7 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
     name = executable.substring(executable.lastIndexOf("/") + 1);
     if (name === "xed") {
         /* NOTE!: Security Gate: Allow only following path's */
-        validation = resolveDeveloperTool("xcrun", label, ["/usr/bin/xcrun"]);
+        validation = resolveTool("xcrun", label, ["/usr/bin/xcrun"]);
         if (!validation.ok) {
             return validation;
         }
@@ -327,11 +327,27 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
         return { ok: true, value: validation.value };
     }
 
-    /* NOTE!: Security Gate: Allow only following 'root' path's */
-    candidates = Array.isArray(preferredPaths) ? preferredPaths.slice() : [];
-    roots = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"];
+    /* NOTE!: Gate: Allow only following 'root' path's */
+    let preferredPaths = MCPStudio.osCommandsPaths();
+    roots = Array.isArray(preferredPaths) ? preferredPaths.slice() : [];
+    if (roots.length === 0) {
+        let msg = "[Script]: resolveTool(): Parameter preferredPaths must not empty. Check tool call path and EoF MCP Studio oscommands.json configuration.";
+        console.error(msg);
+        return { ok: false, message: msg };
+    }
+
+    candidates = [];
     for (i = 0; i < roots.length; i += 1) {
-        candidates.push(joinPath(roots[i], name));
+        if (typeof roots[i] === "string" && roots[i].charAt(0) === "/") {
+            candidates.push(joinPath(roots[i], name));
+        }
+    }
+    if (additionalPaths && additionalPaths.length > 0) {
+        for (i = 0; i < additionalPaths.length; i += 1) {
+            if (typeof additionalPaths[i] === "string" && additionalPaths[i].charAt(0) === "/") {
+                candidates.push(joinPath(additionalPaths[i], name));
+            }
+        }
     }
 
     console.debug("[Script]: Shell candidates: " + JSON.stringify(candidates, null, 2));
@@ -345,8 +361,8 @@ function resolveDeveloperTool(value, parameterName, preferredPaths) {
     }
 
     let result = { ok: false, message: label + " not found: " + executable };
-    
-    console.debug("[Script]: Shell result: " + JSON.stringify(result, null, 2));
+
+    console.debug("[Script]: resolveTool()result: " + JSON.stringify(result, null, 2));
 
     return result;
 }
@@ -388,6 +404,10 @@ function executeProcess(executable, parameters) {
             };
         }
     }
+
+    args.time_out = 4 * 60 * 60;
+
+    console.log(`[Script] shell_call cmd=${executable} args=\n${JSON.stringify(args)}`);
 
     try {
         succeeded = MCPStudio.process(executable, args, "stdOut", "stdErr");
@@ -542,8 +562,8 @@ function getErrorOutput() {
 // .............................
 // Available module entry points
 module.exports = {
-    success, 
-    error, 
+    success,
+    error,
     copyMetadata,
     setToolResultPayload,
     setSuccessResult,
@@ -560,7 +580,7 @@ module.exports = {
     quoteShellArgument,
     validateShellFragment,
     validateExecutable,
-    resolveDeveloperTool,
+    resolveTool,
     splitArgumentString,
     executeProcess,
     createProcessOutput,

@@ -94,6 +94,12 @@ Each subjectEvidence value must be a non-empty array of short exact excerpts or 
 identifiers copied from substantive passages in that source.
 Provide multiple excerpts from independent, non-overlapping passages for each required subject
 when the source permits it, so both train and validation can retain direct evidence.
+Treat multiple excerpts that fall in one preparation chunk as one evidence block.
+For every required subject, supply candidate anchors from at least two non-overlapping passages
+across the complete selected-source set. One block must remain for train and one for validation.
+Map the same subject to every selected authoritative source that contains one of its listed
+source-specific anchors; do not restrict a subject to only one source when both module and
+component documentation support it.
 Do not use a title, table of contents, Related Parts section, product catalogue, or filename alone
 as subject evidence.
 Mark a requested subject missing when no authoritative source supports it.
@@ -116,6 +122,27 @@ plan even when RAG already returned a shorter excerpt for that subject. Candidat
 retrieved excerpts so preparation can locate independent substantive chunks.
 
 For Bokra_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.pdf:
+- bokra-ltc2309-module-overview:
+  "The BOKRA I2C 8AI LTC2309 modules are analog input modules based on the 12-bit high-speed and low-power ADC LTC2309."
+  "The following figure shows the location of elements on the BOKRA I2C 8AI LTC2309 module"
+- bokra-ltc2309-analog-channels:
+  "The BOKRA I2C 8AI LTC2309 modules allow you to measure eight differential analog signals"
+  "the channel is used to measure voltage between (+) and (-) terminal"
+  "the channel is used to measure current"
+- bokra-ltc2309-i2c-interface:
+  "I 2 C interface: 100Khz, 400Khz"
+  "Communication with BOKRA I2C 8AI LTC2309 via I 2 C interface via an external P3 connector."
+- bokra-ltc2309-addressing:
+  "The addresses of the LTC2309 ADC on the I 2 C are one of 9 possible addresses"
+  "The LTC2309 ADC address on the I 2 C interface is set using connector P1."
+  "the LTC2309 also contains a global address (1101011)"
+- bokra-ltc2309-data-format:
+  "The LTC2309 is a 12-bit ADC that transmits its data as two bytes with 12 significant bits"
+  "the 16-bit value received from LTC2309 must be shifted to the right for 4 bits"
+- bokra-ltc2309-electrical-limits:
+  "Input power: 5VDC."
+  "The voltage range is unipolar, from 0 to +5V full scale"
+  "The current range is unipolar, from 0 to +20 mA full scale"
 - bokra-ltc2309-connectors-and-jumpers:
   "Each BOKRA I2C 8AI LTC2309 channel has its corresponding shunt jumper."
   "Power Supply - Via P6 Connector."
@@ -135,11 +162,19 @@ For LTC2309_I2C_Datasheet.pdf:
 - bokra-ltc2309-i2c-interface:
   "The LTC2309 communicates through a 2-wire I 2 C compatible serial interface."
   "the device is ready to accept a read/write request"
+  "The LTC2309 communicates through an I 2 C interface."
+  "The LTC2309 can only be addressed as a slave"
+- bokra-ltc2309-addressing:
+  "The LTC2309 has two address pins (AD0 and AD1) that may be tied HIGH, LOW, or left floating"
+  "the LTC2309 also contains a global address (1101011)"
+  "all converters can be synchronized through the use of a global address call"
 - bokra-ltc2309-conversion-control:
   "The various modes of operation of the LTC2309 are programmed by a 6-bit D IN word."
   "S/D O/S S1 S0 UNI SLP"
   "A STOP command may then be issued after performing the read/write operation to trigger a new conversion."
+  "the D IN word defaults to all 0s"
 - bokra-ltc2309-data-format:
+  "There are 12 bits of output data followed by 4 trailing zeros."
   "The data output stream is 16 bits long"
   "The first bit is the MSB and the 12th bit is the LSB of the conversion result."
   "The remaining four bits are zero."
@@ -147,12 +182,31 @@ For LTC2309_I2C_Datasheet.pdf:
   "The analog input MUX is programmed by the S/D, O/S, S1 and S0 bits"
   "S/D = SINGLE-ENDED/ DIFFERENTIAL BIT"
   "UNI = UNIPOLAR/ BIPOLAR BIT"
+  "The input byte consists of the 6-bit D IN word followed by two bits"
 - bokra-i2c-procedures:
   "Conversions are initiated by signaling a STOP condition"
   "The device will not acknowledge (NACK) an external request until the conversion is finished."
   "A write operation may follow the read operation by using a repeat START"
+  "Data is transferred over the bus in groups of nine bits"
+  "After a complete read operation of 2 bytes, a STOP condition is needed to initiate a new conversion."
+  "At the end of a read operation, a STOP condition may be given to start a new conversion."
 
 For Bokra_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.pdf:
+- bokra-mcp23008-module-overview:
+  "The BOKRA I2C 4DI+4DO module is digital I / O module containing four digital input and four digital output channels."
+  "The following figure shows the location of elements on the BOKRA I2C 4DI+4DO module"
+- bokra-mcp23008-digital-inputs:
+  "The level of the digital input signal - 24V."
+  "signals DI2 and DI3 are obtained from it"
+- bokra-mcp23008-digital-outputs:
+  "Digital output signals - open collector, n-p-n."
+  "Using the DIRECT connector, external signals DO2 are fed to the module"
+- bokra-mcp23008-i2c-interface:
+  "controlled via the I 2 C interface using the MCP23008 chip"
+  "MCP23008 is controlled via I 2 C connector."
+- bokra-mcp23008-electrical-limits:
+  "Maximum current per channel - 300 mA peak"
+  "Power supply - 5 VDC."
 - bokra-mcp23008-connectors-and-jumpers:
   "The microcontroller has the ability to direct access four channels"
   "Using the DIRECT connector, external signals DO2 are fed to the module"
@@ -178,12 +232,14 @@ For MCP23008_I2C_and_MCP23S08_SPI_atasheet.pdf:
   "The MCP23X08 contains eleven registers that can be addressed through the serial interface block"
   "Writing to the GPIO register actually causes a write to the OLAT."
   "The OLAT register provides access to the output latches."
+  "Controls the direction of the data I/O."
 - bokra-mcp23008-digital-outputs:
   "Writing to the OLAT register forces the associated output drivers to drive to the level in OLAT."
   "Pins configured as inputs turn off the associated output driver and put it in high-impedance."
 - bokra-mcp23008-i2c-interface:
   "The I 2 C Write operation includes the control byte and register address sequence"
   "eight bits of data from the master and an Acknowledge (ACK) from the MCP23008"
+  "The MCP23008 is a slave I 2 C device that supports 7-bit slave addressing"
 - bokra-mcp23008-interrupt-and-reset:
   "The INTCAP register captures the GPIO port value at the time the interrupt occurred."
   "the interrupt is cleared via a read of INTCAP or GPIO"
@@ -192,6 +248,8 @@ For MCP23008_I2C_and_MCP23S08_SPI_atasheet.pdf:
   "The I 2 C Write operation includes the control byte and register address sequence"
   "The operation is ended with a STOP or RESTART condition being generated by the master."
   "eight bits of data from the master and an Acknowledge (ACK) from the MCP23008"
+  "The I 2 C Read operation includes the control byte sequence"
+  "The sequence ends with the master sending a STOP or RESTART condition."
 
 LTC2309 module overview coverage
 Cover the documented product designation exactly.

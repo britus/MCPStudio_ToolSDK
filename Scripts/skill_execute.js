@@ -34,7 +34,7 @@ function skillExecute(params) {
     }
 
     /* NOTE!: Security Gate: Allow only following path's */
-    resolved = shared.resolveDeveloperTool(command.trim(), "command");
+    resolved = shared.resolveTool(command.trim(), "command");
     if (!resolved.ok) {
         return shared.setErrorResult(resolved.message, {
             operation: operation,

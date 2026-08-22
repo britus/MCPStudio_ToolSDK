@@ -221,7 +221,13 @@ def _policy_source_map(policy: dict[str, Any] | None) -> dict[str, dict[str, Any
 
 
 def _normalized_evidence_text(value: str) -> str:
-    return " ".join(re.findall(r"\w+", value.casefold()))
+    normalized = value.casefold()
+    # PDF extraction commonly inserts spaces into bus and part identifiers. Keep
+    # evidence matching exact at the word level while treating these OCR forms as
+    # equivalent to the source-plan spelling.
+    normalized = re.sub(r"\bi\s*2\s*c\b", "i2c", normalized)
+    normalized = re.sub(r"\bl\s+tc\s*(?=\d)", "ltc", normalized)
+    return " ".join(re.findall(r"\w+", normalized))
 
 
 def _subjects_for_chunk(chunk: CodeChunk, source_policy: dict[str, Any]) -> list[str]:
@@ -402,7 +408,12 @@ def chunk_document_source(
 
 
 def _overlaps(left: CodeChunk, right: CodeChunk) -> bool:
-    return left.start_line <= right.end_line and right.start_line <= left.end_line
+    return (
+        left.project == right.project
+        and left.path == right.path
+        and left.start_line <= right.end_line
+        and right.start_line <= left.end_line
+    )
 
 
 def _blocked_split(
@@ -485,14 +496,15 @@ def _evidence_blocked_split(
     chunks: list[CodeChunk],
     validation_ratio: float,
     seed: int,
-    source_policy: dict[str, Any],
+    source_policies: dict[str, dict[str, Any]],
 ) -> tuple[list[CodeChunk], list[CodeChunk]]:
-    """Cover evidenced subjects in validation while retaining independent train evidence."""
+    """Split project evidence globally while retaining train coverage for every subject."""
     if validation_ratio <= 0 or len(chunks) < 2:
         return _blocked_split(chunks, validation_ratio, seed)
 
     subjects_by_chunk = {
-        id(chunk): set(_subjects_for_chunk(chunk, source_policy)) for chunk in chunks
+        id(chunk): set(_subjects_for_chunk(chunk, source_policies[chunk.path]))
+        for chunk in chunks
     }
     available_subjects = set().union(*subjects_by_chunk.values())
     target = max(1, round(len(chunks) * validation_ratio))
@@ -745,6 +757,8 @@ def prepare_documents(
                 combined["subject_evidence"][subject].extend(markers)
         records_by_path: dict[str, list[dict[str, Any]]] = {}
         validation_by_path: dict[str, list[dict[str, Any]]] = {}
+        evidence_chunks: list[CodeChunk] = []
+        evidence_policies: dict[str, dict[str, Any]] = {}
         for source in sources:
             source_key = f"{project}/{source.relative_path}"
             observed_policy_paths.add(source.relative_path)
@@ -826,9 +840,13 @@ def prepare_documents(
 
             if policy:
                 if source_policy["evidence_bound"]:
-                    train_chunks, validation_chunks = _evidence_blocked_split(
-                        chunks, validation_ratio, seed, source_policy
-                    )
+                    # Split evidence only after every source in the project has
+                    # been scanned. Independent support may live in another file.
+                    evidence_chunks.extend(chunks)
+                    evidence_policies[source.relative_path] = source_policy
+                    records_by_path[source.relative_path] = []
+                    validation_by_path[source.relative_path] = []
+                    continue
                 else:
                     train_chunks, validation_chunks = _blocked_split(
                         chunks, validation_ratio, seed
@@ -841,6 +859,47 @@ def prepare_documents(
                 source_records = records_for(chunks, "train")
                 validation_by_path[source.relative_path] = []
             records_by_path[source.relative_path] = source_records
+
+        if evidence_chunks:
+            train_chunks, validation_chunks = _evidence_blocked_split(
+                evidence_chunks,
+                validation_ratio,
+                seed,
+                evidence_policies,
+            )
+
+            def add_evidence_records(
+                selected_chunks: list[CodeChunk],
+                target: dict[str, list[dict[str, Any]]],
+                split_name: str,
+                current_policies: dict[str, dict[str, Any]] = evidence_policies,
+                current_document_type: str = project_document_type,
+            ) -> None:
+                for chunk in selected_chunks:
+                    subjects = _subjects_for_chunk(
+                        chunk,
+                        current_policies[chunk.path],
+                    )
+                    if not subjects:
+                        unassigned_evidence_chunks.append(
+                            {
+                                "path": f"{chunk.project}/{chunk.path}",
+                                "start_line": chunk.start_line,
+                                "end_line": chunk.end_line,
+                                "split": split_name,
+                            }
+                        )
+                        continue
+                    target[chunk.path].extend(
+                        _records_for_chunk(chunk, current_document_type, subjects)
+                    )
+
+            add_evidence_records(train_chunks, records_by_path, "train")
+            add_evidence_records(
+                validation_chunks,
+                validation_by_path,
+                "validation",
+            )
 
         validation_paths = (
             set()

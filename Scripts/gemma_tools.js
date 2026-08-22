@@ -45,7 +45,7 @@ function stringArray(value, fallback, label) {
 
 function runScript(root, scriptRelativePath, args, operation) {
     const script = shared.joinPath(root, scriptRelativePath);
-    const resolution = shared.resolveDeveloperTool(script, operation + ' executable');
+    const resolution = shared.resolveTool(script, operation + ' executable');
     if (!resolution.ok) {
         return shared.error(resolution.message);
     }

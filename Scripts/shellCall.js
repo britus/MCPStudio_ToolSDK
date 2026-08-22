@@ -46,7 +46,7 @@ function shellCall(params) {
     // splitArgumentString rejects shell control characters and only separates
     // on whitespace; no shell is invoked.
     commandParts = { ok: true, value: [command.trim()] };
-    resolved = shared.resolveDeveloperTool(commandParts.value[0], "command");
+    resolved = shared.resolveTool(commandParts.value[0], "command");
     if (!resolved.ok && /\s/.test(command.trim())) {
         commandParts = shared.splitArgumentString(command, "command");
         if (!commandParts.ok) {
@@ -55,7 +55,7 @@ function shellCall(params) {
                 command: command
             });
         }
-        resolved = shared.resolveDeveloperTool(commandParts.value[0], "command");
+        resolved = shared.resolveTool(commandParts.value[0], "command");
     }
 
     if (!resolved.ok) {

@@ -505,7 +505,7 @@ function prepareDocuments(params, sid) {
     const runSegment = 'run-' + Date.now() + '-' + safeSegment(sid);
     const runRelativePath = shared.joinPath(stagingRoot, runSegment);
     const runPath = shared.joinPath(root, runRelativePath);
-    const extractScript = shared.resolveDeveloperTool(
+    const extractScript = shared.resolveTool(
         shared.joinPath(root, 'scripts/extract_pdfs.sh'),
         'PDF extraction executable'
     );
@@ -571,13 +571,13 @@ function prepareDocuments(params, sid) {
                 : '';
             const extractedRelativePath =
                 typeof extractedDocument.output_relative_path === 'string' &&
-                extractedDocument.output_relative_path.trim()
-                ? relativePath(
-                    extractedDocument.output_relative_path,
-                    '',
-                    'Docling output_relative_path'
-                )
-                : '';
+                    extractedDocument.output_relative_path.trim()
+                    ? relativePath(
+                        extractedDocument.output_relative_path,
+                        '',
+                        'Docling output_relative_path'
+                    )
+                    : '';
             const expectedExtractedPath = extractedRelativePath
                 ? shared.joinPath(documentDir, extractedRelativePath)
                 : '';
@@ -649,7 +649,7 @@ function prepareDocuments(params, sid) {
         return shared.error('Could not write the dataset policy contract');
     }
 
-    const prepareScript = shared.resolveDeveloperTool(
+    const prepareScript = shared.resolveTool(
         shared.joinPath(root, 'scripts/prepare_docs.sh'),
         'document preparation executable'
     );
@@ -712,7 +712,7 @@ function prepareDocuments(params, sid) {
 
 function runScript(root, scriptRelativePath, args, operation) {
     const script = shared.joinPath(root, scriptRelativePath);
-    const resolution = shared.resolveDeveloperTool(script, operation + ' executable');
+    const resolution = shared.resolveTool(script, operation + ' executable');
     if (!resolution.ok) {
         return shared.error(resolution.message);
     }
@@ -744,7 +744,7 @@ function trainAdapter(params) {
         root,
         smokeTest ? 'scripts/smoke_train.sh' : 'scripts/train.sh'
     );
-    const resolution = shared.resolveDeveloperTool(script, operation + ' executable');
+    const resolution = shared.resolveTool(script, operation + ' executable');
     if (!resolution.ok) {
         return shared.error(resolution.message);
     }
@@ -841,7 +841,7 @@ function verifyMaster(params) {
     if (outputFile) { args.push('--output', outputFile); }
 
     const script = shared.joinPath(root, 'scripts/verify_master.sh');
-    const resolution = shared.resolveDeveloperTool(script, 'finetuneVerifyMaster executable');
+    const resolution = shared.resolveTool(script, 'finetuneVerifyMaster executable');
     if (!resolution.ok) {
         return shared.error(resolution.message);
     }
@@ -914,7 +914,7 @@ function mergeAdapters(params) {
         args.push('--force');
     }
     const script = shared.joinPath(root, 'scripts/merge_adapters.sh');
-    const resolution = shared.resolveDeveloperTool(script, 'finetuneMergeAdapters executable');
+    const resolution = shared.resolveTool(script, 'finetuneMergeAdapters executable');
     if (!resolution.ok) {
         return shared.error(resolution.message);
     }

@@ -119,7 +119,7 @@ return shared.error('The operation failed');
 | `normalizePath(path)` | Normalizes separators and `.` segments; returns `null` for parent traversal |
 | `joinPath(base, child)` | Joins two path components without resolving the filesystem |
 | `validateExecutable(value, name)` | Accepts a safe executable name or validated path |
-| `resolveDeveloperTool(value, name, preferredPaths)` | Resolves an approved developer tool to the absolute path required by the V1 process policy |
+| `resolveTool(value, name, preferredPaths)` | Resolves an approved developer tool to the absolute path required by the V1 process policy |
 | `splitArgumentString(value, name)` | Converts a restricted, whitespace-separated legacy option string to an argument array |
 | `executeProcess(executable, args)` | Calls `MCPStudio.process` and captures the injected output arrays |
 | `limitText(value, max)` / `limitOutput(lines, max)` | Bounds content returned to the assistant |

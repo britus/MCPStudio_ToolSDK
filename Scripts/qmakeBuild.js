@@ -96,12 +96,12 @@ function qmakeBuild(params) {
     makeFilePath = shared.joinPath(buildPath, "Makefile");
 
     /* NOTE!: Security Gate: Allow only following path's */
-    qmakeValidation = shared.resolveDeveloperTool("qmake", "qmake", [
+    qmakeValidation = shared.resolveTool("qmake", "qmake", [
         "/opt/homebrew/bin/qmake",
         "/usr/local/bin/qmake",
         "/usr/bin/qmake"
     ]);
-    makeValidation = shared.resolveDeveloperTool("make", "make", ["/usr/bin/make"]);
+    makeValidation = shared.resolveTool("make", "make", ["/usr/bin/make"]);
     if (!qmakeValidation.ok || !makeValidation.ok) {
         return shared.setErrorResult(
             !qmakeValidation.ok ? qmakeValidation.message : makeValidation.message,

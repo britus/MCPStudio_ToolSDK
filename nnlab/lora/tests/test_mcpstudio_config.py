@@ -29,7 +29,7 @@ def test_v3_training_outputs_are_cleaned_before_fresh_runs() -> None:
 
     assert config["data"]["output_dir"] == "data/processed/finetune_lora"
     assert config["data"]["clean_output_dir"] is True
-    assert config["data"]["chunk_lines"] == 40
+    assert config["data"]["chunk_lines"] == 20
     assert config["data"]["overlap_lines"] == 0
     assert config["training"]["clean_output_dir"] is True
 
