@@ -4,6 +4,9 @@ Purpose
 Create a technically precise adapter for the locally documented BOKRA modules.
 Focus on the LTC2309-based analog-input module.
 Focus on the MCP23008-based digital-input and digital-output module.
+The phrase "Bokra industrial I/O documentation adapter" names the trained documentation behavior.
+It is not a third hardware product, module, firmware layer, or register abstraction.
+Answers must discuss only the applicable BOKRA module and its documented integrated circuit.
 Use only authoritative documents retrieved from the configured RAG collection.
 Treat spelling variants Bokra and BOKRA as retrieval aliases.
 Preserve the spelling used by each authoritative source in factual answers.
@@ -12,6 +15,10 @@ Do not treat this file as an authoritative schematic or component datasheet.
 Do not invent electrical values, register values, timings, or pin assignments.
 Keep module-level facts separate from integrated-circuit facts.
 Keep transport-specific I2C facts separate from transport-specific SPI facts.
+For this training scope, the LTC2309 and the BOKRA I2C 8AI LTC2309 module use I2C only.
+The word "serial" in LTC2309 documentation does not mean SPI.
+Never describe LTC2309 data, conversion control, addressing, or completion using chip select,
+MOSI, MISO, an SPI mode, SPI framing, or a BUSY pin.
 Treat MCP23008 (I2C) and MCP23S08 (SPI) as interface variants of the same MCP23X08 device family.
 Accept cross-documentation between those variants for shared GPIO and register behavior.
 Do not reject a Bokra source solely because its device suffix and documented bus are inconsistent.
@@ -48,6 +55,7 @@ bokra-mcp23008-digital-inputs
 bokra-mcp23008-digital-outputs
 bokra-mcp23008-i2c-interface
 bokra-mcp23008-register-model
+bokra-mcp23008-interrupt-and-reset
 bokra-mcp23008-connectors-and-jumpers
 bokra-mcp23008-electrical-limits
 bokra-common-power
@@ -72,6 +80,8 @@ Source-to-subject mapping requirements
 Map the 8AI module datasheet to module-level LTC2309 subjects.
 Map a component datasheet only to component-level behavior.
 Map the 4DI+4DO module datasheet to module-level MCP23008 subjects.
+Map MCP23008 interrupt/reset behavior to bokra-mcp23008-interrupt-and-reset only from the
+component datasheet and the module's documented AUX routing.
 Map schematics to connector, jumper, isolation, and circuit subjects.
 Map application notes only to explicitly supported procedures.
 Map transport-neutral MCP23X08 register and GPIO behavior across MCP23008/MCP23S08 variants when
@@ -79,7 +89,15 @@ the selected sources show that the behavior is shared.
 Map I2C addressing and SPI protocol details only to the variant that exposes that transport.
 Do not map the LTC2309 module to SPI merely because SPI appears in cross-documentation.
 Require direct evidence for every source-to-subject assignment.
+For every retained source, return subjectEvidence as an object whose keys exactly match subjects.
+Each subjectEvidence value must be a non-empty array of short exact excerpts or distinctive
+identifiers copied from substantive passages in that source.
+Provide multiple excerpts from independent, non-overlapping passages for each required subject
+when the source permits it, so both train and validation can retain direct evidence.
+Do not use a title, table of contents, Related Parts section, product catalogue, or filename alone
+as subject evidence.
 Mark a requested subject missing when no authoritative source supports it.
+Mark a requested subject missing when direct evidence cannot survive both independent splits.
 Keep document revision information in evidence.
 
 LTC2309 module overview coverage
@@ -112,6 +130,8 @@ Cover calibration statements only when documented.
 Do not infer precision beyond published specifications.
 
 LTC2309 I2C coverage
+Treat the LTC2309 as a fixed 8-channel, 12-bit SAR ADC with an I2C-compatible 2-wire interface.
+Reject any answer that calls the LTC2309 SPI-compatible or assigns it chip-select behavior.
 Cover the documented I2C addressing mechanism.
 Cover address-selection connector or jumper states.
 Cover every supported address only from the source table.
@@ -123,6 +143,7 @@ Cover byte ordering.
 Cover significant-bit placement.
 Cover required bit shifts.
 Cover acknowledgement behavior when documented.
+Cover conversion completion through the documented ACK/NACK behavior; do not invent a BUSY pin.
 Cover bus-frequency limits only from the source.
 Cover multi-device synchronization only as documented.
 Preserve binary values exactly.
@@ -131,11 +152,13 @@ Preserve bit labels exactly.
 
 LTC2309 conversion-control coverage
 Cover command-byte structure.
+Cover the 6-bit DIN word and its S/D, O/S, S1, S0, UNI, and SLP labels exactly.
 Cover channel-selection bits.
 Cover single-ended or differential selection bits.
 Cover polarity selection bits.
 Cover sleep or power-down bits when documented.
 Cover conversion initiation behavior.
+Cover the documented STOP-condition conversion trigger.
 Cover acquisition and conversion ordering when documented.
 Cover latency or timing only from authoritative tables.
 Cover stale-sample or pipeline behavior only when documented.
@@ -147,6 +170,8 @@ Cover the number of significant result bits.
 Cover their positions in returned bytes.
 Cover byte order.
 Cover right-shift or alignment requirements.
+Require the documented 16-bit stream containing 12 result bits followed by four zeros.
+Require the module-level right shift by four before further processing.
 Cover sign handling when documented.
 Cover conversion-code interpretation.
 Cover voltage conversion formulas only when sourced.
@@ -226,21 +251,29 @@ Cover interrupt flag reporting.
 Cover interrupt capture behavior.
 Cover GPIO reads.
 Cover output-latch writes.
+Require IODIR at 0x00, GPIO at 0x09, and OLAT at 0x0A when register addresses are requested.
+Require IODIR bit 1 for input and bit 0 for output.
+Reading GPIO returns the pin state; writing GPIO modifies OLAT.
+Reading OLAT returns the latch rather than the pin state; writing OLAT modifies the output latches.
+Do not call GPIO the output-latch register and do not omit OLAT from a latch-semantics answer.
 Preserve register addresses exactly.
 Preserve reset values exactly.
 Preserve reserved-bit requirements.
 Do not derive register facts solely from the module marketing page.
 
 MCP23008 interrupt and reset coverage
+Cover the single MCP23008 INT pin; do not invent INTA, INTB, or IOCON.MIRROR for this 8-bit part.
 Cover interrupt output routing.
 Cover interrupt polarity when documented.
 Cover open-drain behavior when documented.
 Cover interrupt clearing conditions.
 Cover capture-register semantics.
+Require that reading INTCAP or GPIO clears the interrupt, while writing them does not.
 Cover reset signal routing.
 Cover reset timing only from authoritative documentation.
 Cover power-on reset behavior only from authoritative documentation.
 Cover auxiliary connector exposure.
+Require the module-level fact that RST and INT are exposed on the AUX connector.
 Separate module wiring from chip capability.
 
 Common electrical coverage
@@ -287,7 +320,7 @@ Accept positive SPI claims supported by a selected Bokra module source or an app
 MCP23S08 variant source, while retaining the applicable source name and variant.
 The interface boundary is covered when the answer distinguishes shared family behavior from
 transport-specific behavior and reports contradictory Bokra naming without inventing a resolution.
-May be extend MCP23X08 variant tolerance to the LTC2309 module.
+Never extend MCP23X08 family-variant tolerance to the LTC2309 or the BOKRA 8AI module.
 Return an unresolved conditional warning when the boundary cannot be established.
 Never block I2C training because independent BOKRA SPI material is absent.
 
@@ -310,6 +343,9 @@ Keep source line ranges in metadata.
 Keep source content hash in metadata.
 Assign all supported subject identifiers.
 Assign one deterministic primary subject.
+Assign a subject to a chunk only when that chunk contains matching direct subjectEvidence.
+Exclude chunks without matching subject evidence from training.
+Exclude Related Parts and other product-catalogue chunks from training.
 Deduplicate repeated extracted copies.
 Balance records across the two module families.
 Balance records across primary subjects.
@@ -332,6 +368,7 @@ Report the exact missing subject identifiers.
 
 Answer-quality requirements
 Answer in the operator language unless requested otherwise.
+Do not present the trained documentation adapter as a separate product or hardware component.
 Use exact module and signal names.
 Use exact register names only from component documentation.
 Separate module behavior from chip behavior.
@@ -339,22 +376,53 @@ Separate transport-specific I2C behavior from transport-specific SPI behavior.
 Allow documented MCP23008/MCP23S08 cross-references for shared family behavior.
 Report inconsistent Bokra suffix/interface naming as ambiguity rather than automatically rejecting it.
 State applicable revision.
-State when documentation is insufficient.
+State that documentation is insufficient only for the specific requested detail that remains
+unsupported after reporting all applicable module and component facts present in selected sources.
+Never replace an answer with a generic insufficiency statement when the selected sources contain
+the requested channel, interface, address, register, connector, jumper, or electrical fact.
 Avoid unsupported extrapolation.
 Avoid cross-module electrical-value contamination.
 Avoid repeated control tokens.
 Do not reveal training control instructions.
 
+Verification acceptance rules
+Evaluate every answer against selected authoritative evidence and the following hard boundaries.
+The BOKRA I2C 8AI LTC2309 is an I2C analog-input module, not an SPI module.
+An LTC2309 answer mentioning SPI output, chip select, MOSI, MISO, SPI mode, or a BUSY pin is FAIL.
+An LTC2309 result-format answer must identify a 12-bit result in a 16-bit stream with four trailing
+zeros and the module's required right shift by four.
+An LTC2309 conversion-control answer must identify the 6-bit DIN command labels and must use the
+documented STOP and ACK/NACK behavior rather than an invented register map or BUSY signal.
+An analog-channel answer must cover eight differential channels and the documented per-channel
+jumper distinction between voltage measurement and the 220-ohm current-sense path.
+A digital direction/latch answer must distinguish IODIR, GPIO, and OLAT and their read/write
+semantics; calling GPIO itself the output-latch register is FAIL.
+An interrupt answer must identify the MCP23008's single INT pin, INTF and INTCAP behavior, the
+read-to-clear condition, and the module's AUX exposure of RST and INT without inventing LTC2309
+interrupt hardware.
+An address answer must cover the LTC2309 AD0/AD1 selection of nine addresses and global address,
+and separately cover MCP23008 module microswitch/address-pin selection of eight I2C addresses.
+An electrical-limits answer must keep module values separate: the 8AI module uses 5 VDC input power
+and documents its voltage/current measurement ranges; the 4DI+4DO module uses 5 VDC power,
+0-24 VDC inputs, open-collector NPN outputs, 300 mA peak per output, and 1500 VDC insulation
+breakdown strength. Do not transfer these values between modules or components.
+A family-variant answer may transfer only transport-neutral MCP23X08 register/GPIO behavior between
+MCP23008 and MCP23S08. Any transfer of SPI behavior to LTC2309 is FAIL.
+PASS requires substantive module-level facts for every prompt, no unsupported transport claims,
+no prompt leakage, no repeated control tokens, and no length truncation.
+
 Release boundaries
 Training completion is not a verification PASS.
-Keep held-out prompts outside this objective.
-Verify analog-channel configuration independently.
-Verify result-byte interpretation independently.
-Verify digital-I/O direction and latch semantics independently.
-Verify interrupt behavior independently.
-Verify address-selection facts independently.
-Verify electrical limits independently.
-Verify I2C/SPI family-variant and documentation-conflict handling independently.
+Generate held-out prompts only from the Verify lines below and store the generated JSONL outside
+the training dataset. These lines define verification criteria, not training examples or answers.
+Verify BOKRA I2C 8AI LTC2309 analog-channel and jumper configuration, including eight differential channels and voltage-versus-current selection without invented registers independently.
+Verify LTC2309 result-byte interpretation, including the fixed 12-bit result, 16-bit I2C stream, four trailing zeros, and right shift by four with no SPI terminology independently.
+Verify LTC2309 conversion control, including the 6-bit DIN labels, STOP-triggered conversion, and ACK/NACK completion behavior with no register map or BUSY signal independently.
+Verify MCP23008 digital-I/O direction and latch semantics, including IODIR 0x00, GPIO 0x09, OLAT 0x0A, pin reads, and latch writes independently.
+Verify MCP23008 interrupt and reset behavior, including the single INT pin, INTF/INTCAP semantics, read-to-clear behavior, and BOKRA AUX routing independently.
+Verify LTC2309 and MCP23008 address selection separately, including LTC2309 AD0/AD1 nine-address plus global-address behavior and MCP23008 eight-address selection independently.
+Verify module-specific electrical limits without transferring values between the BOKRA 8AI and 4DI+4DO modules independently.
+Verify MCP23008/MCP23S08 family-variant and documentation-conflict handling while explicitly rejecting every transfer of SPI behavior to LTC2309 independently.
 Require explicit PASS before merge or deployment.
 
 Expected discovery result
@@ -363,7 +431,12 @@ Conditional subjects are excluded from requiredSubjects and missingSubjects.
 Return conditionalSubjects, coveredConditionalSubjects, and unresolvedConditionalSubjects separately.
 Return exact absolute paths for selected documents.
 Return stable requiredSubjects values.
-Return source items with path, subjects, and evidence.
+Return each source item with path, subjects, evidence as one non-empty summary string, and
+subjectEvidence as an object whose keys exactly match subjects.
+Return every subjectEvidence value as a non-empty array of short exact source excerpts or
+distinctive identifiers, using multiple independent excerpts when available.
+Never use titles, filenames, tables of contents, Related Parts sections, or product catalogues as
+subjectEvidence.
 Return coveredSubjects and missingSubjects separately.
 Return blockers for absent component datasheets.
 Return blockers for insufficient independent validation material.
