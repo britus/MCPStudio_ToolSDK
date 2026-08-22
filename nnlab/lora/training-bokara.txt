@@ -20,11 +20,10 @@ Do not transfer I2C addressing, SPI opcodes, bus wiring, or transport timing bet
 This variant tolerance does not reinterpret the LTC2309 interface or any unrelated device family.
 
 Required source documents
-Retrieve Bokra_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.
-Retrieve Bokra_I2C_8AI_LTC2309_ver_1.01 when it is a distinct source.
 Retrieve Bokra_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.
+Retrieve Bokra_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.pdf.
 Retrieve an authoritative I2C LTC2309 component datasheet when present in RAG.
-Retrieve an authoritative I2C MCP23008 / component datasheet when present in RAG.
+Retrieve an authoritative I2C MCP23008/MCP23S08 component datasheet when present in RAG.
 Retrieve module schematics only when available as readable source material.
 Retrieve application notes only when their device applicability is explicit.
 Retrieve I2C/SPI documents for independently documented I2C/SPI hardware and MCP23008/MCP23S08 family-variant context.
