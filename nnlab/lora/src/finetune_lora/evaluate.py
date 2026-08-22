@@ -123,7 +123,7 @@ def _evaluate_transformers(
     dataset = CompletionDataset(
         validation_path,
         tokenizer,
-        int(nested(config, "data", "max_seq_length", 8192)),
+        int(nested(config, "data", "max_seq_length", 4096)),
     )
     loader = DataLoader(
         dataset,

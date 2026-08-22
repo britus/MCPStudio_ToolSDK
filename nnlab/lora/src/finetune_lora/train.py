@@ -78,8 +78,8 @@ def _train_transformers(config_path: str, resume_from_checkpoint: str | None = N
             ),
         )
     model.config.use_cache = False
-
-    max_length = int(nested(config, "data", "max_seq_length", 8192))
+    seq_limit = 4096
+    max_length = int(nested(config, "data", "max_seq_length", seq_limit))
     train_path = resolve_path(nested(config, "data", "train_file"))
     validation_path = resolve_path(nested(config, "data", "validation_file"))
     train_dataset = CompletionDataset(train_path, tokenizer, max_length)
