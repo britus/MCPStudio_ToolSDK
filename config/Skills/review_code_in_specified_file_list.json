@@ -2,7 +2,9 @@
   "allowedToolNames" : [
     "file_exists",
     "list_files",
-    "read_file"
+    "mkdir",
+    "read_file",
+    "write_file"
   ],
   "description" : "Reviews a source-code file by file of specified file list (one or more files) and writes one Markdown review per source file into a mirrored Reviews directory. Use this skill when the user wants a structured code review of specific file(s) with actionable AI correction instructions.",
   "modelPreferences" : {

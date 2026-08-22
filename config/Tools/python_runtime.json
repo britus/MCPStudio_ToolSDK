@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.572Z",
+    "lastModified" : "2026-08-22T14:51:12.857Z",
     "priority" : 0.9
   },
   "description" : "Execute Python using Python 3. Provide inline Python or a script path; the tool runs it with the configured Python executable and returns stdout, stderr, exit code, and execution status.",

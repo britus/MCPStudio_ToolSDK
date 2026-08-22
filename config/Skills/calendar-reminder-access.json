@@ -1,0 +1,23 @@
+{
+  "allowedToolNames" : [
+    "list_calendars",
+    "list_events",
+    "list_reminder_lists",
+    "list_reminders"
+  ],
+  "description" : "Read-only access to the user's calendars, events, reminder lists and reminders. Use when a workflow or chat task needs to list calendars, load events for a date range, or load reminders.",
+  "name" : "calendar-reminder-access",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Use the authorized calendar and reminder tools to answer read-only calendar requests.\n\nWorkflow:\n1. Call list_calendars to discover available calendars.\n2. Call list_events with calendar_id plus ISO 8601 start_date and end_date for each relevant calendar.\n3. Call list_reminder_lists when reminder list ids are needed, then list_reminders with list_id and include_completed=false unless the user asks for completed reminders.\n\nDo not invent calendar data. Preserve calendar\/list names, dates, titles, locations, due dates, and tool errors in the result.",
+  "toolScopeMode" : "restricted",
+  "triggerPhrases" : [
+    "list calendars",
+    "show calendar events",
+    "list reminders"
+  ],
+  "visibilityScope" : "global"
+}

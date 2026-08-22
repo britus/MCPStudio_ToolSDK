@@ -4,26 +4,31 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-11T00:00:00.000Z",
+    "lastModified" : "2026-08-22T14:51:12.863Z",
     "priority" : 0.9
   },
-  "description" : "Execute one Launch Agent V1 approved developer tool directly with a verbatim argument array. Command interpreters, pipelines, redirections, and script text are not supported.",
+  "description" : "Execute a shell command with optional parameters.",
   "execHandler" : "shellCall",
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
       "command" : {
-        "description" : "Approved developer-tool name, absolute executable path, or a whitespace-separated invocation such as 'git status --short'. Prefer parameters for arguments that must remain a single value.",
+        "description" : "Shell command to execute.",
         "name" : "command",
         "type" : "string"
       },
       "parameters" : {
-        "description" : "Verbatim process arguments. Each array item is passed as one argument.",
+        "description" : "Array of command arguments.",
         "items" : {
           "type" : "string"
         },
         "name" : "parameters",
         "type" : "array"
+      },
+      "shell" : {
+        "description" : "Absolute path to the shell interpreter.",
+        "name" : "shell",
+        "type" : "string"
       }
     },
     "required" : [

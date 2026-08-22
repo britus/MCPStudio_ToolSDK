@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.577Z",
+    "lastModified" : "2026-08-22T14:51:12.862Z",
     "priority" : 0.9
   },
   "description" : "Builds an Xcode project with xcodebuild and reports whether the build is valid. Returns compiler and linker errors when the build fails.",

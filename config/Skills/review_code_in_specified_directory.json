@@ -3,7 +3,9 @@
     "analyze_directory",
     "file_exists",
     "list_files",
-    "read_file"
+    "mkdir",
+    "read_file",
+    "write_file"
   ],
   "description" : "Reviews a specified source-code directory file by file and writes one Markdown review per source file into a mirrored Reviews directory. Use this skill when the user wants a structured code review of a source tree with actionable AI correction instructions.",
   "name" : "review_code_in_specified_directory",

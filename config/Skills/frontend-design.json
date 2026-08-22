@@ -4,6 +4,8 @@
     "file_exists",
     "list_files",
     "mkdir",
+    "nodejs_runtime",
+    "python_runtime",
     "read_file",
     "shell_call",
     "skill_execute",

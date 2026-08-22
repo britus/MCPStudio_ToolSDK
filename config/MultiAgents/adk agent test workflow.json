@@ -26,7 +26,8 @@
       ],
       "role" : "rootCoordinator",
       "skillNames" : [
-
+        "python-runtime-resource-access",
+        "nodejs-runtime-resource-access"
       ],
       "temperature" : 0.1,
       "toolName" : ""
@@ -42,6 +43,13 @@
       "positionX" : 142.6953125,
       "positionY" : 308.458984375,
       "properties" : [
+        {
+          "description" : "Optional string environment variables for the Node.js child process. PATH does not control executable resolution.",
+          "key" : "environment",
+          "required" : false,
+          "value" : "",
+          "valueType" : "object"
+        },
         {
           "description" : "Inline JavaScript with a 5 second delay and deterministic stdout.",
           "key" : "inlineScript",

@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.575Z",
+    "lastModified" : "2026-08-22T14:51:12.861Z",
     "priority" : 0.9
   },
   "description" : "Use this tool to check source code syntax with clang compiler. This tool is applicable for C, CPP, Objective-C source code. This tool provides information about the validity of the changes. If errors occur, try to fix them.",

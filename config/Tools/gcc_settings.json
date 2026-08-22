@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.576Z",
+    "lastModified" : "2026-08-22T14:51:12.861Z",
     "priority" : 0.9
   },
   "description" : "Report detailed GCC compiler settings and supported flags.",

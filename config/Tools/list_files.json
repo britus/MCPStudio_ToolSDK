@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-04T06:37:36.576Z",
+    "lastModified" : "2026-08-22T14:51:12.862Z",
     "priority" : 0.9
   },
   "description" : "Lists all files in the specified directory using a string list of file extensions (i.e. „.cpp“ or „.js“)",
@@ -26,12 +26,13 @@
         "type" : "string"
       },
       "recursive" : {
-        "defaultValue" : "true",
+        "defaultValue" : "false",
         "description" : "Boolean parameter to enable recursive traversal of the directory tree. Set the value 'false' to list the contents of the directory or the value 'true' to include subdirectories.",
         "name" : "recursive",
         "type" : "boolean"
       },
       "sort" : {
+        "defaultValue" : "name",
         "description" : "Sort by name, date, size",
         "name" : "sort",
         "type" : "string"
