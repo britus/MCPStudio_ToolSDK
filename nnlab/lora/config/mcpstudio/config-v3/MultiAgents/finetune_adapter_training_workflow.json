@@ -2,32 +2,32 @@
   "agents" : [
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Use the validated `trainingGoal` supplied by Load Training Objective as the complete runtime objective. Extract separate required and conditional subject lists, resolve exact local source documents, and compute required coverage from the required subjects assigned to retained sources. Never promote a conditional subject to required. Automatically generated verification or check identifiers do not by themselves require dedicated RAG documents. Treat availability-qualified revision, schematic and similar supplemental verification subjects as conditional unless the operator explicitly makes source coverage essential for this training run; a generated list or heading alone is not such intent. Prefer explicit sources in the objective; call rag_query with focused subject-and-source queries for each uncovered required subject and use no other tool. Batch independent rag_query calls in the same response whenever possible and reserve the final turn for the required JSON result. For provider portability call rag_query with its required query string only; never pass a Boolean as top_k and never guess a collection name. Preserve exact absolute file:\/\/ URIs or filesystem paths returned by results. Classify explicitly best-effort or conditional source requests as non-blocking. Missing or rejected optional and conditional sources are warnings when other retained sources evidence every required subject; mandatory-source failures remain blockers. Never retain a source whose identity, variant or revision evidence conflicts with the objective, even when it is optional; rejected sources cannot contribute required coverage. RAG snippets cannot prove that a PDF lacks visual material, so unresolved conditional schematics are warnings rather than blockers. A negative interface boundary can be supported by authoritative sources that document the selected module interface; do not require unrelated positive-interface documents. Output exactly one raw JSON object with approved, sourcePlan, coveredSubjects, missingSubjects, conditionalSubjects, coveredConditionalSubjects, unresolvedConditionalSubjects, blockers and warnings. sourcePlan.requiredSubjects and every source subject assignment passed to preparation must contain required subjects only. Each source must contain path, non-empty subjects, evidence as one non-empty summary string, and subjectEvidence as an object whose keys exactly match subjects. Every subjectEvidence value must be a non-empty array of short exact excerpts or distinctive identifiers copied from substantive supporting passages; provide multiple independent excerpts when available. Never use a table of contents, Related Parts section or product catalogue as subject evidence. coveredSubjects must equal the union of source subjects; missingSubjects must equal requiredSubjects minus that union and must exclude conditional subjects. approved may be true only when missingSubjects and blockers are empty; unresolved conditional subjects and warnings may be non-empty. Never use the objective file itself as an authoritative technical source unless explicitly requested. No Markdown or surrounding prose.",
+      "instruction" : "Route the resolved request into the deterministic objective-loader stage. Extract the absolute training config after `Training configuration (absolute):`, or after the legacy `Training configuration:` label, the absolute value after `Training objective file:`, and the optional value after `Inline training objective:`. Return exactly one raw JSON object with objectiveFile, objectiveText, projectRoot and trainingConfig. Do not read either file, interpret domain content, query RAG or start training.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
-      "maxTurns" : 24,
-      "name" : "Training Document Finder",
-      "positionX" : 490.921875,
-      "positionY" : 82.21875,
+      "maxTurns" : 2,
+      "name" : "Training Coordinator",
+      "positionX" : 117.22265625,
+      "positionY" : 79.375,
       "properties" : [
         {
-          "description" : "Required retrieval behavior.",
-          "key" : "discoveryPolicy",
+          "description" : "Absolute project root passed to project tools.",
+          "key" : "projectRoot",
           "required" : true,
-          "value" : "exact-local-paths; explicit training subjects gate approval; generated verification and conditional subjects warn; source-specific objective anchors are provisional until extraction; truncated RAG references do not prove subject absence; no inferred paths",
+          "value" : "${CHAT_PROJECT_DIR}",
           "valueType" : "string"
         },
         {
-          "description" : "Validated objective content supplied by the deterministic loader.",
-          "key" : "trainingGoal",
+          "description" : "Absolute training TOML to execute.",
+          "key" : "trainingConfig",
           "required" : true,
-          "value" : "",
+          "value" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio-v3.toml",
           "valueType" : "string"
         }
       ],
-      "role" : "specialist",
+      "role" : "planner",
       "skillNames" : [
-        "finetune_training_document_discovery"
+        "finetune_training_request_router"
       ],
       "temperature" : 0.1,
       "toolName" : ""
@@ -40,8 +40,8 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Load Training Objective",
-      "positionX" : 405,
-      "positionY" : 82,
+      "positionX" : 494.7734375,
+      "positionY" : 80.6640625,
       "properties" : [
         {
           "description" : "Absolute file path extracted from the resolved Prompt Picker request.",
@@ -73,6 +73,38 @@
       "toolName" : "finetune_load_training_objective"
     },
     {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Use the validated `trainingGoal` supplied by Load Training Objective as the complete runtime objective. Extract separate required and conditional subject lists, resolve exact local source documents, and compute required coverage from the required subjects assigned to retained sources. Never promote a conditional subject to required. Automatically generated verification or check identifiers do not by themselves require dedicated RAG documents. Treat availability-qualified revision, schematic and similar supplemental verification subjects as conditional unless the operator explicitly makes source coverage essential for this training run; a generated list or heading alone is not such intent. Prefer explicit sources in the objective; call rag_query with focused subject-and-source queries for each uncovered required subject and use no other tool. Batch independent rag_query calls in the same response whenever possible and reserve the final turn for the required JSON result. For provider portability call rag_query with its required query string only; never pass a Boolean as top_k and never guess a collection name. Preserve exact absolute file:\/\/ URIs or filesystem paths returned by results. Classify explicitly best-effort or conditional source requests as non-blocking. Missing or rejected optional and conditional sources are warnings when other retained sources evidence every required subject; mandatory-source failures remain blockers. Never retain a source whose identity, variant or revision evidence conflicts with the objective, even when it is optional; rejected sources cannot contribute required coverage. RAG snippets cannot prove that a PDF lacks visual material, so unresolved conditional schematics are warnings rather than blockers. A negative interface boundary can be supported by authoritative sources that document the selected module interface; do not require unrelated positive-interface documents. Output exactly one raw JSON object with approved, sourcePlan, coveredSubjects, missingSubjects, conditionalSubjects, coveredConditionalSubjects, unresolvedConditionalSubjects, blockers and warnings. sourcePlan.requiredSubjects and every source subject assignment passed to preparation must contain required subjects only. Each source must contain path, non-empty subjects, evidence as one non-empty summary string, and subjectEvidence as an object whose keys exactly match subjects. Every subjectEvidence value must be a non-empty array of short exact excerpts or distinctive identifiers copied from substantive supporting passages; provide multiple independent excerpts when available. Never use a table of contents, Related Parts section or product catalogue as subject evidence. coveredSubjects must equal the union of source subjects; missingSubjects must equal requiredSubjects minus that union and must exclude conditional subjects. approved may be true only when missingSubjects and blockers are empty; unresolved conditional subjects and warnings may be non-empty. Never use the objective file itself as an authoritative technical source unless explicitly requested. No Markdown or surrounding prose.",
+      "llmProviderID" : "activeSession",
+      "logLevel" : "debug",
+      "maxTurns" : 24,
+      "name" : "Training Document Finder",
+      "positionX" : 897.1796875,
+      "positionY" : 80.6825284090909,
+      "properties" : [
+        {
+          "description" : "Required retrieval behavior.",
+          "key" : "discoveryPolicy",
+          "required" : true,
+          "value" : "exact-local-paths; explicit training subjects gate approval; generated verification and conditional subjects warn; source-specific objective anchors are provisional until extraction; truncated RAG references do not prove subject absence; no inferred paths",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Validated objective content supplied by the deterministic loader.",
+          "key" : "trainingGoal",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+        "finetune_training_document_discovery"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
       "executionMode" : "mcpTool",
       "instruction" : "Materialize every selected document. Extract each PDF to text, copy readable text sources into an isolated batch, then run the configured prepare_docs batch exactly once. Return the real process result and manifest counts.",
       "llmProviderID" : "none",
@@ -80,8 +112,8 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Prepare Training Documents",
-      "positionX" : 915.44140625,
-      "positionY" : 83.60546875,
+      "positionX" : 896.8984375,
+      "positionY" : 320.15234375,
       "properties" : [
         {
           "description" : "Absolute training TOML whose dataset files are rebuilt.",
@@ -91,11 +123,18 @@
           "valueType" : "string"
         },
         {
-          "description" : "Generic source-to-subject JSON contract returned by the finder.",
-          "key" : "sourcePlan",
-          "required" : true,
-          "value" : "{}",
-          "valueType" : "json"
+          "description" : "Deterministic deduplication, balancing, coverage and validation-independence report.",
+          "key" : "datasetPolicy",
+          "required" : false,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Absolute document paths or file:\/\/ URIs selected for this training objective. Each item is materialized; all items are then prepared as one batch.",
+          "key" : "documentPaths",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
         },
         {
           "description" : "Absolute fine-tuning project root.",
@@ -103,6 +142,13 @@
           "required" : true,
           "value" : "${CHAT_PROJECT_DIR}",
           "valueType" : "string"
+        },
+        {
+          "description" : "Generic source-to-subject JSON contract returned by the finder.",
+          "key" : "sourcePlan",
+          "required" : true,
+          "value" : "{}",
+          "valueType" : "json"
         },
         {
           "description" : "Parent directory for isolated per-run materialized batches.",
@@ -121,32 +167,25 @@
     },
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Route the resolved request into the deterministic objective-loader stage. Extract the absolute training config after `Training configuration (absolute):`, or after the legacy `Training configuration:` label, the absolute value after `Training objective file:`, and the optional value after `Inline training objective:`. Return exactly one raw JSON object with objectiveFile, objectiveText, projectRoot and trainingConfig. Do not read either file, interpret domain content, query RAG or start training.",
+      "instruction" : "Report the deterministic pipeline result concisely. Include selected sources and subject assignments, discovery warnings and blockers, deduplicated inputs, train and validation coverage, balancing status, smoke PASS or FAIL, early-stop and best-checkpoint details, full-training result or stop reason, artifact path, generated verificationInputPath and unresolved risks. Never turn a warning into a blocker. Never call tools and never claim merge, verification or installation occurred.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 2,
-      "name" : "Training Coordinator",
-      "positionX" : 117.47265625,
-      "positionY" : 84.75390625,
+      "name" : "Training Result Synthesizer",
+      "positionX" : 117.39453125,
+      "positionY" : 538.23828125,
       "properties" : [
         {
-          "description" : "Absolute project root passed to project tools.",
-          "key" : "projectRoot",
+          "description" : "Final training report format.",
+          "key" : "outputFormat",
           "required" : true,
-          "value" : "${CHAT_PROJECT_DIR}",
-          "valueType" : "string"
-        },
-        {
-          "description" : "Absolute training TOML to execute.",
-          "key" : "trainingConfig",
-          "required" : true,
-          "value" : "${CHAT_PROJECT_DIR}\/config\/mcpstudio-v3.toml",
+          "value" : "markdown",
           "valueType" : "string"
         }
       ],
-      "role" : "planner",
+      "role" : "synthesizer",
       "skillNames" : [
-        "finetune_training_request_router"
+        "finetune_adapter_training_workflow_context"
       ],
       "temperature" : 0.1,
       "toolName" : ""
@@ -159,8 +198,8 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Smoke Training Runner",
-      "positionX" : 916.3515625,
-      "positionY" : 311.83203125,
+      "positionX" : 897.203125,
+      "positionY" : 566.7421875,
       "properties" : [
         {
           "description" : "Absolute training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
@@ -174,6 +213,13 @@
           "key" : "expectedOutputDir",
           "required" : true,
           "value" : "artifacts\/finetune_lora_candidate_smoke",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional validated absolute training-objective path used to generate verification_input.json after a full run.",
+          "key" : "objectiveFile",
+          "required" : false,
+          "value" : "",
           "valueType" : "string"
         },
         {
@@ -206,31 +252,6 @@
       "toolName" : "finetune_train_adapter"
     },
     {
-      "executionMode" : "llmInstruction",
-      "instruction" : "Report the deterministic pipeline result concisely. Include selected sources and subject assignments, discovery warnings and blockers, deduplicated inputs, train and validation coverage, balancing status, smoke PASS or FAIL, early-stop and best-checkpoint details, full-training result or stop reason, artifact path, generated verificationInputPath and unresolved risks. Never turn a warning into a blocker. Never call tools and never claim merge, verification or installation occurred.",
-      "llmProviderID" : "activeSession",
-      "logLevel" : "debug",
-      "maxTurns" : 2,
-      "name" : "Training Result Synthesizer",
-      "positionX" : 303.25390625,
-      "positionY" : 423.8671875,
-      "properties" : [
-        {
-          "description" : "Final training report format.",
-          "key" : "outputFormat",
-          "required" : true,
-          "value" : "markdown",
-          "valueType" : "string"
-        }
-      ],
-      "role" : "synthesizer",
-      "skillNames" : [
-        "finetune_adapter_training_workflow_context"
-      ],
-      "temperature" : 0.1,
-      "toolName" : ""
-    },
-    {
       "executionMode" : "mcpTool",
       "instruction" : "Run the full configured training exactly once and only when the smoke tool's executable gate returns success=true. Pass the validated objective file so the training command creates a reusable verification_input.json. Return the real process result, artifact validation, verification input path, stdout and stderr.",
       "llmProviderID" : "none",
@@ -238,8 +259,8 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Full Training Runner",
-      "positionX" : 916.73828125,
-      "positionY" : 543.5703125,
+      "positionX" : 492.84375,
+      "positionY" : 691.6328125,
       "properties" : [
         {
           "description" : "Absolute training TOML. Keep synchronized with Training Coordinator.trainingConfig.",
@@ -295,21 +316,30 @@
   "connections" : [
     {
       "artifactPolicy" : "pass-structured",
-      "condition" : "Load the selected objective after request routing.",
-      "kind" : "delegation",
-      "label" : "Load selected objective",
-      "sharedStateKeys" : "objectiveFile,objectiveText,projectRoot",
-      "source" : "Training Coordinator",
-      "target" : "Load Training Objective"
-    },
-    {
-      "artifactPolicy" : "pass-structured",
       "condition" : "Start document discovery only when objective loading returns success=true.",
       "kind" : "artifactFlow",
       "label" : "Discover sources for validated objective",
       "sharedStateKeys" : "trainingGoal,objectiveFile",
       "source" : "Load Training Objective",
       "target" : "Training Document Finder"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Supply the validated objective path for verification-input generation.",
+      "kind" : "artifactFlow",
+      "label" : "Generate verification input from objective",
+      "sharedStateKeys" : "objectiveFile",
+      "source" : "Load Training Objective",
+      "target" : "Full Training Runner"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "Load the selected objective after request routing.",
+      "kind" : "delegation",
+      "label" : "Load selected objective",
+      "sharedStateKeys" : "objectiveFile,objectiveText,projectRoot",
+      "source" : "Training Coordinator",
+      "target" : "Load Training Objective"
     },
     {
       "artifactPolicy" : "pass-structured",
@@ -327,15 +357,6 @@
       "label" : "Provide objective",
       "sharedStateKeys" : "projectRoot,trainingConfig",
       "source" : "Training Coordinator",
-      "target" : "Training Result Synthesizer"
-    },
-    {
-      "artifactPolicy" : "allow-failed-diagnostics",
-      "condition" : "Always report objective loading success, failure or skip reason.",
-      "kind" : "artifactFlow",
-      "label" : "Report objective loading",
-      "sharedStateKeys" : "objectiveLoadResult",
-      "source" : "Load Training Objective",
       "target" : "Training Result Synthesizer"
     },
     {
@@ -358,6 +379,15 @@
     },
     {
       "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report objective loading success, failure or skip reason.",
+      "kind" : "artifactFlow",
+      "label" : "Report objective loading",
+      "sharedStateKeys" : "objectiveLoadResult",
+      "source" : "Load Training Objective",
+      "target" : "Training Result Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
       "condition" : "Always report smoke PASS, FAIL or skip reason.",
       "kind" : "artifactFlow",
       "label" : "Report smoke gate",
@@ -372,15 +402,6 @@
       "label" : "Run full training on smoke PASS",
       "sharedStateKeys" : "smokeResult",
       "source" : "Smoke Training Runner",
-      "target" : "Full Training Runner"
-    },
-    {
-      "artifactPolicy" : "pass-override",
-      "condition" : "Supply the validated objective path for verification-input generation.",
-      "kind" : "artifactFlow",
-      "label" : "Generate verification input from objective",
-      "sharedStateKeys" : "objectiveFile",
-      "source" : "Load Training Objective",
       "target" : "Full Training Runner"
     },
     {

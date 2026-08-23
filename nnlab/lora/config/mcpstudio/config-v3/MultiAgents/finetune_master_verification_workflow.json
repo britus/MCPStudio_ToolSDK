@@ -2,52 +2,20 @@
   "agents" : [
     {
       "executionMode" : "llmInstruction",
-      "instruction" : "Extract the absolute value after `Verification config (absolute):` from the complete workflow input. Return exactly one raw JSON object with verificationConfig and projectRoot. Preserve both paths exactly. Do not read files, merge, verify, install or deploy.",
-      "llmProviderID" : "activeSession",
-      "logLevel" : "debug",
-      "maxTurns" : 2,
-      "name" : "Verification Request Router",
-      "positionX" : 70,
-      "positionY" : 90,
-      "properties" : [
-        { "description" : "Absolute active chat project root.", "key" : "projectRoot", "required" : true, "value" : "${CHAT_PROJECT_DIR}", "valueType" : "string" }
-      ],
-      "role" : "planner",
-      "skillNames" : [ "finetune_master_verification_workflow_context" ],
-      "temperature" : 0.1,
-      "toolName" : ""
-    },
-    {
-      "executionMode" : "mcpTool",
-      "instruction" : "Load and deterministically validate the selected verification_input.json. Return its exact normalized fields and diagnostics without changing them.",
-      "llmProviderID" : "none",
-      "logLevel" : "debug",
-      "maxTurns" : 1,
-      "modelName" : "",
-      "name" : "Load Verification Input",
-      "positionX" : 350,
-      "positionY" : 90,
-      "properties" : [
-        { "description" : "Absolute active chat project root.", "key" : "projectRoot", "required" : true, "value" : "${CHAT_PROJECT_DIR}", "valueType" : "string" },
-        { "description" : "Absolute selected verification_input.json.", "key" : "verificationConfig", "required" : true, "value" : "", "valueType" : "string" }
-      ],
-      "role" : "toolRunner",
-      "skillNames" : [],
-      "temperature" : 0.1,
-      "toolName" : "finetune_load_verification_input"
-    },
-    {
-      "executionMode" : "llmInstruction",
       "instruction" : "Inspect the validated verification input. Require non-empty projectRoot, configPath, promptsFile, outputFile, subjectContext, acceptanceCriteria, master, at least one adapter and output. Require weights to be empty or contain exactly one value for the master plus one per adapter. Require output to differ from every input. When bootstrapRequired=true, require exactly one trained adapter; the deterministic merge tool will seed the absent master from it without scaling. Return exactly one raw JSON object with ready (Boolean) and missingPrerequisites (array of strings). Do not call tools.",
       "llmProviderID" : "activeSession",
       "logLevel" : "debug",
       "maxTurns" : 3,
       "name" : "Verification Merge Readiness Inspector",
-      "positionX" : 650,
-      "positionY" : 90,
-      "properties" : [],
+      "positionX" : 461.01953125,
+      "positionY" : 84.98828125,
+      "properties" : [
+
+      ],
       "role" : "specialist",
-      "skillNames" : [ "finetune_master_verification_workflow_context" ],
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
       "temperature" : 0.1,
       "toolName" : ""
     },
@@ -59,22 +27,130 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Candidate Merge Runner",
-      "positionX" : 950,
-      "positionY" : 90,
+      "positionX" : 879.71875,
+      "positionY" : 85.07421875,
       "properties" : [
-        { "description" : "Project-relative TOML.", "key" : "configPath", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "Additional adapter directories.", "key" : "adapters", "required" : true, "value" : "[]", "valueType" : "json" },
-        { "description" : "Explicit replacement permission.", "key" : "force", "required" : true, "value" : "false", "valueType" : "boolean" },
-        { "description" : "In-place publication is forbidden.", "key" : "inPlace", "required" : true, "value" : "false", "valueType" : "boolean" },
-        { "description" : "Master adapter directory.", "key" : "master", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "New merge candidate directory.", "key" : "output", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "Absolute project root.", "key" : "projectRoot", "required" : true, "value" : "${CHAT_PROJECT_DIR}", "valueType" : "string" },
-        { "description" : "String weights, master first.", "key" : "weights", "required" : false, "value" : "[]", "valueType" : "json" }
+        {
+          "description" : "Additional adapter directories.",
+          "key" : "adapters",
+          "required" : true,
+          "value" : "[]",
+          "valueType" : "json"
+        },
+        {
+          "description" : "Project-relative TOML.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Explicit replacement permission.",
+          "key" : "force",
+          "required" : true,
+          "value" : "false",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "In-place publication is forbidden.",
+          "key" : "inPlace",
+          "required" : true,
+          "value" : "false",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Master adapter directory.",
+          "key" : "master",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "New merge candidate directory.",
+          "key" : "output",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "String weights, master first.",
+          "key" : "weights",
+          "required" : false,
+          "value" : "[]",
+          "valueType" : "json"
+        }
       ],
       "role" : "toolRunner",
-      "skillNames" : [],
+      "skillNames" : [
+
+      ],
       "temperature" : 0.1,
       "toolName" : "finetune_merge_adapters"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Extract the absolute value after `Verification config (absolute):` from the complete workflow input. Return exactly one raw JSON object with verificationConfig and projectRoot. Preserve both paths exactly. Do not read files, merge, verify, install or deploy.",
+      "llmProviderID" : "activeSession",
+      "logLevel" : "debug",
+      "maxTurns" : 2,
+      "name" : "Verification Request Router",
+      "positionX" : 130.03515625,
+      "positionY" : 85.1796875,
+      "properties" : [
+        {
+          "description" : "Absolute active chat project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "mcpTool",
+      "instruction" : "Load and deterministically validate the selected verification_input.json. Return its exact normalized fields and diagnostics without changing them.",
+      "llmProviderID" : "none",
+      "logLevel" : "debug",
+      "maxTurns" : 1,
+      "modelName" : "",
+      "name" : "Load Verification Input",
+      "positionX" : 129.60546875,
+      "positionY" : 307.37109375,
+      "properties" : [
+        {
+          "description" : "Absolute active chat project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute selected verification_input.json.",
+          "key" : "verificationConfig",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : "finetune_load_verification_input"
     },
     {
       "executionMode" : "mcpTool",
@@ -84,17 +160,49 @@
       "maxTurns" : 1,
       "modelName" : "",
       "name" : "Merged Candidate Verification Runner",
-      "positionX" : 1250,
-      "positionY" : 90,
+      "positionX" : 1125.4140625,
+      "positionY" : 396.1171875,
       "properties" : [
-        { "description" : "Merged adapter supplied only by Candidate Merge Runner.", "key" : "adapter", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "Unified lifecycle TOML.", "key" : "configPath", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "Verification report path.", "key" : "outputFile", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "Held-out JSONL prompt file.", "key" : "promptsFile", "required" : true, "value" : "", "valueType" : "string" },
-        { "description" : "Absolute project root.", "key" : "projectRoot", "required" : true, "value" : "${CHAT_PROJECT_DIR}", "valueType" : "string" }
+        {
+          "description" : "Merged adapter supplied only by Candidate Merge Runner.",
+          "key" : "adapter",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Unified lifecycle TOML.",
+          "key" : "configPath",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Verification report path.",
+          "key" : "outputFile",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Absolute project root.",
+          "key" : "projectRoot",
+          "required" : true,
+          "value" : "${CHAT_PROJECT_DIR}",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Held-out JSONL prompt file.",
+          "key" : "promptsFile",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        }
       ],
       "role" : "toolRunner",
-      "skillNames" : [],
+      "skillNames" : [
+
+      ],
       "temperature" : 0.1,
       "toolName" : "finetune_verify_master"
     },
@@ -105,11 +213,15 @@
       "logLevel" : "debug",
       "maxTurns" : 5,
       "name" : "Merged Candidate Evidence Reviewer",
-      "positionX" : 1250,
-      "positionY" : 330,
-      "properties" : [],
+      "positionX" : 879.66796875,
+      "positionY" : 635.47265625,
+      "properties" : [
+
+      ],
       "role" : "reviewer",
-      "skillNames" : [ "finetune_master_verification_workflow_context" ],
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
       "temperature" : 0.1,
       "toolName" : ""
     },
@@ -120,30 +232,146 @@
       "logLevel" : "debug",
       "maxTurns" : 3,
       "name" : "Verification Merge Gate Synthesizer",
-      "positionX" : 920,
-      "positionY" : 560,
-      "properties" : [],
+      "positionX" : 461.16796875,
+      "positionY" : 635.9453125,
+      "properties" : [
+
+      ],
       "role" : "synthesizer",
-      "skillNames" : [ "finetune_master_verification_workflow_context" ],
+      "skillNames" : [
+        "finetune_master_verification_workflow_context"
+      ],
       "temperature" : 0.1,
       "toolName" : ""
     }
   ],
   "connections" : [
-    { "artifactPolicy" : "pass-override", "condition" : "Load the selected verification input.", "kind" : "delegation", "label" : "Load verification config", "sharedStateKeys" : "verificationConfig,projectRoot", "source" : "Verification Request Router", "target" : "Load Verification Input" },
-    { "artifactPolicy" : "pass-structured", "condition" : "$.success equals true", "kind" : "artifactFlow", "label" : "Inspect validated input", "sharedStateKeys" : "verificationInput", "source" : "Load Verification Input", "target" : "Verification Merge Readiness Inspector" },
-    { "artifactPolicy" : "pass-structured", "condition" : "$.ready equals true", "kind" : "artifactFlow", "label" : "Open merge gate", "sharedStateKeys" : "readinessResult", "source" : "Verification Merge Readiness Inspector", "target" : "Candidate Merge Runner" },
-    { "artifactPolicy" : "pass-override", "condition" : "Supply exact validated merge arguments.", "kind" : "artifactFlow", "label" : "Provide merge arguments", "sharedStateKeys" : "projectRoot,configPath,master,adapters,weights,output,force", "source" : "Load Verification Input", "target" : "Candidate Merge Runner" },
-    { "artifactPolicy" : "pass-override", "condition" : "$.success equals true", "kind" : "artifactFlow", "label" : "Verify produced candidate", "sharedStateKeys" : "adapter", "source" : "Candidate Merge Runner", "target" : "Merged Candidate Verification Runner" },
-    { "artifactPolicy" : "pass-override", "condition" : "Supply exact validated verification arguments.", "kind" : "artifactFlow", "label" : "Provide verification arguments", "sharedStateKeys" : "projectRoot,configPath,promptsFile,outputFile", "source" : "Load Verification Input", "target" : "Merged Candidate Verification Runner" },
-    { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Review real verification output or failure diagnostics.", "kind" : "review", "label" : "Review verification evidence", "sharedStateKeys" : "verificationResult,reportPath", "source" : "Merged Candidate Verification Runner", "target" : "Merged Candidate Evidence Reviewer" },
-    { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Include the exact merge result.", "kind" : "artifactFlow", "label" : "Provide merge evidence", "sharedStateKeys" : "mergeResult,adapter,mergeReportPath", "source" : "Candidate Merge Runner", "target" : "Merged Candidate Evidence Reviewer" },
-    { "artifactPolicy" : "pass-summary", "condition" : "Provide validated runtime context.", "kind" : "artifactFlow", "label" : "Provide acceptance context", "sharedStateKeys" : "verificationInput", "source" : "Load Verification Input", "target" : "Merged Candidate Evidence Reviewer" },
-    { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Always report input loading.", "kind" : "artifactFlow", "label" : "Report selected input", "sharedStateKeys" : "verificationInput", "source" : "Load Verification Input", "target" : "Verification Merge Gate Synthesizer" },
-    { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Always report readiness.", "kind" : "artifactFlow", "label" : "Report readiness", "sharedStateKeys" : "readinessResult", "source" : "Verification Merge Readiness Inspector", "target" : "Verification Merge Gate Synthesizer" },
-    { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Always report merge.", "kind" : "artifactFlow", "label" : "Report merge", "sharedStateKeys" : "mergeResult,adapter,mergeReportPath", "source" : "Candidate Merge Runner", "target" : "Verification Merge Gate Synthesizer" },
-    { "artifactPolicy" : "allow-failed-diagnostics", "condition" : "Always report verification.", "kind" : "artifactFlow", "label" : "Report verification", "sharedStateKeys" : "verificationResult,reportPath", "source" : "Merged Candidate Verification Runner", "target" : "Verification Merge Gate Synthesizer" },
-    { "artifactPolicy" : "pass-all", "condition" : "Publish the independent decision.", "kind" : "artifactFlow", "label" : "Publish decision", "sharedStateKeys" : "decision,findings,reportPaths", "source" : "Merged Candidate Evidence Reviewer", "target" : "Verification Merge Gate Synthesizer" }
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "$.success equals true",
+      "kind" : "artifactFlow",
+      "label" : "Inspect validated input",
+      "sharedStateKeys" : "verificationInput",
+      "source" : "Load Verification Input",
+      "target" : "Verification Merge Readiness Inspector"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Load the selected verification input.",
+      "kind" : "delegation",
+      "label" : "Load verification config",
+      "sharedStateKeys" : "verificationConfig,projectRoot",
+      "source" : "Verification Request Router",
+      "target" : "Load Verification Input"
+    },
+    {
+      "artifactPolicy" : "pass-structured",
+      "condition" : "$.ready equals true",
+      "kind" : "artifactFlow",
+      "label" : "Open merge gate",
+      "sharedStateKeys" : "readinessResult",
+      "source" : "Verification Merge Readiness Inspector",
+      "target" : "Candidate Merge Runner"
+    },
+    {
+      "artifactPolicy" : "pass-summary",
+      "condition" : "Provide validated runtime context.",
+      "kind" : "artifactFlow",
+      "label" : "Provide acceptance context",
+      "sharedStateKeys" : "verificationInput",
+      "source" : "Load Verification Input",
+      "target" : "Merged Candidate Evidence Reviewer"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Supply exact validated merge arguments.",
+      "kind" : "artifactFlow",
+      "label" : "Provide merge arguments",
+      "sharedStateKeys" : "projectRoot,configPath,master,adapters,weights,output,force",
+      "source" : "Load Verification Input",
+      "target" : "Candidate Merge Runner"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Include the exact merge result.",
+      "kind" : "artifactFlow",
+      "label" : "Provide merge evidence",
+      "sharedStateKeys" : "mergeResult,adapter,mergeReportPath",
+      "source" : "Candidate Merge Runner",
+      "target" : "Merged Candidate Evidence Reviewer"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "Supply exact validated verification arguments.",
+      "kind" : "artifactFlow",
+      "label" : "Provide verification arguments",
+      "sharedStateKeys" : "projectRoot,configPath,promptsFile,outputFile",
+      "source" : "Load Verification Input",
+      "target" : "Merged Candidate Verification Runner"
+    },
+    {
+      "artifactPolicy" : "pass-all",
+      "condition" : "Publish the independent decision.",
+      "kind" : "artifactFlow",
+      "label" : "Publish decision",
+      "sharedStateKeys" : "decision,findings,reportPaths",
+      "source" : "Merged Candidate Evidence Reviewer",
+      "target" : "Verification Merge Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report merge.",
+      "kind" : "artifactFlow",
+      "label" : "Report merge",
+      "sharedStateKeys" : "mergeResult,adapter,mergeReportPath",
+      "source" : "Candidate Merge Runner",
+      "target" : "Verification Merge Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report readiness.",
+      "kind" : "artifactFlow",
+      "label" : "Report readiness",
+      "sharedStateKeys" : "readinessResult",
+      "source" : "Verification Merge Readiness Inspector",
+      "target" : "Verification Merge Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report input loading.",
+      "kind" : "artifactFlow",
+      "label" : "Report selected input",
+      "sharedStateKeys" : "verificationInput",
+      "source" : "Load Verification Input",
+      "target" : "Verification Merge Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Always report verification.",
+      "kind" : "artifactFlow",
+      "label" : "Report verification",
+      "sharedStateKeys" : "verificationResult,reportPath",
+      "source" : "Merged Candidate Verification Runner",
+      "target" : "Verification Merge Gate Synthesizer"
+    },
+    {
+      "artifactPolicy" : "allow-failed-diagnostics",
+      "condition" : "Review real verification output or failure diagnostics.",
+      "kind" : "review",
+      "label" : "Review verification evidence",
+      "sharedStateKeys" : "verificationResult,reportPath",
+      "source" : "Merged Candidate Verification Runner",
+      "target" : "Merged Candidate Evidence Reviewer"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "$.success equals true",
+      "kind" : "artifactFlow",
+      "label" : "Verify produced candidate",
+      "sharedStateKeys" : "adapter",
+      "source" : "Candidate Merge Runner",
+      "target" : "Merged Candidate Verification Runner"
+    }
   ],
   "goal" : "Load one generated verification_input.json, bootstrap an absent master or create a reversible merged candidate, verify that exact returned adapter and return an evidence-backed release decision without deploying.",
   "name" : "finetune_master_verification_workflow",
