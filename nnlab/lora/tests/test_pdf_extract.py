@@ -26,7 +26,8 @@ class FakeDocument:
         self.text = text
         self.pages = {1: object(), 2: object()}
 
-    def export_to_text(self) -> str:
+    def export_to_text(self, page_no: int | None = None) -> str:
+        assert page_no is None or page_no in self.pages
         return self.text
 
     def iterate_items(self) -> list[tuple[Any, int]]:
@@ -98,6 +99,9 @@ def test_extract_single_pdf_to_structured_markdown(tmp_path: Path) -> None:
     assert item.output_relative_path == "sample.md"
     assert item.materialized_path == output_dir / "sample.md"
     assert item.pages == 2
+    assert item.page_characters == {1: 31, 2: 31}
+    assert item.empty_text_pages == []
+    assert item.ocr_fallback_used is False
     assert item.item_counts == {"picture": 1, "section_header": 1, "table": 1}
     markdown = item.materialized_path.read_text(encoding="utf-8")
     assert "| CONFIG | 0x01 |" in markdown
@@ -149,6 +153,40 @@ def test_insufficient_text_does_not_publish_partial_output(tmp_path: Path) -> No
     assert "insufficient text" in skipped[0].reason
     assert not output.exists()
     assert not list(tmp_path.glob(".out.tmp-*"))
+
+
+def test_insufficient_primary_text_uses_full_page_ocr_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from finetune_lora import pdf_extract
+
+    pdf_path = _pdf(tmp_path / "scanned.pdf")
+    calls: list[bool] = []
+
+    def converter_factory(
+        _settings: PdfExtractionSettings, full_page_ocr: bool = False
+    ) -> FakeConverter:
+        calls.append(full_page_ocr)
+        return FakeConverter(
+            text=(
+                "Readable full-page OCR content"
+                if full_page_ocr
+                else "short"
+            )
+        )
+
+    monkeypatch.setattr(pdf_extract, "build_converter", converter_factory)
+    extracted, skipped = extract_pdfs(
+        pdf_path,
+        tmp_path / "out",
+        min_text_chars=20,
+    )
+
+    assert skipped == []
+    assert calls == [False, True]
+    assert extracted[0].ocr_fallback_used is True
+    assert extracted[0].characters == 30
 
 
 def test_existing_output_requires_explicit_clean_replacement(tmp_path: Path) -> None:

@@ -59,6 +59,9 @@ class ExtractedPdf:
     item_counts: dict[str, int]
     warnings: list[dict[str, Any]]
     conversion_seconds: float
+    page_characters: dict[int, int]
+    empty_text_pages: list[int]
+    ocr_fallback_used: bool
 
 
 @dataclass(frozen=True)
@@ -156,14 +159,16 @@ def settings_from_config(config_path: str | Path | None) -> PdfExtractionSetting
     ).validate()
 
 
-def build_converter(settings: PdfExtractionSettings) -> Any:
+def build_converter(
+    settings: PdfExtractionSettings, full_page_ocr: bool = False
+) -> Any:
     try:
         from docling.datamodel.accelerator_options import (
             AcceleratorDevice,
             AcceleratorOptions,
         )
         from docling.datamodel.base_models import InputFormat
-        from docling.datamodel.pipeline_options import PdfPipelineOptions
+        from docling.datamodel.pipeline_options import OcrMode, PdfPipelineOptions
         from docling.document_converter import DocumentConverter, PdfFormatOption
     except ImportError as error:
         raise RuntimeError(
@@ -194,11 +199,31 @@ def build_converter(settings: PdfExtractionSettings) -> Any:
         images_scale=settings.image_scale,
         document_timeout=settings.document_timeout,
     )
+    if full_page_ocr:
+        options.ocr_options.mode = OcrMode.FULL_PAGE
     options.heading_hierarchy_options.enabled = True
     return DocumentConverter(
         allowed_formats=[InputFormat.PDF],
         format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=options)},
     )
+
+
+def _conversion_result(
+    converter: Any, pdf_file: Path
+) -> tuple[Any, str, list[dict[str, Any]], str]:
+    result = converter.convert(pdf_file, raises_on_error=False)
+    status = getattr(result.status, "value", str(result.status)).casefold()
+    errors = _error_records(getattr(result, "errors", []))
+    document = getattr(result, "document", None)
+    plain_text = document.export_to_text() if document is not None else ""
+    return document, status, errors, plain_text
+
+
+def _page_character_counts(document: Any) -> dict[int, int]:
+    return {
+        int(page_no): len(document.export_to_text(page_no=int(page_no)).strip())
+        for page_no in sorted(document.pages)
+    }
 
 
 def _publish_directory(staging: Path, output: Path, replace_output: bool) -> None:
@@ -249,6 +274,7 @@ def extract_pdfs(
 
     selected_settings = (settings or PdfExtractionSettings()).validate()
     selected_converter = converter or build_converter(selected_settings)
+    full_page_converter: Any | None = None
     try:
         from docling_core.types.doc import ImageRefMode
     except ImportError as error:
@@ -278,18 +304,56 @@ def extract_pdfs(
             staged_artifacts = staged_markdown.parent / artifacts_name
             started = time.monotonic()
             try:
-                result = selected_converter.convert(pdf_file, raises_on_error=False)
-                status = getattr(result.status, "value", str(result.status)).casefold()
-                errors = _error_records(getattr(result, "errors", []))
+                document, status, errors, plain_text = _conversion_result(
+                    selected_converter, pdf_file
+                )
+                ocr_fallback_used = False
+                fallback_detail = ""
+                if (
+                    converter is None
+                    and selected_settings.enable_ocr
+                    and (
+                        status not in SUPPORTED_STATUSES
+                        or len(plain_text.strip()) < min_text_chars
+                    )
+                ):
+                    try:
+                        if full_page_converter is None:
+                            full_page_converter = build_converter(
+                                selected_settings, full_page_ocr=True
+                            )
+                        (
+                            fallback_document,
+                            fallback_status,
+                            fallback_errors,
+                            fallback_text,
+                        ) = _conversion_result(full_page_converter, pdf_file)
+                        if (
+                            fallback_status in SUPPORTED_STATUSES
+                            and len(fallback_text.strip()) > len(plain_text.strip())
+                        ):
+                            document = fallback_document
+                            status = fallback_status
+                            errors = fallback_errors
+                            plain_text = fallback_text
+                            ocr_fallback_used = True
+                    except Exception as fallback_error:  # noqa: BLE001
+                        fallback_detail = f"; full-page OCR fallback failed: {fallback_error}"
                 if status not in SUPPORTED_STATUSES:
                     raise RuntimeError(
                         f"Docling returned status {status}: "
-                        f"{json.dumps(errors, ensure_ascii=False)}"
+                        f"{json.dumps(errors, ensure_ascii=False)}{fallback_detail}"
                     )
-                document = result.document
-                plain_text = document.export_to_text()
                 if len(plain_text.strip()) < min_text_chars:
-                    raise ValueError("insufficient text extracted")
+                    fallback_suffix = (
+                        " after full-page OCR fallback"
+                        if converter is None and selected_settings.enable_ocr
+                        else ""
+                    )
+                    raise ValueError(
+                        f"insufficient text extracted{fallback_suffix}{fallback_detail}"
+                    )
+                page_characters = _page_character_counts(document)
                 document.save_as_markdown(
                     staged_markdown,
                     artifacts_dir=Path(artifacts_name),
@@ -313,6 +377,13 @@ def extract_pdfs(
                         item_counts=_item_counts(document),
                         warnings=errors,
                         conversion_seconds=round(time.monotonic() - started, 3),
+                        page_characters=page_characters,
+                        empty_text_pages=[
+                            page_no
+                            for page_no, characters in page_characters.items()
+                            if characters == 0
+                        ],
+                        ocr_fallback_used=ocr_fallback_used,
                     )
                 )
             except Exception as error:  # noqa: BLE001 - isolate per-document failures

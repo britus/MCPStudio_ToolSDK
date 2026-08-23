@@ -506,6 +506,119 @@ def test_policy_v2_splits_evidence_globally_across_sources(tmp_path: Path) -> No
             )
 
 
+def test_policy_v2_backtracks_when_greedy_evidence_split_misses_subject(
+    tmp_path: Path,
+) -> None:
+    doc_dir = tmp_path / "runtime-sources"
+    doc_dir.mkdir()
+    subject_markers = {
+        "subject-0": "marker zero",
+        "subject-1": "marker one",
+        "subject-2": "marker two",
+        "subject-3": "marker three",
+        "subject-4": "marker four",
+    }
+    chunk_subjects = [
+        {"subject-0", "subject-4"},
+        {"subject-1", "subject-4"},
+        {"subject-0"},
+        {"subject-1", "subject-2", "subject-3"},
+        {"subject-0", "subject-3", "subject-4"},
+        {"subject-0", "subject-2"},
+    ]
+    lines: list[str] = []
+    for index, subjects in enumerate(chunk_subjects):
+        lines.extend(subject_markers[subject] for subject in sorted(subjects))
+        lines.extend(f"padding {index}-{offset}" for offset in range(4 - len(subjects)))
+    (doc_dir / "manual.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    manifest = prepare_documents(
+        [doc_dir],
+        tmp_path / "train.jsonl",
+        tmp_path / "validation.jsonl",
+        tmp_path / "manifest.json",
+        chunk_lines=4,
+        overlap_lines=0,
+        max_file_bytes=1_000_000,
+        validation_ratio=0.1,
+        seed=1,
+        policy={
+            "format": 2,
+            "requiredSubjects": list(subject_markers),
+            "sources": [
+                {
+                    "path": "manual.txt",
+                    "subjects": list(subject_markers),
+                    "subjectEvidence": {
+                        subject: [marker]
+                        for subject, marker in subject_markers.items()
+                    },
+                }
+            ],
+        },
+    )
+
+    assert manifest["dataset_policy"]["status"] == "pass"
+    assert manifest["dataset_policy"]["missing_train_subjects"] == []
+    assert manifest["dataset_policy"]["missing_validation_subjects"] == []
+
+
+def test_policy_v2_refines_entangled_evidence_chunks(tmp_path: Path) -> None:
+    doc_dir = tmp_path / "runtime-sources"
+    doc_dir.mkdir()
+    markers = {
+        "input": "input evidence",
+        "isolation": "isolation evidence",
+        "electrical": "electrical evidence",
+    }
+    evidence_by_line = {
+        1: markers["input"],
+        11: markers["isolation"],
+        21: markers["isolation"],
+        31: markers["electrical"],
+        41: markers["input"],
+        51: markers["electrical"],
+    }
+    (doc_dir / "manual.txt").write_text(
+        "\n".join(
+            evidence_by_line.get(line, f"padding line {line}")
+            for line in range(1, 61)
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    manifest = prepare_documents(
+        [doc_dir],
+        tmp_path / "train.jsonl",
+        tmp_path / "validation.jsonl",
+        tmp_path / "manifest.json",
+        chunk_lines=20,
+        overlap_lines=0,
+        max_file_bytes=1_000_000,
+        validation_ratio=0.1,
+        seed=42,
+        policy={
+            "format": 2,
+            "requiredSubjects": list(markers),
+            "sources": [
+                {
+                    "path": "manual.txt",
+                    "subjects": list(markers),
+                    "subjectEvidence": {
+                        subject: [marker] for subject, marker in markers.items()
+                    },
+                }
+            ],
+        },
+    )
+
+    assert manifest["dataset_policy"]["status"] == "pass"
+    assert manifest["projects"][0]["evidence_chunk_lines"] == 10
+    assert manifest["dataset_policy"]["missing_train_subjects"] == []
+    assert manifest["dataset_policy"]["missing_validation_subjects"] == []
+
+
 def test_policy_splits_short_document_into_independent_records(tmp_path: Path) -> None:
     doc_dir = tmp_path / "runtime-sources"
     doc_dir.mkdir()

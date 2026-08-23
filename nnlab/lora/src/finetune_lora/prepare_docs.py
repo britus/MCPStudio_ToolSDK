@@ -531,23 +531,92 @@ def _evidence_blocked_split(
         )
         return bool(remaining) and remaining_subjects == available_subjects
 
-    validation_subjects: set[str] = set()
-    for subject in sorted(available_subjects):
-        if subject in validation_subjects:
-            continue
-        candidate = next(
-            (
-                chunk
-                for chunk in ordered
-                if chunk not in selected
-                and subject in subjects_by_chunk[id(chunk)]
-                and preserves_train_coverage(chunk)
-            ),
-            None,
+    # Find a complete validation cover before falling back to the historical
+    # greedy selection. A locally valid choice can consume the only remaining
+    # train block for a later subject even though another global assignment is
+    # possible. Choosing the most constrained uncovered subject first keeps the
+    # search small and makes the result deterministic.
+    chunk_indexes = {id(chunk): index for index, chunk in enumerate(chunks)}
+    ordered_indexes = [chunk_indexes[id(chunk)] for chunk in ordered]
+    order_rank = {index: rank for rank, index in enumerate(ordered_indexes)}
+    memo: set[tuple[int, ...]] = set()
+
+    def complete_selection(
+        selected_indexes: tuple[int, ...],
+    ) -> tuple[int, ...] | None:
+        state = tuple(sorted(selected_indexes))
+        if state in memo or len(memo) >= 50_000:
+            return None
+        memo.add(state)
+        selected_chunks = [chunks[index] for index in state]
+        covered = set().union(
+            *(subjects_by_chunk[id(chunk)] for chunk in selected_chunks)
+        ) if selected_chunks else set()
+        if covered == available_subjects:
+            return state
+
+        viable_by_subject: dict[str, list[int]] = {}
+        for subject in sorted(available_subjects - covered):
+            viable: list[int] = []
+            for index in ordered_indexes:
+                candidate = chunks[index]
+                if index in state or subject not in subjects_by_chunk[id(candidate)]:
+                    continue
+                if any(_overlaps(candidate, selected_chunk) for selected_chunk in selected_chunks):
+                    continue
+                remaining = remaining_after([*selected_chunks, candidate])
+                remaining_subjects = set().union(
+                    *(subjects_by_chunk[id(chunk)] for chunk in remaining)
+                )
+                if remaining and remaining_subjects == available_subjects:
+                    viable.append(index)
+            if not viable:
+                return None
+            viable_by_subject[subject] = viable
+
+        next_subject = min(
+            viable_by_subject,
+            key=lambda subject: (len(viable_by_subject[subject]), subject),
         )
-        if candidate is not None:
-            selected.append(candidate)
-            validation_subjects.update(subjects_by_chunk[id(candidate)])
+        candidates = sorted(
+            viable_by_subject[next_subject],
+            key=lambda index: (
+                -len(subjects_by_chunk[id(chunks[index])] - covered),
+                order_rank[index],
+            ),
+        )
+        for index in candidates:
+            result = complete_selection((*state, index))
+            if result is not None:
+                return result
+        return None
+
+    complete = complete_selection(())
+    if complete is not None:
+        selected = [chunks[index] for index in complete]
+
+    validation_subjects: set[str] = set()
+    if selected:
+        validation_subjects = set().union(
+            *(subjects_by_chunk[id(chunk)] for chunk in selected)
+        )
+    else:
+        for subject in sorted(available_subjects):
+            if subject in validation_subjects:
+                continue
+            candidate = next(
+                (
+                    chunk
+                    for chunk in ordered
+                    if chunk not in selected
+                    and subject in subjects_by_chunk[id(chunk)]
+                    and preserves_train_coverage(chunk)
+                ),
+                None,
+            )
+            if candidate is not None:
+                selected.append(candidate)
+                validation_subjects.update(subjects_by_chunk[id(candidate)])
 
     for candidate in ordered:
         if len(selected) >= target:
@@ -758,7 +827,9 @@ def prepare_documents(
         records_by_path: dict[str, list[dict[str, Any]]] = {}
         validation_by_path: dict[str, list[dict[str, Any]]] = {}
         evidence_chunks: list[CodeChunk] = []
+        evidence_sources: list[SourceFile] = []
         evidence_policies: dict[str, dict[str, Any]] = {}
+        project_evidence_chunk_lines: int | None = None
         for source in sources:
             source_key = f"{project}/{source.relative_path}"
             observed_policy_paths.add(source.relative_path)
@@ -843,6 +914,7 @@ def prepare_documents(
                     # Split evidence only after every source in the project has
                     # been scanned. Independent support may live in another file.
                     evidence_chunks.extend(chunks)
+                    evidence_sources.append(source)
                     evidence_policies[source.relative_path] = source_policy
                     records_by_path[source.relative_path] = []
                     validation_by_path[source.relative_path] = []
@@ -867,6 +939,123 @@ def prepare_documents(
                 seed,
                 evidence_policies,
             )
+            expected_evidence_subjects = set().union(
+                *(
+                    set(evidence_policies[source.relative_path]["subjects"])
+                    for source in evidence_sources
+                )
+            )
+
+            def split_subjects(
+                selected: list[CodeChunk],
+                current_policies: dict[str, dict[str, Any]] = evidence_policies,
+            ) -> set[str]:
+                return set().union(
+                    *(
+                        set(
+                            _subjects_for_chunk(
+                                chunk,
+                                current_policies[chunk.path],
+                            )
+                        )
+                        for chunk in selected
+                    )
+                ) if selected else set()
+
+            def balanced_train_subjects(
+                selected: list[CodeChunk],
+                current_policies: dict[str, dict[str, Any]] = evidence_policies,
+                current_document_type: str = project_document_type,
+            ) -> set[str]:
+                records: list[dict[str, Any]] = []
+                for chunk in selected:
+                    subjects = _subjects_for_chunk(
+                        chunk,
+                        current_policies[chunk.path],
+                    )
+                    records.extend(
+                        _records_for_chunk(
+                            chunk,
+                            current_document_type,
+                            subjects,
+                        )
+                    )
+                balanced = _balance_training_records(
+                    records,
+                    max_source_fraction=max_source_fraction,
+                    max_subject_imbalance=max_subject_imbalance,
+                    seed=seed,
+                )
+                return set(_subject_counts(balanced))
+
+            project_evidence_chunk_lines = chunk_lines
+            final_excluded: list[dict[str, Any]] = []
+            final_unassigned: list[dict[str, Any]] = []
+            while (
+                (
+                    balanced_train_subjects(train_chunks)
+                    != expected_evidence_subjects
+                    or split_subjects(validation_chunks) != expected_evidence_subjects
+                )
+                and project_evidence_chunk_lines > 2
+            ):
+                refined_lines = max(2, project_evidence_chunk_lines // 2)
+                refined_chunks: list[CodeChunk] = []
+                refined_excluded: list[dict[str, Any]] = []
+                refined_unassigned: list[dict[str, Any]] = []
+                for source in evidence_sources:
+                    source_key = f"{project}/{source.relative_path}"
+                    source_policy = evidence_policies[source.relative_path]
+                    for chunk in chunk_document_source(source, refined_lines, 0):
+                        excluded_heading = _excluded_training_section(chunk)
+                        if excluded_heading:
+                            refined_excluded.append(
+                                {
+                                    "path": source_key,
+                                    "start_line": chunk.start_line,
+                                    "end_line": chunk.end_line,
+                                    "reason": f"excluded section: {excluded_heading}",
+                                }
+                            )
+                            continue
+                        if not _subjects_for_chunk(chunk, source_policy):
+                            refined_unassigned.append(
+                                {
+                                    "path": source_key,
+                                    "start_line": chunk.start_line,
+                                    "end_line": chunk.end_line,
+                                    "split": "excluded-before-split",
+                                }
+                            )
+                            continue
+                        refined_chunks.append(chunk)
+                evidence_chunks = refined_chunks
+                final_excluded = refined_excluded
+                final_unassigned = refined_unassigned
+                project_evidence_chunk_lines = refined_lines
+                train_chunks, validation_chunks = _evidence_blocked_split(
+                    evidence_chunks,
+                    validation_ratio,
+                    seed,
+                    evidence_policies,
+                )
+
+            if project_evidence_chunk_lines != chunk_lines:
+                evidence_source_keys = {
+                    f"{project}/{source.relative_path}" for source in evidence_sources
+                }
+                excluded_training_chunks[:] = [
+                    item
+                    for item in excluded_training_chunks
+                    if item["path"] not in evidence_source_keys
+                ]
+                unassigned_evidence_chunks[:] = [
+                    item
+                    for item in unassigned_evidence_chunks
+                    if item["path"] not in evidence_source_keys
+                ]
+                excluded_training_chunks.extend(final_excluded)
+                unassigned_evidence_chunks.extend(final_unassigned)
 
             def add_evidence_records(
                 selected_chunks: list[CodeChunk],
@@ -952,6 +1141,7 @@ def prepare_documents(
                 "skipped_files": [asdict(item) for item in skipped],
                 "train_records": project_train,
                 "validation_records": project_validation,
+                "evidence_chunk_lines": project_evidence_chunk_lines,
                 "files": [
                     {"path": item.relative_path, "sha256": item.sha256} for item in sources
                 ],
