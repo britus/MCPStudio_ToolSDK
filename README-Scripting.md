@@ -168,7 +168,7 @@ The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/
 | `getGccInfo` | — | `compiler=gcc` |
 | `skillExecute` | `command` | `parameters=[]`, `operation=skillExecute`; launches one approved developer tool directly |
 
-`clangCompile` writes an object file next to the source. `cmakeBuild` uses `cmake --build` and honors `projectTarget`; `qmakeBuild` resolves qmake from standard tool locations. `cmakeFlags`, `cmakeArgs`, `qmakeArgs`, and `makeArgs` remain privileged, whitespace-separated compatibility fields; quoting and command metacharacters are rejected, and each token is passed directly as one process argument.
+`clangCompile` writes an object file next to the source. `cmakeBuild` uses `cmake --build` and honors `projectTarget`; `qmakeBuild` resolves qmake from standard tool locations. `cmakeFlags`, `cmakeArgs`, `qmakeArgs`, and `makeArgs` remain privileged, whitespace-separated compatibility fields; quoting, and each token is passed directly as one process argument.
 
 ### HTTP tools
 

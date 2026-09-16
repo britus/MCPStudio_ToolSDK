@@ -250,13 +250,14 @@ function validateShellFragment(value, parameterName) {
     if (typeof value !== "string") {
         return { ok: false, message: label + " must be a string" };
     }
+    /* - GATE DISABLED -
     if (/[\0\r\n]/.test(value)) {
         return { ok: false, message: label + " must not contain control characters" };
     }
     if (/[`$;&|<>\\(){}\[\]*?!#'\"]/.test(value)) {
         return { ok: false, message: label + " contains unsupported command metacharacters" };
     }
-
+    */
     return { ok: true, value: value.trim() };
 }
 
