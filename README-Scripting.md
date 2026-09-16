@@ -66,7 +66,7 @@ Depending on the handler, MCP Studio supplies functions such as:
 - `MCPStudio.httpRequest`
 - `MCPStudio.setToolResult`
 
-Build/process helpers also read injected `stdOut` and `stdErr` arrays through `sharedFunctions.js`. External tools are launched directly with an absolute executable path and an argument array; command interpreters, pipelines, redirections, substitutions, and script strings are not supported. Scripts that use these values will fail in plain Node.js unless a test harness provides compatible globals.
+Build/process helpers also read injected `stdOut` and `stdErr` arrays through `sharedFunctions.js`. External tools are normally launched directly with an absolute executable path and an argument array. `shellCall` deliberately writes its command source to a temporary file and launches that file with zsh or bash, so pipelines, redirections, substitutions, and script strings are supported there. Scripts that use these values will fail in plain Node.js unless a test harness provides compatible globals.
 
 `xed` is exposed as a compatibility alias and is delegated to the policy-approved `/usr/bin/xcrun xed` invocation.
 
@@ -162,7 +162,7 @@ The default for `mkdir`, `createDirectory`, and `listDirectory` is `<Documents>/
 | `clangMake` | `makeFile` | — |
 | `cmakeBuild` | `projectDir` | `projectTarget=app`, `buildType=Debug`, `cmakeFlags`, `cmakeArgs`, `verbose=false` |
 | `qmakeBuild` | `projectDir` | `projectTarget`, `projectFile`, `buildType=Debug`, `qmakeArgs`, `makeArgs`, `verbose=false` |
-| `shellCall` | `command` | `parameters=[]`; compatibility entry point that launches one approved developer tool directly |
+| `shellCall` | `command` | `parameters=[]`, `shell=/bin/zsh`; writes a temporary script and executes it with the macOS system shell (falls back to `/bin/bash`) |
 | `checkWithGcc` | — | `arch`, `verbose=false` |
 | `gccSettings` | — | `compiler=gcc`, `verbose=false` |
 | `getGccInfo` | — | `compiler=gcc` |
@@ -225,7 +225,7 @@ Then import the module and add its name to `HANDLERS` in `Scripts/tool_entry.js`
 - Do not assume path validation grants access; macOS sandbox and security-scoped resource rules still apply.
 - Do not store credentials in tool JSON files or log authorization headers.
 - Response text, directory entries, and process output are bounded by the shared helpers; retain those limits in new handlers to prevent context and memory exhaustion.
-- Launch only approved developer tools through `MCPStudio.process` and pass every argument as a separate array item.
+- Launch approved developer tools through `MCPStudio.process` and pass every argument as a separate array item. `shellCall` is the deliberate exception: it writes the supplied shell source to a temporary file, invokes `/bin/zsh` (or `/bin/bash`), and removes the file afterwards.
 
 ## Related documentation
 

@@ -7,18 +7,18 @@
     "lastModified" : "2026-08-22T14:51:12.863Z",
     "priority" : 0.9
   },
-  "description" : "Execute a shell command with optional parameters.",
+  "description" : "Execute a shell command through a temporary script using the macOS system shell. Supports pipes, redirections, and other shell syntax.",
   "execHandler" : "shellCall",
   "execMethod" : "toolEntry",
   "inputSchema" : {
     "properties" : {
       "command" : {
-        "description" : "Shell command to execute.",
+        "description" : "Shell command to execute. Supports pipes, redirections, substitutions, and other shell syntax.",
         "name" : "command",
         "type" : "string"
       },
       "parameters" : {
-        "description" : "Array of command arguments.",
+        "description" : "Optional arguments appended to the shell command as safely quoted values.",
         "items" : {
           "type" : "string"
         },
@@ -26,7 +26,7 @@
         "type" : "array"
       },
       "shell" : {
-        "description" : "Absolute path to the shell interpreter.",
+        "description" : "Optional absolute path to the shell interpreter. Defaults to /bin/zsh, then /bin/bash.",
         "name" : "shell",
         "type" : "string"
       }
