@@ -1,0 +1,118 @@
+{
+  "annotations": {
+    "audience": [
+      "user",
+      "assistant"
+    ],
+    "lastModified": "2026-09-21T04:50:08.000Z",
+    "priority": 0.9
+  },
+  "description": "Run an advanced web search via the Kimi / Moonshot AI Tools Search Pro API with site and time-range constraints plus structured content chunks.",
+  "execHandler": "kimi_search_pro",
+  "execMethod": "toolEntry",
+  "inputSchema": {
+    "properties": {
+      "apiKey": {
+        "description": "Moonshot API key used for Bearer authorization.",
+        "name": "apiKey",
+        "type": "string"
+      },
+      "text_query": {
+        "description": "Search query text. Must not be empty.",
+        "name": "text_query",
+        "type": "string"
+      },
+      "limit": {
+        "default": 5,
+        "description": "Maximum number of results to return, from 1 to 20. Defaults to 5.",
+        "maximum": 20,
+        "minimum": 1,
+        "name": "limit",
+        "type": "integer"
+      },
+      "timeout_seconds": {
+        "description": "Search timeout in seconds, from 1 to 60.",
+        "maximum": 60,
+        "minimum": 1,
+        "name": "timeout_seconds",
+        "type": "integer"
+      },
+      "include_content": {
+        "default": false,
+        "description": "Whether to return full page content in each result's text field.",
+        "name": "include_content",
+        "type": "boolean"
+      },
+      "chunks": {
+        "default": false,
+        "description": "Whether to return structured content chunks for each result.",
+        "name": "chunks",
+        "type": "boolean"
+      },
+      "sites": {
+        "description": "Restrict results to specific sites. Multiple sites are OR'd; at most 5 entries.",
+        "items": {
+          "type": "string"
+        },
+        "maxItems": 5,
+        "name": "sites",
+        "type": "array"
+      },
+      "time_window": {
+        "description": "Constrain the time range. start and end accept YYYY, YYYY-MM, or YYYY-MM-DD formats.",
+        "name": "time_window",
+        "properties": {
+          "start": {
+            "description": "Start date in YYYY, YYYY-MM, or YYYY-MM-DD format.",
+            "name": "start",
+            "type": "string"
+          },
+          "end": {
+            "description": "End date in YYYY, YYYY-MM, or YYYY-MM-DD format.",
+            "name": "end",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "type": "object"
+      },
+      "headers": {
+        "description": "Optional additional HTTP headers for the request.",
+        "name": "headers",
+        "type": "object"
+      }
+    },
+    "required": [
+      "text_query",
+      "apiKey"
+    ],
+    "type": "object"
+  },
+  "name": "kimi_search_pro",
+  "outputSchema": {
+    "properties": {
+      "error": {
+        "description": "Operation status message",
+        "name": "error",
+        "type": "string"
+      },
+      "operation": {
+        "description": "Operation name",
+        "name": "operation",
+        "type": "string"
+      },
+      "success": {
+        "description": "Operation status",
+        "name": "success",
+        "type": "boolean"
+      }
+    },
+    "type": "object"
+  },
+  "pluginName": "",
+  "scriptName": "${TOOLSDK}/Scripts/tool_entry.js",
+  "toolType": "ScriptTool"
+}
