@@ -146,6 +146,9 @@ function httpTools(handlerName, params) {
             case "kimi_search":
                 return kimi_search(params);
 
+            case "kimi_search_pro":
+                return kimi_search_pro(params);
+
             default:
                 return shared.error("Unknown handler: " + handlerName);
         }
@@ -898,6 +901,193 @@ function extractPattern(html, pattern) {
         console.error("[Script] Invalid pattern: " + pattern);
         return [];
     }
+}
+
+
+/**
+ * Performs an advanced web search using the Kimi / Moonshot AI Search Pro API.
+ * Endpoint: POST https://api.moonshot.ai/v1/tools/search_pro
+ * Supports site restrictions, time-range constraints, and structured content chunks.
+ * @param {Object} params - Command parameters
+ * @param {string} params.text_query - Search query text (required)
+ * @param {string} params.apiKey - Moonshot API key used for Bearer authorization (required)
+ * @param {number} [params.limit=5] - Maximum number of results to return, 1-20 (optional)
+ * @param {number} [params.timeout_seconds] - Search timeout in seconds, 1-60 (optional)
+ * @param {boolean} [params.include_content=false] - Return full page content in each result (optional)
+ * @param {Array<string>} [params.sites] - Restrict results to specific sites, up to 5 (optional)
+ * @param {Object} [params.time_window] - Time range with start and end (YYYY, YYYY-MM, or YYYY-MM-DD) (optional)
+ * @param {boolean} [params.chunks=false] - Return structured content chunks for each result (optional)
+ * @param {Object} [params.headers] - Optional additional HTTP headers for the request
+ * @returns {string} JSON result with search results or error message
+ */
+function kimi_search_pro(params) {
+    var textQuery = typeof params.text_query === "string" ? params.text_query.trim() : "";
+    var apiKey = typeof params.apiKey === "string" ? params.apiKey.trim() : "";
+    var limit = params.limit === undefined ? 5 : params.limit;
+    var timeoutSeconds = params.timeout_seconds;
+    var includeContent = params.include_content === true;
+    var sites = params.sites;
+    var timeWindow = params.time_window;
+    var chunks = params.chunks === true;
+    var extraHeaders = params.headers;
+    var url = "https://api.moonshot.ai/v1/tools/search_pro";
+    var body;
+    var headers;
+    var response;
+    var contentLimit = 5000;
+
+    if (!textQuery) {
+        return shared.error("text_query is required");
+    }
+    if (!apiKey) {
+        return shared.error("apiKey is required");
+    }
+    if (typeof limit !== "number" || isNaN(limit) || limit < 1 || limit > 20) {
+        return shared.error("limit must be between 1 and 20");
+    }
+    if (timeoutSeconds !== undefined && timeoutSeconds !== null) {
+        if (typeof timeoutSeconds !== "number" || isNaN(timeoutSeconds) ||
+            timeoutSeconds < 1 || timeoutSeconds > 60) {
+            return shared.error("timeout_seconds must be between 1 and 60");
+        }
+    }
+    if (params.include_content !== undefined && params.include_content !== null &&
+        typeof params.include_content !== "boolean") {
+        return shared.error("include_content must be a boolean");
+    }
+    if (params.chunks !== undefined && params.chunks !== null &&
+        typeof params.chunks !== "boolean") {
+        return shared.error("chunks must be a boolean");
+    }
+    if (extraHeaders !== undefined && extraHeaders !== null &&
+        (typeof extraHeaders !== "object" || Array.isArray(extraHeaders))) {
+        return shared.error("headers must be an object");
+    }
+
+    body = {
+        text_query: textQuery,
+        limit: limit,
+        include_content: includeContent,
+        chunks: chunks
+    };
+    if (timeoutSeconds !== undefined && timeoutSeconds !== null) {
+        body.timeout_seconds = timeoutSeconds;
+    }
+
+    if (sites !== undefined && sites !== null) {
+        if (!Array.isArray(sites)) {
+            return shared.error("sites must be an array of strings");
+        }
+        if (sites.length > 5) {
+            return shared.error("sites may contain at most 5 entries");
+        }
+        var normalizedSites = [];
+        for (var i = 0; i < sites.length; i += 1) {
+            if (typeof sites[i] !== "string" || sites[i].length === 0) {
+                return shared.error("sites must contain only non-empty strings");
+            }
+            normalizedSites.push(sites[i]);
+        }
+        if (normalizedSites.length > 0) {
+            body.sites = normalizedSites;
+        }
+    }
+
+    if (timeWindow !== undefined && timeWindow !== null) {
+        var twValidation = validateTimeWindow(timeWindow);
+        if (!twValidation.ok) {
+            return shared.error(twValidation.message);
+        }
+        body.time_window = twValidation.value;
+    }
+
+    headers = copyHeaders(extraHeaders);
+    headers["Content-Type"] = "application/json";
+    headers["Authorization"] = "Bearer " + apiKey;
+
+    console.log("[Script] Searching Kimi Pro for: " + textQuery);
+
+    response = request("POST", url, JSON.stringify(body), headers);
+
+    if (response.error) {
+        return shared.error("Kimi search pro request failed: " + response.error);
+    }
+    if (response.statusCode >= 400) {
+        return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
+    }
+
+    try {
+        var data = JSON.parse(response.body);
+        var results = data && Array.isArray(data.search_results) ? data.search_results : [];
+
+        // Bound full-page content per result so a single large page does not
+        // exhaust the overall result budget.
+        results.forEach(function (result) {
+            if (result && typeof result.text === "string" && result.text.length > contentLimit) {
+                result.text = result.text.substring(0, contentLimit) + "\n\n[Content truncated]";
+            }
+        });
+
+        return shared.success({
+            search_results: results,
+            resultCount: results.length
+        }, {
+            operation: "kimi_search_pro",
+            query: textQuery
+        });
+    } catch (e) {
+        return shared.error("Failed to parse Kimi search pro response: " + (e.message || e.toString()));
+    }
+}
+
+/**
+ * Validates a Search Pro time_window object.
+ * @param {Object} timeWindow - Object with start and end date strings
+ * @returns {Object} Validation result {ok, message?, value?}
+ */
+function validateTimeWindow(timeWindow) {
+    var datePattern = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+    var start = timeWindow.start;
+    var end = timeWindow.end;
+
+    if (!timeWindow || typeof timeWindow !== "object" || Array.isArray(timeWindow)) {
+        return { ok: false, message: "time_window must be an object" };
+    }
+    if (typeof start !== "string" || !datePattern.test(start)) {
+        return { ok: false, message: "time_window.start must be YYYY, YYYY-MM, or YYYY-MM-DD" };
+    }
+    if (typeof end !== "string" || !datePattern.test(end)) {
+        return { ok: false, message: "time_window.end must be YYYY, YYYY-MM, or YYYY-MM-DD" };
+    }
+
+    var normalizedStart = normalizeDate(start);
+    var normalizedEnd = normalizeDate(end);
+    if (normalizedStart > normalizedEnd) {
+        return { ok: false, message: "time_window.start must not be later than time_window.end" };
+    }
+
+    return {
+        ok: true,
+        value: {
+            start: start,
+            end: end
+        }
+    };
+}
+
+/**
+ * Normalizes a YYYY, YYYY-MM, or YYYY-MM-DD date to YYYY-MM-DD for comparison.
+ * @param {string} date - Date string in supported format
+ * @returns {string} Normalized YYYY-MM-DD date string
+ */
+function normalizeDate(date) {
+    if (/^\d{4}$/.test(date)) {
+        return date + "-01-01";
+    }
+    if (/^\d{4}-\d{2}$/.test(date)) {
+        return date + "-01";
+    }
+    return date;
 }
 
 module.exports = {

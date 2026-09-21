@@ -55,7 +55,8 @@ const HANDLERS = {
     apiRequest: function (params) { return httpTools.httpTools("apiRequest", params); },
     checkStatus: function (params) { return httpTools.httpTools("checkStatus", params); },
     webhookCall: function (params) { return httpTools.httpTools("webhookCall", params); },
-    kimi_search: function (params) { return httpTools.httpTools("kimi_search", params); }
+    kimi_search: function (params) { return httpTools.httpTools("kimi_search", params); },
+    kimi_search_pro: function (params) { return httpTools.httpTools("kimi_search_pro", params); }
 };
 
 function getHandler(handlerName) {
