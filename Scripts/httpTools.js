@@ -143,6 +143,9 @@ function httpTools(handlerName, params) {
             case "webhookCall":
                 return webhookCall(params);
 
+            case "kimi_search":
+                return kimi_search(params);
+
             default:
                 return shared.error("Unknown handler: " + handlerName);
         }
@@ -637,6 +640,103 @@ function webhookCall(params) {
         operation: "webhookCall",
         url: url
     });
+}
+
+/**
+ * Performs a web search using the Kimi / Moonshot AI search API.
+ * Endpoint: POST https://api.moonshot.ai/v1/tools/search
+ * @param {Object} params - Command parameters
+ * @param {string} params.text_query - Search query text (required)
+ * @param {string} params.apiKey - Moonshot API key used for Bearer authorization (required)
+ * @param {number} [params.limit=5] - Maximum number of results to return, 1-20 (optional)
+ * @param {number} [params.timeout_seconds] - Search timeout in seconds, 1-60 (optional)
+ * @param {boolean} [params.include_content=false] - Return full page content in each result (optional)
+ * @param {Object} [params.headers] - Optional additional HTTP headers for the request
+ * @returns {string} JSON result with search results or error message
+ */
+function kimi_search(params) {
+    var textQuery = typeof params.text_query === "string" ? params.text_query.trim() : "";
+    var apiKey = typeof params.apiKey === "string" ? params.apiKey.trim() : "";
+    var limit = params.limit === undefined ? 5 : params.limit;
+    var timeoutSeconds = params.timeout_seconds;
+    var includeContent = params.include_content === true;
+    var extraHeaders = params.headers;
+    var url = "https://api.moonshot.ai/v1/tools/search";
+    var body;
+    var headers;
+    var response;
+    var contentLimit = 5000;
+
+    if (!textQuery) {
+        return shared.error("text_query is required");
+    }
+    if (!apiKey) {
+        return shared.error("apiKey is required");
+    }
+    if (typeof limit !== "number" || isNaN(limit) || limit < 1 || limit > 20) {
+        return shared.error("limit must be between 1 and 20");
+    }
+    if (timeoutSeconds !== undefined && timeoutSeconds !== null) {
+        if (typeof timeoutSeconds !== "number" || isNaN(timeoutSeconds) ||
+            timeoutSeconds < 1 || timeoutSeconds > 60) {
+            return shared.error("timeout_seconds must be between 1 and 60");
+        }
+    }
+    if (params.include_content !== undefined && params.include_content !== null &&
+        typeof params.include_content !== "boolean") {
+        return shared.error("include_content must be a boolean");
+    }
+    if (extraHeaders !== undefined && extraHeaders !== null &&
+        (typeof extraHeaders !== "object" || Array.isArray(extraHeaders))) {
+        return shared.error("headers must be an object");
+    }
+
+    body = {
+        text_query: textQuery,
+        limit: limit,
+        include_content: includeContent
+    };
+    if (timeoutSeconds !== undefined && timeoutSeconds !== null) {
+        body.timeout_seconds = timeoutSeconds;
+    }
+
+    headers = copyHeaders(extraHeaders);
+    headers["Content-Type"] = "application/json";
+    headers["Authorization"] = "Bearer " + apiKey;
+
+    console.log("[Script] Searching Kimi for: " + textQuery);
+
+    response = request("POST", url, JSON.stringify(body), headers);
+
+    if (response.error) {
+        return shared.error("Kimi search request failed: " + response.error);
+    }
+    if (response.statusCode >= 400) {
+        return shared.error("HTTP " + response.statusCode + ": " + response.statusText);
+    }
+
+    try {
+        var data = JSON.parse(response.body);
+        var results = data && Array.isArray(data.search_results) ? data.search_results : [];
+
+        // Bound full-page content per result so a single large page does not
+        // exhaust the overall result budget.
+        results.forEach(function (result) {
+            if (result && typeof result.text === "string" && result.text.length > contentLimit) {
+                result.text = result.text.substring(0, contentLimit) + "\n\n[Content truncated]";
+            }
+        });
+
+        return shared.success({
+            search_results: results,
+            resultCount: results.length
+        }, {
+            operation: "kimi_search",
+            query: textQuery
+        });
+    } catch (e) {
+        return shared.error("Failed to parse Kimi search response: " + (e.message || e.toString()));
+    }
 }
 
 // ===================================================================

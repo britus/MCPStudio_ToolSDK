@@ -16,6 +16,7 @@
 
 **/.ruff_cache/
 **/.pytest_cache/
+**/.ai/
 
 # not this
 config/MultiAgents/border crossing research.json
