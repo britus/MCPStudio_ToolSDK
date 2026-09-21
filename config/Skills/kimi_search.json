@@ -1,0 +1,20 @@
+{
+  "allowedToolNames" : [
+    "kimi_search"
+  ],
+  "description" : "Run a web search via the Kimi \/ Moonshot AI Tools Search API and get structured search results.",
+  "name" : "kimi_search",
+  "promptTemplate" : "",
+  "resourceNames" : [
+
+  ],
+  "skillEnabled" : true,
+  "systemInstruction" : "Run a web search via the Kimi \/ Moonshot AI Tools Search API using kimi_search tool and get structured search results.",
+  "toolScopeMode" : "restricted",
+  "triggerPhrases" : [
+    "kimi_search",
+    "research",
+    "web search"
+  ],
+  "visibilityScope" : "chat"
+}
