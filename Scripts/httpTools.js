@@ -84,16 +84,16 @@ function request(method, url, body, headers) {
 
     // httpRequest is the documented MCP Studio bridge. The method-specific
     // fallbacks keep the scripts compatible with older host versions.
-    if (typeof MCPStudio.httpRequest === "function") {
-        responseJSON = MCPStudio.httpRequest(method, url, body, headersJSON);
-    } else if (method === "GET" && typeof MCPStudio.httpGet === "function") {
+    if (method === "GET" && typeof MCPStudio.httpGet === "function" && (body === undefined || body === null)) {
         responseJSON = MCPStudio.httpGet(url, headersJSON);
     } else if (method === "POST" && typeof MCPStudio.httpPost === "function") {
         responseJSON = MCPStudio.httpPost(url, body, headersJSON);
     } else if (method === "PUT" && typeof MCPStudio.httpPut === "function") {
         responseJSON = MCPStudio.httpPut(url, body, headersJSON);
+    } else if (typeof MCPStudio.httpRequest === "function") {
+        responseJSON = MCPStudio.httpRequest(method, url, body, headersJSON);
     } else {
-        throw new Error("The MCP Studio HTTP bridge does not support " + method);
+        throw new Error("HTTP bridge does not support " + method);
     }
 
     return parseResponse(responseJSON);
