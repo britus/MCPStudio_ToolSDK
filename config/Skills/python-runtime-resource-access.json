@@ -5,12 +5,8 @@
     "get_temp_path",
     "list_files",
     "mkdir",
-    "python_runtime",
     "read_file",
-    "scrape_web_page",
-    "shell_call",
-    "skill_execute",
-    "write_file"
+    "write_file", "python_runtime"
   ],
   "description" : "Guides the assistant in using the Python runtime tool for Python automation and careful local or remote resource access.",
   "modelPreferences" : {

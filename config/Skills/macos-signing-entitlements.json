@@ -4,9 +4,7 @@
     "list_files",
     "mkdir",
     "read_file",
-    "shell_call",
-    "skill_execute",
-    "write_file"
+    "write_file", "shell_call", "python_runtime", "nodejs_runtime"
   ],
   "description" : "Inspect signing, entitlements, hardened runtime, and Gatekeeper issues for macOS apps. Use when asked to diagnose code signing failures, missing entitlements, sandbox problems, notarization prerequisites, or trust-policy launch errors.",
   "name" : "macos-signing-entitlements",

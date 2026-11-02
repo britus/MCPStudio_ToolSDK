@@ -10,7 +10,6 @@ const httpTools = require('httpTools');
 const checkWithXcode = require('checkWithXcode');
 const clangTools = require('clangTools');
 const shellCall = require('shellCall');
-const skillExecute = require('skill_execute');
 const cmakeBuild = require('cmakeBuild');
 const qmakeBuild = require('qmakeBuild');
 const checkWithGcc = require('checkWithGcc');
@@ -29,7 +28,6 @@ const HANDLERS = {
     clangCompile: clangTools.clangCompile,
     clangMake: clangTools.clangMake,
     shellCall: shellCall.shellCall,
-    skillExecute: skillExecute.skillExecute,
     cmakeBuild: cmakeBuild.cmakeBuild,
     qmakeBuild: qmakeBuild.qmakeBuild,
     checkWithGcc: checkWithGcc.checkWithGcc,
@@ -55,8 +53,6 @@ const HANDLERS = {
     apiRequest: function (params) { return httpTools.httpTools("apiRequest", params); },
     checkStatus: function (params) { return httpTools.httpTools("checkStatus", params); },
     webhookCall: function (params) { return httpTools.httpTools("webhookCall", params); },
-    kimi_search: function (params) { return httpTools.httpTools("kimi_search", params); },
-    kimi_search_pro: function (params) { return httpTools.httpTools("kimi_search_pro", params); }
 };
 
 function getHandler(handlerName) {

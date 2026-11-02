@@ -5,8 +5,7 @@
     "mkdir",
     "read_file",
     "shell_call",
-    "skill_execute",
-    "write_file"
+    "write_file", "shell_call", "python_runtime", "nodejs_runtime"
   ],
   "description" : "Build, run, and test pure SwiftPM-based macOS packages and executables. Use when the repo is package-first, when there is no Xcode project, or when Swift package workflows are the fastest path to diagnosis.",
   "name" : "swiftpm-macos",

@@ -5,9 +5,7 @@
     "list_files",
     "mkdir",
     "read_file",
-    "shell_call",
-    "skill_execute",
-    "write_file"
+    "write_file", "shell_call", "python_runtime", "nodejs_runtime"
   ],
   "description" : "Build, run, and debug local macOS apps and desktop executables using shell-first Xcode and Swift workflows. Use when asked to build a Mac app, launch it, diagnose compiler or linker failures, inspect startup problems, or debug desktop-only runtime issues.",
   "name" : "build-run-debug-xcode",
