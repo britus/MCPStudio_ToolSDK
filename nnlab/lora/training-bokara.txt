@@ -11,7 +11,7 @@ Use only authoritative documents retrieved from the configured RAG collection.
 Treat spelling variants Bokra and BOKRA as retrieval aliases.
 Preserve the spelling used by each authoritative source in factual answers.
 Treat this file as a runtime objective and retrieval specification.
-Do not treat this file as an authoritative schematic or component datasheet.
+Do not treat this file as an authoritative component datasheet.
 Do not invent electrical values, register values, timings, or pin assignments.
 Keep module-level facts separate from integrated-circuit facts.
 Keep transport-specific I2C facts separate from transport-specific SPI facts.
@@ -31,13 +31,12 @@ Retrieve Bokra_Datasheet_I2C_4CH-DI-DO_MCP23008_Ver_1-12.
 Retrieve Bokra_Datasheet_I2C_ADC_8CH-LTC2309_Ver_1-01.pdf.
 Retrieve an authoritative I2C LTC2309 component datasheet when present in RAG.
 Retrieve an authoritative I2C MCP23008/MCP23S08 component datasheet when present in RAG.
-Retrieve module schematics only when available as readable source material.
 Retrieve application notes only when their device applicability is explicit.
 Retrieve I2C/SPI documents for independently documented I2C/SPI hardware and MCP23008/MCP23S08 family-variant context.
 Use exact local file paths returned by RAG.
 Never infer a filesystem path from a document title.
 Deduplicate content-identical document copies by content hash.
-Retain distinct revisions and distinct schematics separately.
+Retain distinct revisions separately.
 Reject unrelated I/O boards as substitutes.
 
 Required subject identifiers
@@ -64,8 +63,6 @@ bokra-i2c-procedures
 
 Conditional subject identifiers
 bokra-revision-differences
-bokra-ltc2309-schematic
-bokra-mcp23008-schematic
 bokra-spi-boundary
 bokra-common-power
 bokra-common-mechanics
@@ -74,7 +71,7 @@ Conditional subjects never block discovery approval or I2C training.
 Cover them only when the selected authoritative sources provide direct evidence.
 Report unresolved conditional subjects as warnings, not as missing required subjects or blockers.
 Automatically generated verification identifiers do not require a dedicated RAG document.
-Treat unavailable revision-comparison and schematic evidence as an unresolved verification warning.
+Treat unavailable revision-comparison as an unresolved verification warning.
 
 Source-to-subject mapping requirements
 Map the 8AI module datasheet to module-level LTC2309 subjects.
@@ -82,7 +79,6 @@ Map a component datasheet only to component-level behavior.
 Map the 4DI+4DO module datasheet to module-level MCP23008 subjects.
 Map MCP23008 interrupt/reset behavior to bokra-mcp23008-interrupt-and-reset only from the
 component datasheet and the module's documented AUX routing.
-Map schematics to connector, jumper, isolation, and circuit subjects.
 Map application notes only to explicitly supported procedures.
 Map transport-neutral MCP23X08 register and GPIO behavior across MCP23008/MCP23S08 variants when
 the selected sources show that the behavior is shared.
@@ -343,8 +339,6 @@ Cover protection components when documented.
 Cover power rails.
 Cover test points when documented.
 Cover dimensions and mounting information.
-Cover schematic signal names exactly.
-Do not infer missing schematic connections.
 
 MCP23008 module overview coverage
 Cover the documented product designation exactly.
@@ -500,7 +494,6 @@ Exclude Related Parts and other product-catalogue chunks from training.
 Deduplicate repeated extracted copies.
 Balance records across the two module families.
 Balance records across primary subjects.
-Do not create synthetic schematics.
 Do not create synthetic register tables.
 Do not place held-out verification questions into training data.
 

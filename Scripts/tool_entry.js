@@ -1,5 +1,5 @@
 // ===================================================================
-// Tool entry main script - FIXED VERSION
+// Tool entry main script
 // ===================================================================
 
 // Import shared functions

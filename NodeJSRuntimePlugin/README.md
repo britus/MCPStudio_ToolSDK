@@ -1,12 +1,12 @@
 # Node.js runtime plugin
 
-`NodeJSRuntimeTool.bundle` is an ABI version 3 MCP Studio custom-tool plugin. It launches a Node.js process from an inline script or an absolute script path and returns a complete MCP tool-result object.
+`NodeJSRuntimeTool.bundle` is an ABI version 4 EoF MCP Studio custom-tool plugin. It launches a Node.js process from an inline script or an absolute script path and returns a complete MCP tool-result object.
 
 ## Requirements
 
 - macOS 15 or newer
 - CMake 3.25 or newer, or Xcode
-- A Node.js executable available at a standard location, on the MCP Studio process `PATH`, or by explicit absolute path
+- A Node.js executable available at a standard location, on the EoF MCP Studio process `PATH`, or by explicit absolute path
 
 ## Build with CMake
 
@@ -38,7 +38,7 @@ xcodebuild \
 
 The Xcode target depends on `ToolJSONBridge` and writes `libToolJSONBridge.dylib` beside the bundle in the Xcode products directory. Keep the library and bundle together so the configured `@loader_path/../../..` rpath can resolve it.
 
-## MCP Studio configuration
+## EoF MCP Studio configuration
 
 Import or adapt `config/Tools/nodejs_runtime.json`. It connects the public `nodejs_runtime` tool to:
 
@@ -128,8 +128,8 @@ Run the capture example through the plugin with:
 
 ## Process behavior
 
-- The child inherits the MCP Studio process environment, overlaid with values from `environment` when used.
+- The child inherits the EoF MCP Studio process environment, overlaid with values from `environment` when used.
 - Changing the child `PATH` does not change which Node.js executable is selected; executable resolution happens first.
 - On timeout the plugin sends normal termination, waits up to two seconds, then sends `SIGKILL` if needed.
 - Non-UTF-8 output is replaced with a diagnostic that reports the byte count.
-- Filesystem and process access remain subject to MCP Studio/plugin permissions and macOS sandbox rules.
+- Filesystem and process access remain subject to EoF MCP Studio/plugin permissions and macOS sandbox rules.
