@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.861Z",
+    "lastModified" : "2026-07-09T10:25:52.290Z",
     "priority" : 0.9
   },
   "description" : "Scrape web page (This tool strip some HTML tags)  from original HTML code.",
@@ -46,5 +46,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "Scrape web page",
   "toolType" : "ScriptTool"
 }

@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.865Z",
+    "lastModified" : "2026-07-09T10:25:52.294Z",
     "priority" : 0.9
   },
   "description" : "Update a contact.",
@@ -81,5 +81,6 @@
   },
   "pluginName" : "",
   "scriptName" : "",
+  "title" : "Update contact",
   "toolType" : "BuiltinTool"
 }

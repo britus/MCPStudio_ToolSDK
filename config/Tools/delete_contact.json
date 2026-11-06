@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.857Z",
+    "lastModified" : "2026-07-09T10:25:52.286Z",
     "priority" : 0.9
   },
   "description" : "Delete a contact.",
@@ -45,5 +45,6 @@
   },
   "pluginName" : "",
   "scriptName" : "",
+  "title" : "Delete contact",
   "toolType" : "BuiltinTool"
 }

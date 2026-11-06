@@ -1,0 +1,674 @@
+{
+  "agents" : [
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Coordinate search-first land border crossing research. Delegate URL's crawl plans, run configured crawler runners, then route outputs to specialists, review, and synthesis. Require URLs, titles, fetch metadata, search provenance, translations, and uncertainty notes.",
+      "logLevel" : "debug",
+      "maxTurns" : 10,
+      "name" : "ResearchCoordinator",
+      "positionX" : 508.5234375,
+      "positionY" : 83.06640625,
+      "properties" : [
+        {
+          "description" : "Output language.",
+          "key" : "outputLanguage",
+          "required" : true,
+          "value" : "Match user language; translate source material as needed.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Research scope.",
+          "key" : "researchScope",
+          "required" : true,
+          "value" : "Current border crossings, disputes, security, stability, search context, official corroboration.",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Shared state keys.",
+          "key" : "sharedProperties",
+          "required" : false,
+          "value" : "azScriptPlan, ruScriptPlan, geScriptPlan, azResult, geResult, ruResult, reviewFindings, finalSummary",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "rootCoordinator",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan Azerbaijan land border crossing status for 2026 crawl with given Python script file name. \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nOutput format:\nJSON\n\nURLs:\nhttps:\/\/bordercrossinghub.com\/tsiteli-red-bridge-shikhly-ii-border-crossing\/\nhttps:\/\/caravanistan.com\/border-crossings\/azerbaijan\/\nhttps:\/\/mfa.gov.az\/en\/news\nhttps:\/\/mfa.gov.az\/en\/category\/announcements\nhttps:\/\/www.migration.gov.az\/en\/\nhttps:\/\/www.gov.uk\/foreign-travel-advice\/azerbaijan\nhttps:\/\/en.apa.az\/\n\nUse the agent properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": <copy from agent property scriptPath>,\n  \"stdinJSON\": {\n    \"country\": \"Azerbaijan\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
+      "logLevel" : "debug",
+      "maxTurns" : 4,
+      "name" : "AzerbaijanScriptPlanner",
+      "positionX" : 173.7572227883454,
+      "positionY" : 196.73794157608697,
+      "properties" : [
+        {
+          "description" : "Input parameter from research coordinator agent.",
+          "key" : "azScriptPlan",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python script to use",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_az_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxBytesPerUrl",
+          "required" : false,
+          "value" : "50000",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Number of subpages to crawl",
+          "key" : "stdinJSON.maxCrawlDepth",
+          "required" : false,
+          "value" : "5",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxLinksPerPage",
+          "required" : false,
+          "value" : "16",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Maximum number of reported web pages.",
+          "key" : "stdinJSON.maxPages",
+          "required" : false,
+          "value" : "24",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxSearchResultsPerPage",
+          "required" : false,
+          "value" : "8",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxTextCharsPerUrl",
+          "required" : false,
+          "value" : "4000",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan Russia\/North Caucasus land border crossing status for 2026 crawl with given Python script file name. \n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nOutput format:\nJSON\n\nURLs:\nhttps:\/\/regionalert.com\/tracker\/upper-lars-border\/\nhttps:\/\/bordercrossinghub.com\/dariali-verkhny-lars-border-crossing\/\nhttps:\/\/mid.ru\/en\/foreign_policy\/news\/\nhttps:\/\/mid.ru\/en\/foreign_policy\/international_safety\/\nhttps:\/\/russiable.com\/russia-borders\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": <copy from agent property scriptPath>,\n  \"stdinJSON\": {\n    \"country\": \"Russia\/North Caucasus\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
+      "logLevel" : "none",
+      "maxTurns" : 4,
+      "name" : "RussiaScriptPlanner",
+      "positionX" : 913.3427734375,
+      "positionY" : 199.208984375,
+      "properties" : [
+        {
+          "description" : "Input parameter from research coordinator agent.",
+          "key" : "ruScriptPlan",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python crawler script to use",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_ru_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxBytesPerUrl",
+          "required" : false,
+          "value" : "50000",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Number of subpages to crawl",
+          "key" : "stdinJSON.maxCrawlDepth",
+          "required" : false,
+          "value" : "5",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxLinksPerPage",
+          "required" : false,
+          "value" : "16",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Maximum number of reported web pages.",
+          "key" : "stdinJSON.maxPages",
+          "required" : false,
+          "value" : "24",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxSearchResultsPerPage",
+          "required" : false,
+          "value" : "8",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxTextCharsPerUrl",
+          "required" : false,
+          "value" : "4000",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Plan Georgia land border crossing status for 2026 crawl with given Python script file name.\n\nCoding Rules:\nPrevent any external third party dependencies. Use only standard Python modules. \n\nImportant and Forbidden:\nfrom bs4 import BeautifulSoup\n\nAvailable tools:\npython_runtime\n\nOutput format:\nJSON\n\nURLs:\nhttps:\/\/mfa.gov.ge\/en\/news\nhttps:\/\/mfa.gov.ge\/en\/statements-by-mfa\nhttps:\/\/bordercrossinghub.com\/tsiteli-red-bridge-shikhly-ii-border-crossing\/\nhttps:\/\/bordercrossinghub.com\/dariali-north-ossetia-alania-republic-border-crossing\/\n\nUse the planner properties. Ignore unrelated navigation, media, social, language, advertising, and institutional boilerplate links. Do not crawl irrelevant links.\n\nReturn only a JSON object with these keys:\n{\n  \"scriptPath\": <copy from agent property scriptPath>,\n  \"stdinJSON\": {\n    \"country\": \"Georgia\",\n    \"urls\": [...],\n    \"searchEngine\": \"bing\",\n    \"searchQueries\": [...],\n    \"maxLinksPerPage\": <copy from agent property stdinJSON.maxLinksPerPage>,\n    \"maxSearchResultsPerPage\": <copy from agent property stdinJSON.maxSearchResultsPerPage>,\n    \"maxBytesPerUrl\": <copy from agent property stdinJSON.maxBytesPerUrl>,\n    \"maxTextCharsPerUrl\": <copy from agent property stdinJSON.maxTextCharsPerUrl>,\n    \"maxPages\": <copy from agent property stdinJSON.maxPages>,\n    \"maxDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"maxCrawlDepth\": <copy from agent property stdinJSON.maxDepth>,\n    \"relevantTerms\": [...]\n  },\n  \"timeoutSeconds\": 120,\n  \"resultMode\": \"capture\"\n}\n",
+      "logLevel" : "none",
+      "maxTurns" : 4,
+      "name" : "GeorgiaScriptPlanner",
+      "positionX" : 506.53645833333326,
+      "positionY" : 303.4111328125,
+      "properties" : [
+        {
+          "description" : "Input parameter from research coordinator agent.",
+          "key" : "geScriptPlan",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Python script to use",
+          "key" : "scriptPath",
+          "required" : false,
+          "value" : "${HOME}\/EoF\/python_crawler\/crawler_ge_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxBytesPerUrl",
+          "required" : false,
+          "value" : "50000",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Number of subpages to crawl",
+          "key" : "stdinJSON.maxCrawlDepth",
+          "required" : false,
+          "value" : "5",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxLinksPerPage",
+          "required" : false,
+          "value" : "16",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Maximum number of reported web pages.",
+          "key" : "stdinJSON.maxPages",
+          "required" : false,
+          "value" : "24",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxSearchResultsPerPage",
+          "required" : false,
+          "value" : "8",
+          "valueType" : "string"
+        },
+        {
+          "description" : "",
+          "key" : "stdinJSON.maxTextCharsPerUrl",
+          "required" : false,
+          "value" : "4000",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "planner",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Use only the bound kimi_search skill and tool. Derive a focused text_query from the incoming plan and coordinator context for current Russia\/North Caucasus land border crossing status in 2026, including Verkhny Lars\/Upper LarsDariali, closures, disputes, security, and official government corroboration. Pass valid kimi_search arguments: text_query, include_content, limit, and timeout_seconds. Request page content when useful for evidence. Do not invoke python_runtime or treat scriptPath\/stdinJSON as executable crawler input. Return the structured search results with the exact query, result titles, URLs, snippets or page content, search provenance, and any errors or limitations. Do not fabricate crawler stdout, stderr, exit codes, fetch metadata, or page visits.",
+      "llmProviderID" : "kimi",
+      "logLevel" : "none",
+      "maxTurns" : 3,
+      "modelName" : "kimi-k2.6",
+      "name" : "RussiaScriptRunnerAgent",
+      "positionX" : 881.0647321428571,
+      "positionY" : 437.3681640625,
+      "properties" : [
+        {
+          "description" : "Include page content when supported; defaults to false.",
+          "key" : "include_content",
+          "required" : false,
+          "value" : "false",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Maximum results from 1 through 20; defaults to 5.",
+          "key" : "limit",
+          "required" : false,
+          "value" : "5",
+          "valueType" : "integer"
+        },
+        {
+          "description" : "Search query text.",
+          "key" : "text_query",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Request timeout from 1 through 60 seconds.",
+          "key" : "timeout_seconds",
+          "required" : false,
+          "value" : "",
+          "valueType" : "integer"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+        "kimi_search"
+      ],
+      "temperature" : 0.1,
+      "toolName" : "kimi_search"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Use only the bound kimi_search skill and tool. Derive a focused text_query from the incoming plan and coordinator context for current Azerbaijan land border crossing status in 2026, including closures, exceptions, disputes, security, and official government or travel-advice corroboration. Pass valid kimi_search arguments: text_query, include_content, limit, and timeout_seconds. Request page content when useful for evidence. Do not invoke python_runtime or treat scriptPath\/stdinJSON as executable crawler input. Return the structured search results with the exact query, result titles, URLs, snippets or page content, search provenance, and any errors or limitations. Do not fabricate crawler stdout, stderr, exit codes, fetch metadata, or page visits.",
+      "llmProviderID" : "kimi",
+      "logLevel" : "debug",
+      "maxTurns" : 3,
+      "modelName" : "kimi-k2.6",
+      "name" : "AzerbaijanScriptRunnerAgent",
+      "positionX" : 172.25326936141303,
+      "positionY" : 459.58203125,
+      "properties" : [
+        {
+          "description" : "Include page content when supported; defaults to false.",
+          "key" : "include_content",
+          "required" : false,
+          "value" : "false",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Maximum results from 1 through 20; defaults to 5.",
+          "key" : "limit",
+          "required" : false,
+          "value" : "5",
+          "valueType" : "integer"
+        },
+        {
+          "description" : "Search query text.",
+          "key" : "text_query",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Request timeout from 1 through 60 seconds.",
+          "key" : "timeout_seconds",
+          "required" : false,
+          "value" : "",
+          "valueType" : "integer"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+        "kimi_search"
+      ],
+      "temperature" : 0.1,
+      "toolName" : "kimi_search"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Use only the bound kimi_search skill and tool. Derive a focused text_query from the incoming plan and coordinator context for current Georgia land border crossing status in 2026, including Red Bridge\/Tsiteli, Dariali\/KazbegiUpper Lars, closures, disputes, security, and official government corroboration. Pass valid kimi_search arguments: text_query, include_content, limit, and timeout_seconds. Request page content when useful for evidence. Do not invoke python_runtime or treat scriptPath\/stdinJSON as executable crawler input. Return the structured search results with the exact query, result titles, URLs, snippets or page content, search provenance, and any errors or limitations. Do not fabricate crawler stdout, stderr, exit codes, fetch metadata, or page visits.",
+      "llmProviderID" : "kimi",
+      "logLevel" : "none",
+      "maxTurns" : 3,
+      "modelName" : "kimi-k2.6",
+      "name" : "GeorgiaScriptRunnerAgent",
+      "positionX" : 558.431640625,
+      "positionY" : 540.9755859375,
+      "properties" : [
+        {
+          "description" : "Include page content when supported; defaults to false.",
+          "key" : "include_content",
+          "required" : false,
+          "value" : "false",
+          "valueType" : "boolean"
+        },
+        {
+          "description" : "Maximum results from 1 through 20; defaults to 5.",
+          "key" : "limit",
+          "required" : false,
+          "value" : "5",
+          "valueType" : "integer"
+        },
+        {
+          "description" : "Search query text.",
+          "key" : "text_query",
+          "required" : true,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Request timeout from 1 through 60 seconds.",
+          "key" : "timeout_seconds",
+          "required" : false,
+          "value" : "",
+          "valueType" : "integer"
+        }
+      ],
+      "role" : "toolRunner",
+      "skillNames" : [
+        "kimi_search"
+      ],
+      "temperature" : 0.1,
+      "toolName" : "kimi_search"
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Analyze Azerbaijan from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return azResult with findings, risks, limits, and uncertainties.",
+      "logLevel" : "debug",
+      "maxTurns" : 6,
+      "name" : "AzerbaijanBorderSpecialist",
+      "positionX" : 169.9873046875,
+      "positionY" : 712.0009765625,
+      "properties" : [
+        {
+          "description" : "Azerbaijan result.",
+          "key" : "azResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Analyze Russia\/North Caucasus from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return ruResult with findings, risks, limits, and uncertainties.",
+      "logLevel" : "none",
+      "maxTurns" : 6,
+      "name" : "RussiaNorthCaucasusSpecialist",
+      "positionX" : 880.302734375,
+      "positionY" : 712.681640625,
+      "properties" : [
+        {
+          "description" : "Russia result.",
+          "key" : "ruResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Analyze Georgia from Python crawler stdout JSON. Audit searchResultLinks, selectedLinks, pagesFetched, sourcePageText, seed URLs, fetch metadata, stderr\/exit status, and relevance. Translate evidence as needed. Return geResult with findings, risks, limits, and uncertainties.",
+      "logLevel" : "none",
+      "maxTurns" : 6,
+      "name" : "GeorgiaBorderSpecialist",
+      "positionX" : 579.95703125,
+      "positionY" : 763.6982421875,
+      "properties" : [
+        {
+          "description" : "Georgia result.",
+          "key" : "geResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "specialist",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.3,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Synthesize reviewed findings in the user language. Cover border status, disputes, security dynamics, evidence, URLs\/queries used, source gaps, and uncertainties. Produce finalSummary.",
+      "logLevel" : "none",
+      "maxTurns" : 5,
+      "name" : "FinalReportSynthesizer",
+      "positionX" : 175.1494140625,
+      "positionY" : 993.146484375,
+      "properties" : [
+        {
+          "description" : "Final report.",
+          "key" : "finalSummary",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Review result.",
+          "key" : "reviewFindings",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "synthesizer",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.2,
+      "toolName" : ""
+    },
+    {
+      "executionMode" : "llmInstruction",
+      "instruction" : "Review country findings for accuracy, attribution, search provenance, execution evidence, translation, gaps, and uncertainty. Produce reviewFindings.",
+      "logLevel" : "debug",
+      "maxTurns" : 4,
+      "name" : "BorderAnalysisReviewer",
+      "positionX" : 580.8932291666667,
+      "positionY" : 1059.6897786458333,
+      "properties" : [
+        {
+          "description" : "Azerbaijan result.",
+          "key" : "azResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Georgia result.",
+          "key" : "geResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Review result.",
+          "key" : "reviewFindings",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Russia result.",
+          "key" : "ruResult",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        }
+      ],
+      "role" : "reviewer",
+      "skillNames" : [
+
+      ],
+      "temperature" : 0.1,
+      "toolName" : ""
+    }
+  ],
+  "connections" : [
+    {
+      "artifactPolicy" : "pass",
+      "condition" : "Python runtime output is available or failed with diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Analyze Azerbaijan",
+      "sharedStateKeys" : "azResult",
+      "source" : "AzerbaijanScriptRunnerAgent",
+      "target" : "AzerbaijanBorderSpecialist"
+    },
+    {
+      "artifactPolicy" : "pass",
+      "condition" : "Python runtime output is available or failed with diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Analyze Georgia",
+      "sharedStateKeys" : "geResult",
+      "source" : "GeorgiaScriptRunnerAgent",
+      "target" : "GeorgiaBorderSpecialist"
+    },
+    {
+      "artifactPolicy" : "pass",
+      "condition" : "Python runtime output is available or failed with diagnostics.",
+      "kind" : "artifactFlow",
+      "label" : "Analyze Russia\/North Caucasus",
+      "sharedStateKeys" : "ruResult",
+      "source" : "RussiaScriptRunnerAgent",
+      "target" : "RussiaNorthCaucasusSpecialist"
+    },
+    {
+      "artifactPolicy" : "pass",
+      "condition" : "Start of research task.",
+      "kind" : "delegation",
+      "label" : "Plan Azerbaijan",
+      "sharedStateKeys" : "azScriptPlan",
+      "source" : "ResearchCoordinator",
+      "target" : "AzerbaijanScriptPlanner"
+    },
+    {
+      "artifactPolicy" : "pass",
+      "condition" : "Start of research task.",
+      "kind" : "delegation",
+      "label" : "Plan Georgia",
+      "sharedStateKeys" : "geScriptPlan",
+      "source" : "ResearchCoordinator",
+      "target" : "GeorgiaScriptPlanner"
+    },
+    {
+      "artifactPolicy" : "pass",
+      "condition" : "Start of research task.",
+      "kind" : "delegation",
+      "label" : "Plan Russia\/North Caucasus",
+      "sharedStateKeys" : "ruScriptPlan",
+      "source" : "ResearchCoordinator",
+      "target" : "RussiaScriptPlanner"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "if output format is JSON",
+      "kind" : "artifactFlow",
+      "label" : "Run Azerbaijan Python script",
+      "sharedStateKeys" : "stdinJSON",
+      "source" : "AzerbaijanScriptPlanner",
+      "target" : "AzerbaijanScriptRunnerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "if output format is JSON",
+      "kind" : "artifactFlow",
+      "label" : "Run Georgia Python Script",
+      "sharedStateKeys" : "stdinJSON",
+      "source" : "GeorgiaScriptPlanner",
+      "target" : "GeorgiaScriptRunnerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-override",
+      "condition" : "if output format is JSON",
+      "kind" : "artifactFlow",
+      "label" : "Run Russia Python Script",
+      "sharedStateKeys" : "stdinJSON",
+      "source" : "RussiaScriptPlanner",
+      "target" : "RussiaScriptRunnerAgent"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Country result is available.",
+      "kind" : "artifactFlow",
+      "label" : "Send Azerbaijan result",
+      "sharedStateKeys" : "azResult",
+      "source" : "AzerbaijanBorderSpecialist",
+      "target" : "BorderAnalysisReviewer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Country result is available.",
+      "kind" : "artifactFlow",
+      "label" : "Send Georgia result",
+      "sharedStateKeys" : "geResult",
+      "source" : "GeorgiaBorderSpecialist",
+      "target" : "BorderAnalysisReviewer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Country result is available.",
+      "kind" : "artifactFlow",
+      "label" : "Send Russia result",
+      "sharedStateKeys" : "ruResult",
+      "source" : "RussiaNorthCaucasusSpecialist",
+      "target" : "BorderAnalysisReviewer"
+    },
+    {
+      "artifactPolicy" : "pass-latest",
+      "condition" : "Reviewer output is available.",
+      "kind" : "handoff",
+      "label" : "Synthesize final report",
+      "sharedStateKeys" : "reviewFindings, finalSummary",
+      "source" : "BorderAnalysisReviewer",
+      "target" : "FinalReportSynthesizer"
+    }
+  ],
+  "goal" : "Collect current border evidence with search-first Python runners, LLM relevance review, source attribution, translations, uncertainty notes, and final analysis for Azerbaijan, Georgia, and Russia\/North Caucasus.",
+  "name" : "Border Crossing Research with Python Runners",
+  "pattern" : "coordinator",
+  "summary" : "Search-first border research workflow with one-URL planners, Python crawlers, specialist analysis, review, and synthesis.",
+  "systemInstruction" : "Use one-URL planner agents for auditable crawl plans. Runner agents execute only configured python_runtime inputs. Preserve source URLs, titles, search provenance, stdout\/stderr\/exit metadata, translations, and uncertainties. Do not use Markdown tables as a design element in the final report."
+}

@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.859Z",
+    "lastModified" : "2026-07-09T10:25:52.288Z",
     "priority" : 0.9
   },
   "description" : "Delete a file.",
@@ -49,5 +49,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "Delete file",
   "toolType" : "ScriptTool"
 }

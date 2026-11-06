@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.853Z",
+    "lastModified" : "2026-07-09T10:25:52.284Z",
     "priority" : 0.9
   },
   "description" : "Inspect the available GCC toolchain and report its capabilities.",
@@ -56,5 +56,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "Check with GCC",
   "toolType" : "ScriptTool"
 }

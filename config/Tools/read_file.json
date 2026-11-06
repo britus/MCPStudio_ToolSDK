@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.861Z",
+    "lastModified" : "2026-07-09T10:25:52.290Z",
     "priority" : 0.9
   },
   "description" : "Read a file from local file system",
@@ -13,7 +13,7 @@
   "inputSchema" : {
     "properties" : {
       "file_path" : {
-        "description" : "Absolute or relative path to file to read",
+        "description" : "Absolute or relative path, or local file URL, to the file to read",
         "name" : "file_path",
         "type" : "string"
       }
@@ -70,5 +70,6 @@
   },
   "pluginName" : "",
   "scriptName" : "",
+  "title" : "Read file",
   "toolType" : "BuiltinTool"
 }

@@ -4,10 +4,10 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.856Z",
+    "lastModified" : "2026-07-09T10:25:52.286Z",
     "priority" : 0.9
   },
-  "description" : "Write\/Saves content to a file on local file system",
+  "description" : "Writes content to a file on the local file system and creates missing parent directories",
   "execHandler" : "FileResourceHandler",
   "execMethod" : "writeFile",
   "inputSchema" : {
@@ -18,7 +18,7 @@
         "type" : "string"
       },
       "file_path" : {
-        "description" : "Absolute or relative path to the file",
+        "description" : "Absolute or relative path, or local file URL, to the file",
         "name" : "file_path",
         "type" : "string"
       }
@@ -67,5 +67,6 @@
   },
   "pluginName" : "",
   "scriptName" : "",
+  "title" : "Write file",
   "toolType" : "BuiltinTool"
 }

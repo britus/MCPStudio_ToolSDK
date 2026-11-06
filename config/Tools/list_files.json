@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.862Z",
+    "lastModified" : "2026-07-09T10:25:52.291Z",
     "priority" : 0.9
   },
   "description" : "Lists all files in the specified directory using a string list of file extensions (i.e. „.cpp“ or „.js“)",
@@ -21,18 +21,17 @@
         "type" : "array"
       },
       "project_path" : {
-        "description" : "Path to the project directory",
+        "description" : "Path or local file URL to the project directory",
         "name" : "project_path",
         "type" : "string"
       },
       "recursive" : {
-        "defaultValue" : "false",
+        "defaultValue" : "true",
         "description" : "Boolean parameter to enable recursive traversal of the directory tree. Set the value 'false' to list the contents of the directory or the value 'true' to include subdirectories.",
         "name" : "recursive",
         "type" : "boolean"
       },
       "sort" : {
-        "defaultValue" : "name",
         "description" : "Sort by name, date, size",
         "name" : "sort",
         "type" : "string"
@@ -93,5 +92,6 @@
   },
   "pluginName" : "",
   "scriptName" : "",
+  "title" : "List files",
   "toolType" : "BuiltinTool"
 }

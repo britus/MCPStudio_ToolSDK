@@ -1,13 +1,15 @@
 {
   "allowedToolNames" : [
-    "shell_call", "python_runtime", "nodejs_runtime"
+    "shell_call",
+    "python_runtime",
+    "nodejs_runtime"
   ],
   "description" : "Runs standard make in a selected project directory.",
   "modelPreferences" : {
 
   },
   "name" : "make-standard-build",
-  "promptTemplate" : "Run the complete Bash script with `shell_call` using its `command` parameter (example: `{ \"command\": \"<complete Bash script>\", \"shell\": \"/bin/bash\" }`). First check runtime availability with `shell_call` and `command -v node || true; command -v python3 || true`. Use `shell_call` for these native build and compiler commands. For a Node.js helper, use `nodejs_runtime` with `{ \"inlineScript\": \"...\", \"workingDirectory\": \"...\", \"timeoutSeconds\": 60 }`; for Python use `python_runtime` with `{ \"inlineScript\": \"...\", \"workingDirectory\": \"...\", \"timeoutSeconds\": 60 }`. Use `{{project_directory}}` as the directory containing the Makefile.\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPROJECT_DIR=\"{{project_directory}}\"\n[ -n \"$PROJECT_DIR\" ] && [ \"$PROJECT_DIR\" != \"{{project_directory}}\" ] || { echo \"Missing project_directory\" >&2; exit 1; }\ncd \"$PROJECT_DIR\"\nmake -j\"$(sysctl -n hw.ncpu 2>/dev/null || echo 4)\"\n```\n\nReturn the make output.",
+  "promptTemplate" : "Run the complete Bash script with `shell_call` using its `command` parameter (example: `{ \"command\": \"<complete Bash script>\", \"shell\": \"\/bin\/bash\" }`). First check runtime availability with `shell_call` and `command -v node || true; command -v python3 || true`. Use `shell_call` for these native build and compiler commands. For a Node.js helper, use `nodejs_runtime` with `{ \"inlineScript\": \"...\", \"workingDirectory\": \"...\", \"timeoutSeconds\": 60 }`; for Python use `python_runtime` with `{ \"inlineScript\": \"...\", \"workingDirectory\": \"...\", \"timeoutSeconds\": 60 }`. Use `{{project_directory}}` as the directory containing the Makefile.\n\n```bash\n#!\/usr\/bin\/env bash\nset -euo pipefail\nPROJECT_DIR=\"{{project_directory}}\"\n[ -n \"$PROJECT_DIR\" ] && [ \"$PROJECT_DIR\" != \"{{project_directory}}\" ] || { echo \"Missing project_directory\" >&2; exit 1; }\ncd \"$PROJECT_DIR\"\nmake -j\"$(sysctl -n hw.ncpu 2>\/dev\/null || echo 4)\"\n```\n\nReturn the make output.",
   "resourceNames" : [
 
   ],

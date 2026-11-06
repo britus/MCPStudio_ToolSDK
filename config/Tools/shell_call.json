@@ -26,7 +26,7 @@
         "type" : "array"
       },
       "shell" : {
-        "description" : "Optional absolute path to the shell interpreter. Defaults to /bin/zsh, then /bin/bash.",
+        "description" : "Optional absolute path to the shell interpreter. Defaults to \/bin\/zsh, then \/bin\/bash.",
         "name" : "shell",
         "type" : "string"
       }
@@ -62,5 +62,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "Shell call",
   "toolType" : "ScriptTool"
 }

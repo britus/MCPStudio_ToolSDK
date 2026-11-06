@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.859Z",
+    "lastModified" : "2026-07-09T10:25:52.287Z",
     "priority" : 0.9
   },
   "description" : "Create a calendar event.",
@@ -77,5 +77,6 @@
   },
   "pluginName" : "",
   "scriptName" : "",
+  "title" : "Create event",
   "toolType" : "BuiltinTool"
 }

@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.862Z",
+    "lastModified" : "2026-07-09T10:25:52.291Z",
     "priority" : 0.9
   },
   "description" : "Post any JSON code to web site or web service using specified ‚url‘ parameter and json code ‚data‘ parameter",
@@ -58,5 +58,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "HTTP(S) POST Method",
   "toolType" : "ScriptTool"
 }

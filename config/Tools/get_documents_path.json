@@ -4,10 +4,10 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.852Z",
+    "lastModified" : "2026-07-09T10:25:52.283Z",
     "priority" : 0.9
   },
-  "description" : "Return the MCPStudio documents directory path.",
+  "description" : "Return the EoF MCP Studio documents directory path.",
   "execHandler" : "getDocumentsPath",
   "execMethod" : "toolEntry",
   "inputSchema" : {
@@ -42,5 +42,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "Get document path",
   "toolType" : "ScriptTool"
 }

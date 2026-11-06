@@ -4,7 +4,7 @@
       "user",
       "assistant"
     ],
-    "lastModified" : "2026-08-22T14:51:12.862Z",
+    "lastModified" : "2026-07-09T10:25:52.291Z",
     "priority" : 0.9
   },
   "description" : "Builds an Xcode project with xcodebuild and reports whether the build is valid. Returns compiler and linker errors when the build fails.",
@@ -119,5 +119,6 @@
   },
   "pluginName" : "",
   "scriptName" : "${TOOLSDK}\/Scripts\/tool_entry.js",
+  "title" : "Build with Xcode",
   "toolType" : "ScriptTool"
 }

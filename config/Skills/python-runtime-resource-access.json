@@ -6,7 +6,8 @@
     "list_files",
     "mkdir",
     "read_file",
-    "write_file", "python_runtime"
+    "write_file",
+    "python_runtime"
   ],
   "description" : "Guides the assistant in using the Python runtime tool for Python automation and careful local or remote resource access.",
   "modelPreferences" : {
