@@ -258,43 +258,85 @@
       "toolName" : ""
     },
     {
-      "executionMode" : "llmInstruction",
+      "executionMode" : "mcpTool",
       "instruction" : "Use only the bound kimi_search skill and tool. Derive a focused text_query from the incoming plan and coordinator context for current Russia\/North Caucasus land border crossing status in 2026, including Verkhny Lars\/Upper LarsDariali, closures, disputes, security, and official government corroboration. Pass valid kimi_search arguments: text_query, include_content, limit, and timeout_seconds. Request page content when useful for evidence. Do not invoke python_runtime or treat scriptPath\/stdinJSON as executable crawler input. Return the structured search results with the exact query, result titles, URLs, snippets or page content, search provenance, and any errors or limitations. Do not fabricate crawler stdout, stderr, exit codes, fetch metadata, or page visits.",
       "llmProviderID" : "kimi",
       "logLevel" : "none",
       "maxTurns" : 3,
-      "modelName" : "kimi-k2.6",
+      "modelName" : "kimi-k2.7-code",
       "name" : "RussiaScriptRunnerAgent",
-      "positionX" : 881.0647321428571,
-      "positionY" : 437.3681640625,
+      "positionX" : 881.5022321428571,
+      "positionY" : 437.2431640625,
       "properties" : [
         {
-          "description" : "Include page content when supported; defaults to false.",
-          "key" : "include_content",
+          "description" : "Optional string environment variables for the Python child process. PATH does not control executable resolution.",
+          "key" : "environment",
           "required" : false,
-          "value" : "false",
-          "valueType" : "boolean"
+          "value" : "",
+          "valueType" : "object"
         },
         {
-          "description" : "Maximum results from 1 through 20; defaults to 5.",
-          "key" : "limit",
+          "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
+          "key" : "inlineScript",
           "required" : false,
-          "value" : "5",
-          "valueType" : "integer"
-        },
-        {
-          "description" : "Search query text.",
-          "key" : "text_query",
-          "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Request timeout from 1 through 60 seconds.",
-          "key" : "timeout_seconds",
+          "description" : "Optional absolute path to the Python executable, or 'python'\/'python3' to resolve from trusted host locations.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "\/opt\/homebrew\/bin\/python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Result handling mode. Use 'capture' to return stdout\/stderr automatically, or 'toolResultJSON' to parse stdout as a complete MCP tool result JSON object.",
+          "key" : "resultMode",
           "required" : false,
           "value" : "",
-          "valueType" : "integer"
+          "valueType" : "string"
+        },
+        {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Absolute path to a Python file to execute. Use this or inlineScript.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "${TOOLSDK}\/crawler\/crawler_ru_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional JSON object passed to the Python process via stdin.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Maximum execution time in seconds. Defaults to 60 and is capped at 600.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Optional existing absolute working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "${TOOLSDK}\/crawler",
+          "valueType" : "string"
         }
       ],
       "role" : "toolRunner",
@@ -302,46 +344,88 @@
         "kimi_search"
       ],
       "temperature" : 0.1,
-      "toolName" : "kimi_search"
+      "toolName" : "python_runtime"
     },
     {
-      "executionMode" : "llmInstruction",
+      "executionMode" : "mcpTool",
       "instruction" : "Use only the bound kimi_search skill and tool. Derive a focused text_query from the incoming plan and coordinator context for current Azerbaijan land border crossing status in 2026, including closures, exceptions, disputes, security, and official government or travel-advice corroboration. Pass valid kimi_search arguments: text_query, include_content, limit, and timeout_seconds. Request page content when useful for evidence. Do not invoke python_runtime or treat scriptPath\/stdinJSON as executable crawler input. Return the structured search results with the exact query, result titles, URLs, snippets or page content, search provenance, and any errors or limitations. Do not fabricate crawler stdout, stderr, exit codes, fetch metadata, or page visits.",
       "llmProviderID" : "kimi",
       "logLevel" : "debug",
       "maxTurns" : 3,
-      "modelName" : "kimi-k2.6",
+      "modelName" : "kimi-k2.7-code",
       "name" : "AzerbaijanScriptRunnerAgent",
       "positionX" : 172.25326936141303,
-      "positionY" : 459.58203125,
+      "positionY" : 459.45703125,
       "properties" : [
         {
-          "description" : "Include page content when supported; defaults to false.",
-          "key" : "include_content",
+          "description" : "Optional string environment variables for the Python child process. PATH does not control executable resolution.",
+          "key" : "environment",
           "required" : false,
-          "value" : "false",
-          "valueType" : "boolean"
+          "value" : "",
+          "valueType" : "object"
         },
         {
-          "description" : "Maximum results from 1 through 20; defaults to 5.",
-          "key" : "limit",
+          "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
+          "key" : "inlineScript",
           "required" : false,
-          "value" : "5",
-          "valueType" : "integer"
-        },
-        {
-          "description" : "Search query text.",
-          "key" : "text_query",
-          "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Request timeout from 1 through 60 seconds.",
-          "key" : "timeout_seconds",
+          "description" : "Optional absolute path to the Python executable, or 'python'\/'python3' to resolve from trusted host locations.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "\/opt\/homebrew\/bin\/python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Result handling mode. Use 'capture' to return stdout\/stderr automatically, or 'toolResultJSON' to parse stdout as a complete MCP tool result JSON object.",
+          "key" : "resultMode",
           "required" : false,
           "value" : "",
-          "valueType" : "integer"
+          "valueType" : "string"
+        },
+        {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Absolute path to a Python file to execute. Use this or inlineScript.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "${TOOLSDK}\/crawler\/crawler_az_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional JSON object passed to the Python process via stdin.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Maximum execution time in seconds. Defaults to 60 and is capped at 600.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Optional existing absolute working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "${TOOLSDK}\/crawler",
+          "valueType" : "string"
         }
       ],
       "role" : "toolRunner",
@@ -349,46 +433,88 @@
         "kimi_search"
       ],
       "temperature" : 0.1,
-      "toolName" : "kimi_search"
+      "toolName" : "python_runtime"
     },
     {
-      "executionMode" : "llmInstruction",
+      "executionMode" : "mcpTool",
       "instruction" : "Use only the bound kimi_search skill and tool. Derive a focused text_query from the incoming plan and coordinator context for current Georgia land border crossing status in 2026, including Red Bridge\/Tsiteli, Dariali\/KazbegiUpper Lars, closures, disputes, security, and official government corroboration. Pass valid kimi_search arguments: text_query, include_content, limit, and timeout_seconds. Request page content when useful for evidence. Do not invoke python_runtime or treat scriptPath\/stdinJSON as executable crawler input. Return the structured search results with the exact query, result titles, URLs, snippets or page content, search provenance, and any errors or limitations. Do not fabricate crawler stdout, stderr, exit codes, fetch metadata, or page visits.",
       "llmProviderID" : "kimi",
       "logLevel" : "none",
       "maxTurns" : 3,
-      "modelName" : "kimi-k2.6",
+      "modelName" : "kimi-k2.7-code",
       "name" : "GeorgiaScriptRunnerAgent",
-      "positionX" : 558.431640625,
+      "positionX" : 558.666015625,
       "positionY" : 540.9755859375,
       "properties" : [
         {
-          "description" : "Include page content when supported; defaults to false.",
-          "key" : "include_content",
+          "description" : "Optional string environment variables for the Python child process. PATH does not control executable resolution.",
+          "key" : "environment",
           "required" : false,
-          "value" : "false",
-          "valueType" : "boolean"
+          "value" : "",
+          "valueType" : "object"
         },
         {
-          "description" : "Maximum results from 1 through 20; defaults to 5.",
-          "key" : "limit",
+          "description" : "Python source code to execute with Python 3. Use this or scriptPath.",
+          "key" : "inlineScript",
           "required" : false,
-          "value" : "5",
-          "valueType" : "integer"
-        },
-        {
-          "description" : "Search query text.",
-          "key" : "text_query",
-          "required" : true,
           "value" : "",
           "valueType" : "string"
         },
         {
-          "description" : "Request timeout from 1 through 60 seconds.",
-          "key" : "timeout_seconds",
+          "description" : "Optional absolute path to the Python executable, or 'python'\/'python3' to resolve from trusted host locations.",
+          "key" : "pythonExecutable",
+          "required" : false,
+          "value" : "\/opt\/homebrew\/bin\/python3",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Result handling mode. Use 'capture' to return stdout\/stderr automatically, or 'toolResultJSON' to parse stdout as a complete MCP tool result JSON object.",
+          "key" : "resultMode",
           "required" : false,
           "value" : "",
-          "valueType" : "integer"
+          "valueType" : "string"
+        },
+        {
+          "description" : "Arguments passed to the Python script.",
+          "key" : "scriptArguments",
+          "required" : false,
+          "value" : "",
+          "valueType" : "array"
+        },
+        {
+          "description" : "Absolute path to a Python file to execute. Use this or inlineScript.",
+          "key" : "scriptPath",
+          "required" : true,
+          "value" : "${TOOLSDK}\/crawler\/crawler_ge_border_status.py",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional text passed to the Python process via stdin.",
+          "key" : "stdin",
+          "required" : false,
+          "value" : "",
+          "valueType" : "string"
+        },
+        {
+          "description" : "Optional JSON object passed to the Python process via stdin.",
+          "key" : "stdinJSON",
+          "required" : true,
+          "value" : "",
+          "valueType" : "object"
+        },
+        {
+          "description" : "Maximum execution time in seconds. Defaults to 60 and is capped at 600.",
+          "key" : "timeoutSeconds",
+          "required" : false,
+          "value" : "",
+          "valueType" : "number"
+        },
+        {
+          "description" : "Optional existing absolute working directory for the Python process.",
+          "key" : "workingDirectory",
+          "required" : false,
+          "value" : "${TOOLSDK}\/crawler",
+          "valueType" : "string"
         }
       ],
       "role" : "toolRunner",
@@ -396,7 +522,7 @@
         "kimi_search"
       ],
       "temperature" : 0.1,
-      "toolName" : "kimi_search"
+      "toolName" : "python_runtime"
     },
     {
       "executionMode" : "llmInstruction",
