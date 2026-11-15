@@ -143,12 +143,6 @@ function httpTools(handlerName, params) {
             case "webhookCall":
                 return webhookCall(params);
 
-            case "kimi_search":
-                return kimi_search(params);
-
-            case "kimi_search_pro":
-                return kimi_search_pro(params);
-
             default:
                 return shared.error("Unknown handler: " + handlerName);
         }
