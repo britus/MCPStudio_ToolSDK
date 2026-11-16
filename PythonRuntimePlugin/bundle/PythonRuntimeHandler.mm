@@ -9,6 +9,7 @@
 #import "RuntimeHostServices.h"
 #import "ToolJSONBridge.h"
 
+//NOTE!!: Update in EoF MCP Studio LocalProcessExecutor and LaunchAgent
 static const NSUInteger PythonRuntimeMaxOutputBytes = 64 * 1024 * 1024;
 
 @implementation PythonRuntimeHandler
