@@ -9,7 +9,7 @@
 #import "RuntimeHostServices.h"
 #import "ToolJSONBridge.h"
 
-static const NSUInteger PythonRuntimeMaxOutputBytes = 10 * 1024 * 1024;
+static const NSUInteger PythonRuntimeMaxOutputBytes = 64 * 1024 * 1024;
 
 @implementation PythonRuntimeHandler
 
@@ -293,9 +293,14 @@ static const NSUInteger PythonRuntimeMaxOutputBytes = 10 * 1024 * 1024;
     NSData *stderrData = [[NSData alloc] initWithBase64EncodedString:[self stringValue:result[@"standardError"]] ?: @"" options:0];
     NSString *terminationReason = [self stringValue:result[@"terminationReason"]] ?: @"launchFailed";
     NSNumber *exitCode = [result[@"exitCode"] isKindOfClass:[NSNumber class]] ? result[@"exitCode"] : @(-1);
+
     BOOL timedOut = [terminationReason isEqualToString:@"timedOut"];
-    BOOL outputLimitExceeded = [terminationReason isEqualToString:@"outputLimitExceeded"] || [result[@"outputTruncated"] boolValue];
     BOOL success = [terminationReason isEqualToString:@"exited"] && exitCode.integerValue == 0;
+    BOOL outputLimitExceeded = [terminationReason isEqualToString:@"outputLimitExceeded"] || [result[@"outputTruncated"] boolValue];
+    
+    if (exitCode.integerValue == 0 && !success) {
+        exitCode = @(-1);
+    }
 
     return @{
         @"success": @(success),
