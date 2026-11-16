@@ -5,6 +5,12 @@
 # EoF MCP Studio ToolSDK Packager
 .toolsdk.package.chksum
 
+# release build script
+build-release.sh
+
+# release build script
+build-release.sh
+
 #nnlab
 **/artifacts/
 **/data/
